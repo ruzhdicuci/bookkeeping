@@ -131,7 +131,7 @@ backend.delete('/api/entries/:id', auth, async (req, res) => {
 
 // Start Express
 backend.listen(3210, () => {
-  console.log('✅ API running on http://localhost:3210');
+  console.log('✅ API running on https://bookkeeping-i8e0.onrender.com');
 });
 
 // --- Electron Window ---
