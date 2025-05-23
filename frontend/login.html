@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login - Bookkeeping</title>
+  <style>
+ body { font-family: sans-serif; max-width: 300px; margin: 40px auto;
+background-color: rgb(38, 36, 36);
+ padding-left: 40px;}
+    label, input, select, button { 
+      display: block; 
+      margin: 1rem 0; 
+      font-size: 1rem;  
+
+    }
+
+      select { 
+     border: 1px solid #e1e1e1; 
+       padding: 8px 8px; 
+    }
+
+
+input { 
+ border: 1px solid #e1e1e1; 
+ padding: 8px 8px; 
+    }
+
+ button { 
+ background-color: rgb(209, 12, 12);
+ color: white;
+ border: 1px solid rgb(209, 12, 12);
+ padding: 8px 16px;
+border-radius: 10px; 
+    }
+ button:hover { 
+ background-color: white;
+ color:  rgb(209, 12, 12);
+
+    }
+
+    #b1 { 
+ border: 1px solid blue;
+ padding: 8px 16px; 
+ background-color: blue;
+ color: white;
+border-radius: 10px; 
+    }
+
+
+    #b1:hover { 
+
+ background-color: white;
+ color: blue;
+
+    }
+
+
+    .box { 
+      border: 1px solid #e1e1e1; 
+      padding: 1rem; 
+      margin-bottom:     2rem; 
+        padding-left:   15%; 
+      background: white; 
+    align-items: center;
+   
+
+    }
+      
+
+    /* width */
+::-webkit-scrollbar {
+  overflow: hidden;
+   width: 20px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    overflow: hidden;
+ width: 20px;
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+overflow: hidden;
+  width: 20px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: black; 
+  width: 20px;
+}
+
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>🔐 Login</h2>
+    <form id="loginForm">
+      <label for="loginUserSelect">User</label>
+      <select id="loginUserSelect"></select>
+
+      <label for="loginPassword">Password</label>
+      <input type="password" id="loginPassword" placeholder="Password" required />
+
+      <button id="b1" type="submit">Login</button>
+    </form>
+  </div>
+
+  <div class="box">
+    <h2>🆕 Register</h2>
+    <form id="registerForm">
+      <label for="registerEmail">Email</label>
+      <input type="text" id="registerEmail" placeholder="New user email" />
+
+      <label for="registerPassword">Password</label>
+      <input type="password" id="registerPassword" placeholder="Password" />
+
+      <button type="submit">Register</button>
+    </form>
+  </div>
+
+  <script src="login.js"></script>
+</body>
+</html>
