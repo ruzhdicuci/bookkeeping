@@ -47,7 +47,7 @@ let entries = [];
 
 // ✅ Corrected fetchEntries with dynamic person/bank dropdown population
 async function fetchEntries() {
-  const res = await fetch('http://localhost:3210/api/entries', {
+  const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
     headers: { Authorization: `Bearer ${token}` }
   });
   entries = await res.json();
@@ -226,7 +226,7 @@ async function saveEdit(row) {
     updated[field] = field === 'amount' ? parseFloat(cell.textContent) : cell.textContent.trim();
   });
 
-  await fetch(`http://localhost:3210/api/entries/${id}`, {
+  await fetch(`https://bookkeeping-i8e0.onrender.com/api/entries/${id}`, {
     method: 'PUT',
     headers: {
       Authorization: `Bearer ${token}`,
@@ -239,7 +239,7 @@ async function saveEdit(row) {
 }
 
 async function deleteEntry(id) {
-  await fetch(`http://localhost:3210/api/entries/${id}`, {
+  await fetch(`https://bookkeeping-i8e0.onrender.com/api/entries/${id}`, {
     method: 'DELETE',
     headers: { Authorization: `Bearer ${token}` }
   });
@@ -308,7 +308,7 @@ document.getElementById('importCSV').addEventListener('change', async (e) => {
       bank: row[6]
     };
 
-    await fetch('http://localhost:3210/api/entries', {
+    await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -377,7 +377,7 @@ function exportCombinedCSV() {
 async function deleteAllEntries() {
   if (!confirm("Are you sure you want to delete all entries?")) return;
 
-  const res = await fetch('http://localhost:3210/api/entries/delete-all', {
+  const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries/delete-all', {
     method: 'DELETE',
     headers: { Authorization: `Bearer ${token}` }
   });
@@ -403,7 +403,7 @@ document.getElementById('entryForm').addEventListener('submit', async (e) => {
     bank: document.getElementById('newBank').value,
   };
 
-  await fetch('http://localhost:3210/api/entries', {
+  await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,
@@ -550,7 +550,7 @@ function restoreBackup(e) {
       for (const entry of data.entries) {
         if (entry._id) delete entry._id; // 🧼 Remove _id to avoid MongoDB duplicate error
 
-        await fetch('http://localhost:3210/api/entries', {
+        await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${token}`,
@@ -575,7 +575,7 @@ function restoreBackup(e) {
 
 // Fetch and populate login dropdown with registered users
 async function populateLoginUserDropdown() {
-  const res = await fetch('http://localhost:3210/api/users');
+  const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/users');
   const users = await res.json();
 
   const loginSelect = document.getElementById('loginUserSelect');
@@ -589,7 +589,7 @@ async function populateLoginUserDropdown() {
 
 // Fetch and populate login dropdown with registered users
 async function populateLoginUserDropdown() {
-  const res = await fetch('http://localhost:3210/api/users');
+  const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/users');
   const users = await res.json();
 
   const loginSelect = document.getElementById('loginUserSelect');
@@ -606,7 +606,7 @@ async function loginWithSelectedUser() {
   const email = document.getElementById('loginUserSelect').value;
   const password = document.getElementById('loginPassword').value;
 
-  const res = await fetch('http://localhost:3210/api/login', {
+  const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password })
@@ -661,7 +661,7 @@ function openUserManager() {
 }
 // Show clean user manager modal (with delete and change PW only)
 async function showUserManagerModal() {
-  const res = await fetch('http://localhost:3210/api/users');
+  const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/users');
   const users = await res.json();
 
   const currentUser = localStorage.getItem('currentUser') || 'default';
@@ -695,7 +695,7 @@ function closeModal() {
 }
 
 function deleteUser(email) {
-  fetch(`http://localhost:3210/api/users/${encodeURIComponent(email)}`, {
+  fetch(`https://bookkeeping-i8e0.onrender.com/api/users/${encodeURIComponent(email)}`, {
     method: 'DELETE'
   })
     .then(res => res.json())
@@ -711,7 +711,7 @@ function showChangePassword(email) {
   const newPassword = prompt(`Set new password for ${email}:`);
   if (!newPassword) return;
 
-  fetch(`http://localhost:3210/api/users/${encodeURIComponent(email)}/password`, {
+  fetch(`https://bookkeeping-i8e0.onrender.com/api/users/${encodeURIComponent(email)}/password`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ password: newPassword })
@@ -726,7 +726,7 @@ function showChangePassword(user) {
   const newPassword = prompt(`Set new password for ${user}:`);
   if (!newPassword) return;
 
-  fetch(`http://localhost:3210/api/users/${encodeURIComponent(user)}/password`, {
+  fetch(`https://bookkeeping-i8e0.onrender.com/api/users/${encodeURIComponent(user)}/password`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ password: newPassword })

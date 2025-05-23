@@ -5,7 +5,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   const email = document.getElementById('loginUserSelect').value; // 👈 this was 'loginEmail'
   const password = document.getElementById('loginPassword').value;
 
-  const res = await fetch('http://localhost:3210/api/login', {
+  const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password })
@@ -30,7 +30,7 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
   const email = document.getElementById('registerEmail').value;
   const password = document.getElementById('registerPassword').value;
 
-  const res = await fetch('http://localhost:3210/api/register', {
+  const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/register', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password })
@@ -48,7 +48,7 @@ async function registerUser() {
   const email = document.getElementById('registerEmail').value;
   const password = document.getElementById('registerPassword').value;
 
-  const res = await fetch('http://localhost:3210/api/register', {
+  const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/register', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password })
@@ -66,7 +66,7 @@ async function registerUser() {
 
 // Fetch and populate login dropdown with registered users
 async function populateLoginUserDropdown() {
-  const res = await fetch('http://localhost:3210/api/users');
+  const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/users');
   const users = await res.json();
 
   const loginSelect = document.getElementById('loginUserSelect');
@@ -91,7 +91,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   const email = document.getElementById('loginUserSelect').value;
   const password = document.getElementById('loginPassword').value;
 
-  const res = await fetch('http://localhost:3210/api/login', {
+  const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password })
@@ -115,7 +115,7 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
   const email = document.getElementById('registerEmail').value;
   const password = document.getElementById('registerPassword').value;
 
-  const res = await fetch('http://localhost:3210/api/register', {
+  const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/register', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password })
@@ -139,7 +139,7 @@ async function loginWithSelectedUser() {
   const email = document.getElementById('loginUserSelect').value;
   const password = document.getElementById('loginPassword').value;
 
-  const res = await fetch('http://localhost:3210/api/login', {
+  const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password })
@@ -160,7 +160,7 @@ async function registerUser() {
   const email = document.getElementById('registerEmail').value;
   const password = document.getElementById('registerPassword').value;
 
-  const res = await fetch('http://localhost:3210/api/register', {
+  const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/register', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password })
