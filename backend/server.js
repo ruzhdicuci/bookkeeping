@@ -1,6 +1,8 @@
+const express = require('express');
+const app = express();
 
 const path = require('path');
-const express = require('express');
+
 const cors = require('cors');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
@@ -134,22 +136,6 @@ backend.listen(3210, () => {
   console.log('✅ API running on https://bookkeeping-i8e0.onrender.com');
 });
 
-// --- Electron Window ---
-function createWindow() {
-  const win = new BrowserWindow({
-    width: 1000,
-    height: 800,
-    webPreferences: {
-      contextIsolation: false,
-      nodeIntegration: true
-    }
-  });
-
-win.loadFile(path.join(__dirname, 'client/login.html'));
-
-}
-
-app.whenReady().then(createWindow);
 
 
 
