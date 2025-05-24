@@ -691,37 +691,15 @@ window.addEventListener('DOMContentLoaded', populateLoginUserDropdown);
 
 
 
-// Show a modal popup for managing users
-function showUserManager(users, currentUser) {
-  const modal = document.createElement('div');
-  modal.className = 'modal';
-  modal.innerHTML = `
-    <div class="modal-content">
-      <h3>User Management</h3>
-      <ul id="userList">
-        ${users.map(user => `
-          <li>
-            ${user}
-            ${user !== 'default' && user !== currentUser ? `<button onclick="deleteUser('${user}')">🗑️</button>` : ''}
-          </li>
-        `).join('')}
-      </ul>
-     
-      <button onclick="closeModal()">❌ Close</button>
-    </div>
-  `;
-  document.body.appendChild(modal);
-}
 
 
 
 
 // Entry point to trigger popup
 function openUserManager() {
-  const users = JSON.parse(localStorage.getItem('users') || '["default"]');
-  const currentUser = localStorage.getItem('currentUser') || 'default';
-  showUserManager(users, currentUser);
+  showUserManagerModal();
 }
+
 // Show clean user manager modal (with delete and change PW only)
 async function showUserManagerModal() {
   const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/users');
@@ -738,11 +716,10 @@ async function showUserManagerModal() {
         ${users.map(user => `
           <li>
             ${user}
-            ${user !== 'default' && user !== currentUser
-              ? `
-                <button onclick="deleteUser('${user}')">🗑️</button>
-                <button onclick="showChangePassword('${user}')">🔒 Change PW</button>
-              ` : ''}
+            ${user !== currentUser ? `
+              <button onclick="deleteUser('${user}')">🗑️</button>
+            ` : ''}
+            <button onclick="showChangePassword('${user}')">🔒 Change PW</button>
           </li>
         `).join('')}
       </ul>
@@ -756,6 +733,8 @@ function closeModal() {
   const modal = document.querySelector('.modal');
   if (modal) modal.remove();
 }
+
+
 
 function deleteUser(email) {
   fetch(`https://bookkeeping-i8e0.onrender.com/api/users/${encodeURIComponent(email)}`, {
