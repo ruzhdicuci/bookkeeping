@@ -57,13 +57,11 @@ async function fetchEntries() {
   populateFilters();
   renderBankBalanceForm();
   renderEntries();
-   e.target.reset();
- fetchEntries(); // this will repopulate dropdowns automatically
-  // ✅ ADD THIS HERE:
-setTimeout(() => {
-  populateBankDropdownFromBalances();
-}, 0);
 
+  // ✅ DO NOT include e.target.reset() here!
+  setTimeout(() => {
+    populateBankDropdownFromBalances();
+  }, 0);
 }
 
 
@@ -182,7 +180,6 @@ function handlePersonCheckboxChange() {
 }
 
 
-
 function renderEntries() {
   const searchAmount = parseFloat(amountSearch.value);
   const selectedPersons = Array.from(document.querySelectorAll('[name="personFilter"]:checked')).map(cb => cb.value);
@@ -192,7 +189,7 @@ function renderEntries() {
     (selectedPersons.length === 0 || selectedPersons.includes(e.person)) &&
     (!bankFilter.value || e.bank === bankFilter.value) &&
     (!typeFilter.value || e.type === typeFilter.value) &&
-    (!currencyFilter.value || e.currency === currencyFilter.value) &&
+    (!currencyFilter.value || e.currency === e.currency) &&
     (!descSearch.value || e.description.toLowerCase().includes(descSearch.value.toLowerCase())) &&
     (amountSearch.value === '' || String(e.amount).includes(amountSearch.value))
   );
@@ -224,9 +221,9 @@ function renderEntries() {
 
     row.querySelectorAll('[contenteditable]').forEach(cell => {
       cell.addEventListener('blur', () => saveEdit(row));
-      cell.addEventListener('keydown', e => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
+      cell.addEventListener('keydown', ev => {
+        if (ev.key === 'Enter') {
+          ev.preventDefault();
           cell.blur();
         }
       });
@@ -236,11 +233,20 @@ function renderEntries() {
   });
 
   const balance = incomeTotal - expenseTotal;
-  document.getElementById('totalIncome').textContent = incomeTotal.toFixed(2);
-  document.getElementById('totalExpense').textContent = expenseTotal.toFixed(2);
-  document.getElementById('totalBalance').textContent = balance.toFixed(2);
-  balanceEl.textContent = balance.toFixed(2);
+
+  // ✅ Safely update summary
+  const incomeEl = document.getElementById('totalIncome');
+  const expenseEl = document.getElementById('totalExpense');
+  const totalEl = document.getElementById('totalBalance');
+
+  if (incomeEl) incomeEl.textContent = incomeTotal.toFixed(2);
+  if (expenseEl) expenseEl.textContent = expenseTotal.toFixed(2);
+  if (totalEl) totalEl.textContent = balance.toFixed(2);
+  if (balanceEl) balanceEl.textContent = balance.toFixed(2);
 }
+
+
+
 
 
 
@@ -450,7 +456,7 @@ document.getElementById('entryForm').addEventListener('submit', async (e) => {
   
 
 
-  e.target.reset();
+
   fetchEntries();
   populateNewEntryDropdowns();
 
@@ -521,6 +527,7 @@ window.initialLocked = false;
 function toggleLock() {
   window.initialLocked = !window.initialLocked;
   renderBankBalanceForm(); // re-render to apply readonly toggle
+  
 }
 
 
@@ -537,10 +544,11 @@ function saveBankBalances() {
 
   renderBankBalanceForm();
   renderEntries();
+  
 }
 
 
-document.getElementById('bankBalanceForm').addEventListener('submit', (e) => {
+document.getElementById('bankBalanceForm')?.addEventListener('submit', (e) => {
   e.preventDefault();
 
   const inputs = document.querySelectorAll('#bankInputs input');
@@ -549,9 +557,7 @@ document.getElementById('bankBalanceForm').addEventListener('submit', (e) => {
     initialBankBalances[bank] = parseFloat(input.value) || 0;
   });
 
-  renderEntries(); // update chart + table + balances
-balanceEl.textContent = balance.toFixed(2);
-
+  renderEntries(); // This already updates balance, no need to set it manually here
 });
 
 
@@ -624,33 +630,28 @@ function restoreBackup(e) {
 }
 
 
-// Fetch and populate login dropdown with registered users
-async function populateLoginUserDropdown() {
-  const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/users');
-  const users = await res.json();
 
-  const loginSelect = document.getElementById('loginUserSelect');
-  loginSelect.innerHTML = users.map(email => `<option value="${email}">${email}</option>`).join('');
-
-  const lastUser = localStorage.getItem('lastLoginUser');
-  if (lastUser && users.includes(lastUser)) {
-    loginSelect.value = lastUser;
-  }
-}
 
 // Fetch and populate login dropdown with registered users
 async function populateLoginUserDropdown() {
-  const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/users');
-  const users = await res.json();
-
   const loginSelect = document.getElementById('loginUserSelect');
-  loginSelect.innerHTML = users.map(email => `<option value="${email}">${email}</option>`).join('');
+  if (!loginSelect) return; // ✅ exit safely if not on login page
 
-  const lastUser = localStorage.getItem('lastLoginUser');
-  if (lastUser && users.includes(lastUser)) {
-    loginSelect.value = lastUser;
+  try {
+    const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/users');
+    const users = await res.json();
+
+    loginSelect.innerHTML = users.map(email => `<option value="${email}">${email}</option>`).join('');
+
+    const lastUser = localStorage.getItem('lastLoginUser');
+    if (lastUser && users.includes(lastUser)) {
+      loginSelect.value = lastUser;
+    }
+  } catch (err) {
+    console.error('❌ Failed to fetch users:', err);
   }
 }
+
 
 // Triggered on login submit
 async function loginWithSelectedUser() {
@@ -775,3 +776,7 @@ function togglePersonDropdown() {
   options.style.display = options.style.display === 'none' ? 'block' : 'none';
 }
 
+function toggleLock() {
+  window.initialLocked = !window.initialLocked;
+  renderBankBalanceForm();
+}
