@@ -159,8 +159,8 @@ function renderEntries() {
 
   const filtered = entries.filter(e =>
     (!monthSelect.value || e.date.startsWith(monthSelect.value)) &&
-    (() => {
-  const selectedPersons = [...document.querySelectorAll('input[name="personFilter"]:checked')].map(cb => cb.value);
+(() => {
+  const selectedPersons = Array.from(document.querySelectorAll('[name="personFilter"]:checked')).map(cb => cb.value);
   return selectedPersons.length === 0 || selectedPersons.includes(e.person);
 })() &&
     (!bankFilter.value || e.bank === bankFilter.value) &&
