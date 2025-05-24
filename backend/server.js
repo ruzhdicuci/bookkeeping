@@ -154,12 +154,3 @@ backend.listen(3210, () => {
 
 
 
-backend.get('/api/fix-duplicates', async (req, res) => {
-  const email = "ruzhdicuci@gmail.com";
-  const users = await User.find({ email });
-  if (users.length > 1) {
-    await User.deleteOne({ _id: users[1]._id }); // or keep the first
-    return res.send("Duplicate removed.");
-  }
-  res.send("No duplicates found.");
-});
