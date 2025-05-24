@@ -182,88 +182,45 @@ function handlePersonCheckboxChange() {
 }
 
 
+
 function renderEntries() {
-   const searchAmount = parseFloat(amountSearch.value);
+  const searchAmount = parseFloat(amountSearch.value);
+  const selectedPersons = Array.from(document.querySelectorAll('[name="personFilter"]:checked')).map(cb => cb.value);
 
   const filtered = entries.filter(e =>
     (!monthSelect.value || e.date.startsWith(monthSelect.value)) &&
-(() => {
-  const selected = Array.from(document.querySelectorAll('[name="personFilter"]:checked')).map(cb => cb.value);
-  return selected.length === 0 || selected.includes(e.person);
-})()
- &&
+    (selectedPersons.length === 0 || selectedPersons.includes(e.person)) &&
     (!bankFilter.value || e.bank === bankFilter.value) &&
     (!typeFilter.value || e.type === typeFilter.value) &&
     (!currencyFilter.value || e.currency === currencyFilter.value) &&
     (!descSearch.value || e.description.toLowerCase().includes(descSearch.value.toLowerCase())) &&
     (amountSearch.value === '' || String(e.amount).includes(amountSearch.value))
-    
   );
-
 
   entryTableBody.innerHTML = '';
 
   let incomeTotal = 0;
   let expenseTotal = 0;
- 
-
-
-
-filtered.forEach(e => {
-if (e.type === 'income') {
-  incomeTotal += e.amount;
-} else if (e.type === 'expense' || e.type === 'transfer') {
-  expenseTotal += e.amount;
-}
-
-  const row = document.createElement('tr');
-  row.dataset.id = e._id;
-  row.innerHTML = `
-    <td contenteditable="true" data-field="date">${e.date}</td>
-    <td contenteditable="true" data-field="description">${e.description}</td>
-    <td contenteditable="true" data-field="amount">${e.amount}</td>
-    <td contenteditable="true" data-field="currency">${e.currency || ''}</td>
-    <td contenteditable="true" data-field="type">${e.type}</td>
-    <td contenteditable="true" data-field="person">${e.person}</td>
-    <td contenteditable="true" data-field="bank">${e.bank}</td>
-    <td><button onclick="deleteEntry('${e._id}')" > Delete</button></td>
-  `;
-  row.querySelectorAll('[contenteditable]').forEach(cell => {
-    cell.addEventListener('blur', () => saveEdit(row));
-    cell.addEventListener('keydown', e => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        cell.blur();
-      }
-    });
-  });
-  entryTableBody.appendChild(row);
- 
-});
-
-  const balance = incomeTotal - expenseTotal;
-  document.getElementById('totalIncome').textContent = incomeTotal.toFixed(2);
-  document.getElementById('totalExpense').textContent = expenseTotal.toFixed(2);
-  document.getElementById('totalBalance').textContent = balance.toFixed(2);
-  balanceEl.textContent = balance.toFixed(2);
-
-
-
 
   filtered.forEach(e => {
-    balance += e.type === 'income' ? e.amount : -e.amount;
+    if (e.type === 'income') {
+      incomeTotal += e.amount;
+    } else if (e.type === 'expense' || e.type === 'transfer') {
+      expenseTotal += e.amount;
+    }
+
     const row = document.createElement('tr');
     row.dataset.id = e._id;
-   row.innerHTML = `
-  <td contenteditable="true" data-field="date">${e.date}</td>
-  <td contenteditable="true" data-field="description">${e.description}</td>
-  <td contenteditable="true" data-field="amount">${e.amount}</td>
-  <td contenteditable="true" data-field="currency">${e.currency || ''}</td>
-  <td contenteditable="true" data-field="type">${e.type}</td>
-  <td contenteditable="true" data-field="person">${e.person}</td>
-  <td contenteditable="true" data-field="bank">${e.bank}</td>
-  <td><button onclick="deleteEntry('${e._id}')">🗑️</button></td>
-`;
+    row.innerHTML = `
+      <td contenteditable="true" data-field="date">${e.date}</td>
+      <td contenteditable="true" data-field="description">${e.description}</td>
+      <td contenteditable="true" data-field="amount">${e.amount}</td>
+      <td contenteditable="true" data-field="currency">${e.currency || ''}</td>
+      <td contenteditable="true" data-field="type">${e.type}</td>
+      <td contenteditable="true" data-field="person">${e.person}</td>
+      <td contenteditable="true" data-field="bank">${e.bank}</td>
+      <td><button onclick="deleteEntry('${e._id}')">🗑️</button></td>
+    `;
 
     row.querySelectorAll('[contenteditable]').forEach(cell => {
       cell.addEventListener('blur', () => saveEdit(row));
@@ -274,12 +231,18 @@ if (e.type === 'income') {
         }
       });
     });
+
     entryTableBody.appendChild(row);
   });
 
+  const balance = incomeTotal - expenseTotal;
+  document.getElementById('totalIncome').textContent = incomeTotal.toFixed(2);
+  document.getElementById('totalExpense').textContent = expenseTotal.toFixed(2);
+  document.getElementById('totalBalance').textContent = balance.toFixed(2);
   balanceEl.textContent = balance.toFixed(2);
- 
 }
+
+
 
 async function saveEdit(row) {
   const id = row.dataset.id;
