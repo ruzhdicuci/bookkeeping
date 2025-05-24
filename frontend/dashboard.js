@@ -107,30 +107,58 @@ const bankCells = bankTable.querySelectorAll('thead th');
 
 
 
-// Updated populateFilters() preserving selected values for month, person, and bank
 function populateFilters() {
   const months = [...new Set(entries.map(e => e.date.slice(0, 7)))].sort();
   const prevMonth = monthSelect.value;
   const prevBank = bankFilter.value;
 
-  // Month filter
   monthSelect.innerHTML = `<option value="">All</option>` + months.map(m => `<option value="${m}">${m}</option>`).join('');
   monthSelect.value = months.includes(prevMonth) ? prevMonth : "";
 
-  // Bank filter
   const banks = [...new Set(entries.map(e => e.bank))].filter(Boolean);
   bankFilter.innerHTML = `<option value="">All</option>` + banks.map(b => `<option value="${b}">${b}</option>`).join('');
   bankFilter.value = banks.includes(prevBank) ? prevBank : "";
 
-  // Person filter with checkboxes
+  // ✅ PERSON DROPDOWN
   const persons = [...new Set(entries.map(e => e.person))].filter(Boolean);
   const personOptions = document.getElementById('personOptions');
-  const previouslySelected = getSelectedPersons();
 
-  personOptions.innerHTML = persons.map(p => {
-    const checked = previouslySelected.includes(p) ? 'checked' : '';
-    return `<label><input type="checkbox" value="${p}" ${checked}> ${p}</label>`;
-  }).join('');
+// Add "All" checkbox at the top
+personOptions.innerHTML = `
+  <label style="display: block;">
+    <input type="checkbox" id="selectAllPersons" checked />
+    <strong>All</strong>
+  </label>
+` + persons
+  .map(p => `
+    <label style="display: block;">
+      <input type="checkbox" name="personFilter" value="${p}" checked />
+      ${p}
+    </label>
+  `).join('');
+
+// Toggle all checkboxes when "All" is clicked
+document.getElementById('selectAllPersons').addEventListener('change', function () {
+  const all = this.checked;
+  document.querySelectorAll('[name="personFilter"]').forEach(cb => {
+    cb.checked = all;
+  });
+  renderEntries();
+});
+
+// Update "All" checkbox state if any single one is unchecked
+document.querySelectorAll('[name="personFilter"]').forEach(cb => {
+  cb.addEventListener('change', () => {
+    const allChecked = Array.from(document.querySelectorAll('[name="personFilter"]')).every(cb => cb.checked);
+    document.getElementById('selectAllPersons').checked = allChecked;
+    renderEntries();
+  });
+});
+
+  // Attach change listeners
+  personOptions.querySelectorAll('input').forEach(cb => {
+    cb.addEventListener('change', renderEntries);
+  });
 }
 
 
@@ -160,9 +188,10 @@ function renderEntries() {
   const filtered = entries.filter(e =>
     (!monthSelect.value || e.date.startsWith(monthSelect.value)) &&
 (() => {
-  const selectedPersons = Array.from(document.querySelectorAll('[name="personFilter"]:checked')).map(cb => cb.value);
-  return selectedPersons.length === 0 || selectedPersons.includes(e.person);
-})() &&
+  const selected = Array.from(document.querySelectorAll('[name="personFilter"]:checked')).map(cb => cb.value);
+  return selected.length === 0 || selected.includes(e.person);
+})()
+ &&
     (!bankFilter.value || e.bank === bankFilter.value) &&
     (!typeFilter.value || e.type === typeFilter.value) &&
     (!currencyFilter.value || e.currency === currencyFilter.value) &&
@@ -181,8 +210,11 @@ function renderEntries() {
 
 
 filtered.forEach(e => {
-  if (e.type === 'income') incomeTotal += e.amount;
-  else expenseTotal += e.amount;
+if (e.type === 'income') {
+  incomeTotal += e.amount;
+} else if (e.type === 'expense' || e.type === 'transfer') {
+  expenseTotal += e.amount;
+}
 
   const row = document.createElement('tr');
   row.dataset.id = e._id;
@@ -769,4 +801,9 @@ function showChangePassword(user) {
 
 function getSelectedPersons() {
   return Array.from(document.querySelectorAll('#personOptions input[type="checkbox"]:checked')).map(cb => cb.value);
+}
+
+function togglePersonDropdown() {
+  const options = document.getElementById('personOptions');
+  options.style.display = options.style.display === 'none' ? 'block' : 'none';
 }

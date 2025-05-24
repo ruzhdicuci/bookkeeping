@@ -489,18 +489,31 @@ border: 1px solid #ccc;
   border: 1px solid #ccc;
       color: #444;
 }
+
+
+
+
 .multi-select {
   position: relative;
-  background: white;
-  border: 1px solid #ccc;
-  width: 200px;
+ 
+ width: 100%;
   cursor: pointer;
+
+  border: 1px solid #ccc;
+      color: #444;
+
+text-align: center;
+
+  background: #eee;
+ font-size: 1rem;
+  border-radius: 4px;
+   margin-top: 10px;
 }
 
 .multi-select-toggle {
   padding: 8px;
   background: #fff;
-  border-bottom: 1px solid #ccc;
+
 }
 
 .multi-select-options {

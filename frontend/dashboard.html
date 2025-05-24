@@ -65,10 +65,12 @@
       <option value="EUR">EUR</option>
       <option value="USD">USD</option>
     </select>
-    <select id="newType" required>
-      <option value="income">Income</option>
-      <option value="expense">Expense</option>
-    </select>
+  <select id="newType">
+  <option>Income</option>
+  <option>Expense</option>
+  <option>Transfer</option>
+</select>
+
 
 <input list="personList" id="newPerson" placeholder="Person" required />
 <datalist id="personList"></datalist>
@@ -130,11 +132,13 @@
 
     <label>
       Type:
-      <select id="typeFilter">
-        <option value="">All</option>
-        <option value="income">Income</option>
-        <option value="expense">Expense</option>
-      </select>
+<select id="typeFilter">
+  <option value="">All</option>
+  <option>Income</option>
+  <option>Expense</option>
+  <option>Transfer</option> <!-- ✅ Add this -->
+</select>
+
     </label>
 
     <label>
@@ -148,11 +152,12 @@
     </label>
 
  <label>
+
   Person:
   <div class="multi-select" id="personMultiSelect">
     <div class="multi-select-toggle" onclick="togglePersonDropdown()">Select Persons ▼</div>
     <div class="multi-select-options" id="personOptions" style="display: none;"></div>
-  </div>
+  </div> 
 </label>
 
 
