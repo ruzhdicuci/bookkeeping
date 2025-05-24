@@ -17,18 +17,20 @@ const cleanAmountInput = amountSearch.value.replace(/[^\d.-]/g, '');
 
 
 
-
-
-
 monthSelect.onchange =
-  personFilter.onchange =
   bankFilter.onchange =
   typeFilter.onchange =
   currencyFilter.onchange =
+  descSearch.oninput =
+  amountSearch.oninput = renderEntries;
 
+// Person checkboxes
+document.addEventListener('change', (e) => {
+  if (e.target.matches('#personOptions input[type="checkbox"]')) {
+    renderEntries();
+  }
+});
 
-
-descSearch.oninput = amountSearch.oninput = renderEntries;
 
 let initialBankBalances = {}; // will be populated from form
 const storedBalances = localStorage.getItem('initialBankBalances');
@@ -109,35 +111,28 @@ const bankCells = bankTable.querySelectorAll('thead th');
 function populateFilters() {
   const months = [...new Set(entries.map(e => e.date.slice(0, 7)))].sort();
   const prevMonth = monthSelect.value;
-  const prevPerson = personFilter.value;
   const prevBank = bankFilter.value;
 
+  // Month filter
   monthSelect.innerHTML = `<option value="">All</option>` + months.map(m => `<option value="${m}">${m}</option>`).join('');
   monthSelect.value = months.includes(prevMonth) ? prevMonth : "";
 
+  // Bank filter
   const banks = [...new Set(entries.map(e => e.bank))].filter(Boolean);
   bankFilter.innerHTML = `<option value="">All</option>` + banks.map(b => `<option value="${b}">${b}</option>`).join('');
   bankFilter.value = banks.includes(prevBank) ? prevBank : "";
 
-const personContainer = document.getElementById('personFilterContainer');
-const persons = [...new Set(entries.map(e => e.person))].filter(Boolean);
+  // Person filter with checkboxes
+  const persons = [...new Set(entries.map(e => e.person))].filter(Boolean);
+  const personOptions = document.getElementById('personOptions');
+  const previouslySelected = getSelectedPersons();
 
-personContainer.innerHTML = persons
-  .map(p => `
-    <label style="margin-right: 10px;">
-      <input type="checkbox" name="personFilter" value="${p}" checked />
-      ${p}
-    </label>
-  `)
-  .join('');
-
-personContainer.querySelectorAll('input').forEach(cb => {
-  cb.addEventListener('change', renderEntries);
-});
-
-  // ✅ NEW: build checkboxes for person filtering
-  populatePersonCheckboxes();
+  personOptions.innerHTML = persons.map(p => {
+    const checked = previouslySelected.includes(p) ? 'checked' : '';
+    return `<label><input type="checkbox" value="${p}" ${checked}> ${p}</label>`;
+  }).join('');
 }
+
 
 function populatePersonCheckboxes() {
   const persons = [...new Set(entries.map(e => e.person))].filter(Boolean);
@@ -772,3 +767,6 @@ function showChangePassword(user) {
     .catch(err => alert('❌ Failed to change password'));
 }
 
+function getSelectedPersons() {
+  return Array.from(document.querySelectorAll('#personOptions input[type="checkbox"]:checked')).map(cb => cb.value);
+}
