@@ -535,7 +535,7 @@ function renderBankBalanceForm() {
   html += '</tr>';
 
   html += '</tbody></table><button id="saveBankBalances" onclick="saveBankBalances()">Save</button>';
-html += `<button id="lockbalance" onclick="toggleLock()">${window.initialLocked ? '🔓 Unlock' : '🔒 Lock'}</button>`;
+html += `<button id="lockbalance" onclick="toggleLock()">${window.initialLocked ? 'Unlock' : 'Lock'}</button>`;
 
 
 
@@ -578,7 +578,7 @@ document.getElementById('bankBalanceForm').addEventListener('submit', (e) => {
   });
 
   renderEntries(); // update chart + table + balances
-balanceEl.textContent = balance.toFixed(2);
+balanceEl.textContent = balanceEl.toFixed(2);
 
 });
 
