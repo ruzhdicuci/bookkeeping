@@ -598,4 +598,10 @@ text-align: center;
   display: block;
   padding: 5px 10px;
   cursor: pointer;
+  color: #444;
+}
+
+
+#newDate  {
+ color: #444;
 }

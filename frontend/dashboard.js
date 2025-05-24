@@ -578,7 +578,7 @@ document.getElementById('bankBalanceForm').addEventListener('submit', (e) => {
   });
 
   renderEntries(); // update chart + table + balances
-balanceEl.textContent = balanceEl.toFixed(2);
+balanceEl.textContent = balance.toFixed(2);
 
 });
 
