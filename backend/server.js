@@ -110,6 +110,17 @@ backend.delete('/api/entries/delete-all', auth, async (req, res) => {
   res.json({ success: true });
 });
 
+// Update an entry by ID
+backend.put('/api/entries/:id', auth, async (req, res) => {
+  const updated = await Entry.findOneAndUpdate(
+    { _id: req.params.id, userId: req.userId },
+    req.body,
+    { new: true }
+  );
+  res.json(updated);
+});
+
+
 
 // Change password for a user
 backend.put('/api/users/:email/password', async (req, res) => {
