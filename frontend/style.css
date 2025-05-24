@@ -527,6 +527,7 @@ text-align: center;
   background: white;
   border: 1px solid #ccc;
   z-index: 100;
+  text-align: left;
 }
 
 .multi-select-options label {
