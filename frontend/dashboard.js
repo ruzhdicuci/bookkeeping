@@ -452,6 +452,15 @@ async function deleteAllEntries() {
   }
 }
 
+// Autofill with today's date if empty
+window.addEventListener('DOMContentLoaded', () => {
+  const dateInput = document.getElementById('newDate');
+  if (!dateInput.value) {
+    dateInput.valueAsDate = new Date();
+  }
+});
+
+
 
 document.getElementById('entryForm').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -802,3 +811,4 @@ function togglePersonDropdown() {
   const options = document.getElementById('personOptions');
   options.style.display = options.style.display === 'none' ? 'block' : 'none';
 }
+
