@@ -153,20 +153,3 @@ backend.listen(3210, () => {
 
 
 
-
-// TEMPORARY: Remove duplicate users by email
-backend.get('/api/fix-duplicates', async (req, res) => {
-  const targetEmail = "ruzhdicuci@gmail.com";
-
-  const users = await User.find({ email: targetEmail });
-  if (users.length > 1) {
-    // Keep the first user, remove the rest
-    const toDelete = users.slice(1);
-    const idsToDelete = toDelete.map(u => u._id);
-    await User.deleteMany({ _id: { $in: idsToDelete } });
-
-    return res.send(`✅ Removed ${toDelete.length} duplicate(s) for ${targetEmail}`);
-  }
-
-  res.send("✅ No duplicates found.");
-});
