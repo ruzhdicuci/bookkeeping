@@ -115,24 +115,59 @@ function populateFilters() {
   monthSelect.innerHTML = `<option value="">All</option>` + months.map(m => `<option value="${m}">${m}</option>`).join('');
   monthSelect.value = months.includes(prevMonth) ? prevMonth : "";
 
-  const persons = [...new Set(entries.map(e => e.person))].filter(Boolean);
-  personFilter.innerHTML = `<option value="">All</option>` + persons.map(p => `<option value="${p}">${p}</option>`).join('');
-  personFilter.value = persons.includes(prevPerson) ? prevPerson : "";
-
   const banks = [...new Set(entries.map(e => e.bank))].filter(Boolean);
   bankFilter.innerHTML = `<option value="">All</option>` + banks.map(b => `<option value="${b}">${b}</option>`).join('');
   bankFilter.value = banks.includes(prevBank) ? prevBank : "";
+
+const personContainer = document.getElementById('personFilterContainer');
+const persons = [...new Set(entries.map(e => e.person))].filter(Boolean);
+
+personContainer.innerHTML = persons
+  .map(p => `
+    <label style="margin-right: 10px;">
+      <input type="checkbox" name="personFilter" value="${p}" checked />
+      ${p}
+    </label>
+  `)
+  .join('');
+
+personContainer.querySelectorAll('input').forEach(cb => {
+  cb.addEventListener('change', renderEntries);
+});
+
+  // ✅ NEW: build checkboxes for person filtering
+  populatePersonCheckboxes();
+}
+
+function populatePersonCheckboxes() {
+  const persons = [...new Set(entries.map(e => e.person))].filter(Boolean);
+  const container = document.getElementById('personOptions');
+
+  const saved = JSON.parse(localStorage.getItem('personFilterValues') || '[]');
+
+  container.innerHTML = persons.map(p => `
+    <label>
+      <input type="checkbox" value="${p}" ${saved.includes(p) ? 'checked' : ''} onchange="handlePersonCheckboxChange()"> ${p}
+    </label>
+  `).join('');
+}
+
+function handlePersonCheckboxChange() {
+  const selected = [...document.querySelectorAll('#personOptions input:checked')].map(cb => cb.value);
+  localStorage.setItem('personFilterValues', JSON.stringify(selected));
+  renderEntries();
 }
 
 
-
-
 function renderEntries() {
-  const searchAmount = parseFloat(amountSearch.value);
+   const searchAmount = parseFloat(amountSearch.value);
 
   const filtered = entries.filter(e =>
     (!monthSelect.value || e.date.startsWith(monthSelect.value)) &&
-    (!personFilter.value || e.person === personFilter.value) &&
+    (() => {
+  const selectedPersons = [...document.querySelectorAll('input[name="personFilter"]:checked')].map(cb => cb.value);
+  return selectedPersons.length === 0 || selectedPersons.includes(e.person);
+})() &&
     (!bankFilter.value || e.bank === bankFilter.value) &&
     (!typeFilter.value || e.type === typeFilter.value) &&
     (!currencyFilter.value || e.currency === currencyFilter.value) &&
@@ -140,6 +175,7 @@ function renderEntries() {
     (amountSearch.value === '' || String(e.amount).includes(amountSearch.value))
     
   );
+
 
   entryTableBody.innerHTML = '';
 
