@@ -518,7 +518,10 @@ function renderBankBalanceForm() {
   html += '<tr><td><strong>Initial</strong></td>';
   banks.forEach(bank => {
     const val = initialBankBalances[bank] ?? 0;
-    html += `<td><input type="number" step="0.01" data-bank="${bank}" value="${val}" /></td>`;
+    html += `<td>
+  <input type="number" step="0.01" data-bank="${bank}" value="${val}" ${window.initialLocked ? 'readonly' : ''} />
+</td>
+`;
   });
   html += '</tr>';
 
@@ -532,9 +535,22 @@ function renderBankBalanceForm() {
   html += '</tr>';
 
   html += '</tbody></table><button id="saveBankBalances" onclick="saveBankBalances()">Save</button>';
+html += `<button id="lockbalance" onclick="toggleLock()">${window.initialLocked ? '🔓 Unlock' : '🔒 Lock'}</button>`;
+
+
 
   container.innerHTML = html;
 }
+
+//
+
+window.initialLocked = false;
+
+function toggleLock() {
+  window.initialLocked = !window.initialLocked;
+  renderBankBalanceForm(); // re-render to apply readonly toggle
+}
+
 
 
 function saveBankBalances() {

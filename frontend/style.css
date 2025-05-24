@@ -356,14 +356,32 @@ padding: 10px 10px 10px 10px;
   background-color: rgb(179, 0, 255);
   border: none;
   color: white;
-  padding: 0.5rem 1rem;
+
 font-size: 1.2rem;
   border-radius: 4px;
   cursor: pointer;
-  margin-top: 0.5rem;
+
    width: 120px;
  height: 40px;
 }
+
+
+#lockbalance  {
+  background-color: rgb(255, 0, 153);
+  border: none;
+  color: white;
+padding-bottom: 2px;
+font-size: 1.2rem;
+  border-radius: 4px;
+  cursor: pointer;
+margin-top: 7px;
+   width: 120px;
+ height: 42px;
+ margin-left: 10px;
+}
+
+
+
 
 #saveBankBalances:hover {
   background-color: #c8efd4;
