@@ -13,7 +13,7 @@ const currencyFilter = document.getElementById('currencyFilter');
 const typeFilter = document.getElementById('typeFilter');
 const descSearch = document.getElementById('descSearch');
 const amountSearch = document.getElementById('amountSearch');
-const cleanAmountInput = amountSearch.value.replace(/[^\d.-]/g, '');
+
 
 
 
@@ -30,38 +30,34 @@ document.addEventListener('change', (e) => {
     renderEntries();
   }
 });
-
+let entries = [];
 
 let initialBankBalances = {}; // will be populated from form
 const storedBalances = localStorage.getItem('initialBankBalances');
 if (storedBalances) {
   initialBankBalances = JSON.parse(storedBalances);
 }
-
-let entries = [];
-
-
-
   fetchEntries(); // this will repopulate dropdowns automatically
   
 
 
-
-// ✅ Corrected fetchEntries with dynamic person/bank dropdown population
 async function fetchEntries() {
-  const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  entries = await res.json();
+  try {
+    const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
 
-  populateFilters();
-  renderBankBalanceForm();
-  renderEntries();
+    if (!res.ok) throw new Error('Failed to fetch entries');
 
-  // ✅ DO NOT include e.target.reset() here!
-  setTimeout(() => {
-    populateBankDropdownFromBalances();
-  }, 0);
+    entries = await res.json();
+    console.log("📦 Entries:", entries);
+
+    populateFilters();
+    renderBankBalanceForm();
+    renderEntries();
+  } catch (err) {
+    console.error("❌ fetchEntries failed:", err);
+  }
 }
 
 
@@ -87,7 +83,10 @@ function populateBankDropdownFromBalances() {
 if (!bankTable) return;
 
 const bankCells = bankTable.querySelectorAll('thead th');
-  console.log("🏦 Bank headers found:", [...bankCells].map(th => th.textContent));
+const banks = [...bankCells].slice(1).map(th => th.textContent.replace(/\s+/g, ' ').trim());
+console.log("🏦 Bank headers found:", banks);
+
+
 
   const bankSelect = document.getElementById('newBank');
   bankSelect.innerHTML = '<option value="">Select bank</option>';
@@ -179,17 +178,17 @@ function handlePersonCheckboxChange() {
   renderEntries();
 }
 
-
 function renderEntries() {
-  const searchAmount = parseFloat(amountSearch.value);
-  const selectedPersons = Array.from(document.querySelectorAll('[name="personFilter"]:checked')).map(cb => cb.value);
+  const searchAmount = parseFloat(amountSearch.value || "0");
+  const selectedPersons = Array.from(document.querySelectorAll('[name="personFilter"]:checked'))
+    .map(cb => cb.value);
 
   const filtered = entries.filter(e =>
     (!monthSelect.value || e.date.startsWith(monthSelect.value)) &&
     (selectedPersons.length === 0 || selectedPersons.includes(e.person)) &&
     (!bankFilter.value || e.bank === bankFilter.value) &&
     (!typeFilter.value || e.type === typeFilter.value) &&
-    (!currencyFilter.value || e.currency === e.currency) &&
+    (!currencyFilter.value || e.currency === currencyFilter.value) &&
     (!descSearch.value || e.description.toLowerCase().includes(descSearch.value.toLowerCase())) &&
     (amountSearch.value === '' || String(e.amount).includes(amountSearch.value))
   );
@@ -200,11 +199,8 @@ function renderEntries() {
   let expenseTotal = 0;
 
   filtered.forEach(e => {
-    if (e.type === 'income') {
-      incomeTotal += e.amount;
-    } else if (e.type === 'expense' || e.type === 'transfer') {
-      expenseTotal += e.amount;
-    }
+    if (e.type === 'income') incomeTotal += e.amount;
+    else if (e.type === 'expense' || e.type === 'transfer') expenseTotal += e.amount;
 
     const row = document.createElement('tr');
     row.dataset.id = e._id;
@@ -221,9 +217,9 @@ function renderEntries() {
 
     row.querySelectorAll('[contenteditable]').forEach(cell => {
       cell.addEventListener('blur', () => saveEdit(row));
-      cell.addEventListener('keydown', ev => {
-        if (ev.key === 'Enter') {
-          ev.preventDefault();
+      cell.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
           cell.blur();
         }
       });
@@ -232,18 +228,19 @@ function renderEntries() {
     entryTableBody.appendChild(row);
   });
 
-  const balance = incomeTotal - expenseTotal;
-
-  // ✅ Safely update summary
   const incomeEl = document.getElementById('totalIncome');
   const expenseEl = document.getElementById('totalExpense');
   const totalEl = document.getElementById('totalBalance');
+  
+
+  const balance = incomeTotal - expenseTotal;
 
   if (incomeEl) incomeEl.textContent = incomeTotal.toFixed(2);
   if (expenseEl) expenseEl.textContent = expenseTotal.toFixed(2);
   if (totalEl) totalEl.textContent = balance.toFixed(2);
-  if (balanceEl) balanceEl.textContent = balance.toFixed(2);
+  
 }
+
 
 
 
@@ -453,16 +450,13 @@ document.getElementById('entryForm').addEventListener('submit', async (e) => {
     body: JSON.stringify(entry)
   });
 
-  
+  document.getElementById('entryForm').reset(); // ✅ Clear the form
 
-
-
-  fetchEntries();
-  populateNewEntryDropdowns();
-
+  await fetchEntries();                        // ✅ Ensure entries are refreshed
+  populateNewEntryDropdowns();                // ✅ Then update dropdowns
 });
 
-
+  
 
 function renderBankBalanceForm() {
   const container = document.getElementById('bankBalanceTableContainer');
@@ -475,10 +469,7 @@ function renderBankBalanceForm() {
 
   // Collect net changes
   const changes = {};
-  banks.forEach(bank => {
-    changes[bank] = 0;
-  });
-
+  banks.forEach(bank => (changes[bank] = 0));
   entries.forEach(e => {
     if (changes[e.bank] != null) {
       changes[e.bank] += (e.type === 'income' ? e.amount : -e.amount);
@@ -492,18 +483,15 @@ function renderBankBalanceForm() {
   });
   html += '</tr></thead><tbody>';
 
-  // Row 1: Initial balances (editable)
+  // Row 1: Initial balances
   html += '<tr><td><strong>Initial</strong></td>';
   banks.forEach(bank => {
     const val = initialBankBalances[bank] ?? 0;
-    html += `<td>
-  <input type="number" step="0.01" data-bank="${bank}" value="${val}" ${window.initialLocked ? 'readonly' : ''} />
-</td>
-`;
+    html += `<td><input type="number" step="0.01" data-bank="${bank}" value="${val}" ${window.initialLocked ? 'readonly' : ''} /></td>`;
   });
   html += '</tr>';
 
-  // Row 2: Net change from entries
+  // Row 2: Change
   html += '<tr><td><strong>Change</strong></td>';
   banks.forEach(bank => {
     const delta = changes[bank] ?? 0;
@@ -512,25 +500,19 @@ function renderBankBalanceForm() {
   });
   html += '</tr>';
 
-  html += '</tbody></table><button id="saveBankBalances" onclick="saveBankBalances()">Save</button>';
-html += `<button id="lockbalance" onclick="toggleLock()">${window.initialLocked ? 'Unlock' : 'Lock'}</button>`;
-
-
+  html += `</tbody></table>
+    <button id="saveBankBalances" onclick="saveBankBalances()">Save</button>
+    <button id="lockbalance" onclick="toggleLock()">${window.initialLocked ? 'Unlock' : 'Lock'}</button>`;
 
   container.innerHTML = html;
 }
-
-//
 
 window.initialLocked = false;
 
 function toggleLock() {
   window.initialLocked = !window.initialLocked;
-  renderBankBalanceForm(); // re-render to apply readonly toggle
-  
+  renderBankBalanceForm(); // Reflect new readonly state
 }
-
-
 
 function saveBankBalances() {
   const inputs = document.querySelectorAll('[data-bank]');
@@ -539,32 +521,15 @@ function saveBankBalances() {
     initialBankBalances[bank] = parseFloat(input.value) || 0;
   });
 
-  // ✅ Save to localStorage
   localStorage.setItem('initialBankBalances', JSON.stringify(initialBankBalances));
 
-  renderBankBalanceForm();
-  renderEntries();
-  
+  renderBankBalanceForm(); // To reapply readonly if locked
+  renderEntries();         // To reflect changes in total balance
 }
 
-
-document.getElementById('bankBalanceForm')?.addEventListener('submit', (e) => {
-  e.preventDefault();
-
-  const inputs = document.querySelectorAll('#bankInputs input');
-  inputs.forEach(input => {
-    const bank = input.dataset.bank;
-    initialBankBalances[bank] = parseFloat(input.value) || 0;
-  });
-
-  renderEntries(); // This already updates balance, no need to set it manually here
-});
-
-
-
-// Wait for render to complete
+// Resize alignment for consistency
 setTimeout(() => {
-  const mainTable = document.querySelector('table'); // or a better selector if needed
+  const mainTable = document.querySelector('table');
   const bankTable = document.querySelector('#bankBalanceTableContainer table');
   if (mainTable && bankTable) {
     bankTable.style.width = `${mainTable.offsetWidth}px`;
