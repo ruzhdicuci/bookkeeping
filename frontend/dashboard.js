@@ -157,10 +157,12 @@ document.querySelectorAll('.personOption').forEach(cb => {
 
 
 
+
 function renderEntries() {
   const searchAmount = parseFloat(amountSearch.value || "0");
   const selectedPersons = Array.from(document.querySelectorAll('.personOption:checked')).map(cb => cb.value);
 
+  // ✅ Filter entries
   const filtered = entries.filter(e =>
     (!monthSelect.value || e.date.startsWith(monthSelect.value)) &&
     (selectedPersons.length === 0 || selectedPersons.includes(e.person)) &&
@@ -168,47 +170,40 @@ function renderEntries() {
     (!typeFilter.value || e.type === typeFilter.value) &&
     (!currencyFilter.value || e.currency === currencyFilter.value) &&
     (!descSearch.value || e.description.toLowerCase().includes(descSearch.value.toLowerCase())) &&
-    (amountSearch.value === '' || String(e.amount).includes(amountSearch.value))
+    (amountSearch.value === '' || String(e.amount ?? '').includes(amountSearch.value))
   );
 
   entryTableBody.innerHTML = '';
 
+  // ✅ Calculate totals
   let incomeTotal = 0;
   let expenseTotal = 0;
 
-  // ✅ Loop 1: Calculate totals
-filtered.forEach(e => {
-  const type = (e.type || '').trim().toLowerCase();
-  const amount = Math.abs(parseFloat(e.amount) || 0); // make sure it's always positive
+  filtered.forEach(e => {
+    const type = (e.type || '').toLowerCase();
+    const amount = Number(e.amount) || 0;
+    if (type === 'income') incomeTotal += amount;
+    else expenseTotal += amount;
+  });
 
-  if (type === 'income') {
-    incomeTotal += amount;
-  } else {
-    expenseTotal += amount;
-  }
-});
+  // ✅ Render rows (non-editable)
+  filtered.forEach(e => {
+    const row = document.createElement('tr');
+    row.dataset.id = e._id;
+    row.innerHTML = `
+      <td>${e.date}</td>
+      <td>${e.description}</td>
+      <td>${e.amount}</td>
+      <td>${e.currency || ''}</td>
+      <td>${e.type}</td>
+      <td>${e.person}</td>
+      <td>${e.bank}</td>
+      <td><button onclick="deleteEntry('${e._id}')">delete</button></td>
+    `;
+    entryTableBody.appendChild(row);
+  });
 
-
-
-  // ✅ Loop 2: Render rows
- filtered.forEach(e => {
-  const row = document.createElement('tr');
-  row.dataset.id = e._id;
-  row.innerHTML = `
-    <td>${e.date}</td>
-    <td>${e.description}</td>
-    <td>${e.amount}</td>
-    <td>${e.currency || ''}</td>
-    <td>${e.type}</td>
-    <td>${e.person}</td>
-    <td>${e.bank}</td>
-    <td><button onclick="deleteEntry('${e._id}')">Delete</button></td>
-  `;
-  entryTableBody.appendChild(row);
-});
-
-
-  // ✅ Display results
+  // ✅ Update totals in UI
   const balance = incomeTotal - expenseTotal;
   document.getElementById('totalIncome').textContent = incomeTotal.toFixed(2);
   document.getElementById('totalExpense').textContent = expenseTotal.toFixed(2);
@@ -219,27 +214,55 @@ filtered.forEach(e => {
 
 
 
-
-
 async function saveEdit(row) {
   const id = row.dataset.id;
   const updated = {};
+
   row.querySelectorAll('[contenteditable]').forEach(cell => {
     const field = cell.dataset.field;
-    updated[field] = field === 'amount' ? parseFloat(cell.textContent) : cell.textContent.trim();
+    if (!field) return;
+
+    let value = cell.textContent.trim();
+    if (field === 'amount') {
+      const num = parseFloat(value);
+      if (isNaN(num)) {
+        alert('❌ Invalid number in Amount field.');
+        return;
+      }
+      updated[field] = num;
+    } else {
+      updated[field] = value;
+    }
   });
 
-  await fetch(`https://bookkeeping-i8e0.onrender.com/api/entries/${id}`, {
-    method: 'PUT',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(updated)
-  });
+  // Optional: require all fields to be non-empty
+  if (!updated.date || !updated.description || isNaN(updated.amount)) {
+    alert("⚠️ Some required fields are empty or invalid.");
+    return;
+  }
 
-  fetchEntries();
+  try {
+    const res = await fetch(`https://bookkeeping-i8e0.onrender.com/api/entries/${id}`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(updated)
+    });
+
+    if (!res.ok) {
+      const data = await res.json();
+      alert(`❌ Failed to save: ${data.message || res.statusText}`);
+    } else {
+      fetchEntries();
+    }
+  } catch (err) {
+    console.error('❌ Save error:', err);
+    alert('❌ Could not save changes.');
+  }
 }
+
 
 async function deleteEntry(id) {
   await fetch(`https://bookkeeping-i8e0.onrender.com/api/entries/${id}`, {
