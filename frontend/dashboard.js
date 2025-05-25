@@ -191,32 +191,22 @@ filtered.forEach(e => {
 
 
   // ✅ Loop 2: Render rows
-  filtered.forEach(e => {
-    const row = document.createElement('tr');
-    row.dataset.id = e._id;
-    row.innerHTML = `
-      <td contenteditable="true" data-field="date">${e.date}</td>
-      <td contenteditable="true" data-field="description">${e.description}</td>
-      <td contenteditable="true" data-field="amount">${e.amount}</td>
-      <td contenteditable="true" data-field="currency">${e.currency || ''}</td>
-      <td contenteditable="true" data-field="type">${e.type}</td>
-      <td contenteditable="true" data-field="person">${e.person}</td>
-      <td contenteditable="true" data-field="bank">${e.bank}</td>
-      <td><button onclick="deleteEntry('${e._id}')">Delete</button></td>
-    `;
+ filtered.forEach(e => {
+  const row = document.createElement('tr');
+  row.dataset.id = e._id;
+  row.innerHTML = `
+    <td>${e.date}</td>
+    <td>${e.description}</td>
+    <td>${e.amount}</td>
+    <td>${e.currency || ''}</td>
+    <td>${e.type}</td>
+    <td>${e.person}</td>
+    <td>${e.bank}</td>
+    <td><button onclick="deleteEntry('${e._id}')">Delete</button></td>
+  `;
+  entryTableBody.appendChild(row);
+});
 
-    row.querySelectorAll('[contenteditable]').forEach(cell => {
-      cell.addEventListener('blur', () => saveEdit(row));
-      cell.addEventListener('keydown', e => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          cell.blur();
-        }
-      });
-    });
-
-    entryTableBody.appendChild(row);
-  });
 
   // ✅ Display results
   const balance = incomeTotal - expenseTotal;
@@ -739,11 +729,3 @@ function togglePersonDropdown() {
   }
 }
 
-
-function toggleEntryLock() {
-  isLocked = !isLocked;
-  document.getElementById('toggleLockBtn').textContent = isLocked
-    ? 'Unlock'
-    : 'Lock Income/Expense';
-  renderEntries(); // refresh table with new lock state
-}
