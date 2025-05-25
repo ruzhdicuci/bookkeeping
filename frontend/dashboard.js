@@ -739,3 +739,11 @@ function togglePersonDropdown() {
   }
 }
 
+
+function toggleEntryLock() {
+  isLocked = !isLocked;
+  document.getElementById('toggleLockBtn').textContent = isLocked
+    ? 'Unlock'
+    : 'Lock Income/Expense';
+  renderEntries(); // refresh table with new lock state
+}
