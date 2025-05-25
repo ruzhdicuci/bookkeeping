@@ -157,7 +157,6 @@ document.querySelectorAll('.personOption').forEach(cb => {
 
 
 
-
 function renderEntries() {
   const searchAmount = parseFloat(amountSearch.value || "0");
   const selectedPersons = Array.from(document.querySelectorAll('.personOption:checked')).map(cb => cb.value);
@@ -177,12 +176,22 @@ function renderEntries() {
   let incomeTotal = 0;
   let expenseTotal = 0;
 
-  filtered.forEach(e => {
-    const type = (e.type || '').toLowerCase();
-    const amount = Number(e.amount) || 0;
-    if (type === 'income') incomeTotal += amount;
-    else expenseTotal += amount;
+  // ✅ Loop 1: Calculate totals
+filtered.forEach(e => {
+  const type = (e.type || '').trim().toLowerCase();
+  const amount = Math.abs(parseFloat(e.amount) || 0); // make sure it's always positive
 
+  if (type === 'income') {
+    incomeTotal += amount;
+  } else {
+    expenseTotal += amount;
+  }
+});
+
+
+
+  // ✅ Loop 2: Render rows
+  filtered.forEach(e => {
     const row = document.createElement('tr');
     row.dataset.id = e._id;
     row.innerHTML = `
@@ -209,12 +218,13 @@ function renderEntries() {
     entryTableBody.appendChild(row);
   });
 
+  // ✅ Display results
   const balance = incomeTotal - expenseTotal;
-
   document.getElementById('totalIncome').textContent = incomeTotal.toFixed(2);
   document.getElementById('totalExpense').textContent = expenseTotal.toFixed(2);
   document.getElementById('totalBalance').textContent = balance.toFixed(2);
 }
+
 
 
 
@@ -430,7 +440,6 @@ document.getElementById('entryForm').addEventListener('submit', async (e) => {
   populateNewEntryDropdowns();                // ✅ Then update dropdowns
 });
 
-  
 
 function renderBankBalanceForm() {
   const container = document.getElementById('bankBalanceTableContainer');
@@ -444,9 +453,14 @@ function renderBankBalanceForm() {
   // Collect net changes
   const changes = {};
   banks.forEach(bank => (changes[bank] = 0));
+
   entries.forEach(e => {
-    if (changes[e.bank] != null) {
-      changes[e.bank] += (e.type === 'income' ? e.amount : -e.amount);
+    const bank = e.bank;
+    const type = (e.type || '').trim().toLowerCase();
+    const amount = Math.abs(parseFloat(e.amount)) || 0;
+
+    if (changes[bank] != null) {
+      changes[bank] += (type === 'income') ? amount : -amount;
     }
   });
 
