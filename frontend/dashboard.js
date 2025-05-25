@@ -119,69 +119,48 @@ function populateFilters() {
   // ✅ PERSON DROPDOWN
   const persons = [...new Set(entries.map(e => e.person))].filter(Boolean);
   const personOptions = document.getElementById('personOptions');
+ 
 
-// Add "All" checkbox at the top
+  // Clear and add "All" checkbox
+ // Clear and add "All" checkbox
 personOptions.innerHTML = `
-  <label style="display: block;">
-    <input type="checkbox" id="selectAllPersons" checked />
-    <strong>All</strong>
-  </label>
-` + persons
-  .map(p => `
-    <label style="display: block;">
-      <input type="checkbox" name="personFilter" value="${p}" checked />
-      ${p}
-    </label>
-  `).join('');
 
-// Toggle all checkboxes when "All" is clicked
+  <div class="personOptionGroup">
+    <label><input type="checkbox" id="selectAllPersons" /> <strong>All</strong></label>
+    ${persons.map(p => `
+      <label>
+        <input type="checkbox" class="personOption" name="personFilter" value="${p}" checked />
+        ${p}
+      </label>
+    `).join('')}
+  </div>
+`;
+
+// Handle "Select All"
 document.getElementById('selectAllPersons').addEventListener('change', function () {
-  const all = this.checked;
-  document.querySelectorAll('[name="personFilter"]').forEach(cb => {
-    cb.checked = all;
-  });
+  const allChecked = this.checked;
+  document.querySelectorAll('.personOption').forEach(cb => cb.checked = allChecked);
   renderEntries();
 });
 
-// Update "All" checkbox state if any single one is unchecked
-document.querySelectorAll('[name="personFilter"]').forEach(cb => {
+// Handle single checkbox changes
+document.querySelectorAll('.personOption').forEach(cb => {
   cb.addEventListener('change', () => {
-    const allChecked = Array.from(document.querySelectorAll('[name="personFilter"]')).every(cb => cb.checked);
-    document.getElementById('selectAllPersons').checked = allChecked;
+    const all = document.querySelectorAll('.personOption');
+    const checked = document.querySelectorAll('.personOption:checked');
+    document.getElementById('selectAllPersons').checked = all.length === checked.length;
     renderEntries();
   });
 });
-
-  // Attach change listeners
-  personOptions.querySelectorAll('input').forEach(cb => {
-    cb.addEventListener('change', renderEntries);
-  });
-}
+ }
+ 
 
 
-function populatePersonCheckboxes() {
-  const persons = [...new Set(entries.map(e => e.person))].filter(Boolean);
-  const container = document.getElementById('personOptions');
 
-  const saved = JSON.parse(localStorage.getItem('personFilterValues') || '[]');
-
-  container.innerHTML = persons.map(p => `
-    <label>
-      <input type="checkbox" value="${p}" ${saved.includes(p) ? 'checked' : ''} onchange="handlePersonCheckboxChange()"> ${p}
-    </label>
-  `).join('');
-}
-
-function handlePersonCheckboxChange() {
-  const selected = [...document.querySelectorAll('#personOptions input:checked')].map(cb => cb.value);
-  localStorage.setItem('personFilterValues', JSON.stringify(selected));
-  renderEntries();
-}
 
 function renderEntries() {
   const searchAmount = parseFloat(amountSearch.value || "0");
-  const selectedPersons = Array.from(document.querySelectorAll('[name="personFilter"]:checked'))
-    .map(cb => cb.value);
+  const selectedPersons = Array.from(document.querySelectorAll('.personOption:checked')).map(cb => cb.value);
 
   const filtered = entries.filter(e =>
     (!monthSelect.value || e.date.startsWith(monthSelect.value)) &&
@@ -199,8 +178,10 @@ function renderEntries() {
   let expenseTotal = 0;
 
   filtered.forEach(e => {
-    if (e.type === 'income') incomeTotal += e.amount;
-    else if (e.type === 'expense' || e.type === 'transfer') expenseTotal += e.amount;
+    const type = (e.type || '').toLowerCase();
+    const amount = Number(e.amount) || 0;
+    if (type === 'income') incomeTotal += amount;
+    else expenseTotal += amount;
 
     const row = document.createElement('tr');
     row.dataset.id = e._id;
@@ -212,7 +193,7 @@ function renderEntries() {
       <td contenteditable="true" data-field="type">${e.type}</td>
       <td contenteditable="true" data-field="person">${e.person}</td>
       <td contenteditable="true" data-field="bank">${e.bank}</td>
-      <td><button onclick="deleteEntry('${e._id}')">🗑️</button></td>
+      <td><button onclick="deleteEntry('${e._id}')">Delete</button></td>
     `;
 
     row.querySelectorAll('[contenteditable]').forEach(cell => {
@@ -228,19 +209,12 @@ function renderEntries() {
     entryTableBody.appendChild(row);
   });
 
-  const incomeEl = document.getElementById('totalIncome');
-  const expenseEl = document.getElementById('totalExpense');
-  const totalEl = document.getElementById('totalBalance');
-  
-
   const balance = incomeTotal - expenseTotal;
 
-  if (incomeEl) incomeEl.textContent = incomeTotal.toFixed(2);
-  if (expenseEl) expenseEl.textContent = expenseTotal.toFixed(2);
-  if (totalEl) totalEl.textContent = balance.toFixed(2);
-  
+  document.getElementById('totalIncome').textContent = incomeTotal.toFixed(2);
+  document.getElementById('totalExpense').textContent = expenseTotal.toFixed(2);
+  document.getElementById('totalBalance').textContent = balance.toFixed(2);
 }
-
 
 
 
@@ -509,10 +483,7 @@ function renderBankBalanceForm() {
 
 window.initialLocked = false;
 
-function toggleLock() {
-  window.initialLocked = !window.initialLocked;
-  renderBankBalanceForm(); // Reflect new readonly state
-}
+
 
 function saveBankBalances() {
   const inputs = document.querySelectorAll('[data-bank]');
@@ -745,3 +716,12 @@ function toggleLock() {
   window.initialLocked = !window.initialLocked;
   renderBankBalanceForm();
 }
+
+
+function togglePersonDropdown() {
+  const options = document.getElementById('personOptions');
+  if (options) {
+    options.style.display = options.style.display === 'none' ? 'block' : 'none';
+  }
+}
+
