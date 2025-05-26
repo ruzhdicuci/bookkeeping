@@ -769,9 +769,3 @@ function togglePersonDropdown() {
 
 
 
-    personOptions.innerHTML = persons.map(p => `
-  <label class="checkbox-label">
-    <input type="checkbox" class="personOption" value="${p}" checked />
-    ${p}
-  </label>
-`).join('');
