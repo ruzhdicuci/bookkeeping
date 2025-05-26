@@ -752,3 +752,26 @@ function togglePersonDropdown() {
   }
 }
 
+
+    // Using JavaScript to open the page in fullscreen mode
+    const elem = document.documentElement;
+    function openFullscreen() {
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+      }
+    }
+    
+    function closeFullscreen() {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+
+
+
+    personOptions.innerHTML = persons.map(p => `
+  <label class="checkbox-label">
+    <input type="checkbox" class="personOption" value="${p}" checked />
+    ${p}
+  </label>
+`).join('');

@@ -12,10 +12,11 @@
 </head>
 <body>
 
+  <div class="controls">
 
-
-      <h3>📊 Bookkeeping</h1>
-
+      <h3 id="hb5">📊 Bookkeeping</h1>     <button id="full" class="tab"  onclick="openFullscreen();">Full Screen</button>
+     <button id="close"  class="tab"  onclick="closeFullscreen();">Close</button>
+</div>
 
  <div class="controls-wrapper">
   <div class="controls">
@@ -44,14 +45,6 @@
 </div>
 
 
-<h3 id="hb4">▪  Balance</h3>
-
-<div class="summary-totals">
-  <p><strong style="font-size: 24px;">Income:&nbsp&nbsp</strong> <span id="totalIncome">0.00</span></p>
-  <p><strong style="font-size: 24px;">Expenses:&nbsp&nbsp</strong> <span id="totalExpense">0.00</span></p>
-  <p><strong style="font-size: 24px;">Balance:&nbsp&nbsp</strong> <span id="totalBalance">0.00</span></p>
-  
-</div>
 
 
 
@@ -73,16 +66,18 @@
 </select>
 
 
-<input list="personList" id="newPerson" placeholder="Person" required />
-<datalist id="personList"></datalist>
+
+
+
+<label>
+<input list="personList"  id="newPerson" placeholder="Person" required />
+<datalist   id="personList"></datalist>
+
 
 <input list="bankList" id="newBank" placeholder="Bank" required />
 <datalist id="bankList"></datalist>
-
-
-
-
-  </div>
+</label>
+ </div>
 
   <div class="entry-button">
     <button id="eb" type="submit">Add Entry</button>
@@ -94,7 +89,7 @@
 
 
 <div  class="table-container">
-  <h3 id="hb4" >▪ Account Balances by Bank</h3>
+  <h3 id="hb4">▪ Balances - 26 Maj 2025</h3>
   
   <div class="th2" id="bankBalanceTableContainer"></div>
 
@@ -107,8 +102,10 @@
     <th id="th1">
    
 
-      <th id="th1"><input type="text" id="descSearch" placeholder="Description" /></th>
-     <th id="th1"><input type="number" id="amountSearch" placeholder="Amount" step="0.01" /></th>
+      <th id="th1"><input type="text" id="descSearch" onfocus="this.placeholder=''" placeholder="... 🔍" /></th>
+     
+     <th id="th1"><input type="number" id="amountSearch" onfocus="this.placeholder=''" placeholder="... 🔍" step="0.01" /></th>
+   
 
   <th id="th1"><th id="th1"><th id="th1"><th id="th1"><th id="th1">
   </tr>
@@ -125,6 +122,15 @@
     <th>Actions</th>
   </tr>
 </thead>
+
+<h3 id="hb4">▪  Balance</h3>
+
+<div class="summary-totals">
+  <p><strong style="font-size: 24px;">Income:&nbsp&nbsp</strong> <span id="totalIncome">0.00</span></p>
+  <p><strong style="font-size: 24px;">Expenses:&nbsp&nbsp</strong> <span id="totalExpense">0.00</span></p>
+  <p><strong style="font-size: 24px;">Balance:&nbsp&nbsp</strong> <span id="totalBalance">0.00</span></p>
+  
+</div>
 
 
 <h3 id="hb4" >▪ Filter</h3>
@@ -156,6 +162,7 @@
         <option value="USD">USD</option>
       </select>
     </label>
+
 
 
 <label>
