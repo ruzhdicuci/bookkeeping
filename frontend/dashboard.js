@@ -58,20 +58,34 @@ async function fetchEntries() {
     entries = await res.json();
     console.log("📦 Entries:", entries);
 
+    await loadInitialBankBalances(); // ✅ Load balances AFTER entries but BEFORE rendering
     populateFilters();
     renderBankBalanceForm();
     renderEntries();
+
   } catch (err) {
     console.error("❌ fetchEntries failed:", err);
   }
 }
 
+
 async function loadInitialBankBalances() {
-  const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/balances', {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  initialBankBalances = await res.json();
-  renderBankBalanceForm();
+  try {
+    const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/balances', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    if (!res.ok) throw new Error('Failed to load balances');
+
+    initialBankBalances = await res.json();
+
+    // Optional: save to localStorage as a fallback
+    localStorage.setItem('initialBankBalances', JSON.stringify(initialBankBalances));
+  } catch (err) {
+    console.warn('⚠️ Could not load balances from backend. Using localStorage fallback.');
+    const local = localStorage.getItem('initialBankBalances');
+    if (local) initialBankBalances = JSON.parse(local);
+  }
 }
 
 
@@ -554,26 +568,27 @@ async function saveBankBalances() {
     initialBankBalances[bank] = parseFloat(input.value) || 0;
   });
 
-  // Save locally
-  localStorage.setItem('initialBankBalances', JSON.stringify(initialBankBalances));
+  localStorage.setItem('initialBankBalances', JSON.stringify(initialBankBalances)); // Optional
 
-  // Save to backend
-  try {
-    await fetch(`${backend}/api/balances`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(initialBankBalances)
-    });
-  } catch (err) {
-    console.error('❌ Error saving balances to cloud:', err);
-  }
+  // ✅ Save to MongoDB backend
+  await fetch('https://bookkeeping-i8e0.onrender.com/api/balances', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(initialBankBalances),
+  });
 
   renderBankBalanceForm();
   renderEntries();
 }
+
+
+
+
+
+
 
 // Resize alignment for consistency
 setTimeout(() => {
@@ -678,19 +693,27 @@ async function loginWithSelectedUser() {
   });
 
   const data = await res.json();
+
   if (res.ok) {
     localStorage.setItem('token', data.token);
     localStorage.setItem('currentUser', email);
     localStorage.setItem('lastLoginUser', email);
+
+    // ✅ Redirect only after login — fetch will run on dashboard page
     location.href = 'dashboard.html';
+
   } else {
     alert(data.message);
   }
 }
 
+
 // Call on login page load
 window.addEventListener('DOMContentLoaded', populateLoginUserDropdown);
 
+window.addEventListener('DOMContentLoaded', async () => {
+  await fetchEntries(); // ← correctly loads entries and balances
+});
 
 // Save to backend
 async function saveBankBalancesToBackend() {
