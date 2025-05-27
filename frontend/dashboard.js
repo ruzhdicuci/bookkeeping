@@ -544,7 +544,7 @@ function renderBankBalanceForm() {
   container.innerHTML = html;
 }
 
-window.initialLocked = true;
+window.initialLocked = false;
 
 
 async function saveBankBalances() {
