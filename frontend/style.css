@@ -36,9 +36,9 @@ font-weight: bold;
    
 }
 
-#h3 {
-  
-   font-weight:bold;
+h3 {
+  font-size: 18px;
+   color: #484545;
 }
 
 /* width */
@@ -76,6 +76,7 @@ h1 {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
+  
 }
 
 .controls button, .filters select {
@@ -88,6 +89,7 @@ h1 {
   display: flex;
   flex-direction: column;
   font-size: 0.85rem;
+  
 }
 
 table {
@@ -97,8 +99,16 @@ table {
   background-color: white;
 
 }
-th, td {
-  border: 1px solid #ccc;
+td {
+  border: 1px solid #f4f2f2;
+  padding: 8px;
+text-align: center;
+  font-weight: lighter;
+
+}
+
+th {
+  border: 1px solid #e3dede;;
   padding: 8px;
 text-align: center;
   font-weight: lighter;
@@ -166,10 +176,7 @@ th {
 }
 
 
-.dark #hb4 {
-color: white;
- background-color: #2b2929;  
-}
+
 
 .dark .filters {
 color: white;
@@ -198,6 +205,7 @@ color: white;
   width: 100%;
   table-layout: fixed;
   font-size: 1.4rem;
+  
 
 }
 #bankBalanceTableContainer input[type="number"] {
@@ -207,7 +215,7 @@ color: white;
   font-size: 1.4rem;
     
 }
-#descSearch, #amountSearch  {
+#descSearch {
   width: 102%;
   table-layout: fixed;
   height: 32px;
@@ -216,20 +224,36 @@ color: white;
   margin-left: -10px;
   gap: 30px;
   background-color: white;
+       border: 1px solid #f4f2f2;
+      margin-bottom: -15px;
  font-size: 1.2rem;
-  color:red
-}
+  color:red;
 
+}
+#amountSearch  {
+  width: 102%;
+  table-layout: fixed;
+  height: 32px;
+  text-align: center;
+  margin-right: -10px;
+  margin-left: -10px;
+  gap: 30px;
+  background-color: white;
+     border: 1px solid #f4f2f2;
+ font-size: 1.2rem;
+  color:red;
+        margin-bottom: -15px;
+}
 #descSearch::placeholder , #amountSearch::placeholder  {
  
  color: rgb(56, 52, 52);
 }
 
 .th2 table th:first-child {
-  background-color: #f4f2f2;
+  background-color: white;
   border: none;
-  border-left: 1px solid #f4f2f2;
-  border-top: 1px solid #f4f2f2;
+  border-left: 1px solid white;
+  border-top: 1px solid white;
  
 }
 
@@ -242,12 +266,7 @@ color: white;
 }
 
 
-#hb4 {
-padding: 10px 10px 10px 10px;
- background-color: #eae8e8;
-  margin-top: 30px ;
-   
-}
+
 
 .summary-totals {
   display: flex;
@@ -272,21 +291,59 @@ padding: 10px 10px 10px 10px;
   flex-wrap: wrap;
   gap: 0.75rem;
   align-items: center;
+ 
 }
+
+.sections {
+   background-color: white;
+  padding-left: 30px;
+  padding-right: 30px;
+  padding-top: 10px;
+  padding-bottom: 5px;
+  margin-top: 10px;
+   margin-bottom: 10px;
+}
+
+.sections2 {
+   background-color: white;
+  padding-left: 30px;
+  padding-right: 30px;
+  padding-top: 1px;
+  padding-bottom: 1px;
+
+   margin-bottom: 10px;
+}
+
+.sections3 {
+   background-color: white;
+  padding-left: 30px;
+  padding-right: 30px;
+  padding-top: 1px;
+  padding-bottom: 15px;
+
+   margin-bottom: 10px;
+}
+.sections4 {
+   background-color: white;
+  padding-left: 30px;
+  padding-right: 30px;
+  padding-top: 1px;
+  padding-bottom: 5px;
+
+   margin-bottom: 5px;
+}
+
 
 .controls button,
 .controls input[type="file"] {
   font-size: 1rem;
   padding: 0.5rem 0.75rem;
-  border: 1px solid #ccc;
+   border: 1px solid #f4f2f2;
   background-color: #ffffff;
   cursor: pointer;
   border-radius: 4px;
 }
 
-.controls input[type="file"] {
-  padding: 0.4rem;
-}
 
 
 .filters {
@@ -295,22 +352,26 @@ padding: 10px 10px 10px 10px;
   gap: 1rem;
   margin: 1rem 0;
   align-items: center;
+
 }
 
 .filters label {
   display: flex;
   flex-direction: column;
   font-size: 1.1rem;
+
 }
 
 .filters select {
   min-width: 120px;
   padding: 0.4rem;
   font-size: 1.1rem;
+
 }
 
 #entryTableBody {
 font-size: 1.1rem;
+  
 }
 
 .entry-form {
@@ -333,7 +394,7 @@ font-size: 1.1rem;
   height: 40px;
   padding: 0.5rem;
   font-size: 1.1rem;
-  border: 1px solid #ccc;
+    border: 1px solid #f4f2f2;
   border-radius: 4px;
   box-sizing: border-box;
   min-width: 80px;
@@ -374,7 +435,7 @@ font-size: 1.1rem;
   padding: 0.5rem 1rem;
   font-size: 1rem;
   background-color: #f1f1f1;
-  border: 1px solid #ccc;
+    border: 1px solid #f4f2f2;
   border-radius: 4px;
   cursor: pointer;
   white-space: nowrap;
@@ -456,7 +517,7 @@ margin-top: 7px;
 .filters input, 
 .filters select {
  
-  border: 1px solid #ccc;
+    border: 1px solid #f4f2f2;
   border-radius: 4px;
   box-sizing: border-box;
  
@@ -481,14 +542,14 @@ margin-top: 7px;
   }
 
   table th, table td {
-    border: 1px solid #ccc;
+       border: 1px solid #f4f2f2;
     padding: 6px;
   }
 }
 .custom-file-label{
   background: white;
   color: black;
-border: 1px solid #ccc;
+    border: 1px solid #f4f2f2;
    padding: 8px 12px;
 
   font-size: 1.1rem;
@@ -568,7 +629,7 @@ border: 1px solid #ccc;
   border-radius: 4px;
       height: 38px;
    font-size: 1rem;
-  border: 1px solid #ccc;
+     border: 1px solid #f4f2f2;
       color: #444;
 }
 
@@ -597,7 +658,7 @@ font-size: 20px;
 .multi-select.styled-select {
   margin-top: 10px;
   border-radius: 4px;
-  border: 1px solid #ccc;
+     border: 1px solid #f4f2f2;
   font-size: 1rem;
   height: 32px;
   color: #444;

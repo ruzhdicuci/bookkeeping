@@ -19,7 +19,7 @@
       <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
+ <div class="sections">
   <div class="controls">
 
       <h3 id="hb5">📊 Bookkeeping</h1>     <button id="full" class="tab"  onclick="openFullscreen();">Full Screen</button>
@@ -28,6 +28,8 @@
     <button id="zoomOutButton">Zoom Out</button>
     <button id="resetZoomButton">Reset</button>
 </div>
+
+
 
  <div class="controls-wrapper">
   <div id="hide2" class="controls">
@@ -50,16 +52,16 @@
 
 
 
-
+</div>
 
   </div>
 </div>
 
 
 
+ <div class="sections2">
 
-
-<h3 id="hb4"> ▪  Add New Entry</h3>
+<h3 id="hb4"> ▪  Entries</h3>
 <form id="entryForm" class="entry-form">
   <div class="entry-fields">
     <input type="date" id="newDate" required />
@@ -97,13 +99,18 @@
   </div>
 
 </form>
+</div>
 
+
+
+
+ <div class="sections3">
 
 <div  class="table-container">
   <h3 id="hb4">▪ Balances - 26 Maj 2025</h3>
   
   <div class="th2" id="bankBalanceTableContainer"></div>
-
+</div></div>
  
   <table>
 
@@ -134,6 +141,8 @@
   </tr>
 </thead>
 
+
+<div class="sections3">
 <h3 id="hb4">▪  Balance</h3>
 
 <div class="summary-totals">
@@ -141,10 +150,10 @@
   <p><strong style="font-size: 24px;">Expenses:&nbsp&nbsp</strong> <span id="totalExpense">0.00</span></p>
   <p><strong style="font-size: 24px;">Balance:&nbsp&nbsp</strong> <span id="totalBalance">0.00</span></p>
   
-</div>
+</div></div>
+<div class="sections4">
 
-
-<h3 id="hb4" >▪ Filter</h3>
+<h3  >▪ Filter</h3>
 <div class="filter-section">
  
   <div class="filters">
@@ -180,7 +189,7 @@
   Person:
  
 <div class="multi-select styled-select" id="personMultiSelect">
-  <button type="button" class="multi-select-toggle" onclick="togglePersonDropdown()">All Persons selected &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;👤</button>
+  <button type="button" class="multi-select-toggle" onclick="togglePersonDropdown()">All Persons selected &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;👤</button>
   <div class="multi-select-options" id="personOptions" style="display: none;"></div>
 </div>
 
@@ -200,7 +209,7 @@
 </div>
 
 
-<h3 id="hb4">▪   Income and Expenses</h3>
+
 
     <tbody id="entryTableBody"></tbody>
   </table>
