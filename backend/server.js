@@ -86,14 +86,14 @@ app.get('/api/users', async (req, res) => {
   res.json(users.map(u => u.email));
 });
 
-backend.delete('/api/users/:email', async (req, res) => {
+app.deleteelete('/api/users/:email', async (req, res) => {
   const { email } = req.params;
   if (email === 'default') return res.status(403).json({ message: 'Cannot delete default user' });
   await User.deleteOne({ email });
   res.json({ message: 'User deleted' });
 });
 
-backend.put('/api/users/:email/password', async (req, res) => {
+app.put('/api/users/:email/password', async (req, res) => {
   const { email } = req.params;
   const { password } = req.body;
 
@@ -117,7 +117,7 @@ app.post('/api/entries', auth, async (req, res) => {
   res.json(entry);
 });
 
-backend.put('/api/entries/:id', auth, async (req, res) => {
+app.put('/api/entries/:id', auth, async (req, res) => {
   const updated = await Entry.findOneAndUpdate(
     { _id: req.params.id, userId: req.userId },
     req.body,
@@ -126,12 +126,12 @@ backend.put('/api/entries/:id', auth, async (req, res) => {
   res.json(updated);
 });
 
-backend.delete('/api/entries/:id', auth, async (req, res) => {
+app.deleteelete('/api/entries/:id', auth, async (req, res) => {
   await Entry.deleteOne({ _id: req.params.id, userId: req.userId });
   res.json({ success: true });
 });
 
-backend.delete('/api/entries/delete-all', auth, async (req, res) => {
+app.deleteelete('/api/entries/delete-all', auth, async (req, res) => {
   await Entry.deleteMany({ userId: req.userId });
   res.json({ success: true });
 });
