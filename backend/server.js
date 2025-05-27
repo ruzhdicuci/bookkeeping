@@ -9,8 +9,9 @@ const bcrypt = require('bcrypt');
 
 const SECRET = 'rudi-bookkeeping-secret'; // replace with env var for production
 
-backend.use(cors());
-backend.use(express.json());
+app.use(cors());
+app.use(express.json());
+
 
 mongoose.connect('mongodb+srv://ruzhdicuci:9BgBDMYEJBjMGFid@bookkeeping.bcakntz.mongodb.net/bookkeeping?retryWrites=true&w=majority&appName=bookkeeping', {
   useNewUrlParser: true,
