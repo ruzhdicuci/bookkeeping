@@ -57,13 +57,10 @@ async function fetchEntries() {
 
     entries = await res.json();
     console.log("📦 Entries:", entries);
-await fetchEntries();
-await loadInitialBankBalances();
 
     populateFilters();
     renderBankBalanceForm();
     renderEntries();
-    
   } catch (err) {
     console.error("❌ fetchEntries failed:", err);
   }
