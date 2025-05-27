@@ -24,6 +24,12 @@ monthSelect.onchange =
   descSearch.oninput =
   amountSearch.oninput = renderEntries;
 
+
+
+
+
+
+
 // Person checkboxes
 document.addEventListener('change', (e) => {
   if (e.target.matches('#personOptions input[type="checkbox"]')) {
@@ -220,6 +226,7 @@ function renderEntries() {
   document.getElementById('totalExpense').textContent = expenseTotal.toFixed(2);
   document.getElementById('totalBalance').textContent = balance.toFixed(2);
 }
+
 
 
 
@@ -465,6 +472,27 @@ document.getElementById('entryForm').addEventListener('submit', async (e) => {
 });
 
 
+
+async function fetchBalancesFromBackend() {
+  try {
+    const res = await fetch(`${backend}/api/balances`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    const data = await res.json();
+    initialBankBalances = data;
+    localStorage.setItem('initialBankBalances', JSON.stringify(initialBankBalances));
+  } catch (err) {
+    console.warn('⚠️ Could not fetch balances from cloud. Using localStorage fallback.');
+    const stored = localStorage.getItem('initialBankBalances');
+    if (stored) initialBankBalances = JSON.parse(stored);
+  }
+}
+
+
+
+
 function renderBankBalanceForm() {
   const container = document.getElementById('bankBalanceTableContainer');
   const banks = [...new Set(entries.map(e => e.bank).filter(Boolean))];
@@ -529,16 +557,22 @@ async function saveBankBalances() {
     initialBankBalances[bank] = parseFloat(input.value) || 0;
   });
 
+  // Save locally
   localStorage.setItem('initialBankBalances', JSON.stringify(initialBankBalances));
 
-  await fetch('https://bookkeeping-i8e0.onrender.com/api/balances', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(initialBankBalances)
-  });
+  // Save to backend
+  try {
+    await fetch(`${backend}/api/balances`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(initialBankBalances)
+    });
+  } catch (err) {
+    console.error('❌ Error saving balances to cloud:', err);
+  }
 
   renderBankBalanceForm();
   renderEntries();
@@ -661,8 +695,26 @@ async function loginWithSelectedUser() {
 window.addEventListener('DOMContentLoaded', populateLoginUserDropdown);
 
 
+// Save to backend
+async function saveBankBalancesToBackend() {
+  await fetch('https://bookkeeping-i8e0.onrender.com/api/balances', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(initialBankBalances)
+  });
+}
 
-
+// Load from backend
+async function loadBankBalancesFromBackend() {
+  const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/balances', {
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+  initialBankBalances = await res.json();
+  localStorage.setItem('initialBankBalances', JSON.stringify(initialBankBalances));
+}
 
 
 
@@ -771,27 +823,9 @@ function togglePersonDropdown() {
   }
 }
 
-// Save balances for logged-in user
-backend.post('/api/balances', authenticateToken, async (req, res) => {
-  const user = req.user.email;
-  const balances = req.body;
 
-  await db.collection('balances').updateOne(
-    { user },
-    { $set: { balances } },
-    { upsert: true }
-  );
 
-  res.send({ success: true });
-});
 
-// Fetch balances for logged-in user
-backend.get('/api/balances', authenticateToken, async (req, res) => {
-  const user = req.user.email;
-  const doc = await db.collection('balances').findOne({ user });
-
-  res.send(doc?.balances || {});
-});
 
 
 

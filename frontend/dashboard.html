@@ -1,10 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Century">
-<script src="dashboard.js?v=20240527"></script>
+
+
+
 
 
   <title>Bookkeeping</title>
@@ -23,15 +28,7 @@
     <button id="zoomOutButton">Zoom Out</button>
     <button id="resetZoomButton">Reset</button>
 </div>
-<script>
-             // function for show/hide speaking minute
-        $(document).ready(function(){
-      $("#hb5").click(function(){
-        $(".controls").toggle();
-    });
-    });
 
-</script>
  <div class="controls-wrapper">
   <div id="hide2" class="controls">
       <button onclick="logout()">🔐 Logout</button>
@@ -213,5 +210,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="dashboard.js"></script>
+
 </body>
 </html>
