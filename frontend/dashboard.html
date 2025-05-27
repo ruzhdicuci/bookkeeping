@@ -16,10 +16,21 @@
 
       <h3 id="hb5">📊 Bookkeeping</h1>     <button id="full" class="tab"  onclick="openFullscreen();">Full Screen</button>
      <button id="close"  class="tab"  onclick="closeFullscreen();">Close</button>
+           <button id="zoomInButton">Zoom In</button>
+    <button id="zoomOutButton">Zoom Out</button>
+    <button id="resetZoomButton">Reset</button>
 </div>
+<script>
+             // function for show/hide speaking minute
+        $(document).ready(function(){
+      $("#hb5").click(function(){
+        $(".controls").toggle();
+    });
+    });
 
+</script>
  <div class="controls-wrapper">
-  <div class="controls">
+  <div id="hide2" class="controls">
       <button onclick="logout()">🔐 Logout</button>
 
     <button onclick="toggleTheme()">🌓 Theme</button>

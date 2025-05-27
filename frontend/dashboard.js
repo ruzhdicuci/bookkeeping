@@ -51,13 +51,24 @@ async function fetchEntries() {
 
     entries = await res.json();
     console.log("📦 Entries:", entries);
+await fetchEntries();
+await loadInitialBankBalances();
 
     populateFilters();
     renderBankBalanceForm();
     renderEntries();
+    
   } catch (err) {
     console.error("❌ fetchEntries failed:", err);
   }
+}
+
+async function loadInitialBankBalances() {
+  const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/balances', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  initialBankBalances = await res.json();
+  renderBankBalanceForm();
 }
 
 
@@ -511,8 +522,7 @@ function renderBankBalanceForm() {
 window.initialLocked = false;
 
 
-
-function saveBankBalances() {
+async function saveBankBalances() {
   const inputs = document.querySelectorAll('[data-bank]');
   inputs.forEach(input => {
     const bank = input.dataset.bank;
@@ -521,8 +531,17 @@ function saveBankBalances() {
 
   localStorage.setItem('initialBankBalances', JSON.stringify(initialBankBalances));
 
-  renderBankBalanceForm(); // To reapply readonly if locked
-  renderEntries();         // To reflect changes in total balance
+  await fetch('https://bookkeeping-i8e0.onrender.com/api/balances', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(initialBankBalances)
+  });
+
+  renderBankBalanceForm();
+  renderEntries();
 }
 
 // Resize alignment for consistency
@@ -752,6 +771,33 @@ function togglePersonDropdown() {
   }
 }
 
+// Save balances for logged-in user
+backend.post('/api/balances', authenticateToken, async (req, res) => {
+  const user = req.user.email;
+  const balances = req.body;
+
+  await db.collection('balances').updateOne(
+    { user },
+    { $set: { balances } },
+    { upsert: true }
+  );
+
+  res.send({ success: true });
+});
+
+// Fetch balances for logged-in user
+backend.get('/api/balances', authenticateToken, async (req, res) => {
+  const user = req.user.email;
+  const doc = await db.collection('balances').findOne({ user });
+
+  res.send(doc?.balances || {});
+});
+
+
+
+
+
+
 
     // Using JavaScript to open the page in fullscreen mode
     const elem = document.documentElement;
@@ -769,3 +815,32 @@ function togglePersonDropdown() {
 
 
 
+
+        // Initial zoom level
+        let zoomLevel = 1;
+
+        // Function to update the zoom
+        function updateZoom() {
+            document.body.style.zoom = zoomLevel;
+        }
+
+        // Zoom in button
+        document.getElementById('zoomInButton').addEventListener('click', () => {
+            zoomLevel += 0.1;
+            updateZoom();
+        });
+
+        // Zoom out button
+        document.getElementById('zoomOutButton').addEventListener('click', () => {
+            zoomLevel -= 0.1;
+            updateZoom();
+        });
+
+        // Reset zoom button
+        document.getElementById('resetZoomButton').addEventListener('click', () => {
+            zoomLevel = 1;
+            updateZoom();
+        });
+ 
+
+ 
