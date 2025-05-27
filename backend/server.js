@@ -81,7 +81,7 @@ app.post('/api/login', async (req, res) => {
   res.json({ token });
 });
 
-backend.get('/api/users', async (req, res) => {
+app.get('/api/users', async (req, res) => {
   const users = await User.find({}, 'email');
   res.json(users.map(u => u.email));
 });
@@ -107,7 +107,7 @@ backend.put('/api/users/:email/password', async (req, res) => {
   res.json({ message: 'Password updated' });
 });
 
-backend.get('/api/entries', auth, async (req, res) => {
+app.get('/api/entries', auth, async (req, res) => {
   const entries = await Entry.find({ userId: req.userId });
   res.json(entries);
 });
@@ -146,12 +146,12 @@ app.post('/api/balances', auth, async (req, res) => {
   res.json({ success: true });
 });
 
-backend.get('/api/balances', auth, async (req, res) => {
+app.get('/api/balances', auth, async (req, res) => {
   const doc = await Balance.findOne({ userId: req.userId });
   res.json(doc?.balances || {});
 });
 
-backend.listen(3210, () => {
+app.listen(3210, () => {
   console.log('✅ API running on https://bookkeeping-i8e0.onrender.com');
 });
 
