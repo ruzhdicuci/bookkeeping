@@ -1,11 +1,11 @@
 const express = require('express');
-const backend = express();
-
+const app = express(); // ✅ Fix: define the Express app
 const path = require('path');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+
 
 const SECRET = 'rudi-bookkeeping-secret'; // replace with env var for production
 
