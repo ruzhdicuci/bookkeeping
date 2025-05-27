@@ -86,7 +86,7 @@ app.get('/api/users', async (req, res) => {
   res.json(users.map(u => u.email));
 });
 
-app.deleteelete('/api/users/:email', async (req, res) => {
+app.delete('/api/users/:email', async (req, res) => {
   const { email } = req.params;
   if (email === 'default') return res.status(403).json({ message: 'Cannot delete default user' });
   await User.deleteOne({ email });
@@ -126,12 +126,12 @@ app.put('/api/entries/:id', auth, async (req, res) => {
   res.json(updated);
 });
 
-app.deleteelete('/api/entries/:id', auth, async (req, res) => {
+app.delete('/api/entries/:id', auth, async (req, res) => {
   await Entry.deleteOne({ _id: req.params.id, userId: req.userId });
   res.json({ success: true });
 });
 
-app.deleteelete('/api/entries/delete-all', auth, async (req, res) => {
+app.delete('/api/entries/delete-all', auth, async (req, res) => {
   await Entry.deleteMany({ userId: req.userId });
   res.json({ success: true });
 });
