@@ -453,7 +453,6 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 
-
 document.getElementById('entryForm').addEventListener('submit', async (e) => {
   e.preventDefault();
 
@@ -467,19 +466,31 @@ document.getElementById('entryForm').addEventListener('submit', async (e) => {
     bank: document.getElementById('newBank').value,
   };
 
-  await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(entry)
-  });
+  try {
+    const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(entry)
+    });
 
-  document.getElementById('entryForm').reset(); // ✅ Clear the form
+    if (!res.ok) {
+      const err = await res.json();
+      alert('❌ Error saving entry: ' + (err.message || res.statusText));
+      return;
+    }
 
-  await fetchEntries();                        // ✅ Ensure entries are refreshed
-  populateNewEntryDropdowns();                // ✅ Then update dropdowns
+    // ✅ Reset and refresh
+    document.getElementById('entryForm').reset();
+    await fetchEntries(); // ← This should NOT call itself inside
+    populateNewEntryDropdowns();
+
+  } catch (error) {
+    console.error('❌ Error saving entry:', error);
+    alert('Failed to save entry.');
+  }
 });
 
 
