@@ -153,3 +153,18 @@ backend.get('/api/balances', auth, async (req, res) => {
 backend.listen(3210, () => {
   console.log('✅ API running on https://bookkeeping-i8e0.onrender.com');
 });
+
+
+app.post('/api/balances', auth, async (req, res) => {
+  await Balance.findOneAndUpdate(
+    { userId: req.userId },
+    { balances: req.body },
+    { upsert: true }
+  );
+  res.json({ success: true });
+});
+
+app.get('/api/balances', auth, async (req, res) => {
+  const doc = await Balance.findOne({ userId: req.userId });
+  res.json(doc?.balances || {});
+});
