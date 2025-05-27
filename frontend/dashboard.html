@@ -8,7 +8,7 @@
 
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Century">
 
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 
 
@@ -20,35 +20,76 @@
 </head>
 <body>
  <div class="sections">
-  <div class="controls">
+<div class="navbar">
+   <a id="toggleTheme" onclick="toggleTheme()">🌓 </a> 
+  <div class="dropdown">
+    
+    <button class="dropbtn">Settings
+      <i class="fa fa-caret-down"></i>
+    </button>
+    <div class="dropdown-content">
+     
+      <a href="#" id="full"  onclick="openFullscreen();">Full Screen</a>
+     <a href="#" id="close"    onclick="closeFullscreen();">Close Screen</a>
+           <a href="#" id="zoomInButton">Zoom In</a>
+    <a href="#" id="zoomOutButton">Zoom Out</a>
+   <a  href="#" id="resetZoomButton">Reset</a>
+    </div>
+ 
+ </div>
+<div class="dropdown">
+    <button class="dropbtn">Table
+      <i class="fa fa-caret-down"></i>
+    </button>
+    <div class="dropdown-content">
+     
+       <a  onclick="logout()">🔐 Logout</a>
+    <a onclick="deleteAllEntries()">🧨 Delete All Entries</a>
+                <a  onclick="backupData()">📦 Backup</a>
+ <input type="file" id="restoreFile" style="display:none" onchange="restoreBackup(event)" />
+ <a  onclick="document.getElementById('restoreFile').click()">♻️ Restore</a>
+    </div>
 
-      <h3 id="hb5">📊 Bookkeeping</h1>     <button id="full" class="tab"  onclick="openFullscreen();">Full Screen</button>
-     <button id="close"  class="tab"  onclick="closeFullscreen();">Close</button>
-           <button id="zoomInButton">Zoom In</button>
-    <button id="zoomOutButton">Zoom Out</button>
-    <button id="resetZoomButton">Reset</button>
+ </div>
+
+
+<div class="dropdown">
+    <button class="dropbtn">Export
+      <i class="fa fa-caret-down"></i>
+    </button>
+    <div class="dropdown-content">
+     
+       <a  onclick="downloadPDF()">🧾 Export PDF</a>
+    <a onclick="deleteAllEntries()">🧨 Delete All Entries</a>
+                 <label for="importCSV" class="custom-file-label">📥 Import CSV</label>
+                <input type="file" id="importCSV" accept=".csv" style="display: none;" />
+ <input type="file" id="restoreFile" style="display:none" onchange="restoreBackup(event)" />
+
+  <a  onclick="exportCombinedCSV()">📤 Export CSV</a>
+    <a onclick="window.print()">🖨️ Print</a>
+        </div>
+  
+
+
+  
+  </div> 
 </div>
 
 
 
- <div class="controls-wrapper">
-  <div id="hide2" class="controls">
-      <button onclick="logout()">🔐 Logout</button>
+     
 
-    <button onclick="toggleTheme()">🌓 Theme</button>
-    <button onclick="showUserManagerModal()">👥 Users</button>
-     <button onclick="deleteAllEntries()">🧨 Delete All</button>
-    <button onclick="downloadPDF()">🧾 Export PDF</button>
-   <label  for="importCSV" class="custom-file-label">📥 Import CSV</label>
-<input type="file" id="importCSV" accept=".csv" style="display: none;" />
-<button onclick="exportCombinedCSV()">📤 Export CSV</button>
+   
+   
+     
+    
+
 
     
    
-    <button onclick="window.print()">🖨️ Print</button>
-    <button onclick="backupData()">📦 Backup</button>
-<input type="file" id="restoreFile" style="display:none" onchange="restoreBackup(event)" />
-<button onclick="document.getElementById('restoreFile').click()">♻️ Restore</button>
+  
+
+
 
 
 
@@ -93,7 +134,7 @@
  </div>
 
   <div class="entry-button">
-    <button id="eb" type="submit">Add Entry</button>
+    <button id="eb" type="submit">Add</button>
 
 
   </div>
@@ -130,14 +171,14 @@
    <thead>
      <thead>
   <tr>
-    <th>Date</th>
-    <th>Description</th>
-    <th>Amount</th>
-    <th>Currency</th>
-    <th>Type</th>
-    <th>Person</th>
-    <th>Bank</th>
-    <th>Actions</th>
+    <th id="th3">Date</th>
+    <th id="th3">Description</th>
+    <th id="th3">Amount</th>
+    <th id="th3">Currency</th>
+    <th id="th3">Type</th>
+    <th id="th3">Person</th>
+    <th id="th3">Bank</th>
+    <th id="th3">Actions</th>
   </tr>
 </thead>
 
