@@ -1,170 +1,146 @@
-const express = require('express');
-const backend = express();
+// ✅ Backend API root
+const backend = 'https://bookkeeping-i8e0.onrender.com';
+const token = localStorage.getItem('token');
+if (!token) location.href = 'index.html';
 
-const path = require('path');
-const cors = require('cors');
-const mongoose = require('mongoose');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
+// ✅ DOM Elements
+const entryTableBody = document.getElementById('entryTableBody');
+const monthSelect = document.getElementById('monthSelect');
+const bankFilter = document.getElementById('bankFilter');
+const personOptions = document.getElementById('personOptions');
+const currencyFilter = document.getElementById('currencyFilter');
+const typeFilter = document.getElementById('typeFilter');
+const descSearch = document.getElementById('descSearch');
+const amountSearch = document.getElementById('amountSearch');
 
-const SECRET = 'rudi-bookkeeping-secret'; // replace with env var for production
+let entries = [];
+let initialBankBalances = {};
 
-backend.use(cors());
-backend.use(express.json());
+// ✅ Load balances from localStorage
+const storedBalances = localStorage.getItem('initialBankBalances');
+if (storedBalances) {
+  initialBankBalances = JSON.parse(storedBalances);
+}
 
-mongoose.connect('mongodb+srv://ruzhdicuci:9BgBDMYEJBjMGFid@bookkeeping.bcakntz.mongodb.net/bookkeeping?retryWrites=true&w=majority&appName=bookkeeping', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
+// ✅ Filters update
+monthSelect.onchange =
+  bankFilter.onchange =
+  typeFilter.onchange =
+  currencyFilter.onchange =
+  descSearch.oninput =
+  amountSearch.oninput = renderEntries;
+
+document.addEventListener('change', (e) => {
+  if (e.target.matches('#personOptions input[type="checkbox"]')) {
+    renderEntries();
+  }
 });
 
-// Define MongoDB Schemas
-const Balance = mongoose.model('Balance', new mongoose.Schema({
-  userId: String,
-  balances: Object
-}));
+// ✅ Initial load
+fetchEntries();
 
-const User = mongoose.model('User', new mongoose.Schema({
-  email: String,
-  password: String
-}));
-
-const Entry = mongoose.model('Entry', new mongoose.Schema({
-  userId: String,
-  description: String,
-  amount: Number,
-  type: String,
-  date: String,
-  person: String,
-  bank: String,
-  currency: String
-}));
-
-// Auth middleware
-function auth(req, res, next) {
-  const token = req.headers.authorization?.split(' ')[1];
-  if (!token) return res.status(401).json({ message: 'Missing token' });
-
+async function fetchEntries() {
   try {
-    const decoded = jwt.verify(token, SECRET);
-    req.userId = decoded.userId;
-    next();
-  } catch {
-    res.status(401).json({ message: 'Invalid token' });
+    const res = await fetch(`${backend}/api/entries`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    entries = await res.json();
+
+    await loadInitialBankBalances();
+    populateFilters();
+    renderBankBalanceForm();
+    renderEntries();
+  } catch (err) {
+    console.error("❌ Failed to load entries:", err);
   }
 }
 
-// Routes
-backend.post('/api/register', async (req, res) => {
-  const email = req.body.email.trim().toLowerCase();
-  const { password } = req.body;
+async function loadInitialBankBalances() {
+  const res = await fetch(`${backend}/api/balances`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  initialBankBalances = await res.json();
+  localStorage.setItem('initialBankBalances', JSON.stringify(initialBankBalances));
+}
 
-  const existing = await User.findOne({ email });
-  if (existing) return res.status(400).json({ message: 'User already exists' });
+function populateFilters() {
+  const months = [...new Set(entries.map(e => e.date.slice(0, 7)))].sort();
+  monthSelect.innerHTML = `<option value="">All</option>` + months.map(m => `<option value="${m}">${m}</option>`).join('');
 
-  const hashed = await bcrypt.hash(password, 10);
-  const user = await User.create({ email, password: hashed });
-  res.json({ message: 'Registered' });
-});
+  const banks = [...new Set(entries.map(e => e.bank))].filter(Boolean);
+  bankFilter.innerHTML = `<option value="">All</option>` + banks.map(b => `<option value="${b}">${b}</option>`).join('');
 
-backend.post('/api/login', async (req, res) => {
-  const email = req.body.email.trim().toLowerCase();
-  const { password } = req.body;
+  const persons = [...new Set(entries.map(e => e.person))].filter(Boolean);
+  personOptions.innerHTML = `
+    <label><input type="checkbox" id="selectAllPersons" /> <strong>All</strong></label>
+    ${persons.map(p => `
+      <label>
+        <input type="checkbox" class="personOption" value="${p}" checked /> ${p}
+      </label>
+    `).join('')}
+  `;
 
-  const user = await User.findOne({ email });
-  if (!user) return res.status(400).json({ message: 'Invalid credentials' });
+  document.getElementById('selectAllPersons').onchange = function () {
+    document.querySelectorAll('.personOption').forEach(cb => cb.checked = this.checked);
+    renderEntries();
+  };
 
-  const match = await bcrypt.compare(password, user.password);
-  if (!match) return res.status(400).json({ message: 'Invalid credentials' });
+  document.querySelectorAll('.personOption').forEach(cb => {
+    cb.onchange = () => {
+      const all = document.querySelectorAll('.personOption');
+      const checked = document.querySelectorAll('.personOption:checked');
+      document.getElementById('selectAllPersons').checked = all.length === checked.length;
+      renderEntries();
+    };
+  });
+}
 
-  const token = jwt.sign({ userId: user._id }, SECRET);
-  res.json({ token });
-});
+function renderEntries() {
+  const selectedPersons = Array.from(document.querySelectorAll('.personOption:checked')).map(cb => cb.value);
 
-backend.get('/api/users', async (req, res) => {
-  const users = await User.find({}, 'email');
-  res.json(users.map(u => u.email));
-});
-
-backend.delete('/api/users/:email', async (req, res) => {
-  const { email } = req.params;
-  if (email === 'default') return res.status(403).json({ message: 'Cannot delete default user' });
-  await User.deleteOne({ email });
-  res.json({ message: 'User deleted' });
-});
-
-backend.put('/api/users/:email/password', async (req, res) => {
-  const { email } = req.params;
-  const { password } = req.body;
-
-  if (!password || password.length < 3) {
-    return res.status(400).json({ message: 'Password too short' });
-  }
-
-  const hashed = await bcrypt.hash(password, 10);
-  await User.updateOne({ email }, { password: hashed });
-
-  res.json({ message: 'Password updated' });
-});
-
-backend.get('/api/entries', auth, async (req, res) => {
-  const entries = await Entry.find({ userId: req.userId });
-  res.json(entries);
-});
-
-backend.post('/api/entries', auth, async (req, res) => {
-  const entry = await Entry.create({ ...req.body, userId: req.userId });
-  res.json(entry);
-});
-
-backend.put('/api/entries/:id', auth, async (req, res) => {
-  const updated = await Entry.findOneAndUpdate(
-    { _id: req.params.id, userId: req.userId },
-    req.body,
-    { new: true }
+  const filtered = entries.filter(e =>
+    (!monthSelect.value || e.date.startsWith(monthSelect.value)) &&
+    (selectedPersons.length === 0 || selectedPersons.includes(e.person)) &&
+    (!bankFilter.value || e.bank === bankFilter.value) &&
+    (!typeFilter.value || e.type === typeFilter.value) &&
+    (!currencyFilter.value || e.currency === currencyFilter.value) &&
+    (!descSearch.value || e.description.toLowerCase().includes(descSearch.value.toLowerCase())) &&
+    (!amountSearch.value || String(e.amount ?? '').includes(amountSearch.value))
   );
-  res.json(updated);
-});
 
-backend.delete('/api/entries/:id', auth, async (req, res) => {
-  await Entry.deleteOne({ _id: req.params.id, userId: req.userId });
-  res.json({ success: true });
-});
+  let incomeTotal = 0;
+  let expenseTotal = 0;
+  entryTableBody.innerHTML = '';
 
-backend.delete('/api/entries/delete-all', auth, async (req, res) => {
-  await Entry.deleteMany({ userId: req.userId });
-  res.json({ success: true });
-});
+  filtered.forEach(e => {
+    const type = (e.type || '').toLowerCase();
+    const amount = Number(e.amount) || 0;
+    if (type === 'income') incomeTotal += amount;
+    else expenseTotal += amount;
 
-// Balances per user
-backend.post('/api/balances', auth, async (req, res) => {
-  await Balance.findOneAndUpdate(
-    { userId: req.userId },
-    { balances: req.body },
-    { upsert: true }
-  );
-  res.json({ success: true });
-});
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${e.date}</td>
+      <td>${e.description}</td>
+      <td>${e.amount}</td>
+      <td>${e.currency || ''}</td>
+      <td>${e.type}</td>
+      <td>${e.person}</td>
+      <td>${e.bank}</td>
+      <td><button onclick="deleteEntry('${e._id}')">🗑️</button></td>
+    `;
+    entryTableBody.appendChild(row);
+  });
 
-backend.get('/api/balances', auth, async (req, res) => {
-  const doc = await Balance.findOne({ userId: req.userId });
-  res.json(doc?.balances || {});
-});
+  document.getElementById('totalIncome').textContent = incomeTotal.toFixed(2);
+  document.getElementById('totalExpense').textContent = expenseTotal.toFixed(2);
+  document.getElementById('totalBalance').textContent = (incomeTotal - expenseTotal).toFixed(2);
+}
 
-backend.listen(3210, () => {
-  console.log('✅ API running on https://bookkeeping-i8e0.onrender.com');
-});
-
-
-app.post('/api/balances', auth, async (req, res) => {
-  await Balance.findOneAndUpdate(
-    { userId: req.userId },
-    { balances: req.body },
-    { upsert: true }
-  );
-  res.json({ success: true });
-});
-
-app.get('/api/balances', auth, async (req, res) => {
-  const doc = await Balance.findOne({ userId: req.userId });
-  res.json(doc?.balances || {});
-});
+async function deleteEntry(id) {
+  await fetch(`${backend}/api/entries/${id}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  fetchEntries();
+}
