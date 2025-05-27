@@ -1,12 +1,8 @@
-const express = require('express');
-const app = express();
+const backend = 'https://bookkeeping-i8e0.onrender.com'; // Replace with your actual backend URL
 
-const path = require('path');
 
-const cors = require('cors');
-const mongoose = require('mongoose');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
+
+
 
 const SECRET = 'rudi-bookkeeping-secret'; // replace with env var for production
 
@@ -15,6 +11,27 @@ mongoose.connect('mongodb+srv://ruzhdicuci:9BgBDMYEJBjMGFid@bookkeeping.bcakntz.
   useUnifiedTopology: true
 });
 
+// Define schema
+const Balance = mongoose.model('Balance', new mongoose.Schema({
+  userId: String,
+  balances: Object
+}));
+
+// Save balances
+backend.post('/api/balances', auth, async (req, res) => {
+  await Balance.findOneAndUpdate(
+    { userId: req.userId },
+    { balances: req.body },
+    { upsert: true }
+  );
+  res.json({ success: true });
+});
+
+// Load balances
+backend.get('/api/balances', auth, async (req, res) => {
+  const doc = await Balance.findOne({ userId: req.userId });
+  res.json(doc?.balances || {});
+});
 
 // --- MongoDB Schemas ---
 const User = mongoose.model('User', new mongoose.Schema({
@@ -34,10 +51,7 @@ const Entry = mongoose.model('Entry', new mongoose.Schema({
 
 }));
 
-// --- Express Backend ---
-const backend = express();
-backend.use(cors());
-backend.use(express.json());
+
 
 // Register
 backend.post('/api/register', async (req, res) => {
