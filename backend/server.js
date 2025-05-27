@@ -55,7 +55,7 @@ function auth(req, res, next) {
 }
 
 // Routes
-backend.post('/api/register', async (req, res) => {
+app.post('/api/register', async (req, res) => {
   const email = req.body.email.trim().toLowerCase();
   const { password } = req.body;
 
@@ -67,7 +67,7 @@ backend.post('/api/register', async (req, res) => {
   res.json({ message: 'Registered' });
 });
 
-backend.post('/api/login', async (req, res) => {
+app.post('/api/login', async (req, res) => {
   const email = req.body.email.trim().toLowerCase();
   const { password } = req.body;
 
@@ -112,7 +112,7 @@ backend.get('/api/entries', auth, async (req, res) => {
   res.json(entries);
 });
 
-backend.post('/api/entries', auth, async (req, res) => {
+app.post('/api/entries', auth, async (req, res) => {
   const entry = await Entry.create({ ...req.body, userId: req.userId });
   res.json(entry);
 });
@@ -137,7 +137,7 @@ backend.delete('/api/entries/delete-all', auth, async (req, res) => {
 });
 
 // Balances per user
-backend.post('/api/balances', auth, async (req, res) => {
+app.post('/api/balances', auth, async (req, res) => {
   await Balance.findOneAndUpdate(
     { userId: req.userId },
     { balances: req.body },
