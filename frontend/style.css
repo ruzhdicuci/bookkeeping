@@ -850,22 +850,21 @@ color: rgb(243, 114, 206);
 
 
 #clearSearch2  {
-margin-left: -20px;
-width: 20px;
-height: 20px;
-border-radius: 20px;
+margin-left: -30px;
+
+
 padding-bottom: 4px;
-background-color: rgb(184, 230, 255);
-
-font-size: 14px;
-
+color: rgb(89, 179, 228);
+background-color: transparent;
+font-size: 20px;
+font-weight: bold;
 border: none;
       
 }
 
 #clearSearch2:hover  {
 
-background-color: rgb(255, 248, 184);
+color: rgb(213, 79, 79);
 
 
       
