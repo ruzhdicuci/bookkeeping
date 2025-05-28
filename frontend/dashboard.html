@@ -10,7 +10,7 @@
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
 
   <title>Bookkeeping</title>
 
@@ -19,9 +19,13 @@
       <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+
  <div class="sections">
 <div class="navbar">
-   <a id="toggleTheme" onclick="toggleTheme()">🌓 </a> 
+   <a id="themeToggle" onclick="toggleTheme()" style="font-size: 1.5rem; border: none; background: none; cursor: pointer;">
+  🌙
+   </a>
   <div class="dropdown">
     
     <button class="dropbtn">Settings
@@ -60,7 +64,7 @@
     <div class="dropdown-content">
      
        <a  onclick="downloadPDF()">🧾 Export PDF</a>
-    <a onclick="deleteAllEntries()">🧨 Delete All Entries</a>
+
                  <label for="importCSV" class="custom-file-label">📥 Import CSV</label>
                 <input type="file" id="importCSV" accept=".csv" style="display: none;" />
  <input type="file" id="restoreFile" style="display:none" onchange="restoreBackup(event)" />
@@ -144,11 +148,11 @@
     <th id="th1">
    
 
-      <th id="th1"><input type="text" id="descSearch"placeholder="... 🔍" />
-    <button onclick="clearSearch('descSearch')" style="cursor:pointer;" id="clearSearch">x</button></th>
-     <th id="th1"><input type="number" id="amountSearch"placeholder="... 🔍" step="0.01" />
+      <th id="th1"><input type="text"  id="descSearch"placeholder="... 🔍" />
+    <button onclick="clearSearch('descSearch')" style="cursor:pointer;" id="clearSearch2">x</button></th>
+     <th id="th1"><input type="number"  id="amountSearch"placeholder="... 🔍" step="0.01" />
        
-<button onclick="clearSearch('amountSearch')" style="cursor:pointer;" id="clearSearch">x</button></th>
+<button onclick="clearSearch('amountSearch')" style="cursor:pointer;"id="clearSearch2">x</button></th>
 
 
            
@@ -175,21 +179,8 @@ function clearSearch(id) {
 
      <thead>
   <tr>
-<script>
-  let dateSortAsc = true;
 
-window.toggleDateSort = function () {
-  dateSortAsc = !dateSortAsc;
-  const icon = dateSortAsc ? '🔽' : '🔼';
-  const iconEl = document.getElementById('dateSortIcon');
-  if (iconEl) iconEl.textContent = icon;
-  renderEntries();
-};
-
-</script>
-        <th onclick="toggleDateSort()" style="cursor:pointer;">
-  Date <span id="dateSortIcon">🔽</span>
-</th>
+        <th id="th3"> Date</th>
     <th id="th3">Description</th>
     <th id="th3">Amount</th>
     <th id="th3">Currency</th>
@@ -279,11 +270,51 @@ window.toggleDateSort = function () {
   </table>
 
 
-
+	
 
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+   
 <script src="dashboard.js" ></script>
 
+<script>
+   // toggle theme
 
+function toggleTheme() {
+  const body = document.body;
+  const icon = document.getElementById('themeToggle');
+
+  const isDark = body.classList.toggle('dark');
+  if (icon) {
+    icon.textContent = isDark ? '☀️' : '🌙';
+  }
+
+
+}
+
+
+// toggle theme
+
+</script>
+<button id="scrollTopBtn" class="scroll-btn" title="Scroll to top" style="color:blue">⬆</button>
+<button id="scrollBottomBtn" class="scroll-btn" title="Scroll to bottom" style="color:green">⬇</button>
+
+<script>
+  document.getElementById('scrollTopBtn').onclick = () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+document.getElementById('scrollBottomBtn').onclick = () => {
+  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+};
+
+
+window.addEventListener('scroll', () => {
+  const show = window.scrollY > 100;
+  document.getElementById('scrollTopBtn').style.opacity = show ? 1 : 0;
+  document.getElementById('scrollBottomBtn').style.opacity = show ? 1 : 0;
+});
+
+
+</script>
 </body>
 </html>
