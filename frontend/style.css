@@ -225,30 +225,8 @@ color:  white;
 border: 1px solid #373535;
 }
 
-.dark .multi-select-toggle{
-  background: #2c2c2c;
-color:  white;
-border: 1px solid #373535;
-}
-.dark .multi-select input{
-  background: #2c2c2c;
-color:  white;
-border: 1px solid #373535;
-}
-
-.dark .multi-select.styled-select{
-  background: #2c2c2c;
-color:  white;
-border: 1px solid #373535;
-}
 
 
-
-.dark .filters label {
-color: #f3a3ff; 
-  background: #222;
- border: none;
-}
 
 .dark #th1  {
   background-color:#111;
@@ -292,13 +270,6 @@ border: 1px solid #373535;
 .dark  .entry-fields select
  {
    background: #2c2c2c;
-color:  white;
-
-border: 1px solid #373535;
-}
-.dark  #newDate
- {
-  
 color:  white;
 
 border: 1px solid #373535;
@@ -755,10 +726,9 @@ font-size: 1rem;
   flex-direction: column;
 
 
-
 border: none;
 
-color: rgb(215, 48, 168);
+color: rgb(243, 114, 206);
 
 }
 
@@ -776,12 +746,7 @@ color: rgb(215, 48, 168);
 
 
 
-#newDate  {
- color: #404344;
- font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-text-align: center;
-font-size: 20px;
-}
+
 
 
 
@@ -794,28 +759,6 @@ font-size: 20px;
 
 
 
-.multi-select.styled-select {
-  margin-top: 10px;
-  border-radius: 4px;
-     border: 1px solid #f4f2f2;
-  font-size: 1rem;
-  height: 32px;
-  color: #444;
-  background-color: white;
-  padding-top: 4px ;
-padding-left: 4px;
- text-align: left;
-  cursor: pointer;
-
-  
-}
-
-.multi-select-toggle {
-
-    background: white;
-    border: none;
-    font-size: 1rem;
-}
 
 
 #toggleTheme:hover {
@@ -825,30 +768,7 @@ padding-left: 4px;
 
 }
 
-.multi-select-options {
 
- 
-  z-index: 100;
-color: rgb(40, 37, 37);
-  overflow-y: auto;
-  width: 100px;
-  border-radius: 4px;
- padding-left: 20px;
-padding-bottom: 15px;
-padding-top: 10px;
-  position: absolute;
-}
-
-
-.multi-select input {
-  background: white;
-border: 1px solid rgb(28, 28, 31);
- width: 20px;
- height: 20px;
- margin: 5px 4px;
- padding: 5px 5px;
-
-}
 
 
 
@@ -962,7 +882,7 @@ background-color: rgb(255, 248, 184);
   font-size: 1.2rem;
   border: none;
   border-radius: 50%;
-
+  background: black;
   color: #333;
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
@@ -981,5 +901,96 @@ background-color: rgb(255, 248, 184);
 }
 
 .scroll-btn:hover {
-  background: #ccc;
+  background: white;
+}
+
+
+  
+
+
+.styled-select {
+  position: relative;
+  width: 200px;
+  height: 24px;
+   border: 1px solid #f4f2f2;
+  border-radius: 4px;
+  font-size: 1rem;
+  padding: 6px 30px 6px 10px;
+  background: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+  color: #333;
+}
+
+.select-display::after {
+  content: '▾';
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #333;
+}
+
+.select-display {
+  flex-grow: 1;
+}
+
+.dropdown-options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #666464;
+user-select: none;
+
+  z-index: 10;
+  width: 100%;
+
+  padding: 8px;
+   
+border-radius: 10px;
+  overflow-y: auto;
+}
+
+.dropdown-options label {
+  display: block;
+  margin-bottom: 10px;
+   color: white;
+   margin-left: 10px;
+    padding-bottom: 10px;
+   margin-right: 10px;
+      border-bottom: 1px solid #727070;
+      margin-top: 10px;
+
+    font-size: 18px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+
+.dark .styled-select {
+  background: #2c2c2c;
+color:  white;
+border: 1px solid #373535;
+
+}
+.dark .dropdown-options label {
+ background: #232323;
+color:  white;
+ border-bottom: 1px solid rgb(57, 54, 54);
+
+}
+.dark .dropdown-options  {
+ background: #232323;
+border: 2px solid #373535;
+box-shadow: 0 4px 6px rgba(100, 99, 99, 0.447);
+}
+
+
+#h4  {
+font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+color: rgb(243, 114, 206);
+
 }

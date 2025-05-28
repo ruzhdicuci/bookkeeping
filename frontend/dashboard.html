@@ -10,7 +10,14 @@
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+<!-- Add Flatpickr CSS and JS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+<!-- Optional: Flatpickr dark theme support -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css" media="(prefers-color-scheme: dark)">
 
   <title>Bookkeeping</title>
 
@@ -92,7 +99,7 @@
 
 <form id="entryForm" class="entry-form">
   <div class="entry-fields">
-    <input type="date" id="newDate" required />
+   <input type="text" id="newDate" placeholder="Select Date" class="flatpickr-input">
     <input type="text" id="newDescription" placeholder="Description" required />
     <input type="number" step="0.01" id="newAmount" placeholder="Amount" required />
     <select id="newCurrency" required>
@@ -237,17 +244,21 @@ function clearSearch(id) {
       </select>
     </label>
 
+ <a id="h4">
+     Persons:
 
-
-<label>
-  Person:
- 
-<div class="multi-select styled-select" id="personMultiSelect">
-  <button type="button" class="multi-select-toggle" onclick="togglePersonDropdown()">All Persons selected &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;👤</button>
-  <div class="multi-select-options" id="personOptions" style="display: none;"></div>
+<div class="styled-select" id="personMultiSelect" onclick="togglePersonDropdown()">
+  <div class="select-display" id="selectedPersonsLabel">All</div>
+  <div class="dropdown-options" id="personOptions" style="display: none;">
+    <label><input type="checkbox" checked value="All" onchange="selectAllPersons(this)"> <strong>All</strong></label>
+    <label><input type="checkbox" class="personOption" value="Rudi" checked /> Rudi</label>
+    <label><input type="checkbox" class="personOption" value="Nora" checked /> Nora</label>
+    <label><input type="checkbox" class="personOption" value="Antje" checked /> Antje</label>
+  </div>
 </div>
 
-</label>
+</a>
+
 
 
     <label>
@@ -292,8 +303,8 @@ function toggleTheme() {
 // toggle theme
 
 </script>
-<button id="scrollTopBtn" class="scroll-btn" title="Scroll to top" style="color:blue">⬆</button>
-<button id="scrollBottomBtn" class="scroll-btn" title="Scroll to bottom" style="color:green">⬇</button>
+<button id="scrollTopBtn" class="scroll-btn" title="Scroll to top" style="color:rgb(235, 11, 56)">⬆</button>
+<button id="scrollBottomBtn" class="scroll-btn" title="Scroll to bottom" style="color:rgb(22, 173, 118)">⬇</button>
 
 <script>
   document.getElementById('scrollTopBtn').onclick = () => {
@@ -313,9 +324,25 @@ window.addEventListener('scroll', () => {
 
 
 </script>
+
+<script>
+ flatpickr("#newDate", {
+    dateFormat: "d.m.Y",
+    defaultDate: new Date(),
+    altInput: true,
+    altFormat: "F j, Y",
+    allowInput: true,
+    theme: "dark" // Optional, controlled by media query
+  });
+</script>
+
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
    
 <script src="dashboard.js" ></script>
 
 </body>
 </html>
+
+
+
+
