@@ -107,7 +107,7 @@ text-align: center;
 
 #th3 {
   background: white;
-color: rgb(215, 48, 168);
+color: rgb(16, 156, 72);
 }
 
 
@@ -207,7 +207,7 @@ color: white;
     
 }
 #descSearch {
-  width: 102%;
+ 
   table-layout: fixed;
   height: 32px;
   text-align: center;
@@ -222,7 +222,7 @@ color: white;
 
 }
 #amountSearch  {
-  width: 102%;
+ 
   table-layout: fixed;
   height: 32px;
   text-align: center;
@@ -299,8 +299,8 @@ font-size: 10px;
    background-color: white;
   padding-left: 30px;
   padding-right: 30px;
-  padding-top: 10px;
-  padding-bottom: 5px;
+
+
   margin-top: 10px;
    margin-bottom: 10px;
 }
@@ -309,8 +309,8 @@ font-size: 10px;
    background-color: white;
   padding-left: 30px;
   padding-right: 30px;
-  padding-top: 1px;
-  padding-bottom: 1px;
+  padding-top: 10px;
+  padding-bottom: 5px;
 
    margin-bottom: 10px;
 }
@@ -319,19 +319,28 @@ font-size: 10px;
    background-color: white;
   padding-left: 30px;
   padding-right: 30px;
-  padding-top: 1px;
-  padding-bottom: 15px;
+  padding-top:  5px;
+  padding-bottom: 20px;
 
-   margin-bottom: 10px;
+   margin-bottom:10px;
 }
 .sections4 {
    background-color: white;
   padding-left: 30px;
   padding-right: 30px;
-  padding-top: 1px;
+  padding-top: 10px;
   padding-bottom: 5px;
 
-   margin-bottom: 5px;
+   margin-bottom: -12px;
+}
+.sections5 {
+   background-color: white;
+  padding-left: 30px;
+  padding-right: 30px;
+  padding-top: 20px;
+  padding-bottom: 5px;
+
+   margin-bottom: 10px;
 }
 
 
@@ -701,9 +710,10 @@ padding-left: 4px;
 }
 
 
-#toggleTheme :hover {
-  background-color: red;
-  border-radius: 40px;
+#toggleTheme:hover {
+
+  border-radius: 10px;
+  cursor: pointer;
 
 }
 
@@ -758,7 +768,7 @@ padding-top: 10px;
   border: none;
   outline: none;
   color: rgb(68, 63, 63);
-  padding: 14px 16px;
+  padding: 18px 16px;
   background-color: inherit;
   font-family: inherit;
   margin: 0;
@@ -796,4 +806,25 @@ padding-top: 10px;
 
 .dropdown:hover .dropdown-content {
   display: block;
+}
+
+
+#clearSearch  {
+margin-left: 4px;
+
+border: none;
+background-color: #fdf6de;
+font-size: 14px;
+color: blue;
+padding-bottom: 4px;
+
+      
+}
+
+#clearSearch:hover  {
+
+background-color: blue;
+
+color: white;
+      
 }

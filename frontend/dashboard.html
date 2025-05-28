@@ -76,23 +76,6 @@
 </div>
 
 
-
-     
-
-   
-   
-     
-    
-
-
-    
-   
-  
-
-
-
-
-
 </div>
 
   </div>
@@ -102,7 +85,7 @@
 
  <div class="sections2">
 
-<h3 id="hb4"> ▪  Entries</h3>
+
 <form id="entryForm" class="entry-form">
   <div class="entry-fields">
     <input type="date" id="newDate" required />
@@ -148,7 +131,7 @@
  <div class="sections3">
 
 <div  class="table-container">
-  <h3 id="hb4">▪ Balances - 26 Maj 2025</h3>
+
   
   <div class="th2" id="bankBalanceTableContainer"></div>
 </div></div>
@@ -161,17 +144,52 @@
     <th id="th1">
    
 
-      <th id="th1"><input type="text" id="descSearch" onfocus="this.placeholder=''" placeholder="... 🔍" /></th>
-     
-     <th id="th1"><input type="number" id="amountSearch" onfocus="this.placeholder=''" placeholder="... 🔍" step="0.01" /></th>
-   
+      <th id="th1"><input type="text" id="descSearch"placeholder="... 🔍" />
+    <button onclick="clearSearch('descSearch')" style="cursor:pointer;" id="clearSearch">x</button></th>
+     <th id="th1"><input type="number" id="amountSearch"placeholder="... 🔍" step="0.01" />
+       
+<button onclick="clearSearch('amountSearch')" style="cursor:pointer;" id="clearSearch">x</button></th>
+
+
+           
+<script>
+
+function clearSearch(id) {
+  const el = document.getElementById(id);
+  if (!el) {
+    console.warn(`No element found with id "${id}"`);
+    return;
+  }
+  el.value = '';
+  renderEntries();
+}
+
+</script>
+
+
 
   <th id="th1"><th id="th1"><th id="th1"><th id="th1"><th id="th1">
+
+
   </tr>
-   <thead>
+
      <thead>
   <tr>
-    <th id="th3">Date</th>
+<script>
+  let dateSortAsc = true;
+
+window.toggleDateSort = function () {
+  dateSortAsc = !dateSortAsc;
+  const icon = dateSortAsc ? '🔽' : '🔼';
+  const iconEl = document.getElementById('dateSortIcon');
+  if (iconEl) iconEl.textContent = icon;
+  renderEntries();
+};
+
+</script>
+        <th onclick="toggleDateSort()" style="cursor:pointer;">
+  Date <span id="dateSortIcon">🔽</span>
+</th>
     <th id="th3">Description</th>
     <th id="th3">Amount</th>
     <th id="th3">Currency</th>
@@ -180,11 +198,15 @@
     <th id="th3">Bank</th>
     <th id="th3">Actions</th>
   </tr>
+  
+
 </thead>
 
 
-<div class="sections3">
-<h3 id="hb4">▪  Balance</h3>
+
+
+<div class="sections5">
+
 
 <div class="summary-totals">
   <p><strong style="font-size: 24px;">Income:&nbsp&nbsp</strong> <span id="totalIncome">0.00</span></p>
@@ -194,7 +216,7 @@
 </div></div>
 <div class="sections4">
 
-<h3  >▪ Filter</h3>
+
 <div class="filter-section">
  
   <div class="filters">
@@ -252,6 +274,7 @@
 
 
 
+
     <tbody id="entryTableBody"></tbody>
   </table>
 
@@ -259,7 +282,8 @@
 
 
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-  <script src="dashboard.js"></script>
+<script src="dashboard.js" ></script>
+
 
 </body>
 </html>
