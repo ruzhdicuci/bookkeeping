@@ -559,7 +559,7 @@ function renderBankBalanceForm() {
   html += '</tr></thead><tbody>';
 
   // Row 1: Initial balances
-  html += '<tr><td><strong>Initial</strong></td>';
+  html += '<tr><td><a id="h4">26 Maj 2025</a></td>';
   banks.forEach(bank => {
     const val = initialBankBalances[bank] ?? 0;
     html += `<td><input type="number" step="0.01" data-bank="${bank}" value="${val}" ${window.initialLocked ? 'readonly' : ''} /></td>`;
@@ -567,7 +567,7 @@ function renderBankBalanceForm() {
   html += '</tr>';
 
   // Row 2: Change
-  html += '<tr><td><strong>Change</strong></td>';
+  html += '<tr><td><a id="h4">Change</a></td>';
   banks.forEach(bank => {
     const delta = changes[bank] ?? 0;
     const color = delta < 0 ? '#ff695d' : '#13a07f';
