@@ -413,7 +413,7 @@ border: 1px solid #373535;
 
 .sections6 {
    background-color: white;
-  padding-left: 30px;
+  padding-left: 24px;
   padding-right: 30px;
   padding-top:-8px;
   height: 100px;
@@ -906,7 +906,7 @@ padding-top: 15px;
   z-index: 9999;
   border-radius: 10px;
 
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 6px rgba(165, 163, 163, 0.931);
 }
 
 .dropdown-options label {
@@ -992,7 +992,7 @@ border: none;
 
 .filters-table td {
  
-
+ margin-left: -20px;
 border: none;
 
 }
@@ -1001,6 +1001,7 @@ border: none;
   vertical-align: top;
 
 border: none;
+ margin-left: -5px;
 padding-top: 15px;
 }
 
@@ -1014,15 +1015,16 @@ padding-top: 15px;
 
 .right-filters   {
   display: block;
- width: 170px;
+ width:170px;
  border: none;
  text-align: left;
- 
+ font-weight: lighter;
 
 }
 .right-filters label  {
+font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 
-
+font-weight: lighter;
  color: #f372ce;
  text-align: left;
 
@@ -1030,7 +1032,7 @@ padding-top: 15px;
 
 
 .filter-item  {
- flex: 1 1 180px;     /* Make all children equal width */
+ flex: 1 1 170px;     /* Make all children equal width */
   display: flex;
   flex-direction: column;
   gap: 4px;
