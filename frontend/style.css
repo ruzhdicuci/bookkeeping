@@ -60,24 +60,33 @@ h1 {
 }
 
 .controls, .filters {
-  margin-bottom: 20px;
+  margin-bottom: 2px;
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
   
 }
 
-.controls button, .filters select {
+.controls button {
   padding: 8px 12px;
   font-size: 1rem;
   background-color: white;
 }
 
 .filters label {
+  flex: 1 1 50px;
+  display: flex;
+  flex-direction: column; /* 👈 This stacks children vertically */
+  gap: 4px;               /* Optional: space between label and field */
+  color: rgb(243, 114, 206);
+}
+
+
+.filter-group {
+  flex: 1 1 50px;
   display: flex;
   flex-direction: column;
-  font-size: 0.85rem;
-  
+ 
 }
 
 table {
@@ -135,7 +144,6 @@ color: rgb(16, 156, 72);
          
 
 
-
 .dark {
   background: #111;
   color: #f0f0f0;
@@ -149,12 +157,12 @@ color: rgb(16, 156, 72);
 }
 
 .dark table th {
-  background: #0f0f0f;
-  border: 1px solid  #373535;
+  background: #222;
+ 
 }
 .dark table tr {
   background: #222;
-  border: 1px solid  #373535;
+  border: 1px solid  #222;
 }
 .dark table td {
   background: #222;
@@ -162,13 +170,24 @@ color: rgb(16, 156, 72);
 }
 
 .dark #th3 {
-  background: #222;
+  background: #111;
   border: 1px solid  #373535;
 }
 .dark #descSearch {
   background: #222;
   border: 1px solid  #373535;
   color: orangered;
+}
+
+.dark #dateSearch {
+  background: #222;
+  border: 1px solid  #373535;
+  color: orangered;
+}
+.dark #personMultiSelect {
+  background: #222;
+  border: 1px solid  #373535;
+ 
 }
 
 
@@ -195,16 +214,31 @@ color: rgb(16, 156, 72);
 
 }
 .dark .sections4{
-  background: #222222;  
+  background: #222;
  border: none;
 
 
 }
 .dark .sections5{
   background: #222;
- 
 
 }
+
+.dark .sections6{
+  background: #222;
+
+}
+.dark .sections7{
+  background: #222;
+  padding-top:5px;
+}
+
+
+.dark .filters-table th{
+  background: #222;
+  border: none;
+}
+
 
 .dark .navbar{
   background: #222;
@@ -284,39 +318,7 @@ border: 1px solid #373535;
   font-size: 1.4rem;
     
 }
-#descSearch {
- 
-  table-layout: fixed;
-  height: 32px;
-  text-align: center;
-  margin-right: -10px;
-  margin-left: -10px;
-  gap: 30px;
-  background-color: white;
-       border: 1px solid #f4f2f2;
-      margin-bottom: -15px;
- font-size: 1rem;
-  color:red;
 
-}
-#amountSearch  {
- 
-  table-layout: fixed;
-  height: 32px;
-  text-align: center;
-  margin-right: -10px;
-  margin-left: -10px;
-  gap: 30px;
-  background-color: white;
-     border: 1px solid #f4f2f2;
- font-size:1rem;
-  color:red;
-        margin-bottom: -15px;
-}
-#descSearch::placeholder , #amountSearch::placeholder  {
- 
- color: rgb(56, 52, 52);
-}
 
 .th2 table th:first-child {
   background-color: white;
@@ -325,16 +327,6 @@ border: 1px solid #373535;
   border-top: 1px solid white;
 }
 
-.th2 table td:first-child {
-  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-font-size: 16px;
-}
-
-.th2 table th {
- 
- font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-font-size: 10px;
-}
 
 
 #th1 {
@@ -421,6 +413,25 @@ font-size: 10px;
    margin-bottom: 10px;
 }
 
+.sections6 {
+   background-color: white;
+  padding-left: 30px;
+  padding-right: 30px;
+  padding-top:-8px;
+  height: 100px;
+   
+
+   margin-bottom: 10px;
+}
+.sections7 {
+   background-color: white;
+  padding-left: 30px;
+  padding-right: 30px;
+  padding-top:10px;
+  padding-bottom:0.5px;
+   margin-bottom: 10px;
+}
+
 
 .controls button,
 .controls input[type="file"] {
@@ -434,28 +445,7 @@ font-size: 10px;
 
 
 
-.filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin: 1rem 0;
-  align-items: center;
 
-}
-
-.filters label {
-  display: flex;
-  flex-direction: column;
-  font-size: 1.1rem;
-
-}
-
-.filters select {
-  min-width: 120px;
-  padding: 0.4rem;
-  font-size: 1.1rem;
-
-}
 
 #entryTableBody {
 font-size: 1.1rem;
@@ -616,15 +606,6 @@ font-size: 1rem;
           }
          
 
-.filters input, 
-.filters select {
- 
-    border: 1px solid #f4f2f2;
-  border-radius: 4px;
-  box-sizing: border-box;
- 
-}
-
 
 @media print {
   body {
@@ -703,45 +684,6 @@ font-size: 1rem;
   width: 100%;
   box-shadow: 0 0 10px rgba(0,0,0,0.2);
 }
-.filter-section {
- 
-  box-sizing: border-box;
-}
-
-
-.filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  background: white;
-
-  border-radius: 4px;
-   margin-top: 10px;
-
-}
-
-.filters label {
-  flex: 1 1 180px;
-  display: flex;
-  flex-direction: column;
-
-
-border: none;
-
-color: rgb(243, 114, 206);
-
-}
-
-.filters select {
-  padding: 6px;
- margin-top: 10px;
-  border-radius: 4px;
-      height: 38px;
-   font-size: 1rem;
-     border: 1px solid #f4f2f2;
-      color: #444;
-}
-
 
 
 
@@ -828,6 +770,8 @@ color: rgb(243, 114, 206);
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 1;
   margin-top: 10px;
+  border: 1px solid #f4f2f2;
+ 
 }
 
 .dropdown-content a {
@@ -837,6 +781,7 @@ color: rgb(243, 114, 206);
   text-decoration: none;
   display: block;
   text-align: left;
+  border: 1px solid #f4f2f2;
 }
 
 .dropdown-content a:hover {
@@ -907,20 +852,21 @@ color: rgb(213, 79, 79);
   
 
 
+
 .styled-select {
   position: relative;
-  width: 200px;
-  height: 24px;
+ height: 23px;
+ margin-top: 8px;
    border: 1px solid #f4f2f2;
   border-radius: 4px;
   font-size: 1rem;
-  padding: 6px 30px 6px 10px;
+  padding:  6px 12px;
   background: white;
   cursor: pointer;
   display: flex;
-  align-items: center;
+
   justify-content: space-between;
-  margin-top: 10px;
+
   color: #333;
 }
 
@@ -932,41 +878,66 @@ color: rgb(213, 79, 79);
   transform: translateY(-50%);
   pointer-events: none;
   color: #333;
+
 }
 
 .select-display {
   flex-grow: 1;
 }
 
+/* Ensure the container above doesn't clip the dropdown */
+.filter-section {
+  position: relative;
+  z-index: 1;
+  overflow: visible;
+
+}
+
+
 .dropdown-options {
   position: absolute;
-  top: 100%;
+  top: calc(100% - 10px);
   left: 0;
-  background: #666464;
-user-select: none;
 
-  z-index: 10;
-  width: 100%;
+  background: #444;
 
-  padding: 8px;
-   
-border-radius: 10px;
-  overflow-y: auto;
+  z-index: 9999;
+  border-radius: 8px;
+
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
 .dropdown-options label {
-  display: block;
-  margin-bottom: 10px;
-   color: white;
-   margin-left: 10px;
-    padding-bottom: 10px;
-   margin-right: 10px;
-      border-bottom: 1px solid #727070;
-      margin-top: 10px;
+  display: flex;
 
-    font-size: 18px;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  justify-content: flex-start;
+  width: 200px;
+   color: white !important;
+  font-size: 18px;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+margin-left: 15px;
+padding-top: 10px;
+padding-bottom: 10px;
+
+  cursor: pointer;
+  border-bottom: 1px solid #514d4d;
 }
+
+.dropdown-options input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+
+
+   color: white !important;
+  accent-color: #00aaff; /* optional: blue checkmark */
+  cursor: pointer;
+}
+
+.dropdown-options label:hover {
+  background: #555; /* optional: highlight on hover */
+  border-radius: 4px;
+}
+
 
 
 .dark .styled-select {
@@ -978,7 +949,7 @@ border: 1px solid #373535;
 .dark .dropdown-options label {
  background: #232323;
 color:  white;
- border-bottom: 1px solid rgb(57, 54, 54);
+ border-bottom: 1px solid rgb(60, 57, 57);
 
 }
 .dark .dropdown-options  {
@@ -988,8 +959,162 @@ box-shadow: 0 4px 6px rgba(100, 99, 99, 0.447);
 }
 
 
+.dark .dropdown-options label:hover {
+  background: #555; /* optional: highlight on hover */
+  border-radius: 4px;
+
+
+color: rgb(70, 187, 250);
+}
 #h4  {
 font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-color: rgb(243, 114, 206);
+
+font-size: 1rem;
+}
+
+.dark .left-filters {
+ border: 1px solid #222222;
 
 }
+.dark .filters-table tr {
+
+ border: 1px solid #222222;
+
+}
+
+
+.filters-table  {
+  width: 102%;
+  border-collapse: collapse;
+border: none;
+
+}
+
+
+.filters-table td {
+ 
+
+border: none;
+
+}
+
+.filters-table th {
+  vertical-align: top;
+
+border: none;
+padding-top: 15px;
+}
+
+
+.left-filters label {
+  border: none;
+ text-align: left;
+  color: #f372ce;
+
+}
+
+.right-filters   {
+  display: block;
+ width: 170px;
+ border: none;
+ text-align: left;
+
+}
+.right-filters label  {
+
+
+ color: #f372ce;
+ text-align: left;
+
+}
+
+
+.filter-item  {
+ flex: 1 1 180px;     /* Make all children equal width */
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+ 
+.filters label {
+  flex: 1 0 ; /* Same base width for all */
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+ 
+ font-size: 1rem;
+    color: #ec5cb3;
+font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap; /* Allows wrapping on small screens */
+  gap: 10px;       /* Space between filters */
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+}
+
+.filters > * {
+  flex: 1 0 ;      /* Make all children equal width */
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+
+.filters input,
+.filters select,
+.filters .styled-select 
+
+{
+  height: 38px;
+  padding: 6px 10px;
+  color: #333;
+ font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  width: 99%;        /* 🟢 Makes all inputs full width inside their container */
+  box-sizing: border-box;
+  border-radius: 4px;
+  border: 1px solid #f4f2f2;
+}
+
+
+
+/* Input + clear button */
+.input-with-clear {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-with-clear input {
+  flex: 1;
+  padding-right: 24px;
+  height: 36px;
+  font-size: 1rem;
+  border-radius: 4px;
+ border: 1px solid #f4f2f2;
+}
+
+.clear-btn {
+  position: absolute;
+  right: 6px;
+  background: transparent;
+  border: none;
+  color: #989898;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* Dropdowns */
+.filters select {
+  height: 36px;
+  font-size: 1rem;
+  border-radius: 4px;
+ border: 1px solid #f4f2f2;
+}
+
+
+

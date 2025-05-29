@@ -99,6 +99,8 @@
 
 <form id="entryForm" class="entry-form">
   <div class="entry-fields">
+   
+
    <input type="text" id="newDate" placeholder="Select Date" class="flatpickr-input">
     <input type="text" id="newDescription" placeholder="Description" required />
     <input type="number" step="0.01" id="newAmount" placeholder="Amount" required />
@@ -147,20 +149,11 @@
   <div class="th2" id="bankBalanceTableContainer"></div>
 </div></div>
  
-  <table>
 
 
-   <thead>
-  <tr id="th1">
-    <th id="th1">
+
+
    
-
-      <th id="th1"><input type="text"  id="descSearch" style="text-align:left; padding-left: 30px;"  placeholder="... 🔍" />
-    <button onclick="clearSearch('descSearch')" style="cursor:pointer;" id="clearSearch2">x</button></th>
-     <th id="th1"><input type="number"  id="amountSearch" style="text-align:left; padding-left: 30px; " placeholder="... 🔍" step="0.01" />
-       
-<button onclick="clearSearch('amountSearch')" style="cursor:pointer;"id="clearSearch2">x</button></th>
-
 
            
 <script>
@@ -179,10 +172,95 @@ function clearSearch(id) {
 
 
 
-  <th id="th1"><th id="th1"><th id="th1"><th id="th1"><th id="th1">
 
 
+
+
+
+<div class="sections5">
+
+
+<div class="summary-totals">
+  <p><strong style="font-size: 24px;">Income:&nbsp&nbsp</strong> <span id="totalIncome">0.00</span></p>
+  <p><strong style="font-size: 24px;">Expenses:&nbsp&nbsp</strong> <span id="totalExpense">0.00</span></p>
+  <p><strong style="font-size: 24px;">Balance:&nbsp&nbsp</strong> <span id="totalBalance">0.00</span></p>
+  
+</div></div>
+
+
+
+<div class="sections6">
+<table  class="filters-table">
+  <tr>
+    <!-- Left column: All standard filters -->
+    <td class="left-filters">
+      <div class="filters">
+        <label>
+          Date:
+          <input type="text" id="dateSearch" placeholder="... 🔍">
+        </label>
+        <label>
+          Description:
+          <div class="input-with-clear">
+            <input type="text" id="descSearch" placeholder="... 🔍">
+            <button class="clear-btn" onclick="clearSearch('descSearch')">x</button>
+          </div>
+        </label>
+        <label>
+          Amount:
+          <div class="input-with-clear">
+            <input type="number" id="amountSearch" step="0.01" placeholder="... 🔍">
+            <button class="clear-btn" onclick="clearSearch('amountSearch')">x</button>
+          </div>
+        </label>
+        <label>
+          Month:
+          <select id="monthSelect"></select>
+        </label>
+        <label>
+          Type:
+          <select id="typeFilter">
+            <option value="">All</option>
+            <option>Income</option>
+            <option>Expense</option>
+            <option>Transfer</option>
+          </select>
+        </label>
+        <label>
+          Currency:
+          <select id="currencyFilter">
+            <option value="">All</option>
+            <option value="CHF">CHF</option>
+            <option value="EUR">EUR</option>
+            <option value="USD">USD</option>
+          </select>
+        </label>
+        <label>
+          Bank:
+          <select id="bankFilter">
+            <option value="">All</option>
+          </select>
+        </label>
+      </div>
+    </td>
+
+    <!-- Right column: Person checkboxes -->
+    <th class="right-filters">
+      <label id="h4">Persons:</label>
+      <div class="styled-select" id="personMultiSelect" onclick="togglePersonDropdown()">
+        <div class="select-display" id="selectedPersonsLabel">All</div>
+        <div class="dropdown-options" id="personOptions" style="display: none;">
+          <!-- Checkboxes inserted dynamically here -->
+        </div>
+        </div>      </div>
+    </th>
   </tr>
+</table>
+   </div>
+
+   <div class="sections7">
+<table>
+
 
      <thead>
   <tr>
@@ -199,83 +277,8 @@ function clearSearch(id) {
   
 
 </thead>
-
-
-
-
-<div class="sections5">
-
-
-<div class="summary-totals">
-  <p><strong style="font-size: 24px;">Income:&nbsp&nbsp</strong> <span id="totalIncome">0.00</span></p>
-  <p><strong style="font-size: 24px;">Expenses:&nbsp&nbsp</strong> <span id="totalExpense">0.00</span></p>
-  <p><strong style="font-size: 24px;">Balance:&nbsp&nbsp</strong> <span id="totalBalance">0.00</span></p>
-  
-</div></div>
-<div class="sections4">
-
-
-<div class="filter-section">
- 
-  <div class="filters">
-    <label>
-      Month:
-      <select id="monthSelect"></select>
-    </label>
-
-    <label>
-      Type:
-<select id="typeFilter">
-  <option value="">All</option>
-  <option>Income</option>
-  <option>Expense</option>
-  <option>Transfer</option> <!-- ✅ Add this -->
-</select>
-
-    </label>
-
-    <label>
-      Currency:
-      <select id="currencyFilter">
-        <option value="">All</option>
-        <option value="CHF">CHF</option>
-        <option value="EUR">EUR</option>
-        <option value="USD">USD</option>
-      </select>
-    </label>
-
- <a id="h4">
-     Persons:
-
-<div class="styled-select" id="personMultiSelect" onclick="togglePersonDropdown()">
-  <div class="select-display" id="selectedPersonsLabel">All</div>
-  <div class="dropdown-options" id="personOptions" style="display: none;">
-    <label><input type="checkbox" checked value="All" onchange="selectAllPersons(this)"> <strong>All</strong></label>
-    <label><input type="checkbox" class="personOption" value="Rudi" checked /> Rudi</label>
-    <label><input type="checkbox" class="personOption" value="Nora" checked /> Nora</label>
-    <label><input type="checkbox" class="personOption" value="Antje" checked /> Antje</label>
-  </div>
 </div>
-
-</a>
-
-
-
-    <label>
-      Bank:
-      <select id="bankFilter">
-        <option value="">All</option>
-      </select>
-    </label>
-   </div>
 </div>
-
-
-</div>
-
-
-
-
 
     <tbody id="entryTableBody"></tbody>
   </table>
@@ -284,25 +287,7 @@ function clearSearch(id) {
 	
 
   
-<script>
-   // toggle theme
 
-function toggleTheme() {
-  const body = document.body;
-  const icon = document.getElementById('themeToggle');
-
-  const isDark = body.classList.toggle('dark');
-  if (icon) {
-    icon.textContent = isDark ? '☀️' : '🌙';
-  }
-
-
-}
-
-
-// toggle theme
-
-</script>
 <button id="scrollTopBtn" class="scroll-btn" title="Scroll to top" style="color:rgb(235, 11, 56)">⬆</button>
 <button id="scrollBottomBtn" class="scroll-btn" title="Scroll to bottom" style="color:rgb(22, 173, 118)">⬇</button>
 

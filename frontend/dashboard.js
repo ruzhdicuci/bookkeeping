@@ -11,9 +11,9 @@ const balanceEl = document.getElementById('balance');
 
 const currencyFilter = document.getElementById('currencyFilter');
 const typeFilter = document.getElementById('typeFilter');
+const dateSearch = document.getElementById('dateSearch');
 const descSearch = document.getElementById('descSearch');
 const amountSearch = document.getElementById('amountSearch');
-
 
 
 
@@ -22,12 +22,8 @@ monthSelect.onchange =
   typeFilter.onchange =
   currencyFilter.onchange =
   descSearch.oninput =
-  amountSearch.oninput = renderEntries;
-
-
-
-
-
+  amountSearch.oninput =
+  dateSearch.oninput = renderEntries;
 
 
 // Person checkboxes
@@ -187,21 +183,31 @@ document.querySelectorAll('.personOption').forEach(cb => {
 
 
 function renderEntries() {
+  const dateQuery = dateSearch.value.trim().toLowerCase();
   const searchAmount = parseFloat(amountSearch.value || "0");
   const selectedPersons = Array.from(document.querySelectorAll('.personOption:checked')).map(cb => cb.value);
 
   // ✅ Filter entries
-  const filtered = entries.filter(e =>
-    (!monthSelect.value || e.date.startsWith(monthSelect.value)) &&
-    (selectedPersons.length === 0 || selectedPersons.includes(e.person)) &&
-    (!bankFilter.value || e.bank === bankFilter.value) &&
-    (!typeFilter.value || e.type === typeFilter.value) &&
-    (!currencyFilter.value || e.currency === currencyFilter.value) &&
-    (!descSearch.value || e.description.toLowerCase().includes(descSearch.value.toLowerCase())) &&
-    (amountSearch.value === '' || String(e.amount ?? '').includes(amountSearch.value))
-  );
+  const filtered = entries.filter(e => {
+    const formattedDate = (e.date || '').toLowerCase(); // You could use custom formatting here if needed
+    const description = (e.description || '').toLowerCase();
+
+    return (
+      (!dateQuery || formattedDate.includes(dateQuery)) &&
+      (!monthSelect.value || e.date.startsWith(monthSelect.value)) &&
+      (selectedPersons.length === 0 || selectedPersons.includes(e.person)) &&
+      (!bankFilter.value || e.bank === bankFilter.value) &&
+      (!typeFilter.value || e.type === typeFilter.value) &&
+      (!currencyFilter.value || e.currency === currencyFilter.value) &&
+      (!descSearch.value || description.includes(descSearch.value.toLowerCase())) &&
+      (amountSearch.value === '' || String(e.amount ?? '').includes(amountSearch.value))
+    );
+  });
 
   entryTableBody.innerHTML = '';
+
+  // Continue rendering table rows...
+
 
   // ✅ Calculate totals
   let incomeTotal = 0;
@@ -319,8 +325,15 @@ function downloadPDF() {
 }
 
 function toggleTheme() {
-  document.body.classList.toggle('dark');
+  const body = document.body;
+  const icon = document.getElementById('themeToggle');
+
+  const isDark = body.classList.toggle('dark');
+  if (icon) {
+    icon.textContent = isDark ? '☀️' : '🌙';
+  }
 }
+
 
 function logout() {
   localStorage.removeItem('token');
@@ -832,26 +845,26 @@ function showChangePassword(user) {
     .catch(err => alert('❌ Failed to change password'));
 }
 
+
+
 function getSelectedPersons() {
   return Array.from(document.querySelectorAll('#personOptions input[type="checkbox"]:checked')).map(cb => cb.value);
 }
 
 function togglePersonDropdown() {
   const options = document.getElementById('personOptions');
-  options.style.display = options.style.display === 'none' ? 'block' : 'none';
+  if (options) {
+    options.style.display = options.style.display === 'none' ? 'block' : 'none';
+  }
 }
+
+
+
+
 
 function toggleLock() {
   window.initialLocked = !window.initialLocked;
   renderBankBalanceForm();
-}
-
-
-function togglePersonDropdown() {
-  const options = document.getElementById('personOptions');
-  if (options) {
-    options.style.display = options.style.display === 'none' ? 'block' : 'none';
-  }
 }
 
 
@@ -908,4 +921,18 @@ function togglePersonDropdown() {
         });
  
 
- 
+ document.addEventListener('click', function (e) {
+  const dropdown = document.getElementById('personOptions');
+  const toggle = document.getElementById('personMultiSelect');
+
+  if (!dropdown || !toggle) return;
+
+  // If the dropdown is open and the click is outside both the toggle and the dropdown
+  if (
+    dropdown.style.display === 'block' &&
+    !dropdown.contains(e.target) &&
+    !toggle.contains(e.target)
+  ) {
+    dropdown.style.display = 'none';
+  }
+});
