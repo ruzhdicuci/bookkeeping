@@ -466,11 +466,16 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 
+// Add entries
+
 document.getElementById('entryForm').addEventListener('submit', async (e) => {
   e.preventDefault();
 
+  const inputDate = document.getElementById('newDate')._flatpickr?.selectedDates[0];
+  const isoDate = inputDate ? inputDate.toISOString().split('T')[0] : '';
+
   const entry = {
-    date: document.getElementById('newDate').value,
+    date: isoDate,
     description: document.getElementById('newDescription').value,
     amount: parseFloat(document.getElementById('newAmount').value),
     currency: document.getElementById('newCurrency').value,
@@ -495,16 +500,17 @@ document.getElementById('entryForm').addEventListener('submit', async (e) => {
       return;
     }
 
-    // ✅ Reset and refresh
+    // ✅ Reset form and refresh entries
     document.getElementById('entryForm').reset();
-    await fetchEntries(); // ← This should NOT call itself inside
-    populateNewEntryDropdowns();
+    await fetchEntries(); // refresh data on the page
+    populateNewEntryDropdowns(); // optional dropdown update
 
   } catch (error) {
     console.error('❌ Error saving entry:', error);
     alert('Failed to save entry.');
   }
 });
+
 
 
 
