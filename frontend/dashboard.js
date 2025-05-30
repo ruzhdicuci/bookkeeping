@@ -467,12 +467,18 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
 // Add entries
-
 document.getElementById('entryForm').addEventListener('submit', async (e) => {
   e.preventDefault();
 
+  // 👇 Get selected date from Flatpickr and convert to local ISO (yyyy-mm-dd)
   const inputDate = document.getElementById('newDate')._flatpickr?.selectedDates[0];
-  const isoDate = inputDate ? inputDate.toISOString().split('T')[0] : '';
+
+  function formatDateToLocalISO(date) {
+    const offsetDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+    return offsetDate.toISOString().split('T')[0];
+  }
+
+  const isoDate = inputDate ? formatDateToLocalISO(inputDate) : '';
 
   const entry = {
     date: isoDate,
