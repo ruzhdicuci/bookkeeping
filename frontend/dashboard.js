@@ -583,7 +583,7 @@ function renderBankBalanceForm() {
   banks.forEach(bank => {
     const delta = changes[bank] ?? 0;
     const color = delta < 0 ? '#ff695d' : '#13a07f';
-    html += `<td style="color:${color}">${delta.toFixed(2)}</td>`;
+    html += `<td id="center1" style="color:${color}">${delta.toFixed(2)}</td>`;
   });
   html += '</tr>';
 

@@ -55,6 +55,7 @@
     <div class="dropdown-content">
      
        <a  onclick="logout()">🔐 Logout</a>
+           <a onclick="showUserManagerModal()">👥 Manage Users</a>
     <a onclick="deleteAllEntries()">🧨 Delete All Entries</a>
                 <a  onclick="backupData()">📦 Backup</a>
  <input type="file" id="restoreFile" style="display:none" onchange="restoreBackup(event)" />
@@ -72,7 +73,7 @@
      
        <a  onclick="downloadPDF()">🧾 Export PDF</a>
 
-                 <label for="importCSV" class="custom-file-label">📥 Import CSV</label>
+                <button id="bt3"> <label for="importCSV" class="custom-file-label">📥 Import CSV</label></button>
                 <input type="file" id="importCSV" accept=".csv" style="display: none;" />
  <input type="file" id="restoreFile" style="display:none" onchange="restoreBackup(event)" />
 
@@ -249,7 +250,7 @@ function clearSearch(id) {
 
     <!-- Right column: Person checkboxes -->
     <th class="right-filters">
-      <label id="h4">Persons:</label>
+      <label id="h4" style="text-align: center;">Persons:</label>
       <div class="styled-select" id="personMultiSelect" onclick="togglePersonDropdown()">
         <div class="select-display" id="selectedPersonsLabel">All</div>
         <div class="dropdown-options" id="personOptions" style="display: none;">

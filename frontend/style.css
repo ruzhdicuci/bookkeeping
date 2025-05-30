@@ -77,12 +77,14 @@ overflow: hidden;
   color: rgb(243, 114, 206);
 }
 
+#center1 {
+ text-align: center;
+}
 
 .filter-group {
   flex: 1 1 50px;
   display: flex;
   flex-direction: column;
- 
 }
 
 table {
@@ -96,7 +98,6 @@ td {
   border: 1px solid #f4f2f2;
   padding: 8px;
 text-align: left;
-
 
 }
 
@@ -531,10 +532,10 @@ font-weight: bold;
   font-size: 1.0rem;
   white-space: normal;
   word-break: break-word;
-  text-align: center;
+  text-align: left;
   padding: 0.5rem;
   max-width: 120px;
-
+text-align: center;
   border: none;
 
 
@@ -628,16 +629,18 @@ font-size: 1rem;
     padding: 6px;
   }
 }
-.custom-file-label{
+#bt3{
  
   color: black;
-    border: 1px solid #f4f2f2;
-   padding: 8px 12px;
-
-  font-size: 1.1rem;
+ height:60px;
+ width: 160px;
+margin-left: -2px;
+  font-size: 18px;
+  border: none;
+  background-color: #f9f9f9;
  
 }
-.custom-file-label:hover{
+#bt3:hover{
   background: rgb(235, 233, 233);
   color: red;
   
@@ -1027,7 +1030,7 @@ font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 
 font-weight: normal;
  color: #f372ce;
- text-align: left;
+
 
 }
 
