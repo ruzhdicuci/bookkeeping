@@ -585,13 +585,10 @@ document.getElementById('categoryFilter')?.addEventListener('change', drawCharts
   });
 </script>
 <script>
-
-// Call on login page load
 window.addEventListener('DOMContentLoaded', async () => {
-  populateLoginUserDropdown(); // if necessary
   await fetchEntries();
   populateNewEntryDropdowns();
-  populateFilters();
+  populateFilters(); // <- this updates #categoryFilter
   renderEntries();
 });
 </script>
