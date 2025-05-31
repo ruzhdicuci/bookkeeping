@@ -227,8 +227,8 @@ function renderEntries() {
       <td>${e.bank}</td>
       <td>${e.category || ''}</td>
       <td>
-        <button onclick="editEntry('${e._id}')">✏️ Edit</button>
-        <button onclick="deleteEntry('${e._id}')">🗑️ Delete</button>
+        <button onclick="editEntry('${e._id}')">✏️</button>
+        <button onclick="deleteEntry('${e._id}')">🗑️</button>
       </td>
     `;
     entryTableBody.appendChild(row);
@@ -717,7 +717,9 @@ async function loginWithSelectedUser() {
 window.addEventListener('DOMContentLoaded', populateLoginUserDropdown);
 
 window.addEventListener('DOMContentLoaded', async () => {
-  await fetchEntries(); // ← correctly loads entries and balances
+await fetchEntries();
+populateNewEntryDropdowns(); // ✅ This ensures the dropdowns get populated
+populateFilters(); // ✅ This ensures filters like category/month are ready
 });
 
 // Save to backend
