@@ -18,12 +18,13 @@
    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
 <!-- Optional: Flatpickr dark theme support -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css" media="(prefers-color-scheme: dark)">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <title>Bookkeeping</title>
 
      
   
       <link rel="stylesheet" href="style.css">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -263,9 +264,12 @@ function clearSearch(id) {
       Category:
         
 <select id="categoryFilter">
-  <option value="">All</option>
+  <option value="All"></option>
 </select>
 </label>
+
+
+
 
 
         <label>
@@ -336,14 +340,13 @@ function clearSearch(id) {
     <tbody id="entryTableBody"></tbody>
   </table>
 
-  
 
 
   <!-- Dashboard Tab -->
   <div id="dashboardTab" class="tab-content active">
    
   <script>
-    // Add entries
+// Add entries
   document.getElementById('entryForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -416,14 +419,13 @@ function clearSearch(id) {
 
     function drawCharts() {
   const categoryFilter = document.getElementById('categoryFilter')?.value || 'All';
-      const entries = window.entries || [];
+      const entries = (window.entries || []).filter(e => typeof e === 'object');
       const monthlyIncome = {}, monthlyExpense = {}, personIncome = {}, personExpense = {}, expenseByCategory = {};
 
       const selectedPerson = document.getElementById('filterPerson')?.value || 'All';
 
       entries.forEach(e => {
-    if (categoryFilter !== 'All' && (e.category || '') !== categoryFilter) return;
-
+    if (categoryFilter && categoryFilter !== 'All' && (e.category || 'Uncategorized') !== categoryFilter) return;
         if (selectedPerson !== 'All' && e.person !== selectedPerson) return;
 
         const month = e.date?.slice(0, 7);
@@ -565,46 +567,10 @@ function chartOptions() {
       link.click();
     }
 
-    document.getElementById('monthSelect')?.addEventListener('change', () => {
-      openTab('chartsTab', document.querySelector('.tab-button:nth-child(2)'));
-    });
+    
     document.getElementById('chartType')?.addEventListener('change', drawCharts);
     document.getElementById('filterPerson')?.addEventListener('change', drawCharts);
 document.getElementById('categoryFilter')?.addEventListener('change', drawCharts);
-
-  </script>
-
-<button id="scrollTopBtn" class="scroll-btn" title="Scroll to top" style="color:rgb(235, 11, 56)">⬆</button>
-<button id="scrollBottomBtn" class="scroll-btn" title="Scroll to bottom" style="color:rgb(22, 173, 118)">⬇</button>
-
-<script>
-  document.getElementById('scrollTopBtn').onclick = () => {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-};
-
-document.getElementById('scrollBottomBtn').onclick = () => {
-  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-};
-
-
-window.addEventListener('scroll', () => {
-  const show = window.scrollY > 100;
-  document.getElementById('scrollTopBtn').style.opacity = show ? 1 : 0;
-  document.getElementById('scrollBottomBtn').style.opacity = show ? 1 : 0;
-});
-
-
-</script>
-
-<script>
- flatpickr("#newDate", {
-    dateFormat: "d.m.Y",
-    defaultDate: new Date(),
-    altInput: true,
-    altFormat: "F j, Y",
-    allowInput: true,
-    theme: "dark" // Optional, controlled by media query
-  });
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>

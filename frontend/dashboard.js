@@ -87,25 +87,25 @@ async function loadInitialBankBalances() {
   }
 }
 
+  function populateNewEntryDropdowns() {
+    const persons = [...new Set(window.entries.map(e => e.person))].filter(Boolean);
+    const banks = [...new Set(window.entries.map(e => e.bank))].filter(Boolean);
+    const categories = [...new Set(window.entries.map(e => e.category))].filter(Boolean);
+
+    const personList = document.getElementById('personList');
+    const bankList = document.getElementById('bankList');
+    const categoryList = document.getElementById('newCategoryList');
+
+    if (personList) personList.innerHTML = persons.map(p => `<option value="${p}">`).join('');
+    if (bankList) bankList.innerHTML = banks.map(b => `<option value="${b}">`).join('');
+    if (categoryList) categoryList.innerHTML = categories.map(c => `<option value="${c}">`).join('');
+
+    console.log("👤 Loaded persons:", persons);
+    console.log("🏦 Loaded banks:", banks);
+    console.log("🏷️ Loaded categories:", categories);
+  }
 
 
-function populateNewEntryDropdowns() {
-  const persons = [...new Set(window.entries.map(e => e.person))].filter(Boolean);
-  const banks = [...new Set(window.entries.map(e => e.bank))].filter(Boolean);
-  const categories = [...new Set(window.entries.map(e => e.category))].filter(Boolean);
-
-  const personList = document.getElementById('personList');
-  const bankList = document.getElementById('bankList');
-  const categoryList = document.getElementById('newCategoryList');
-
-  if (personList) personList.innerHTML = persons.map(p => `<option value="${p}">`).join('');
-  if (bankList) bankList.innerHTML = banks.map(b => `<option value="${b}">`).join('');
-  if (categoryList) categoryList.innerHTML = categories.map(c => `<option value="${c}">`).join('');
-
-  console.log("👤 Loaded persons:", persons);
-  console.log("🏦 Loaded banks:", banks);
-  console.log("🏷️ Loaded categories:", categories);
-}
 
 // Populate New Entry bank dropdown based on Account Balances table
 function populateBankDropdownFromBalances() {
@@ -191,16 +191,14 @@ document.querySelectorAll('.personOption').forEach(cb => {
 function renderEntries() {
   const dateQuery = dateSearch.value.trim().toLowerCase();
   const searchAmount = parseFloat(amountSearch.value || "0");
-  const categoryFilter = document.getElementById('categoryFilter');
-
   const selectedPersons = Array.from(document.querySelectorAll('.personOption:checked')).map(cb => cb.value);
+  const categoryFilter = document.getElementById('categoryFilter');
+  const categoryValue = categoryFilter?.value || "All";
 
   // ✅ Filter entries
   const filtered = entries.filter(e => {
-    const formattedDate = (e.date || '').toLowerCase(); // You could use custom formatting here if needed
+    const formattedDate = (e.date || '').toLowerCase();
     const description = (e.description || '').toLowerCase();
-    const categoryFilter = document.getElementById('categoryFilter');
-
 
     return (
       (!dateQuery || formattedDate.includes(dateQuery)) &&
@@ -210,55 +208,43 @@ function renderEntries() {
       (!typeFilter.value || e.type === typeFilter.value) &&
       (!currencyFilter.value || e.currency === currencyFilter.value) &&
       (!descSearch.value || description.includes(descSearch.value.toLowerCase())) &&
-         (!categoryFilter || !categoryFilter.value || e.category === categoryFilter.value) &&
+      (categoryValue === "All" || e.category === categoryValue) &&
       (amountSearch.value === '' || String(e.amount ?? '').includes(amountSearch.value))
     );
   });
 
+  // ✅ Rebuild table
   entryTableBody.innerHTML = '';
-
-  // Continue rendering table rows...
-
-
-  // ✅ Calculate totals
-  let incomeTotal = 0;
-  let expenseTotal = 0;
-
   filtered.forEach(e => {
-    const type = (e.type || '').toLowerCase();
-    const amount = Number(e.amount) || 0;
-    if (type === 'income') incomeTotal += amount;
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${e.date}</td>
+      <td>${e.description}</td>
+      <td>${e.amount}</td>
+      <td>${e.currency || ''}</td>
+      <td>${e.type}</td>
+      <td>${e.person}</td>
+      <td>${e.bank}</td>
+      <td>${e.category || ''}</td>
+      <td>
+        <button onclick="editEntry('${e._id}')">✏️ Edit</button>
+        <button onclick="deleteEntry('${e._id}')">🗑️ Delete</button>
+      </td>
+    `;
+    entryTableBody.appendChild(row);
+  });
+
+  // ✅ Update totals
+  let incomeTotal = 0, expenseTotal = 0;
+  filtered.forEach(e => {
+    const amount = parseFloat(e.amount) || 0;
+    if ((e.type || '').toLowerCase() === 'income') incomeTotal += amount;
     else expenseTotal += amount;
   });
 
-  // ✅ Render rows (non-editable)
-  filtered.forEach(e => {
-    const row = document.createElement('tr');
-row.dataset.id = e._id;
-row.innerHTML = `
-  <td>${e.date}</td>
-  <td>${e.description}</td>
- 
-  <td>${e.amount}</td>
-  <td>${e.currency || ''}</td>
-  <td>${e.type}</td>
-  <td>${e.person}</td>
-  <td>${e.bank}</td>
-   <td>${e.category || ''}</td>
-  <td>
-    <button onclick="editEntry('${e._id}')">✏️ Edit</button>
-    <button onclick="deleteEntry('${e._id}')">🗑️ Delete</button>
-  </td>
-`;
-entryTableBody.appendChild(row);
-
-  });
-
-  // ✅ Update totals in UI
-  const balance = incomeTotal - expenseTotal;
   document.getElementById('totalIncome').textContent = incomeTotal.toFixed(2);
   document.getElementById('totalExpense').textContent = expenseTotal.toFixed(2);
-  document.getElementById('totalBalance').textContent = balance.toFixed(2);
+  document.getElementById('totalBalance').textContent = (incomeTotal - expenseTotal).toFixed(2);
 }
 
 
