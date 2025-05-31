@@ -11,18 +11,18 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+
 <!-- Add Flatpickr CSS and JS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
 <!-- Optional: Flatpickr dark theme support -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css" media="(prefers-color-scheme: dark)">
+
 
   <title>Bookkeeping</title>
 
-     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+ 
+
 
   
       <link rel="stylesheet" href="style.css">
@@ -266,7 +266,7 @@ function clearSearch(id) {
       Category:
         
 <select id="categoryFilter">
-  <option value="All"></option>
+  <option value="All">All</option>
 </select>
 </label>
 
@@ -575,33 +575,13 @@ function chartOptions() {
 document.getElementById('categoryFilter')?.addEventListener('change', drawCharts);
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
    
+
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
 <script src="dashboard.js" ></script>
-<script>
-  // Initialize Flatpickr
-  flatpickr("#newDate", {
-    dateFormat: "Y-m-d",
-    defaultDate: new Date()
-  });
-
-  // Set today's date if input is empty (after Flatpickr is ready)
-  window.addEventListener('DOMContentLoaded', () => {
-    const dateInput = document.getElementById('newDate');
-    if (dateInput && dateInput._flatpickr && !dateInput.value) {
-      dateInput._flatpickr.setDate(new Date());
-    }
-  });
-</script>
-
-<script>
-window.addEventListener('DOMContentLoaded', async () => {
-  await fetchEntries();
-  populateNewEntryDropdowns();
-  populateFilters(); // <- this updates #categoryFilter
-  renderEntries();
-});
-</script>
 
 </body>
 </html>

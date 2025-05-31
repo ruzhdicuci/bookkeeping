@@ -52,16 +52,15 @@ async function fetchEntries() {
     const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
       headers: { Authorization: `Bearer ${token}` }
     });
-
     if (!res.ok) throw new Error('Failed to fetch entries');
 
-    const data = await res.json();
-    console.log("📦 Entries received from backend:", data);
+    window.entries = await res.json();
+    console.log("📦 Entries:", window.entries);
 
-    window.entries = data;
-    renderEntries();
-    populateNewEntryDropdowns();
-    populateFilters();
+    renderEntries(); // ✅ This populates the table
+    populateNewEntryDropdowns(); // ✅ Person, Bank, Category lists
+    populateFilters(); // ✅ Category filter dropdown, months, etc.
+
   } catch (err) {
     console.error('❌ fetchEntries failed:', err);
   }
@@ -139,52 +138,57 @@ function populateFilters() {
   const prevMonth = monthSelect.value;
   const prevBank = bankFilter.value;
 
-  monthSelect.innerHTML = `<option value="">All</option>` + months.map(m => `<option value="${m}">${m}</option>`).join('');
+  monthSelect.innerHTML = `<option value="">All</option>` +
+    months.map(m => `<option value="${m}">${m}</option>`).join('');
   monthSelect.value = months.includes(prevMonth) ? prevMonth : "";
 
   const banks = [...new Set(entries.map(e => e.bank))].filter(Boolean);
-  bankFilter.innerHTML = `<option value="">All</option>` + banks.map(b => `<option value="${b}">${b}</option>`).join('');
+  bankFilter.innerHTML = `<option value="">All</option>` +
+    banks.map(b => `<option value="${b}">${b}</option>`).join('');
   bankFilter.value = banks.includes(prevBank) ? prevBank : "";
 
-  // ✅ PERSON DROPDOWN
+  // ✅ CATEGORY FILTER — THIS IS MISSING
+  const categoryFilter = document.getElementById('categoryFilter');
+  if (categoryFilter) {
+    const categories = [...new Set(entries.map(e => e.category).filter(Boolean))];
+    categoryFilter.innerHTML =
+      `<option value="All">All</option>` +
+      categories.map(c => `<option value="${c}">${c}</option>`).join('');
+  }
+
+  // ✅ PERSON CHECKBOX FILTERS
   const persons = [...new Set(entries.map(e => e.person))].filter(Boolean);
   const personOptions = document.getElementById('personOptions');
- console.log("🔍 Categories found:", [...new Set(entries.map(e => e.category))]);
 
+  personOptions.innerHTML = `
+    <div class="personOptionGroup">
+      <label><input type="checkbox" id="selectAllPersons" /> <strong>All</strong></label>
+      ${persons.map(p => `
+        <label>
+          <input type="checkbox" class="personOption" name="personFilter" value="${p}" checked />
+          ${p}
+        </label>
+      `).join('')}
+    </div>
+  `;
 
-  // Clear and add "All" checkbox
- // Clear and add "All" checkbox
-personOptions.innerHTML = `
-
-  <div class="personOptionGroup">
-    <label><input type="checkbox" id="selectAllPersons" /> <strong>All</strong></label>
-    ${persons.map(p => `
-      <label>
-        <input type="checkbox" class="personOption" name="personFilter" value="${p}" checked />
-        ${p}
-      </label>
-    `).join('')}
-  </div>
-`;
-
-// Handle "Select All"
-document.getElementById('selectAllPersons').addEventListener('change', function () {
-  const allChecked = this.checked;
-  document.querySelectorAll('.personOption').forEach(cb => cb.checked = allChecked);
-  renderEntries();
-});
-
-// Handle single checkbox changes
-document.querySelectorAll('.personOption').forEach(cb => {
-  cb.addEventListener('change', () => {
-    const all = document.querySelectorAll('.personOption');
-    const checked = document.querySelectorAll('.personOption:checked');
-    document.getElementById('selectAllPersons').checked = all.length === checked.length;
+  // Handle "Select All"
+  document.getElementById('selectAllPersons').addEventListener('change', function () {
+    const allChecked = this.checked;
+    document.querySelectorAll('.personOption').forEach(cb => cb.checked = allChecked);
     renderEntries();
   });
-});
- }
- 
+
+  // Handle individual checkboxes
+  document.querySelectorAll('.personOption').forEach(cb => {
+    cb.addEventListener('change', () => {
+      const all = document.querySelectorAll('.personOption');
+      const checked = document.querySelectorAll('.personOption:checked');
+      document.getElementById('selectAllPersons').checked = all.length === checked.length;
+      renderEntries();
+    });
+  });
+}
 
 
 
@@ -911,3 +915,25 @@ function toggleLock() {
 
 
   
+document.addEventListener('DOMContentLoaded', () => {
+  const dateInput = document.getElementById('newDate');
+  if (!dateInput) return;
+
+  const fp = flatpickr(dateInput, {
+    dateFormat: "Y-m-d",
+    defaultDate: new Date()
+  });
+
+  if (!dateInput.value) {
+    fp.setDate(new Date());
+  }
+});
+
+
+
+window.addEventListener('DOMContentLoaded', async () => {
+  await fetchEntries();               // Loads all entries
+  populateNewEntryDropdowns();       // Populates datalists
+  populateFilters();                 // ✅ Includes category filter now
+  renderEntries();                   // Displays data
+});
