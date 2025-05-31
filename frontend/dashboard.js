@@ -32,7 +32,8 @@ document.addEventListener('change', (e) => {
     renderEntries();
   }
 });
-let entries = [];
+window.entries = [];
+
 
 let initialBankBalances = {}; // will be populated from form
 const storedBalances = localStorage.getItem('initialBankBalances');
@@ -51,7 +52,7 @@ async function fetchEntries() {
 
     if (!res.ok) throw new Error('Failed to fetch entries');
 
-    entries = await res.json();
+   window.entries = await res.json();
     console.log("📦 Entries:", entries);
 
     await loadInitialBankBalances(); // ✅ Load balances AFTER entries but BEFORE rendering
@@ -232,7 +233,11 @@ function renderEntries() {
       <td>${e.type}</td>
       <td>${e.person}</td>
       <td>${e.bank}</td>
-      <td><button onclick="deleteEntry('${e._id}')">delete</button></td>
+<td>
+  <button onclick="editEntry('${e._id}')" style="margin-right: 5px;">✏️ </button>
+  <button onclick="deleteEntry('${e._id}')">🗑️ </button>
+</td>
+
     `;
     entryTableBody.appendChild(row);
   });
@@ -245,6 +250,25 @@ function renderEntries() {
 }
 
 
+function editEntry(id) {
+  const entry = window.entries.find(e => e._id === id);
+  if (!entry) return alert("Entry not found.");
+
+  // Prefill form fields
+  document.getElementById('newDate')._flatpickr.setDate(entry.date);
+  document.getElementById('newDescription').value = entry.description;
+  document.getElementById('newAmount').value = entry.amount;
+  document.getElementById('newCurrency').value = entry.currency;
+  document.getElementById('newType').value = entry.type;
+  document.getElementById('newPerson').value = entry.person;
+  document.getElementById('newBank').value = entry.bank;
+
+  // Store the ID for the update
+  document.getElementById('entryForm').dataset.editId = id;
+
+  // Focus on the first field
+  document.getElementById('newDescription').focus();
+}
 
 
 
@@ -491,14 +515,23 @@ document.getElementById('entryForm').addEventListener('submit', async (e) => {
   };
 
   try {
-    const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(entry)
-    });
+const form = document.getElementById('entryForm');
+const editId = form.dataset.editId;
+
+const method = editId ? 'PUT' : 'POST';
+const url = editId
+  ? `https://bookkeeping-i8e0.onrender.com/api/entries/${editId}`
+  : 'https://bookkeeping-i8e0.onrender.com/api/entries';
+
+const res = await fetch(url, {
+  method,
+  headers: {
+    Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(entry)
+});
+
 
     if (!res.ok) {
       const err = await res.json();
@@ -509,6 +542,10 @@ document.getElementById('entryForm').addEventListener('submit', async (e) => {
     // ✅ Reset form and refresh entries
     document.getElementById('entryForm').reset();
     await fetchEntries(); // refresh data on the page
+    if (editId) {
+  delete form.dataset.editId;
+}
+
     populateNewEntryDropdowns(); // optional dropdown update
 
   } catch (error) {
@@ -948,3 +985,33 @@ function toggleLock() {
     dropdown.style.display = 'none';
   }
 });
+
+
+
+
+  const topBar = document.getElementById('scrollTopBar');
+  const topInner = document.getElementById('scrollTopInner');
+  const content = document.getElementById('scrollContent');
+
+  function syncWidths() {
+    topInner.style.width = content.scrollWidth + 'px';
+  }
+
+  // Sync scroll
+  topBar.onscroll = () => {
+    content.scrollLeft = topBar.scrollLeft;
+  };
+
+  content.onscroll = () => {
+    topBar.scrollLeft = content.scrollLeft;
+  };
+
+  // On load or resize
+  window.addEventListener('load', syncWidths);
+  window.addEventListener('resize', syncWidths);
+
+
+
+
+
+  
