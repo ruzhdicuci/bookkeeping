@@ -21,7 +21,9 @@
 
   <title>Bookkeeping</title>
 
-     
+     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
   
       <link rel="stylesheet" href="style.css">
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -576,6 +578,12 @@ document.getElementById('categoryFilter')?.addEventListener('change', drawCharts
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
    
 <script src="dashboard.js" ></script>
+<script>
+  flatpickr("#newDate", {
+    dateFormat: "Y-m-d",
+    allowInput: true
+  });
+</script>
 
 </body>
 </html>
