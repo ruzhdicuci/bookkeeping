@@ -584,6 +584,17 @@ document.getElementById('categoryFilter')?.addEventListener('change', drawCharts
     allowInput: true
   });
 </script>
+<script>
+
+// Call on login page load
+window.addEventListener('DOMContentLoaded', async () => {
+  populateLoginUserDropdown(); // if necessary
+  await fetchEntries();
+  populateNewEntryDropdowns();
+  populateFilters();
+  renderEntries();
+});
+</script>
 
 </body>
 </html>

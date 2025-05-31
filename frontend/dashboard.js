@@ -914,15 +914,4 @@ function toggleLock() {
 
 
 
-
-
-// Call on login page load
-window.addEventListener('DOMContentLoaded', async () => {
-  populateLoginUserDropdown(); // if necessary
-  await fetchEntries();
-  populateNewEntryDropdowns();
-  populateFilters();
-  renderEntries();
-});
-
   
