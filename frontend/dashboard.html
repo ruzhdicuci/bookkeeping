@@ -579,11 +579,21 @@ document.getElementById('categoryFilter')?.addEventListener('change', drawCharts
    
 <script src="dashboard.js" ></script>
 <script>
+  // Initialize Flatpickr
   flatpickr("#newDate", {
     dateFormat: "Y-m-d",
-    allowInput: true
+    defaultDate: new Date()
+  });
+
+  // Set today's date if input is empty (after Flatpickr is ready)
+  window.addEventListener('DOMContentLoaded', () => {
+    const dateInput = document.getElementById('newDate');
+    if (dateInput && dateInput._flatpickr && !dateInput.value) {
+      dateInput._flatpickr.setDate(new Date());
+    }
   });
 </script>
+
 <script>
 window.addEventListener('DOMContentLoaded', async () => {
   await fetchEntries();

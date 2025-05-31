@@ -149,7 +149,8 @@ function populateFilters() {
   // ✅ PERSON DROPDOWN
   const persons = [...new Set(entries.map(e => e.person))].filter(Boolean);
   const personOptions = document.getElementById('personOptions');
- 
+ console.log("🔍 Categories found:", [...new Set(entries.map(e => e.category))]);
+
 
   // Clear and add "All" checkbox
  // Clear and add "All" checkbox
@@ -253,7 +254,9 @@ function editEntry(id) {
   if (!entry) return alert("Entry not found.");
 
   // Prefill form fields
-  document.getElementById('newDate')._flatpickr.setDate(entry.date);
+  
+  document.getElementById('newDate')._flatpickr.setDate(new Date(entry.date));
+
   document.getElementById('newDescription').value = entry.description;
   document.getElementById('newCategory').value = entry.category || '';
   document.getElementById('newAmount').value = entry.amount;
@@ -478,13 +481,6 @@ async function deleteAllEntries() {
   }
 }
 
-// Autofill with today's date if empty
-window.addEventListener('DOMContentLoaded', () => {
-  const dateInput = document.getElementById('newDate');
-  if (!dateInput.value) {
-    dateInput.valueAsDate = new Date();
-  }
-});
 
 
 
