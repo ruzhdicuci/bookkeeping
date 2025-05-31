@@ -924,6 +924,11 @@ function toggleLock() {
 
 
 
+window.addEventListener('DOMContentLoaded', async () => {
+  await fetchEntries();
+  populateNewEntryDropdowns();
+  populateFilters();
+});
 
 
 
