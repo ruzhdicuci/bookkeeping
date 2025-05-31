@@ -137,6 +137,9 @@
 
    <input type="text" id="newDate" placeholder="Select Date" class="flatpickr-input">
     <input type="text" id="newDescription" placeholder="Description" required />
+   
+
+
     <input type="number" step="0.01" id="newAmount" placeholder="Amount" required />
     <select id="newCurrency" required>
       <option value="CHF">CHF</option>
@@ -150,9 +153,6 @@
 </select>
 
 
-
-
-
 <label>
 <input list="personList"  id="newPerson" placeholder="Person" required />
 <datalist   id="personList"></datalist>
@@ -160,6 +160,8 @@
 
 <input list="bankList" id="newBank" placeholder="Bank" required />
 <datalist id="bankList"></datalist>
+ <input type="text" id="newCategory" placeholder="Category" list="newCategoryList" required />
+<datalist id="newCategoryList"></datalist>
 </label>
  </div>
 
@@ -244,6 +246,8 @@ function clearSearch(id) {
           </div>
         </label>
         <label>
+
+          
           Amount:
           <div class="input-with-clear">
             <input type="number" id="amountSearch" step="0.01" placeholder="... 🔍">
@@ -254,6 +258,14 @@ function clearSearch(id) {
           Month:
           <select id="monthSelect"></select>
         </label>
+
+        <label for="categoryFilter">Category:</label>
+<select id="categoryFilter">
+  <option value="">All</option>
+</select>
+
+
+
         <label>
           Type:
           <select id="typeFilter">
@@ -304,11 +316,13 @@ function clearSearch(id) {
 
         <th id="th3"> Date</th>
     <th id="th3">Description</th>
+  
     <th id="th3">Amount</th>
     <th id="th3">Currency</th>
     <th id="th3">Type</th>
     <th id="th3">Person</th>
     <th id="th3">Bank</th>
+       <th id="th3">Category</th>
     <th id="th3">Actions</th>
   </tr>
   
@@ -320,14 +334,72 @@ function clearSearch(id) {
     <tbody id="entryTableBody"></tbody>
   </table>
 
+  
 
-	 <!-- Dashboard Tab -->
+
+  <!-- Dashboard Tab -->
   <div id="dashboardTab" class="tab-content active">
-    <!-- [unchanged content omitted for brevity] -->
-  </div>
-
+   
   <script>
-      let monthlyChartInstance = null;
+    // Add entries
+  document.getElementById('entryForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const inputDate = document.getElementById('newDate')._flatpickr?.selectedDates[0];
+    function formatDateToLocalISO(date) {
+      const offsetDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+      return offsetDate.toISOString().split('T')[0];
+    }
+    const isoDate = inputDate ? formatDateToLocalISO(inputDate) : '';
+
+    console.log('📥 Submitting entry...');
+    const entry = {
+      date: isoDate,
+      description: document.getElementById('newDescription').value,
+      category: document.getElementById('newCategory').value,
+      amount: parseFloat(document.getElementById('newAmount').value),
+      currency: document.getElementById('newCurrency').value,
+      type: document.getElementById('newType').value,
+      person: document.getElementById('newPerson').value,
+      bank: document.getElementById('newBank').value,
+    };
+
+    try {
+      const form = document.getElementById('entryForm');
+      const editId = form.dataset.editId;
+
+      const method = editId ? 'PUT' : 'POST';
+      const url = editId
+        ? `https://bookkeeping-i8e0.onrender.com/api/entries/${editId}`
+        : 'https://bookkeeping-i8e0.onrender.com/api/entries';
+
+      console.log('📦 Payload being sent:', entry);
+      const res = await fetch(url, {
+        method,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(entry)
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        alert('❌ Error saving entry: ' + (err.message || res.statusText));
+        return;
+      }
+
+      document.getElementById('entryForm').reset();
+      await fetchEntries();
+      if (editId) delete form.dataset.editId;
+      populateNewEntryDropdowns();
+
+    } catch (error) {
+      console.error('❌ Error saving entry:', error);
+      alert('Failed to save entry.');
+    }
+  });
+    let monthlyChartInstance = null;
     let personChartInstance = null;
     let comparisonChartInstance = null;
     let pieChartInstance = null;
@@ -341,18 +413,20 @@ function clearSearch(id) {
     }
 
     function drawCharts() {
+  const categoryFilter = document.getElementById('categoryFilter')?.value || 'All';
       const entries = window.entries || [];
       const monthlyIncome = {}, monthlyExpense = {}, personIncome = {}, personExpense = {}, expenseByCategory = {};
 
       const selectedPerson = document.getElementById('filterPerson')?.value || 'All';
 
       entries.forEach(e => {
+    if (categoryFilter !== 'All' && e.category !== categoryFilter) return;
         if (selectedPerson !== 'All' && e.person !== selectedPerson) return;
 
         const month = e.date?.slice(0, 7);
         const person = e.person || 'Unknown';
         const value = parseFloat(e.amount) || 0;
-        const key = e.description || 'Other';
+        const key = e.category || 'Other';
 
         if (e.type === 'Income') {
           monthlyIncome[month] = (monthlyIncome[month] || 0) + value;
@@ -447,13 +521,23 @@ function clearSearch(id) {
     }
 
     function populatePersonFilter(persons) {
+  populateCategoryFilter(window.entries || []);
       const select = document.getElementById('filterPerson');
       const current = select.value;
       select.innerHTML = '<option value="All">All</option>' + persons.map(p => `<option value="${p}">${p}</option>`).join('');
       select.value = current;
     }
 
-    function chartOptions() {
+    function populateCategoryFilter(entries) {
+  const select = document.getElementById('categoryFilter');
+  if (!select) return;
+  const current = select.value;
+  const categories = [...new Set(entries.map(e => e.category).filter(Boolean))].sort();
+  select.innerHTML = '<option value="All">All</option>' + categories.map(c => `<option value="${c}">${c}</option>`).join('');
+  select.value = current;
+}
+
+function chartOptions() {
       return {
         responsive: true,
         plugins: {
@@ -478,11 +562,12 @@ function clearSearch(id) {
       link.click();
     }
 
-   // document.getElementById('monthSelect')?.addEventListener('change', () => {
-    //  openTab('chartsTab', document.querySelector('.tab-button:nth-child(2)'));
-   // });
+    document.getElementById('monthSelect')?.addEventListener('change', () => {
+      openTab('chartsTab', document.querySelector('.tab-button:nth-child(2)'));
+    });
     document.getElementById('chartType')?.addEventListener('change', drawCharts);
     document.getElementById('filterPerson')?.addEventListener('change', drawCharts);
+document.getElementById('categoryFilter')?.addEventListener('change', drawCharts);
 
   </script>
 

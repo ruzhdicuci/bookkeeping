@@ -4,12 +4,14 @@ if (!token) location.href = 'index.html';
 
 const entryTableBody = document.getElementById('entryTableBody');
 const monthSelect = document.getElementById('monthSelect');
+const catgorySelect = document.getElementById('categorySelect');
 const personFilter = document.getElementById('personFilter');
 const bankFilter = document.getElementById('bankFilter');
 
 const balanceEl = document.getElementById('balance');
 
 const currencyFilter = document.getElementById('currencyFilter');
+const categoryFilter = document.getElementById('categoryFilter');
 const typeFilter = document.getElementById('typeFilter');
 const dateSearch = document.getElementById('dateSearch');
 const descSearch = document.getElementById('descSearch');
@@ -21,6 +23,7 @@ monthSelect.onchange =
   bankFilter.onchange =
   typeFilter.onchange =
   currencyFilter.onchange =
+  categoryFilter.onchange =
   descSearch.oninput =
   amountSearch.oninput =
   dateSearch.oninput = renderEntries;
@@ -52,16 +55,15 @@ async function fetchEntries() {
 
     if (!res.ok) throw new Error('Failed to fetch entries');
 
-   window.entries = await res.json();
-    console.log("📦 Entries:", entries);
+    const data = await res.json();
+    console.log("📦 Entries received from backend:", data);
 
-    await loadInitialBankBalances(); // ✅ Load balances AFTER entries but BEFORE rendering
-    populateFilters();
-    renderBankBalanceForm();
+    window.entries = data;
     renderEntries();
-
+    populateNewEntryDropdowns();
+    populateFilters();
   } catch (err) {
-    console.error("❌ fetchEntries failed:", err);
+    console.error('❌ fetchEntries failed:', err);
   }
 }
 
@@ -88,19 +90,22 @@ async function loadInitialBankBalances() {
 
 
 function populateNewEntryDropdowns() {
-  const persons = [...new Set(entries.map(e => e.person))].filter(Boolean);
-  const banks = [...new Set(entries.map(e => e.bank))].filter(Boolean);
+  const persons = [...new Set(window.entries.map(e => e.person))].filter(Boolean);
+  const banks = [...new Set(window.entries.map(e => e.bank))].filter(Boolean);
+  const categories = [...new Set(window.entries.map(e => e.category))].filter(Boolean);
 
   const personList = document.getElementById('personList');
   const bankList = document.getElementById('bankList');
+  const categoryList = document.getElementById('newCategoryList');
 
-  personList.innerHTML = persons.map(p => `<option value="${p}">`).join('');
-  bankList.innerHTML = banks.map(b => `<option value="${b}">`).join('');
+  if (personList) personList.innerHTML = persons.map(p => `<option value="${p}">`).join('');
+  if (bankList) bankList.innerHTML = banks.map(b => `<option value="${b}">`).join('');
+  if (categoryList) categoryList.innerHTML = categories.map(c => `<option value="${c}">`).join('');
 
   console.log("👤 Loaded persons:", persons);
   console.log("🏦 Loaded banks:", banks);
+  console.log("🏷️ Loaded categories:", categories);
 }
-
 
 // Populate New Entry bank dropdown based on Account Balances table
 function populateBankDropdownFromBalances() {
@@ -186,12 +191,16 @@ document.querySelectorAll('.personOption').forEach(cb => {
 function renderEntries() {
   const dateQuery = dateSearch.value.trim().toLowerCase();
   const searchAmount = parseFloat(amountSearch.value || "0");
+  const categoryFilter = document.getElementById('categoryFilter');
+
   const selectedPersons = Array.from(document.querySelectorAll('.personOption:checked')).map(cb => cb.value);
 
   // ✅ Filter entries
   const filtered = entries.filter(e => {
     const formattedDate = (e.date || '').toLowerCase(); // You could use custom formatting here if needed
     const description = (e.description || '').toLowerCase();
+    const categoryFilter = document.getElementById('categoryFilter');
+
 
     return (
       (!dateQuery || formattedDate.includes(dateQuery)) &&
@@ -201,6 +210,7 @@ function renderEntries() {
       (!typeFilter.value || e.type === typeFilter.value) &&
       (!currencyFilter.value || e.currency === currencyFilter.value) &&
       (!descSearch.value || description.includes(descSearch.value.toLowerCase())) &&
+         (!categoryFilter || !categoryFilter.value || e.category === categoryFilter.value) &&
       (amountSearch.value === '' || String(e.amount ?? '').includes(amountSearch.value))
     );
   });
@@ -224,22 +234,24 @@ function renderEntries() {
   // ✅ Render rows (non-editable)
   filtered.forEach(e => {
     const row = document.createElement('tr');
-    row.dataset.id = e._id;
-    row.innerHTML = `
-      <td>${e.date}</td>
-      <td>${e.description}</td>
-      <td>${e.amount}</td>
-      <td>${e.currency || ''}</td>
-      <td>${e.type}</td>
-      <td>${e.person}</td>
-      <td>${e.bank}</td>
-<td>
-  <button onclick="editEntry('${e._id}')" style="margin-right: 5px;">✏️ </button>
-  <button onclick="deleteEntry('${e._id}')">🗑️ </button>
-</td>
+row.dataset.id = e._id;
+row.innerHTML = `
+  <td>${e.date}</td>
+  <td>${e.description}</td>
+ 
+  <td>${e.amount}</td>
+  <td>${e.currency || ''}</td>
+  <td>${e.type}</td>
+  <td>${e.person}</td>
+  <td>${e.bank}</td>
+   <td>${e.category || ''}</td>
+  <td>
+    <button onclick="editEntry('${e._id}')">✏️ Edit</button>
+    <button onclick="deleteEntry('${e._id}')">🗑️ Delete</button>
+  </td>
+`;
+entryTableBody.appendChild(row);
 
-    `;
-    entryTableBody.appendChild(row);
   });
 
   // ✅ Update totals in UI
@@ -257,18 +269,17 @@ function editEntry(id) {
   // Prefill form fields
   document.getElementById('newDate')._flatpickr.setDate(entry.date);
   document.getElementById('newDescription').value = entry.description;
+  document.getElementById('newCategory').value = entry.category || '';
   document.getElementById('newAmount').value = entry.amount;
   document.getElementById('newCurrency').value = entry.currency;
   document.getElementById('newType').value = entry.type;
   document.getElementById('newPerson').value = entry.person;
   document.getElementById('newBank').value = entry.bank;
 
-  // Store the ID for the update
   document.getElementById('entryForm').dataset.editId = id;
-
-  // Focus on the first field
   document.getElementById('newDescription').focus();
 }
+
 
 
 
@@ -486,71 +497,6 @@ window.addEventListener('DOMContentLoaded', () => {
   const dateInput = document.getElementById('newDate');
   if (!dateInput.value) {
     dateInput.valueAsDate = new Date();
-  }
-});
-
-
-// Add entries
-document.getElementById('entryForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-
-  // 👇 Get selected date from Flatpickr and convert to local ISO (yyyy-mm-dd)
-  const inputDate = document.getElementById('newDate')._flatpickr?.selectedDates[0];
-
-  function formatDateToLocalISO(date) {
-    const offsetDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
-    return offsetDate.toISOString().split('T')[0];
-  }
-
-  const isoDate = inputDate ? formatDateToLocalISO(inputDate) : '';
-
-  const entry = {
-    date: isoDate,
-    description: document.getElementById('newDescription').value,
-    amount: parseFloat(document.getElementById('newAmount').value),
-    currency: document.getElementById('newCurrency').value,
-    type: document.getElementById('newType').value,
-    person: document.getElementById('newPerson').value,
-    bank: document.getElementById('newBank').value,
-  };
-
-  try {
-const form = document.getElementById('entryForm');
-const editId = form.dataset.editId;
-
-const method = editId ? 'PUT' : 'POST';
-const url = editId
-  ? `https://bookkeeping-i8e0.onrender.com/api/entries/${editId}`
-  : 'https://bookkeeping-i8e0.onrender.com/api/entries';
-
-const res = await fetch(url, {
-  method,
-  headers: {
-    Authorization: `Bearer ${token}`,
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify(entry)
-});
-
-
-    if (!res.ok) {
-      const err = await res.json();
-      alert('❌ Error saving entry: ' + (err.message || res.statusText));
-      return;
-    }
-
-    // ✅ Reset form and refresh entries
-    document.getElementById('entryForm').reset();
-    await fetchEntries(); // refresh data on the page
-    if (editId) {
-  delete form.dataset.editId;
-}
-
-    populateNewEntryDropdowns(); // optional dropdown update
-
-  } catch (error) {
-    console.error('❌ Error saving entry:', error);
-    alert('Failed to save entry.');
   }
 });
 
@@ -989,26 +935,7 @@ function toggleLock() {
 
 
 
-  const topBar = document.getElementById('scrollTopBar');
-  const topInner = document.getElementById('scrollTopInner');
-  const content = document.getElementById('scrollContent');
 
-  function syncWidths() {
-    topInner.style.width = content.scrollWidth + 'px';
-  }
-
-  // Sync scroll
-  topBar.onscroll = () => {
-    content.scrollLeft = topBar.scrollLeft;
-  };
-
-  content.onscroll = () => {
-    topBar.scrollLeft = content.scrollLeft;
-  };
-
-  // On load or resize
-  window.addEventListener('load', syncWidths);
-  window.addEventListener('resize', syncWidths);
 
 
 
