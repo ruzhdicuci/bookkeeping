@@ -37,6 +37,7 @@ const Entry = mongoose.model('Entry', new mongoose.Schema({
   date: String,
   person: String,
   bank: String,
+   category: String,
   currency: String
 }));
 
