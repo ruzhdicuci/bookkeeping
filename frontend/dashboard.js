@@ -713,14 +713,6 @@ async function loginWithSelectedUser() {
 }
 
 
-// Call on login page load
-window.addEventListener('DOMContentLoaded', populateLoginUserDropdown);
-
-window.addEventListener('DOMContentLoaded', async () => {
-await fetchEntries();
-populateNewEntryDropdowns(); // ✅ This ensures the dropdowns get populated
-populateFilters(); // ✅ This ensures filters like category/month are ready
-});
 
 // Save to backend
 async function saveBankBalancesToBackend() {
@@ -924,9 +916,13 @@ function toggleLock() {
 
 
 
-
-
-
-
+// Call on login page load
+window.addEventListener('DOMContentLoaded', async () => {
+  populateLoginUserDropdown(); // if necessary
+  await fetchEntries();
+  populateNewEntryDropdowns();
+  populateFilters();
+  renderEntries();
+});
 
   
