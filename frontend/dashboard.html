@@ -420,7 +420,8 @@ function clearSearch(id) {
       const selectedPerson = document.getElementById('filterPerson')?.value || 'All';
 
       entries.forEach(e => {
-    if (categoryFilter !== 'All' && e.category !== categoryFilter) return;
+    if (categoryFilter !== 'All' && (e.category || '') !== categoryFilter) return;
+
         if (selectedPerson !== 'All' && e.person !== selectedPerson) return;
 
         const month = e.date?.slice(0, 7);
