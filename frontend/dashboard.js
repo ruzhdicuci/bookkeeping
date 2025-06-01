@@ -209,23 +209,38 @@ function renderEntries() {
   const selectedPersons = Array.from(document.querySelectorAll('.personOption:checked')).map(cb => cb.value);
   const categoryFilter = document.getElementById('categoryFilter');
   const categoryValue = categoryFilter?.value || "All";
+const dayQuery = dateSearch.value.trim();
+let selectedDays = new Set();
+
+dayQuery.split(',').forEach(part => {
+  const trimmed = part.trim();
+  if (trimmed.includes('-')) {
+    const [start, end] = trimmed.split('-').map(Number);
+    for (let i = start; i <= end; i++) {
+      selectedDays.add(i.toString().padStart(2, '0'));
+    }
+  } else if (trimmed) {
+    selectedDays.add(trimmed.padStart(2, '0'));
+  }
+});
 
   // ✅ Filter entries
   const filtered = entries.filter(e => {
-    const formattedDate = (e.date || '').toLowerCase();
+    const daySearch = dateSearch.value.trim();
+const entryDay = e.date?.split('-')[2];
     const description = (e.description || '').toLowerCase();
 
-    return (
-      (!dateQuery || formattedDate.includes(dateQuery)) &&
-      (!monthSelect.value || e.date.startsWith(monthSelect.value)) &&
-      (selectedPersons.length === 0 || selectedPersons.includes(e.person)) &&
-      (!bankFilter.value || e.bank === bankFilter.value) &&
-      (!typeFilter.value || e.type === typeFilter.value) &&
-      (!currencyFilter.value || e.currency === currencyFilter.value) &&
-      (!descSearch.value || description.includes(descSearch.value.toLowerCase())) &&
-      (categoryValue === "All" || e.category === categoryValue) &&
-      (amountSearch.value === '' || String(e.amount ?? '').includes(amountSearch.value))
-    );
+ return (
+  (selectedDays.size === 0 || selectedDays.has(entryDay)) &&
+  (!monthSelect.value || e.date.startsWith(monthSelect.value)) &&
+  (selectedPersons.length === 0 || selectedPersons.includes(e.person)) &&
+  (!bankFilter.value || e.bank === bankFilter.value) &&
+  (!typeFilter.value || e.type === typeFilter.value) &&
+  (!currencyFilter.value || e.currency === currencyFilter.value) &&
+  (!descSearch.value || (e.description || '').toLowerCase().includes(descSearch.value.toLowerCase())) &&
+  (categoryValue === "All" || e.category === categoryValue) &&
+  (amountSearch.value === '' || String(e.amount ?? '').includes(amountSearch.value))
+);
   });
 
   // ✅ Rebuild table
@@ -589,7 +604,7 @@ html += `
     
     <div style="display: flex; gap: 1rem; align-items: center;">
       <span>Total Plus:&nbsp; 
-        <span style="color: rgb(20, 157, 91); font-size: 22px; ">+${totalPositive.toFixed(2)}</span>
+        <span style="color: green; font-size: 22px; ">+${totalPositive.toFixed(2)}</span>
       </span>&nbsp;&nbsp;
       <span>Total Minus:&nbsp; 
         <span style="color: rgb(255, 85, 0); font-size: 22px; ">${totalNegative.toFixed(2)}</span>
