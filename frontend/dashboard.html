@@ -189,9 +189,42 @@
 </div></div>
  
 
+ <div class="sections4">
+<!-- 💳 Kredit Overview Table -->
+<div id="creditLimitTable" style="margin-top: 2rem; overflow-x: auto;">
+  <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 0.95rem;">
+    <thead style="background: #f3f3f3;">
+      <tr>
+        <th style="padding: 0.75rem;">&nbsp;</th>
+        <th>UBS Master</th>
+        <th>Corner</th>
+        <th>Postfinance Master</th>
+        <th>Total Minus Can</th>
+        <th>Total Minus Can Now</th>
+        <th>Difference</th>
+        <th>Total Minus Can + Total Plus</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="font-weight: bold;">Kredit Limit</td>
+        <td><input type="number" id="creditLimit-ubs" value="3000" /></td>
+        <td><input type="number" id="creditLimit-corner" value="9900" /></td>
+        <td><input type="number" id="creditLimit-pfm" value="1000" /></td>
+        <td id="totalLimit"></td>
+        <td id="totalUsed"></td>
+        <td id="diffUsed"></td>
+        <td id="limitPlusTotal"></td>
+      </tr>
+    </tbody>
+  </table>
+  <div style="text-align: left; margin-top: 0.5rem;">
+    <button onclick="saveCreditLimits()">💾 Save Limits</button>
+  </div>
+</div>
 
 
-
+</div>
    
 
            
@@ -225,6 +258,8 @@ function clearSearch(id) {
   <p><strong style="font-size: 24px;">Balance:&nbsp&nbsp</strong> <span id="totalBalance">0.00</span></p>
   
 </div></div>
+
+
 
 
 
@@ -316,6 +351,8 @@ function clearSearch(id) {
 </table>
    </div>
 
+
+   
    <div class="sections7">
 <table>
 
@@ -340,10 +377,15 @@ function clearSearch(id) {
 </div>
 </div>
 
+
+
+
     <tbody id="entryTableBody"></tbody>
   </table>
 
 
+
+  
 
   <!-- Dashboard Tab -->
   <div id="dashboardTab" class="tab-content active">
@@ -605,13 +647,92 @@ window.addEventListener('scroll', () => {
 </script>
 
 
+
+<script>
+function renderCreditLimitTable() {
+  const limits = {
+    "UBS Master": parseFloat(document.getElementById("creditLimit-ubs")?.value || 0),
+    "Corner": parseFloat(document.getElementById("creditLimit-corner")?.value || 0),
+    "Postfinance Master": parseFloat(document.getElementById("creditLimit-pfm")?.value || 0)
+  };
+
+  const banks = Object.keys(limits);
+  const changes = {};
+  const allChanges = {};
+
+  const headerCells = document.querySelectorAll("#bankBalanceTableContainer thead th");
+  const changeCells = document.querySelectorAll("#bankBalanceTableContainer tbody tr:nth-child(2) td");
+
+  headerCells.forEach((th, i) => {
+    const bank = th.textContent.trim();
+    const val = parseFloat(changeCells[i]?.textContent) || 0;
+    allChanges[bank] = val;
+    if (banks.includes(bank)) {
+      changes[bank] = val;
+    }
+  });
+
+  let totalLimit = 0, totalUsed = 0;
+
+  banks.forEach(bank => {
+    const credit = limits[bank];
+    const used = Math.abs(changes[bank] || 0);
+    totalLimit += credit;
+    totalUsed += used;
+  });
+
+  const totalPlus = Object.entries(allChanges)
+    .filter(([bank, v]) => v > 0)
+    .reduce((sum, [, v]) => sum + v, 0);
+
+  document.getElementById("totalLimit").textContent = totalLimit.toFixed(2);
+  document.getElementById("totalUsed").textContent = totalUsed.toFixed(2);
+  document.getElementById("diffUsed").textContent = (totalLimit - totalUsed).toFixed(2);
+  document.getElementById("limitPlusTotal").textContent = (totalUsed + totalPlus).toFixed(2);
+}
+
+['creditLimit-ubs', 'creditLimit-corner', 'creditLimit-pfm'].forEach(id => {
+  const input = document.getElementById(id);
+  if (input) {
+    input.addEventListener('input', renderCreditLimitTable);
+  }
+});
+
+async function saveCreditLimits() {
+  const limits = {
+    "UBS Master": parseFloat(document.getElementById("creditLimit-ubs")?.value || 0),
+    "Corner": parseFloat(document.getElementById("creditLimit-corner")?.value || 0),
+    "Postfinance Master": parseFloat(document.getElementById("creditLimit-pfm")?.value || 0)
+  };
+
+  await fetch('/api/credit-limits', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${localStorage.getItem("token")}`
+    },
+    body: JSON.stringify(limits)
+  });
+
+  alert("✅ Kredit limits saved");
+}
+
+
+window.addEventListener('entriesUpdated', renderCreditLimitTable);
+window.addEventListener('bankBalanceUpdated', renderCreditLimitTable);
+</script>
+
+
+
+
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 <script src="dashboard.js" ></script>
 
-</body>
-</html>
+
+
+
 
 
 

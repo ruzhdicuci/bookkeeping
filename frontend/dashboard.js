@@ -76,6 +76,9 @@ async function fetchEntries() {
   }
 }
 
+renderBankBalanceForm();
+window.dispatchEvent(new Event('bankBalanceUpdated'));
+
 
 async function loadInitialBankBalances() {
   try {
@@ -995,11 +998,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
+
+
+
 window.addEventListener('DOMContentLoaded', async () => {
   await fetchEntries();
   await loadInitialBankBalances();
   populateNewEntryDropdowns();
   populateFilters();
   renderEntries();
-  renderBankBalanceForm(); // ✅ call this one instead of renderBankBalanceTable()
+  renderBankBalanceForm();
+  renderCreditLimitTable(); // ✅ call it here
 });
