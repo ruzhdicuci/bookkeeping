@@ -76,8 +76,6 @@ async function fetchEntries() {
   }
 }
 
-renderBankBalanceForm();
-window.dispatchEvent(new Event('bankBalanceUpdated'));
 
 
 async function loadInitialBankBalances() {
@@ -279,6 +277,8 @@ const entryDay = e.date?.split('-')[2];
   document.getElementById('totalExpense').textContent = expenseTotal.toFixed(2);
   document.getElementById('totalBalance').textContent = (incomeTotal - expenseTotal).toFixed(2);
 }
+
+
 
 
 function editEntry(id) {
@@ -617,6 +617,8 @@ html += `
 `;
 
   container.innerHTML = html;
+    // ✅ Trigger update for dependent components (like credit limit table)
+  window.dispatchEvent(new Event('bankBalanceUpdated'));
 }
 
 window.initialLocked = true;

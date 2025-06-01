@@ -648,6 +648,7 @@ window.addEventListener('scroll', () => {
 
 
 
+
 <script>
 function renderCreditLimitTable() {
   const limits = {
@@ -691,6 +692,26 @@ function renderCreditLimitTable() {
   document.getElementById("limitPlusTotal").textContent = (totalUsed + totalPlus).toFixed(2);
 }
 
+function saveCreditLimits() {
+  const limits = {
+    "UBS Master": parseFloat(document.getElementById("creditLimit-ubs")?.value || 0),
+    "Corner": parseFloat(document.getElementById("creditLimit-corner")?.value || 0),
+    "Postfinance Master": parseFloat(document.getElementById("creditLimit-pfm")?.value || 0)
+  };
+
+  fetch('/api/credit-limits', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${localStorage.getItem("token")}`
+    },
+    body: JSON.stringify(limits)
+  }).then(() => {
+    alert("✅ Kredit limits saved");
+    renderCreditLimitTable();
+  });
+}
+
 ['creditLimit-ubs', 'creditLimit-corner', 'creditLimit-pfm'].forEach(id => {
   const input = document.getElementById(id);
   if (input) {
@@ -698,29 +719,21 @@ function renderCreditLimitTable() {
   }
 });
 
-async function saveCreditLimits() {
-  const limits = {
-    "UBS Master": parseFloat(document.getElementById("creditLimit-ubs")?.value || 0),
-    "Corner": parseFloat(document.getElementById("creditLimit-corner")?.value || 0),
-    "Postfinance Master": parseFloat(document.getElementById("creditLimit-pfm")?.value || 0)
-  };
-
-  await fetch('/api/credit-limits', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${localStorage.getItem("token")}`
-    },
-    body: JSON.stringify(limits)
-  });
-
-  alert("✅ Kredit limits saved");
-}
-
-
 window.addEventListener('entriesUpdated', renderCreditLimitTable);
 window.addEventListener('bankBalanceUpdated', renderCreditLimitTable);
+
+// Automatically dispatch events after entry or bank balance update
+async function fetchEntries() {
+  // your existing fetch logic...
+  window.dispatchEvent(new Event('entriesUpdated'));
+}
+
+function renderBankBalanceForm() {
+  // your existing render logic...
+  window.dispatchEvent(new Event('bankBalanceUpdated'));
+}
 </script>
+
 
 
 
