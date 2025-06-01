@@ -38,13 +38,23 @@ document.addEventListener('change', (e) => {
 window.entries = [];
 
 
-let initialBankBalances = {}; // will be populated from form
-const storedBalances = localStorage.getItem('initialBankBalances');
-if (storedBalances) {
-  initialBankBalances = JSON.parse(storedBalances);
+let initialBankBalances = {};
+
+async function loadInitialBankBalances() {
+  try {
+    const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/balances', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error('Failed to load balances');
+
+    initialBankBalances = await res.json();
+    localStorage.setItem('initialBankBalances', JSON.stringify(initialBankBalances));
+  } catch (err) {
+    console.warn('⚠️ Could not load balances from backend. Using localStorage fallback.');
+    const local = localStorage.getItem('initialBankBalances');
+    if (local) initialBankBalances = JSON.parse(local);
+  }
 }
-  fetchEntries(); // this will repopulate dropdowns automatically
-  
 
 
 async function fetchEntries() {
@@ -332,7 +342,12 @@ async function deleteEntry(id) {
     method: 'DELETE',
     headers: { Authorization: `Bearer ${token}` }
   });
-  fetchEntries();
+
+  await fetchEntries();             // Reload updated entries
+  renderEntries();                  // Refresh visible table
+  populateNewEntryDropdowns();     // Rebuild inputs with updated data
+  populateFilters();               // Rebuild filters
+  renderBankBalanceForm();         // ✅ Refresh bank balance table
 }
 
 
@@ -555,15 +570,39 @@ function renderBankBalanceForm() {
     html += `<td id="center1" style="color:${color}">${delta.toFixed(2)}</td>`;
   });
   html += '</tr>';
+  html += '</tbody></table>';
 
-  html += `</tbody></table>
+
+  // ✅ Calculate totals
+  let totalPositive = 0;
+  let totalNegative = 0;
+  Object.values(changes).forEach(val => {
+    if (val > 0) totalPositive += val;
+    else totalNegative += val;
+  });
+
+  // ✅ Append summary
+html += `
+  <div style="display: flex; align-items: center; gap: 1.5rem; margin-top: 1rem; flex-wrap: wrap;">
     <button id="saveBankBalances" onclick="saveBankBalances()">Save</button>
-    <button id="lockbalance" onclick="toggleLock()">${window.initialLocked ? 'Unlock' : 'Lock'}</button>`;
+    <button id="lockbalance" onclick="toggleLock()">${window.initialLocked ? 'Unlock' : 'Lock'}</button>
+    
+    <div style="display: flex; gap: 1rem; align-items: center;">
+      <span>Total Plus:&nbsp; 
+        <span style="color: rgb(20, 157, 91); font-size: 22px; ">+${totalPositive.toFixed(2)}</span>
+      </span>&nbsp;&nbsp;
+      <span>Total Minus:&nbsp; 
+        <span style="color: rgb(255, 85, 0); font-size: 22px; ">${totalNegative.toFixed(2)}</span>
+      </span>
+    </div>
+  </div>
+`;
 
   container.innerHTML = html;
 }
 
 window.initialLocked = true;
+
 
 
 async function saveBankBalances() {
@@ -833,6 +872,16 @@ function togglePersonDropdown() {
   }
 }
 
+function calculateCurrentBankBalance(bankName) {
+  return entries
+    .filter(e => e.bank === bankName)
+    .reduce((sum, e) => {
+      const amount = parseFloat(e.amount) || 0;
+      return e.type === 'Income' ? sum + amount
+           : e.type === 'Expense' ? sum - amount
+           : sum;
+    }, 0);
+}
 
 
 
@@ -932,8 +981,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 window.addEventListener('DOMContentLoaded', async () => {
-  await fetchEntries();               // Loads all entries
-  populateNewEntryDropdowns();       // Populates datalists
-  populateFilters();                 // ✅ Includes category filter now
-  renderEntries();                   // Displays data
+  await fetchEntries();
+  await loadInitialBankBalances();
+  populateNewEntryDropdowns();
+  populateFilters();
+  renderEntries();
+  renderBankBalanceForm(); // ✅ call this one instead of renderBankBalanceTable()
 });

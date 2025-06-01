@@ -397,9 +397,14 @@ function clearSearch(id) {
       }
 
       document.getElementById('entryForm').reset();
-      await fetchEntries();
-      if (editId) delete form.dataset.editId;
-      populateNewEntryDropdowns();
+await fetchEntries();                    // reload data from server
+if (editId) delete form.dataset.editId;
+
+populateNewEntryDropdowns();            // refresh datalists
+populateFilters();                      // refresh filters (e.g. categories)
+renderEntries();                        // re-render entry table
+renderBankBalanceForm();                // ✅ re-render balance inputs
+
 
     } catch (error) {
       console.error('❌ Error saving entry:', error);
@@ -576,7 +581,28 @@ document.getElementById('categoryFilter')?.addEventListener('change', drawCharts
 </script>
 
 
-   
+   <button id="scrollTopBtn" class="scroll-btn" title="Scroll to top" style="color:rgb(235, 11, 56)">⬆</button>
+<button id="scrollBottomBtn" class="scroll-btn" title="Scroll to bottom" style="color:rgb(22, 173, 118)">⬇</button>
+
+<script>
+  document.getElementById('scrollTopBtn').onclick = () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+document.getElementById('scrollBottomBtn').onclick = () => {
+  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+};
+
+
+window.addEventListener('scroll', () => {
+  const show = window.scrollY > 100;
+  document.getElementById('scrollTopBtn').style.opacity = show ? 1 : 0;
+  document.getElementById('scrollBottomBtn').style.opacity = show ? 1 : 0;
+});
+
+
+</script>
+
 
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
