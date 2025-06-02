@@ -170,3 +170,41 @@ app.get('/api/balances', auth, async (req, res) => {
   const doc = await Balance.findOne({ userId: req.userId });
   res.json(doc?.balances || {});
 });
+
+
+const Limit = mongoose.model('Limit', new mongoose.Schema({
+  userId: String,
+  limits: {
+    ubs: Number,
+    corner: Number,
+    pfm: Number
+  },
+  locked: Boolean
+}));
+
+// GET limits + lock state
+app.get('/api/limits', auth, async (req, res) => {
+  const doc = await Limit.findOne({ userId: req.userId });
+  if (doc) {
+    res.json({ ...doc.limits, locked: doc.locked });
+  } else {
+    res.json({
+      ubs: 3000,
+      corner: 9900,
+      pfm: 1000,
+      locked: true
+    });
+  }
+});
+
+// POST to save limits + lock state
+app.post('/api/limits', auth, async (req, res) => {
+  const { ubs, corner, pfm, locked } = req.body;
+  await Limit.findOneAndUpdate(
+    { userId: req.userId },
+    { limits: { ubs, corner, pfm }, locked },
+    { upsert: true }
+  );
+  res.json({ success: true });
+});
+
