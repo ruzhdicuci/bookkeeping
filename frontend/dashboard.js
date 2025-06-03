@@ -1,15 +1,12 @@
 
-const backend = 'https://bookkeeping-i8e0.onrender.com';
+const token = localStorage.getItem('token');
 
 if (!token) {
-  console.error('❌ No token found. You must log in first.');
+  console.error('❌ No token found. Please log in.');
   // Optionally redirect:
   // window.location.href = '/login.html';
 }
-
-
-
-
+const backend = 'https://bookkeeping-i8e0.onrender.com';
 
 
 
@@ -1036,27 +1033,28 @@ const lockBtn = document.getElementById('lockBtn');
 const unlockBtn = document.getElementById('unlockBtn');
 
 
-// 🔄 Load initial state from backend
 fetch(`${backend}/api/limits`, {
   headers: {
     Authorization: `Bearer ${token}`
   }
 })
-  .then(res => {
-    if (!res.ok) {
-      throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-    }
-    return res.json();
-  })
-  .then(data => {
-    limitInputs.ubs.value = data.ubs;
-    limitInputs.corner.value = data.corner;
-    limitInputs.pfm.value = data.pfm;
-    setLockState(data.locked);
-  })
-  .catch(err => {
-    console.error('❌ Failed to load limits:', err);
-  });
+.then(res => {
+  if (!res.ok) {
+    throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+  }
+  return res.json();
+})
+.then(data => {
+  limitInputs.ubs.value = data.ubs;
+  limitInputs.corner.value = data.corner;
+  limitInputs.pfm.value = data.pfm;
+  setLockState(data.locked);
+  renderCreditLimit();
+  applyValueColor(limitPlusTotal, 0);
+})
+.catch(err => {
+  console.error('❌ Failed to load limits:', err);
+});
 
 function setLockState(locked) {
   Object.values(limitInputs).forEach(input => {
@@ -1096,12 +1094,11 @@ function saveLimits(locked) {
     },
     body: JSON.stringify(data),
   })
-    .then(res => {
-      if (!res.ok) throw new Error('Failed to save limits');
-    })
-    .catch(err => console.error('❌ Save failed:', err));
-}
-
+  .then(res => {
+    if (!res.ok) throw new Error('Failed to save limits');
+  })
+  .catch(err => console.error('❌ Save failed:', err));
+} // ✅ this was missing
 
 // Apply the color to the input fields based on their value
 function applyValueColor(input, value) {
@@ -1115,7 +1112,7 @@ function applyValueColor(input, value) {
     input.classList.add('neutral');
   }
 
-  input.value = value.toFixed(2);  // Keeps value in 2 decimal places
+  input.value = value.toFixed(2);
 }
 
 // Monitor changes and apply color dynamically

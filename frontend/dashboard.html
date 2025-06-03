@@ -736,21 +736,14 @@ function renderBankBalanceForm() {
   // your existing render logic...
   window.dispatchEvent(new Event('bankBalanceUpdated'));
 }
+  applyValueColor(document.getElementById('totalUsed'), totalUsed);
+  applyValueColor(document.getElementById('limitPlusTotal'), totalUsed + totalPlus);
+} // ✅ add this line to close the function properly
 </script>
-
-
-
-
 
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="dashboard.js"></script>
 
-<script src="dashboard.js" ></script>
-
-
-
-
-
-
-
-
+</body>
+</html>
