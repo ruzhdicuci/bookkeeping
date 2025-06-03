@@ -1,9 +1,15 @@
 
-const token = localStorage.getItem('token');
+const backend = 'https://bookkeeping-i8e0.onrender.com'; // Or your real API URL
 
-if (!token) {
-  console.error('❌ No token found. Please login first.');
-}
+// Then use:
+fetch(`${backend}/api/limits`, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${token}`
+  },
+  body: JSON.stringify(data),
+})
 
 const entryTableBody = document.getElementById('entryTableBody');
 const monthSelect = document.getElementById('monthSelect');
