@@ -141,9 +141,7 @@
    <input type="text" id="newDate" placeholder="Select Date" class="flatpickr-input">
     <input type="text" id="newDescription" placeholder="Description" required />
    
-
-
-    <input type="number" step="0.01" id="newAmount" placeholder="Amount" required />
+    <input type="number" id="newAmount" placeholder="Amount" autocomplete="off" />
     <select id="newCurrency" required>
       <option value="CHF">CHF</option>
       <option value="EUR">EUR</option>
@@ -291,7 +289,7 @@ function clearSearch(id) {
           
           Amount:
           <div class="input-with-clear">
-            <input type="number" id="amountSearch"  placeholder="... 🔍">
+            <input type="number" id="amountSearch" step="0.01" placeholder="... 🔍">
             <button class="clear-btn" onclick="clearSearch('amountSearch')">x</button>
           </div>
         </label>
@@ -689,13 +687,17 @@ const totalPlus = Object.entries(allChanges)
   .reduce((sum, [, v]) => sum + v, 0);
 
 // Update DOM values
+const difference = totalLimit - totalUsed;
+
 document.getElementById("totalLimit").textContent = totalLimit.toFixed(2);
-document.getElementById("diffUsed").textContent = (totalLimit - totalUsed).toFixed(2);
+document.getElementById("totalUsed").textContent = totalUsed.toFixed(2);
+document.getElementById("diffUsed").textContent = difference.toFixed(2); // ✅ FIXED
+
 
 // 💥 Fix here: totalUsed is your "Total Minus Now"
 applyValueColor(document.getElementById('totalUsed'), totalUsed);
 applyValueColor(document.getElementById('limitPlusTotal'), totalUsed + totalPlus);
-
+applyValueColor(document.getElementById("diffUsed"), difference);
 function saveCreditLimits() {
   const limits = {
     "UBS Master": parseFloat(document.getElementById("creditLimit-ubs")?.value || 0),
