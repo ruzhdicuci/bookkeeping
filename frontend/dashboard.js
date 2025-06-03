@@ -1,5 +1,5 @@
 
-const token = localStorage.getItem('token');
+const backend = 'https://bookkeeping-i8e0.onrender.com';
 
 if (!token) {
   console.error('❌ No token found. You must log in first.');
@@ -9,7 +9,7 @@ if (!token) {
 
 
 
-const backend = 'https://bookkeeping-i8e0.onrender.com'; // Or your real API URL
+
 
 
 
