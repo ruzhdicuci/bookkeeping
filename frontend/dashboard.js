@@ -1,6 +1,9 @@
 
 const token = localStorage.getItem('token');
-if (!token) location.href = 'index.html';
+
+if (!token) {
+  console.error('❌ No token found. Please login first.');
+}
 
 const entryTableBody = document.getElementById('entryTableBody');
 const monthSelect = document.getElementById('monthSelect');
@@ -1031,16 +1034,21 @@ fetch('/api/limits', {
     Authorization: `Bearer ${token}`
   }
 })
-  .then(res => res.json())
+  .then(res => {
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    }
+    return res.json();
+  })
   .then(data => {
     limitInputs.ubs.value = data.ubs;
     limitInputs.corner.value = data.corner;
     limitInputs.pfm.value = data.pfm;
-
-    const locked = data.locked;
-    setLockState(locked);
+    setLockState(data.locked);
   })
-  .catch(err => console.error('Failed to load limits:', err));
+  .catch(err => {
+    console.error('❌ Failed to load limits:', err);
+  });
 
 function setLockState(locked) {
   Object.values(limitInputs).forEach(input => {
