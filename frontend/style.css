@@ -27,7 +27,7 @@ input[type="number"] {
 
 /* Colors based on value */
 input.positive {
-  color: orange;
+  color: rgb(140, 131, 112);
   font-weight: bold;
 }
 
@@ -73,7 +73,7 @@ font-size: 1.2rem;
   background-color: #2c2c2c; 
 font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
  
-    color: rgb(224, 224, 70);
+    
  
     }
  

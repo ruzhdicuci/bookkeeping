@@ -1007,7 +1007,12 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-
+document.addEventListener('DOMContentLoaded', () => {
+  const amountInput = document.getElementById('newAmount');
+  if (amountInput) {
+    amountInput.value = ''; // ✅ clears it
+  }
+});
 
 
 
@@ -1137,3 +1142,4 @@ applyValueColor(totalLimit, 13900);
 applyValueColor(totalUsed, 0);
 applyValueColor(diffUsed, 13900);
 applyValueColor(limitPlusTotal, 0);
+
