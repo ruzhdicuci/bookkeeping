@@ -1037,7 +1037,7 @@ const unlockBtn = document.getElementById('unlockBtn');
 
 
 // 🔄 Load initial state from backend
-fetch('/api/limits', {
+fetch(`${backend}/api/limits`, {
   headers: {
     Authorization: `Bearer ${token}`
   }
