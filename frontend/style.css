@@ -90,7 +90,7 @@ text-align: center;       /* Center the text horizontally */
     }
 
 
-.dark table thead:first-child  {
+.dark .th4 table thead:first-child  {
   background-color:#222;
   
   border-left: 1px solid #222;
@@ -503,7 +503,7 @@ border: 1px solid #373535;
   padding-left: 30px;
   padding-right: 30px;
  margin-top: -23px;
-  padding-bottom: 5px;
+  padding-bottom: 20px;
 
    margin-bottom: 10px;
 }
@@ -513,7 +513,7 @@ border: 1px solid #373535;
   padding-right: 30px;
   padding-top: 20px;
   padding-bottom: 5px;
-
+margin-top: 10px;
    margin-bottom: 10px;
 }
 

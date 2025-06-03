@@ -675,25 +675,26 @@ function renderCreditLimitTable() {
       changes[bank] = val;
     }
   });
+let totalLimit = 0, totalUsed = 0;
 
-  let totalLimit = 0, totalUsed = 0;
+banks.forEach(bank => {
+  const credit = limits[bank];
+  const used = Math.abs(changes[bank] || 0);
+  totalLimit += credit;
+  totalUsed += used;
+});
 
-  banks.forEach(bank => {
-    const credit = limits[bank];
-    const used = Math.abs(changes[bank] || 0);
-    totalLimit += credit;
-    totalUsed += used;
-  });
+const totalPlus = Object.entries(allChanges)
+  .filter(([bank, v]) => v > 0)
+  .reduce((sum, [, v]) => sum + v, 0);
 
-  const totalPlus = Object.entries(allChanges)
-    .filter(([bank, v]) => v > 0)
-    .reduce((sum, [, v]) => sum + v, 0);
+// Update DOM values
+document.getElementById("totalLimit").textContent = totalLimit.toFixed(2);
+document.getElementById("diffUsed").textContent = (totalLimit - totalUsed).toFixed(2);
 
-  document.getElementById("totalLimit").textContent = totalLimit.toFixed(2);
-  document.getElementById("totalUsed").textContent = totalUsed.toFixed(2);
-  document.getElementById("diffUsed").textContent = (totalLimit - totalUsed).toFixed(2);
-  document.getElementById("limitPlusTotal").textContent = (totalUsed + totalPlus).toFixed(2);
-}
+// 💥 Fix here: totalUsed is your "Total Minus Now"
+applyValueColor(document.getElementById('totalUsed'), totalUsed);
+applyValueColor(document.getElementById('limitPlusTotal'), totalUsed + totalPlus);
 
 function saveCreditLimits() {
   const limits = {
