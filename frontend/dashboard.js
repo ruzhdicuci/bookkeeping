@@ -11,15 +11,7 @@ if (!token) {
 
 const backend = 'https://bookkeeping-i8e0.onrender.com'; // Or your real API URL
 
-// Then use:
-fetch(`${backend}/api/limits`, {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${token}`
-  },
-  body: JSON.stringify(data),
-})
+
 
 const entryTableBody = document.getElementById('entryTableBody');
 const monthSelect = document.getElementById('monthSelect');
@@ -1096,7 +1088,7 @@ function saveLimits(locked) {
     locked,
   };
 
-  fetch('/api/limits', {
+  fetch(`${backend}/api/limits`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -1107,7 +1099,7 @@ function saveLimits(locked) {
     .then(res => {
       if (!res.ok) throw new Error('Failed to save limits');
     })
-    .catch(err => console.error('Save failed:', err));
+    .catch(err => console.error('❌ Save failed:', err));
 }
 
 
