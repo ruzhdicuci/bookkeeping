@@ -1049,7 +1049,7 @@ fetch(`${backend}/api/limits`, {
   limitInputs.corner.value = data.corner;
   limitInputs.pfm.value = data.pfm;
   setLockState(data.locked);
-  renderCreditLimit();
+renderCreditLimitTable(); // ✅ correct function name
   applyValueColor(limitPlusTotal, 0);
 })
 .catch(err => {
