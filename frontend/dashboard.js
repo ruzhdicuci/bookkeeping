@@ -1012,3 +1012,115 @@ window.addEventListener('DOMContentLoaded', async () => {
   renderBankBalanceForm();
   renderCreditLimitTable(); // ✅ call it here
 });
+
+
+// lock kredit limit
+const limitInputs = {
+  ubs: document.getElementById('creditLimit-ubs'),
+  corner: document.getElementById('creditLimit-corner'),
+  pfm: document.getElementById('creditLimit-pfm'),
+};
+
+const lockBtn = document.getElementById('lockBtn');
+const unlockBtn = document.getElementById('unlockBtn');
+
+
+// 🔄 Load initial state from backend
+fetch('/api/limits', {
+  headers: {
+    Authorization: `Bearer ${token}`
+  }
+})
+  .then(res => res.json())
+  .then(data => {
+    limitInputs.ubs.value = data.ubs;
+    limitInputs.corner.value = data.corner;
+    limitInputs.pfm.value = data.pfm;
+
+    const locked = data.locked;
+    setLockState(locked);
+  })
+  .catch(err => console.error('Failed to load limits:', err));
+
+function setLockState(locked) {
+  Object.values(limitInputs).forEach(input => {
+    input.disabled = locked;
+  });
+
+  lockBtn.style.display = locked ? 'none' : 'inline-block';
+  unlockBtn.style.display = locked ? 'inline-block' : 'none';
+}
+
+// 🔓 Unlock
+unlockBtn.addEventListener('click', () => {
+  setLockState(false);
+  saveLimits(false);
+});
+
+// 🔒 Lock
+lockBtn.addEventListener('click', () => {
+  setLockState(true);
+  saveLimits(true);
+});
+
+// 💾 Save limits + lock state to backend
+function saveLimits(locked) {
+  const data = {
+    ubs: +limitInputs.ubs.value,
+    corner: +limitInputs.corner.value,
+    pfm: +limitInputs.pfm.value,
+    locked,
+  };
+
+  fetch('/api/limits', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(data),
+  })
+    .then(res => {
+      if (!res.ok) throw new Error('Failed to save limits');
+    })
+    .catch(err => console.error('Save failed:', err));
+}
+
+
+// Apply the color to the input fields based on their value
+function applyValueColor(input, value) {
+  input.classList.remove('positive', 'negative', 'neutral');
+
+  if (value > 0) {
+    input.classList.add('positive');
+  } else if (value < 0) {
+    input.classList.add('negative');
+  } else {
+    input.classList.add('neutral');
+  }
+
+  input.value = value.toFixed(2);  // Keeps value in 2 decimal places
+}
+
+// Monitor changes and apply color dynamically
+document.querySelectorAll('input[type="number"]').forEach(input => {
+  input.addEventListener('input', (event) => {
+    const value = parseFloat(event.target.value) || 0;
+    applyValueColor(event.target, value);
+  });
+
+  // Apply color based on the initial value when page loads
+  const initialValue = parseFloat(input.value) || 0;
+  applyValueColor(input, initialValue);
+});
+
+const totalLimit = document.getElementById('totalLimit');
+const totalUsed = document.getElementById('totalUsed');
+const diffUsed = document.getElementById('diffUsed');
+const limitPlusTotal = document.getElementById('limitPlusTotal');
+
+// Example values
+applyValueColor(totalLimit, 13900);
+applyValueColor(totalUsed, 0);
+applyValueColor(diffUsed, 13900);
+applyValueColor(limitPlusTotal, 0);

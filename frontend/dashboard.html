@@ -192,34 +192,37 @@
  <div class="sections4">
 <!-- 💳 Kredit Overview Table -->
 <div id="creditLimitTable" style="margin-top: 2rem; overflow-x: auto;">
-  <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 0.95rem;">
-    <thead style="background: #f3f3f3;">
+  <table class="th4" style="width: 100%; border-collapse: collapse;  text-align: center; font-size: 0.95rem;">
+    <thead class="th4" >
       <tr>
-        <th style="padding: 0.75rem;">&nbsp;</th>
-        <th>UBS Master</th>
-        <th>Corner</th>
-        <th>Postfinance Master</th>
-        <th>Total Minus Can</th>
-        <th>Total Minus Can Now</th>
-        <th>Difference</th>
-        <th>Total Minus Can + Total Plus</th>
+        <th class="th4" style="padding: 0.75rem; border: none;">&nbsp;</th>
+        <th class="th4" style="border: none;">UBS Master Card</th>
+        <th class="th4" style="border: none;">Corner Master Card</th>
+        <th class="th4" style="border: none;">Postfinance Master Card</th>
+        <th class="th4" style="border: none;">Total Minus Allowed</th>
+        <th class="th4" style="border: none;">Total Minus Now</th>
+        <th class="th4" style="border: none;">Difference</th>
+        <th class="th4" style="border: none;">Total Minus Now + Total Plus</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td style="font-weight: bold;">Kredit Limit</td>
-        <td><input type="number" id="creditLimit-ubs" value="3000" /></td>
-        <td><input type="number" id="creditLimit-corner" value="9900" /></td>
-        <td><input type="number" id="creditLimit-pfm" value="1000" /></td>
-        <td id="totalLimit"></td>
-        <td id="totalUsed"></td>
-        <td id="diffUsed"></td>
-        <td id="limitPlusTotal"></td>
+        <td style="text-align: left; font-size: 18px;">Limit</td>
+        <td class="th5"><input type="number" id="creditLimit-ubs" value="3000" /></td>
+        <td class="th5"><input  type="number" id="creditLimit-corner" value="9900" /></td>
+        <td class="th5"><input  type="number" id="creditLimit-pfm" value="1000" /></td>
+     <td class="th5"><input type="number" readonly id="totalLimit" /></td>
+<td class="th5"><input type="number" readonly id="totalUsed" /></td>
+<td class="th5"><input type="number" readonly id="diffUsed" /></td>
+<td class="th5"><input type="number" readonly id="limitPlusTotal" /></td>
+
       </tr>
     </tbody>
   </table>
   <div style="text-align: left; margin-top: 0.5rem;">
-    <button onclick="saveCreditLimits()">💾 Save Limits</button>
+    <button class="save1" onclick="saveCreditLimits()">Save</button>
+    <button class="lock1" id="lockBtn">Lock</button>
+<button class="lock1" id="unlockBtn" style="display:none;">Unlock</button>
   </div>
 </div>
 

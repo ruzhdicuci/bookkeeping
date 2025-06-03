@@ -13,8 +13,92 @@ font-size: 18px;
 
 }
 
+/* Base input styling */
+input[type="number"] {
+  border: none;
+  padding: 8px;
+  gap: 4px;
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 1.2rem;
+  text-align: center;
+  background-color: #ededed;
+}
+
+/* Colors based on value */
+input.positive {
+  color: orange;
+  font-weight: bold;
+}
+
+input.negative {
+  color: red;
+  font-weight: bold;
+}
+
+input.neutral {
+  color: black;
+}
+
+
+
+ .th4 {
+  text-align: center;       /* Center the text horizontally */
+  vertical-align: middle;   /* Center the text vertically */
+  white-space: normal;      /* Allow wrapping */
+  word-wrap: break-word;    /* Ensure long words wrap too */
+  padding: 8px;             /* Optional: spacing inside */
+font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+font-size: 1.1rem;
+border: none;
+
+}
+
+
+
+
+
+.th5 {
+  background-color: white;
+font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+font-size: 1.2rem;
+ /*  border-top: 5px solid #222222; */
+ text-align: center;       /* Center the text horizontally */
+  vertical-align: middle;   /* Center the text vertically */
+    padding: 8px;  
+    color: black;
+
+}
+ .dark input[type="number"]  { 
+  background-color: #2c2c2c; 
+font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
  
-      
+    color: rgb(224, 224, 70);
+ 
+    }
+ 
+.dark .th4  { 
+  background-color: #2c2c2c; 
+font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+font-size: 1.2rem;
+
+
+text-align: center;       /* Center the text horizontally */
+  vertical-align: middle;   /* Center the text vertically */
+    padding: 8px;  
+ 
+    }
+
+
+.dark table thead:first-child  {
+  background-color:#222;
+  
+  border-left: 1px solid #222;
+    border-top: 1px solid#222;
+}
+
+
+
 
 #hb5 {
 
@@ -92,6 +176,7 @@ table {
   border-collapse: collapse;
   margin-top: 10px;
   background-color: white;
+  table-layout: auto;  
 
 }
 td {
@@ -357,6 +442,7 @@ border: 1px solid #373535;
 
 
 
+
 .summary-totals {
   display: flex;
   gap: 1.5rem;
@@ -572,6 +658,29 @@ font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
  color: blue;
 
 }
+ .save1 { background-color:  #fdf6de;
+      
+        border: none;
+  color: #8212e4;
+
+font-size: 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+font-weight: bolder;
+   width: 60px;
+ height: 44px;
+
+   
+                    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+
+          }
+
+          .save1:hover {
+            background-color: white;
+            color: #9733EE;
+            text-decoration: none;
+          }
+         
 
  #saveBankBalances { background-color:  #fdf6de;
       
@@ -599,6 +708,26 @@ font-weight: bolder;
 
 
 
+       .lock1 {background-color: #fdf6de;
+   border: none ;
+font-weight: bold;
+  color: rgb(255, 85, 0);
+padding-bottom: 2px;
+font-size: 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+margin-left: 10px;
+   width: 80px;
+ height: 44px;
+          font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+
+          }
+
+         .lock1:hover {
+          background-color: black;
+            color: #FF512F ;
+            text-decoration: none;
+          }
 
         #lockbalance{background-color: #fdf6de;
    border: none ;
@@ -611,10 +740,8 @@ font-size: 1rem;
 margin-left: -13px;
    width: 80px;
  height: 44px;
-
-         
           font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
- 
+
           }
 
           #lockbalance:hover {
