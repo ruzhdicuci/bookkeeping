@@ -1351,3 +1351,51 @@ background-color: white;
 border: 1px solid rgb(231, 229, 229);
 border-radius: 10px;
     }
+
+
+
+
+    #splitModal {
+      position: fixed;
+      top: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      border: 1px solid #ccc;
+      padding: 20px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 600px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      z-index: 1000;
+    }
+    #splitModal h3 {
+      margin-top: 0;
+    }
+    #splitModal table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 10px;
+    }
+    #splitModal th, #splitModal td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+    #splitModal input, #splitModal select {
+      width: 100%;
+      padding: 5px;
+    }
+    #splitModal button {
+      margin: 5px;
+      padding: 6px 12px;
+      cursor: pointer;
+    }
+
+
+  
+
+ 
+   
+     
+

@@ -173,6 +173,27 @@
 </div>
   <div class="entry-button">
     <button id="eb" type="submit">Add</button>
+    <button id="openSplitModal">Split Expense</button>
+
+<div id="splitModal" style="display:none;">
+  <h3>Split 400 CHF from Corner</h3>
+  <table id="splitTable">
+    <thead>
+      <tr>
+        <th>Amount</th>
+        <th>Description</th>
+        <th>Person</th>
+        <th>Category</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <button id="addSplitRow">+ Add Row</button>
+  <p><strong>Total Split:</strong> <span id="splitSum">0.00</span> / 400.00</p>
+  <button id="submitSplit">💾 Save</button>
+  <button onclick="document.getElementById('splitModal').style.display='none'">Cancel</button>
+</div>
 
 
   </div>
