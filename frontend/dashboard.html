@@ -694,15 +694,17 @@ const totalPlus = Object.entries(allChanges)
 // Update DOM values
 const difference = totalLimit - totalUsed;
 
-document.getElementById("totalLimit").textContent = totalLimit.toFixed(2);
-document.getElementById("totalUsed").textContent = totalUsed.toFixed(2);
-document.getElementById("diffUsed").textContent = difference.toFixed(2); // ✅ FIXED
+document.getElementById("totalLimit").value = totalLimit.toFixed(2);
+document.getElementById("totalUsed").value = totalUsed.toFixed(2);
+document.getElementById("diffUsed").value = difference.toFixed(2);
+document.getElementById("limitPlusTotal").value = (totalUsed + totalPlus).toFixed(2);
 
 
 // 💥 Fix here: totalUsed is your "Total Minus Now"
 applyValueColor(document.getElementById('totalUsed'), totalUsed);
 applyValueColor(document.getElementById('limitPlusTotal'), totalUsed + totalPlus);
 applyValueColor(document.getElementById("diffUsed"), difference);
+
 function saveCreditLimits() {
   const limits = {
     "UBS Master": parseFloat(document.getElementById("creditLimit-ubs")?.value || 0),
