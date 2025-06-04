@@ -1007,12 +1007,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-document.addEventListener('DOMContentLoaded', () => {
-  const amountInput = document.getElementById('newAmount');
-  if (amountInput) {
-    amountInput.value = ''; // ✅ clears it
-  }
-});
+
 
 
 
@@ -1132,6 +1127,7 @@ document.querySelectorAll('input[type="number"]').forEach(input => {
   applyValueColor(input, initialValue);
 });
 
+
 const totalLimit = document.getElementById('totalLimit');
 const totalUsed = document.getElementById('totalUsed');
 const diffUsed = document.getElementById('diffUsed');
@@ -1143,3 +1139,27 @@ applyValueColor(totalUsed, 0);
 applyValueColor(diffUsed, 13900);
 applyValueColor(limitPlusTotal, 0);
 
+document.addEventListener('DOMContentLoaded', () => {
+  // ✅ Clear filters on load
+  document.querySelectorAll('input[type="text"], input[type="number"]').forEach(input => {
+    input.value = '';
+  });
+
+  document.querySelectorAll('select').forEach(select => {
+    select.selectedIndex = 0;
+  });
+
+  // ✅ Reset button handler
+  const resetBtn = document.getElementById('resetFiltersBtn');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      document.querySelectorAll('input[type="text"], input[type="number"]').forEach(input => {
+        input.value = '';
+      });
+
+      document.querySelectorAll('select').forEach(select => {
+        select.selectedIndex = 0;
+      });
+    });
+  }
+});

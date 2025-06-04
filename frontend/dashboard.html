@@ -92,7 +92,7 @@
     <a onclick="window.print()">🖨️ Print</a>
         </div>
   
-
+ <button id="resetFiltersBtn">Reset Filters</button>
 </div>  
   
   </div> 
@@ -133,15 +133,20 @@
  
  <div class="sections2" style="border: none;">
 
-
+  <div id="filter-container">
+   
 <form id="entryForm" class="entry-form">
   <div class="entry-fields">
    
+  
+  <input id="newAmount" type="number" placeholder="Amount" />
+ 
+
 
    <input type="text" id="newDate" placeholder="Select Date" class="flatpickr-input">
     <input type="text" id="newDescription" placeholder="Description" required />
    
-    <input type="number" id="newAmount" placeholder="Amount" autocomplete="off" />
+    <input  id="newAmount" placeholder="Amount" autocomplete="off" required/>
     <select id="newCurrency" required>
       <option value="CHF">CHF</option>
       <option value="EUR">EUR</option>
@@ -165,7 +170,7 @@
 <datalist id="newCategoryList"></datalist>
 </label>
  </div>
-
+</div>
   <div class="entry-button">
     <button id="eb" type="submit">Add</button>
 
