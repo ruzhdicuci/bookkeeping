@@ -1027,6 +1027,7 @@ const limitInputs = {
   ubs: document.getElementById('creditLimit-ubs'),
   corner: document.getElementById('creditLimit-corner'),
   pfm: document.getElementById('creditLimit-pfm'),
+  cembra: document.getElementById('creditLimit-cembra'),
 };
 
 const lockBtn = document.getElementById('lockBtn');
@@ -1083,7 +1084,8 @@ function saveLimits(locked) {
     ubs: +limitInputs.ubs.value,
     corner: +limitInputs.corner.value,
     pfm: +limitInputs.pfm.value,
-    locked,
+     cembra: +limitInputs.cembra.value,
+    locked
   };
 
   fetch(`${backend}/api/limits`, {
@@ -1139,95 +1141,8 @@ applyValueColor(totalUsed, 0);
 applyValueColor(diffUsed, 13900);
 applyValueColor(limitPlusTotal, 0);
 
-document.addEventListener('DOMContentLoaded', () => {
-  // ✅ Clear filters on load
-  document.querySelectorAll('input[type="text"], input[type="number"]').forEach(input => {
-    input.value = '';
-  });
-
-  document.querySelectorAll('select').forEach(select => {
-    select.selectedIndex = 0;
-  });
-
-  // ✅ Reset button handler
-  const resetBtn = document.getElementById('resetFiltersBtn');
-  if (resetBtn) {
-    resetBtn.addEventListener('click', () => {
-      document.querySelectorAll('input[type="text"], input[type="number"]').forEach(input => {
-        input.value = '';
-      });
-
-      document.querySelectorAll('select').forEach(select => {
-        select.selectedIndex = 0;
-      });
-    });
-  }
-});
 
 
 
-const splitTotal = 400;
-const splitModal = document.getElementById('splitModal');
-const splitTable = document.getElementById('splitTable').querySelector('tbody');
-const splitSum = document.getElementById('splitSum');
-
-document.getElementById('openSplitModal').addEventListener('click', () => {
-  splitModal.style.display = 'block';
-  addSplitRow(); // add one row by default
-});
-
-document.getElementById('addSplitRow').addEventListener('click', addSplitRow);
-
-function addSplitRow() {
-  const row = document.createElement('tr');
-  row.innerHTML = `
-    <td><input type="number" step="0.01" class="splitAmount" /></td>
-    <td><input type="text" class="splitDesc" /></td>
-    <td><select class="splitPerson"><option>Rudi</option><option>Nora</option></select></td>
-    <td><select class="splitCat"><option>Groceries</option><option>Cigarettes</option><option>Nails</option></select></td>
-    <td><button onclick="this.parentElement.parentElement.remove(); updateSplitTotal();">❌</button></td>
-  `;
-  row.querySelector('.splitAmount').addEventListener('input', updateSplitTotal);
-  splitTable.appendChild(row);
-  updateSplitTotal();
-}
-
-function updateSplitTotal() {
-  const amounts = [...document.querySelectorAll('.splitAmount')].map(i => parseFloat(i.value) || 0);
-  const sum = amounts.reduce((a, b) => a + b, 0);
-  splitSum.textContent = sum.toFixed(2);
-}
-
-document.getElementById('submitSplit').addEventListener('click', () => {
-  const sum = parseFloat(splitSum.textContent);
-  if (sum !== splitTotal) {
-    alert(`Split total must equal ${splitTotal.toFixed(2)} CHF`);
-    return;
-  }
-
-  const entries = [...splitTable.querySelectorAll('tr')].map(row => ({
-    type: "Expense",
-    amount: parseFloat(row.querySelector('.splitAmount').value),
-    description: row.querySelector('.splitDesc').value,
-    person: row.querySelector('.splitPerson').value,
-    category: row.querySelector('.splitCat').value,
-    bank: "Corner",
-    currency: "CHF",
-    date: new Date().toISOString().slice(0, 10)
-  }));
-
-  // Submit to backend
-  entries.forEach(entry => {
-    fetch(`${backend}/api/entries`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify(entry)
-    });
-  });
-
-  alert('✅ Entries saved.');
-  splitModal.style.display = 'none';
-});
+allChanges["Cembra"] = parseFloat(document.getElementById("creditLimit-cembra")?.value || 0);
+console.log("✅ totalUsed:", totalUsed, "✅ totalPlus:", totalPlus, "✅ Combined:", totalUsed + totalPlus);

@@ -484,7 +484,7 @@ border: 1px solid #373535;
   padding-left: 30px;
   padding-right: 30px;
   padding-top: 10px;
-  padding-bottom: 5px;
+  padding-bottom: 20px;
 
    margin-bottom: 10px;
 
@@ -1355,6 +1355,7 @@ border-radius: 10px;
 
 
 
+<<<<<<< HEAD
     #splitModal {
       position: fixed;
       top: 10%;
@@ -1392,6 +1393,8 @@ border-radius: 10px;
       cursor: pointer;
     }
 
+=======
+>>>>>>> 6e7da26 (✅ new)
 
   
 

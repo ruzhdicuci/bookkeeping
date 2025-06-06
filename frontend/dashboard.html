@@ -91,8 +91,7 @@
   <a  onclick="exportCombinedCSV()">📤 Export CSV</a>
     <a onclick="window.print()">🖨️ Print</a>
         </div>
-  
- <button id="resetFiltersBtn">Reset Filters</button>
+
 </div>  
   
   </div> 
@@ -173,30 +172,10 @@
 </div>
   <div class="entry-button">
     <button id="eb" type="submit">Add</button>
-    <button id="openSplitModal">Split Expense</button>
-
-<div id="splitModal" style="display:none;">
-  <h3>Split 400 CHF from Corner</h3>
-  <table id="splitTable">
-    <thead>
-      <tr>
-        <th>Amount</th>
-        <th>Description</th>
-        <th>Person</th>
-        <th>Category</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-  <button id="addSplitRow">+ Add Row</button>
-  <p><strong>Total Split:</strong> <span id="splitSum">0.00</span> / 400.00</p>
-  <button id="submitSplit">💾 Save</button>
-  <button onclick="document.getElementById('splitModal').style.display='none'">Cancel</button>
-</div>
-
-
+   
   </div>
+
+ 
 
 </form>
 </div>
@@ -220,22 +199,24 @@
     <thead class="th4" >
       <tr>
         <th class="th4" style="padding: 0.75rem; border: none;">&nbsp;</th>
-        <th class="th4" style="border: none;">UBS Master Card</th>
-        <th class="th4" style="border: none;">Corner Master Card</th>
-        <th class="th4" style="border: none;">Postfinance Master Card</th>
-        <th class="th4" style="border: none;">Total Minus Allowed</th>
-        <th class="th4" style="border: none;">Total Minus Now</th>
+        <th class="th4" style="border: none;">UBS Master</th>
+        <th class="th4" style="border: none;">Corner Master</th>
+        <th class="th4" style="border: none;">Post Master</th>
+        <th class="th4" style="border: none;">Cembra</th>
+        <th class="th4" style="border: none;">Total Limit</th>
+        <th class="th4" style="border: none;">Limit Now</th>
         <th class="th4" style="border: none;">Difference</th>
-        <th class="th4" style="border: none;">Total Minus Now + Total Plus</th>
+        <th class="th4" style="border: none;">Limit Now + Total Plus</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td style="text-align: left; font-size: 18px;">Limit</td>
-        <td class="th5"><input type="number" id="creditLimit-ubs" value="3000" /></td>
-        <td class="th5"><input  type="number" id="creditLimit-corner" value="9900" /></td>
-        <td class="th5"><input  type="number" id="creditLimit-pfm" value="1000" /></td>
-     <td class="th5"><input type="number" readonly id="totalLimit" /></td>
+ <td style="text-align: left; font-size: 18px;">Limit</td>
+<td class="th5"><input type="number" id="creditLimit-ubs" value="3000" /></td>
+<td class="th5"><input type="number" id="creditLimit-corner" value="9900" /></td>
+<td class="th5"><input type="number" id="creditLimit-pfm" value="1000" /></td>
+<td class="th5"><input type="number" id="creditLimit-cembra" value="10000" /></td>
+<td class="th5"><input type="number" readonly id="totalLimit" /></td>
 <td class="th5"><input type="number" readonly id="totalUsed" /></td>
 <td class="th5"><input type="number" readonly id="diffUsed" /></td>
 <td class="th5"><input type="number" readonly id="limitPlusTotal" /></td>
@@ -247,6 +228,7 @@
     <button class="save1" onclick="saveCreditLimits()">Save</button>
     <button class="lock1" id="lockBtn">Lock</button>
 <button class="lock1" id="unlockBtn" style="display:none;">Unlock</button>
+
   </div>
 </div>
 
@@ -675,19 +657,20 @@ window.addEventListener('scroll', () => {
 
 
 
-
 <script>
 function renderCreditLimitTable() {
   const limits = {
     "UBS Master": parseFloat(document.getElementById("creditLimit-ubs")?.value || 0),
     "Corner": parseFloat(document.getElementById("creditLimit-corner")?.value || 0),
-    "Postfinance Master": parseFloat(document.getElementById("creditLimit-pfm")?.value || 0)
+    "Postfinance Master": parseFloat(document.getElementById("creditLimit-pfm")?.value || 0),
+    "Cembra": parseFloat(document.getElementById("creditLimit-cembra")?.value || 0),
   };
 
   const banks = Object.keys(limits);
-  const changes = {};
-  const allChanges = {};
+  const changes = {};     // Only for banks in limits
+  const allChanges = {};  // All banks (used for totalPlus)
 
+  // Grab data from your #bankBalanceTableContainer Change row
   const headerCells = document.querySelectorAll("#bankBalanceTableContainer thead th");
   const changeCells = document.querySelectorAll("#bankBalanceTableContainer tbody tr:nth-child(2) td");
 
@@ -699,38 +682,46 @@ function renderCreditLimitTable() {
       changes[bank] = val;
     }
   });
-let totalLimit = 0, totalUsed = 0;
 
-banks.forEach(bank => {
-  const credit = limits[bank];
-  const used = Math.abs(changes[bank] || 0);
-  totalLimit += credit;
-  totalUsed += used;
-});
+  // ✅ Compute Limit Now
+  let totalLimit = 0, totalUsed = 0;
 
-const totalPlus = Object.entries(allChanges)
-  .filter(([bank, v]) => v > 0)
-  .reduce((sum, [, v]) => sum + v, 0);
+  banks.forEach(bank => {
+    const credit = limits[bank];
+    const used = Math.abs(changes[bank] || 0); // Use abs in case of negative values
+    totalLimit += credit;
+    totalUsed += used;
+  });
 
-// Update DOM values
-const difference = totalLimit - totalUsed;
+  // ✅ Compute Total Plus across ALL banks (not just ones in creditLimit)
+  const totalPlus = Object.values(allChanges)
+    .filter(v => v > 0)
+    .reduce((sum, v) => sum + v, 0);
 
-document.getElementById("totalLimit").value = totalLimit.toFixed(2);
-document.getElementById("totalUsed").value = totalUsed.toFixed(2);
-document.getElementById("diffUsed").value = difference.toFixed(2);
-document.getElementById("limitPlusTotal").value = (totalUsed + totalPlus).toFixed(2);
+  // ✅ Compute totals
+  const difference = totalLimit - totalUsed;
+  const limitPlusTotal = totalUsed + totalPlus;
 
+  // ✅ Update fields
+  document.getElementById("totalLimit").value = totalLimit.toFixed(2);
+  document.getElementById("totalUsed").value = totalUsed.toFixed(2);
+  document.getElementById("diffUsed").value = difference.toFixed(2);
+  document.getElementById("limitPlusTotal").value = limitPlusTotal.toFixed(2);
 
-// 💥 Fix here: totalUsed is your "Total Minus Now"
-applyValueColor(document.getElementById('totalUsed'), totalUsed);
-applyValueColor(document.getElementById('limitPlusTotal'), totalUsed + totalPlus);
-applyValueColor(document.getElementById("diffUsed"), difference);
+  // Optional styling
+  applyValueColor(document.getElementById('totalUsed'), totalUsed);
+  applyValueColor(document.getElementById('limitPlusTotal'), limitPlusTotal);
+  applyValueColor(document.getElementById("diffUsed"), difference);
 
+  console.log("✅ allChanges:", allChanges);
+  console.log("✅ totalUsed:", totalUsed, "✅ totalPlus:", totalPlus, "✅ Combined:", limitPlusTotal);
+}
 function saveCreditLimits() {
   const limits = {
     "UBS Master": parseFloat(document.getElementById("creditLimit-ubs")?.value || 0),
     "Corner": parseFloat(document.getElementById("creditLimit-corner")?.value || 0),
-    "Postfinance Master": parseFloat(document.getElementById("creditLimit-pfm")?.value || 0)
+    "Postfinance Master": parseFloat(document.getElementById("creditLimit-pfm")?.value || 0),
+    "Cembra": parseFloat(document.getElementById("creditLimit-cembra")?.value || 0)
   };
 
   fetch('/api/credit-limits', {
@@ -746,7 +737,7 @@ function saveCreditLimits() {
   });
 }
 
-['creditLimit-ubs', 'creditLimit-corner', 'creditLimit-pfm'].forEach(id => {
+['creditLimit-ubs', 'creditLimit-corner', 'creditLimit-pfm', 'creditLimit-cembra'].forEach(id => {
   const input = document.getElementById(id);
   if (input) {
     input.addEventListener('input', renderCreditLimitTable);
@@ -756,7 +747,7 @@ function saveCreditLimits() {
 window.addEventListener('entriesUpdated', renderCreditLimitTable);
 window.addEventListener('bankBalanceUpdated', renderCreditLimitTable);
 
-// Automatically dispatch events after entry or bank balance update
+// Optional: auto-dispatch after entry/balance refresh
 async function fetchEntries() {
   // your existing fetch logic...
   window.dispatchEvent(new Event('entriesUpdated'));
@@ -766,9 +757,8 @@ function renderBankBalanceForm() {
   // your existing render logic...
   window.dispatchEvent(new Event('bankBalanceUpdated'));
 }
-  applyValueColor(document.getElementById('totalUsed'), totalUsed);
-  applyValueColor(document.getElementById('limitPlusTotal'), totalUsed + totalPlus);
-} // ✅ add this line to close the function properly
+
+
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
