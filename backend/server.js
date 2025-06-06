@@ -177,13 +177,15 @@ const Limit = mongoose.model('Limit', new mongoose.Schema({
   limits: {
     ubs: Number,
     corner: Number,
-    pfm: Number
+    pfm: Number,
+     cembra: Number
   },
   locked: Boolean
 }));
 
 
 
+// GET limits + lock state
 // GET limits + lock state
 app.get('/api/limits', auth, async (req, res) => {
   const doc = await Limit.findOne({ userId: req.userId });
@@ -194,6 +196,7 @@ app.get('/api/limits', auth, async (req, res) => {
       ubs: 3000,
       corner: 9900,
       pfm: 1000,
+      cembra: 10000,
       locked: true
     });
   }
@@ -201,10 +204,10 @@ app.get('/api/limits', auth, async (req, res) => {
 
 // POST to save limits + lock state
 app.post('/api/limits', auth, async (req, res) => {
-  const { ubs, corner, pfm, locked } = req.body;
+  const { ubs, corner, pfm, cembra, locked } = req.body;
   await Limit.findOneAndUpdate(
     { userId: req.userId },
-    { limits: { ubs, corner, pfm }, locked },
+    { limits: { ubs, corner, pfm, cembra }, locked },
     { upsert: true }
   );
   res.json({ success: true });
