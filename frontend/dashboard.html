@@ -285,6 +285,7 @@ function clearSearch(id) {
            <button class="clear-btn" onclick="clearSearch('dateSearch')">x</button>
             </div>
         </label>
+
         <label>
           Description:
           <div class="input-with-clear">
@@ -292,15 +293,15 @@ function clearSearch(id) {
             <button class="clear-btn" onclick="clearSearch('descSearch')">x</button>
           </div>
         </label>
-        <label>
 
-          
-          Amount:
+        <label>
+                    Amount:
           <div class="input-with-clear">
-            <input type="number" id="amountSearch" step="0.01" placeholder="... 🔍">
+            <input type="text" id="amountSearch" step="0.01" placeholder="... 🔍">
             <button class="clear-btn" onclick="clearSearch('amountSearch')">x</button>
           </div>
         </label>
+
         <label>
           Month:
           <select id="monthSelect"></select>

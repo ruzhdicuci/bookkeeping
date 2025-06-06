@@ -40,8 +40,9 @@ input.negative {
 input.neutral {
   color: black;
 }
-
-
+input-with-clear{
+  color: red;
+}
 
  .th4 {
   text-align: center;       /* Center the text horizontally */

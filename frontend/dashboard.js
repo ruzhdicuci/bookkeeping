@@ -33,8 +33,9 @@ monthSelect.onchange =
   currencyFilter.onchange =
   categoryFilter.onchange =
   descSearch.oninput =
-  amountSearch.oninput =
-  dateSearch.oninput = renderEntries;
+   dateSearch.oninput =
+ 
+   amountSearch.oninput = renderEntries;
 
 
 // Person checkboxes
@@ -231,7 +232,7 @@ const entryDay = e.date?.split('-')[2];
   (!currencyFilter.value || e.currency === currencyFilter.value) &&
   (!descSearch.value || (e.description || '').toLowerCase().includes(descSearch.value.toLowerCase())) &&
   (categoryValue === "All" || e.category === categoryValue) &&
-  (amountSearch.value === '' || String(e.amount ?? '').includes(amountSearch.value))
+(amountSearch.value === '' || (e.amount + '').toLowerCase().includes(amountSearch.value.toLowerCase()))
 );
   });
 
@@ -1032,6 +1033,8 @@ fetch(`${backend}/api/limits`, {
   limitInputs.ubs.value = data.ubs;
   limitInputs.corner.value = data.corner;
   limitInputs.pfm.value = data.pfm;
+    limitInputs.cembra.value = data.cembra; // ✅ add this if using Cembra
+
   setLockState(data.locked);
 renderCreditLimitTable(); // ✅ correct function name
   applyValueColor(limitPlusTotal, 0);
@@ -1071,18 +1074,29 @@ function saveLimits(locked) {
     locked
   };
 
-  fetch(`${backend}/api/limits`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    },
-    body: JSON.stringify(data),
-  })
-  .then(res => {
-    if (!res.ok) throw new Error('Failed to save limits');
-  })
-  .catch(err => console.error('❌ Save failed:', err));
+fetch(`${backend}/api/limits`, {
+  headers: {
+    Authorization: `Bearer ${token}`
+  }
+})
+.then(res => {
+  if (!res.ok) {
+    throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+  }
+  return res.json();
+})
+.then(data => {
+  limitInputs.ubs.value = data.ubs;
+  limitInputs.corner.value = data.corner;
+  limitInputs.pfm.value = data.pfm;
+  limitInputs.cembra.value = data.cembra; // ✅ add this if using Cembra
+  setLockState(data.locked);
+  renderCreditLimitTable(); // ✅ calculate totals
+  applyValueColor(limitPlusTotal, 0);
+})
+.catch(err => {
+  console.error('❌ Failed to load limits:', err);
+});
 } // ✅ this was missing
 
 // Apply the color to the input fields based on their value
@@ -1126,22 +1140,3 @@ applyValueColor(limitPlusTotal, 0);
 
 
 
-document.addEventListener('DOMContentLoaded', () => {
-  // ✅ Clear all text and number filter inputs
-  document.querySelectorAll('input[type="text"], input[type="number"]').forEach(input => {
-    input.value = '';
-  });
-
-  // ✅ Reset all select dropdowns to first option
-  document.querySelectorAll('select').forEach(select => {
-    select.selectedIndex = 0;
-  });
-
-  // ✅ If you're using checkboxes (like for person/bank filters), you might also want:
-  document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-    cb.checked = true;
-  });
-
-  // ✅ Re-render filtered entries after clearing
-  renderEntries();
-});
