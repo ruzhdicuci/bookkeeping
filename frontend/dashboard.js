@@ -1140,3 +1140,29 @@ applyValueColor(limitPlusTotal, 0);
 
 
 
+function saveCreditLimits() {
+  const limits = {
+    "UBS Master": parseFloat(document.getElementById("creditLimit-ubs")?.value || 0),
+    "Corner": parseFloat(document.getElementById("creditLimit-corner")?.value || 0),
+    "Postfinance Master": parseFloat(document.getElementById("creditLimit-pfm")?.value || 0),
+    "Cembra": parseFloat(document.getElementById("creditLimit-cembra")?.value || 0)
+  };
+
+  fetch(`${backend}/api/limits`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(limits)
+  })
+    .then(res => {
+      if (!res.ok) throw new Error("Failed to save credit limits.");
+      alert("✅ Kredit limits saved");
+      renderCreditLimitTable(); // Refresh calculation
+    })
+    .catch(err => {
+      console.error("❌ Failed to save limits:", err);
+      alert("❌ Could not save limits");
+    });
+}
