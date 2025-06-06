@@ -732,7 +732,7 @@ function saveCreditLimits() {
     "Cembra": parseFloat(document.getElementById("creditLimit-cembra")?.value || 0)
   };
 
-  fetch(`${backend}/api/credit-limits`, {
+  fetch(`${backend}/api/limits`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
