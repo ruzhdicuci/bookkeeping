@@ -769,6 +769,37 @@ async function loadCreditLimits() {
 
 </script>
 
+
+<script>
+function saveCreditLimits() {
+  const limits = {
+    ubs: parseFloat(document.getElementById("creditLimit-ubs")?.value || 0),
+    corner: parseFloat(document.getElementById("creditLimit-corner")?.value || 0),
+    pfm: parseFloat(document.getElementById("creditLimit-pfm")?.value || 0),
+    cembra: parseFloat(document.getElementById("creditLimit-cembra")?.value || 0),
+    locked: window.initialLocked
+  };
+
+  fetch(`${backend}/api/limits`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(limits)
+  })
+    .then(res => {
+      if (!res.ok) throw new Error("Failed to save credit limits.");
+      alert("✅ Kredit limits saved");
+      renderCreditLimitTable();
+    })
+    .catch(err => {
+      console.error("❌ Failed to save limits:", err);
+      alert("❌ Could not save limits");
+    });
+}
+</script>
+
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="dashboard.js"></script>
