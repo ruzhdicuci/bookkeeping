@@ -185,20 +185,24 @@ const Limit = mongoose.model('Limit', new mongoose.Schema({
 
 
 
-// GET limits + lock state
+
 // GET limits + lock state
 app.get('/api/limits', auth, async (req, res) => {
   const doc = await Limit.findOne({ userId: req.userId });
+
+  const defaultLimits = {
+    ubs: 3000,
+    corner: 9900,
+    pfm: 1000,
+    cembra: 10000  // ✅ Default value if missing
+  };
+
   if (doc) {
-    res.json({ ...doc.limits, locked: doc.locked });
+    // Safely merge with defaults to ensure missing fields like cembra are included
+    const safeLimits = { ...defaultLimits, ...doc.limits };
+    res.json({ ...safeLimits, locked: doc.locked });
   } else {
-    res.json({
-      ubs: 3000,
-      corner: 9900,
-      pfm: 1000,
-      cembra: 10000,
-      locked: true
-    });
+    res.json({ ...defaultLimits, locked: true });
   }
 });
 
@@ -212,4 +216,3 @@ app.post('/api/limits', auth, async (req, res) => {
   );
   res.json({ success: true });
 });
-
