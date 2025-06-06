@@ -750,17 +750,6 @@ function saveCreditLimits() {
     });
 }
 
-  fetch('/api/credit-limits', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${localStorage.getItem("token")}`
-    },
-    body: JSON.stringify(limits)
-  }).then(() => {
-    alert("✅ Kredit limits saved");
-    renderCreditLimitTable();
-  });
 
 
 ['creditLimit-ubs', 'creditLimit-corner', 'creditLimit-pfm', 'creditLimit-cembra'].forEach(id => {
