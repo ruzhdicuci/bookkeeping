@@ -53,6 +53,7 @@ async function loadInitialBankBalances() {
     const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/balances', {
       headers: { Authorization: `Bearer ${token}` }
     });
+
     if (!res.ok) throw new Error('Failed to load balances');
 
     initialBankBalances = await res.json();
@@ -86,24 +87,6 @@ async function fetchEntries() {
 
 
 
-async function loadInitialBankBalances() {
-  try {
-    const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/balances', {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-
-    if (!res.ok) throw new Error('Failed to load balances');
-
-    initialBankBalances = await res.json();
-
-    // Optional: save to localStorage as a fallback
-    localStorage.setItem('initialBankBalances', JSON.stringify(initialBankBalances));
-  } catch (err) {
-    console.warn('⚠️ Could not load balances from backend. Using localStorage fallback.');
-    const local = localStorage.getItem('initialBankBalances');
-    if (local) initialBankBalances = JSON.parse(local);
-  }
-}
 
   function populateNewEntryDropdowns() {
     const persons = [...new Set(window.entries.map(e => e.person))].filter(Boolean);
@@ -1143,6 +1126,22 @@ applyValueColor(limitPlusTotal, 0);
 
 
 
+document.addEventListener('DOMContentLoaded', () => {
+  // ✅ Clear all text and number filter inputs
+  document.querySelectorAll('input[type="text"], input[type="number"]').forEach(input => {
+    input.value = '';
+  });
 
-allChanges["Cembra"] = parseFloat(document.getElementById("creditLimit-cembra")?.value || 0);
-console.log("✅ totalUsed:", totalUsed, "✅ totalPlus:", totalPlus, "✅ Combined:", totalUsed + totalPlus);
+  // ✅ Reset all select dropdowns to first option
+  document.querySelectorAll('select').forEach(select => {
+    select.selectedIndex = 0;
+  });
+
+  // ✅ If you're using checkboxes (like for person/bank filters), you might also want:
+  document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+    cb.checked = true;
+  });
+
+  // ✅ Re-render filtered entries after clearing
+  renderEntries();
+});

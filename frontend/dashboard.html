@@ -663,7 +663,7 @@ function renderCreditLimitTable() {
     "UBS Master": parseFloat(document.getElementById("creditLimit-ubs")?.value || 0),
     "Corner": parseFloat(document.getElementById("creditLimit-corner")?.value || 0),
     "Postfinance Master": parseFloat(document.getElementById("creditLimit-pfm")?.value || 0),
-    "Cembra": parseFloat(document.getElementById("creditLimit-cembra")?.value || 0),
+    "Cembra": parseFloat(document.getElementById("creditLimit-cembra")?.value || 0)
   };
 
   const banks = Object.keys(limits);
@@ -674,14 +674,21 @@ function renderCreditLimitTable() {
   const headerCells = document.querySelectorAll("#bankBalanceTableContainer thead th");
   const changeCells = document.querySelectorAll("#bankBalanceTableContainer tbody tr:nth-child(2) td");
 
-  headerCells.forEach((th, i) => {
-    const bank = th.textContent.trim();
-    const val = parseFloat(changeCells[i]?.textContent) || 0;
-    allChanges[bank] = val;
-    if (banks.includes(bank)) {
-      changes[bank] = val;
-    }
-  });
+
+headerCells.forEach((th, i) => {
+  const bank = th.textContent.trim();
+  const val = parseFloat(changeCells[i]?.textContent) || 0;
+  allChanges[bank] = val;
+  if (banks.includes(bank)) {
+    changes[bank] = val;
+  }
+});
+
+// ✅ Force "Cembra" entry into allChanges if it's missing
+if (!("Cembra" in allChanges)) {
+  allChanges["Cembra"] = 0;
+}
+
 
   // ✅ Compute Limit Now
   let totalLimit = 0, totalUsed = 0;
@@ -724,6 +731,25 @@ function saveCreditLimits() {
     "Cembra": parseFloat(document.getElementById("creditLimit-cembra")?.value || 0)
   };
 
+  fetch(`${backend}/api/credit-limits`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(limits)
+  })
+    .then(res => {
+      if (!res.ok) throw new Error("Failed to save credit limits.");
+      alert("✅ Kredit limits saved");
+      renderCreditLimitTable(); // Refresh calculation
+    })
+    .catch(err => {
+      console.error("❌ Failed to save limits:", err);
+      alert("❌ Could not save limits");
+    });
+}
+
   fetch('/api/credit-limits', {
     method: 'POST',
     headers: {
@@ -758,6 +784,24 @@ function renderBankBalanceForm() {
   window.dispatchEvent(new Event('bankBalanceUpdated'));
 }
 
+async function loadCreditLimits() {
+  try {
+    const res = await fetch(`${backend}/api/limits`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const data = await res.json();
+    document.getElementById('creditLimit-ubs').value = data.ubs ?? 3000;
+    document.getElementById('creditLimit-corner').value = data.corner ?? 9900;
+    document.getElementById('creditLimit-pfm').value = data.pfm ?? 1000;
+    document.getElementById('creditLimit-cembra').value = data.cembra ?? 10000;
+
+    window.initialLocked = data.locked ?? true;
+    toggleLockInputs(window.initialLocked);
+    renderCreditLimitTable();
+  } catch (err) {
+    console.error("❌ Failed to load limits:", err);
+  }
+}
 
 </script>
 
