@@ -1029,14 +1029,16 @@ fetch(`${backend}/api/limits`, {
   }
   return res.json();
 })
+
 .then(data => {
   limitInputs.ubs.value = data.ubs;
   limitInputs.corner.value = data.corner;
   limitInputs.pfm.value = data.pfm;
-    limitInputs.cembra.value = data.cembra; // ✅ add this if using Cembra
+  // ✅ MISSING:
+  limitInputs.cembra.value = data.cembra;
 
   setLockState(data.locked);
-renderCreditLimitTable(); // ✅ correct function name
+  renderCreditLimitTable();
   applyValueColor(limitPlusTotal, 0);
 })
 .catch(err => {
@@ -1052,6 +1054,38 @@ function setLockState(locked) {
   unlockBtn.style.display = locked ? 'inline-block' : 'none';
 }
 
+
+// 💾 Save limits + lock state to backend
+function saveLimits(locked) {
+  const data = {
+    ubs: +limitInputs.ubs.value || 0,
+    corner: +limitInputs.corner.value || 0,
+    pfm: +limitInputs.pfm.value || 0,
+    cembra: +limitInputs.cembra.value || 0,
+    locked
+  };
+
+  fetch(`${backend}/api/limits`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(data)
+  })
+    .then(res => {
+      if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+      return res.json();
+    })
+    .then(response => {
+      console.log("✅ Limits saved:", response);
+      renderCreditLimitTable();
+    })
+    .catch(err => {
+      console.error("❌ Failed to save limits:", err);
+    });
+}
+
 // 🔓 Unlock
 unlockBtn.addEventListener('click', () => {
   setLockState(false);
@@ -1064,41 +1098,35 @@ lockBtn.addEventListener('click', () => {
   saveLimits(true);
 });
 
-// 💾 Save limits + lock state to backend
-function saveLimits(locked) {
-  const data = {
-    ubs: +limitInputs.ubs.value,
-    corner: +limitInputs.corner.value,
-    pfm: +limitInputs.pfm.value,
-     cembra: +limitInputs.cembra.value,
-    locked
-  };
+const data = {
+  ubs: +limitInputs.ubs.value || 0,
+  corner: +limitInputs.corner.value || 0,
+  pfm: +limitInputs.pfm.value || 0,
+  cembra: +limitInputs.cembra.value || 0,
+  locked
+};
 
 fetch(`${backend}/api/limits`, {
+  method: "POST",
   headers: {
+    "Content-Type": "application/json",
     Authorization: `Bearer ${token}`
-  }
+  },
+  body: JSON.stringify(data)
 })
-.then(res => {
-  if (!res.ok) {
-    throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-  }
-  return res.json();
-})
-.then(data => {
-  limitInputs.ubs.value = data.ubs;
-  limitInputs.corner.value = data.corner;
-  limitInputs.pfm.value = data.pfm;
-  limitInputs.cembra.value = data.cembra; // ✅ add this if using Cembra
-  setLockState(data.locked);
-  renderCreditLimitTable(); // ✅ calculate totals
-  applyValueColor(limitPlusTotal, 0);
-})
-.catch(err => {
-  console.error('❌ Failed to load limits:', err);
-});
-} // ✅ this was missing
+  .then(res => {
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return res.json();
+  })
+  .then(response => {
+    console.log("✅ Limits saved:", response);
+    renderCreditLimitTable();
+  })
+  .catch(err => {
+    console.error('❌ Failed to save limits:', err);
+  });
 
+  
 // Apply the color to the input fields based on their value
 function applyValueColor(input, value) {
   input.classList.remove('positive', 'negative', 'neutral');
