@@ -145,33 +145,57 @@
 
  
 
-
+   <label>Date:
+     
    <input type="text" id="newDate" placeholder="Select Date" class="flatpickr-input">
+       </label>
+
+      <label>
+          Description:
     <input type="text" id="newDescription" placeholder="Description" required />
-   
+       </label>
+
+  <label>
+          Amount:
     <input  type="number" step="0.01"  id="newAmount" placeholder="Amount" required/>
+       </label>
+
+      <label>
+          Currency:
     <select id="newCurrency" required>
       <option value="CHF">CHF</option>
       <option value="EUR">EUR</option>
       <option value="USD">USD</option>
     </select>
+       </label>
+
+ <label>
+          Type:
   <select id="newType">
   <option>Income</option>
   <option>Expense</option>
   <option>Transfer</option>
 </select>
+   </label>
 
-
-<label>
+  <label>
+          Person:
 <input list="personList"  id="newPerson" placeholder="Person" required />
 <datalist   id="personList"></datalist>
+   </label>
 
-
+ <label>
+          Bank:
 <input list="bankList" id="newBank" placeholder="Bank" required />
 <datalist id="bankList"></datalist>
+   </label>
+
+ <label>
+         Category:
  <input type="text" id="newCategory" placeholder="Category" list="newCategoryList" required />
 <datalist id="newCategoryList"></datalist>
 </label>
+
  </div>
 </div>
   <div class="entry-button">
