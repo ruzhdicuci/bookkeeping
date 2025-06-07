@@ -27,6 +27,7 @@
   
       <link rel="stylesheet" href="style.css">
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </head>
 <body>
 
@@ -82,16 +83,19 @@
     </button>
     <div class="dropdown-content">
      
-       <a  onclick="downloadPDF()">🧾 Export PDF</a>
+     
 
                 <button id="bt3"> <label for="importCSV" class="custom-file-label">📥 Import CSV</label></button>
                 <input type="file" id="importCSV" accept=".csv" style="display: none;" />
  <input type="file" id="restoreFile" style="display:none" onchange="restoreBackup(event)" />
 
   <a  onclick="exportCombinedCSV()">📤 Export CSV</a>
-    <a onclick="window.print()">🖨️ Print</a>
-        </div>
 
+<a onclick="window.print()">🖨️ Print</a>
+<a onclick="window.print()">🧾 Export PDF</a>
+
+        </div>
+</div>
 </div>  
   
   </div> 
@@ -236,22 +240,7 @@
 </div>
    
 
-           
-<script>
-
-function clearSearch(id) {
-  const el = document.getElementById(id);
-  if (!el) {
-    console.warn(`No element found with id "${id}"`);
-    return;
-  }
-  el.value = '';
-  renderEntries();
-}
-
-</script>
-
-
+        
 
 
 
@@ -663,6 +652,8 @@ window.addEventListener('scroll', () => {
 
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<!-- ✅ Add these before your dashboard.js -->
+
 <script src="dashboard.js"></script>
 
 </body>

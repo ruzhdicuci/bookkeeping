@@ -362,20 +362,7 @@ async function deleteEntry(id) {
 
 
 
-function downloadPDF() {
-  const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF();
-  const rows = [...entryTableBody.querySelectorAll('tr')].map(row =>
-    [...row.children].map(td => td.textContent)
-  );
 
-  pdf.text("Monthly Report", 20, 10);
-  rows.forEach((r, i) => {
-    pdf.text(r.join(" | "), 10, 20 + i * 10);
-  });
-
-  pdf.save("monthly_report.pdf");
-}
 
 function toggleTheme() {
   const body = document.body;
@@ -406,15 +393,14 @@ document.getElementById('importCSV').addEventListener('change', async (e) => {
   const text = await file.text();
   const lines = text.trim().split('\n');
 
-  // Skip to 'Entries' section if the file is combined
-  const entriesStartIndex = lines.findIndex(line => line.trim() === 'Entries');
-  const headersIndex = entriesStartIndex >= 0 ? entriesStartIndex + 1 : 0;
+  const entriesStart = lines.findIndex(l => l.trim() === 'Entries');
+  const bankStart = lines.findIndex(l => l.trim() === 'Bank Balances');
 
-  const headers = lines[headersIndex].split(',');
-
-  for (let i = headersIndex + 1; i < lines.length; i++) {
-    const line = lines[i];
-    if (line.trim() === '' || line.trim() === 'Bank Balances') break;
+  // ✅ 1. Parse and import entries
+  const entryHeaders = lines[entriesStart + 1].split(',');
+  for (let i = entriesStart + 2; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line || line === 'Bank Balances') break;
 
     const row = line.split(',');
     if (row.length < 7) continue;
@@ -429,7 +415,7 @@ document.getElementById('importCSV').addEventListener('change', async (e) => {
       bank: row[6]
     };
 
-    await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
+    await fetch(`${backend}/api/entries`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -439,40 +425,62 @@ document.getElementById('importCSV').addEventListener('change', async (e) => {
     });
   }
 
-  alert('✅ Entries Imported!');
-  fetchEntries();
+  // ✅ 2. Parse and import initial balances
+  if (bankStart !== -1 && lines.length > bankStart + 2) {
+    const bankHeaders = lines[bankStart + 1].split(',').slice(1); // remove 'Bank'
+    const initialValues = lines[bankStart + 2].split(',').slice(1); // remove 'Initial'
+
+    const balances = {};
+    bankHeaders.forEach((bank, i) => {
+      balances[bank.trim()] = parseFloat(initialValues[i]) || 0;
+    });
+
+    await fetch(`${backend}/api/balances`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(balances)
+    });
+  }
+
+  alert('✅ CSV Imported!');
+  await fetchEntries();
+  await loadInitialBankBalances();
+  renderBankBalanceForm();
 });
 
-
-// Export both entries and bank balances into a single CSV file
 function exportCombinedCSV() {
   const entryHeaders = ['date', 'description', 'amount', 'currency', 'type', 'person', 'bank'];
-  const entryRows = entries.map(e => [e.date, e.description, e.amount, e.currency, e.type, e.person, e.bank]);
+  const entryRows = entries.map(e => [
+    e.date, e.description, e.amount, e.currency, e.type, e.person, e.bank
+  ]);
 
-  const bankHeaders = ['Bank', ...new Set(entries.map(e => e.bank).filter(Boolean))];
+  const banks = Object.keys(initialBankBalances);
+  const bankHeaders = ['Bank', ...banks];
+
   const initialRow = ['Initial'];
   const changeRow = ['Change'];
 
-  // Get banks in consistent order
-  const banks = bankHeaders.slice(1);
-
-  // Build initial balances row
+  // Initial balances
   banks.forEach(bank => {
     initialRow.push(initialBankBalances[bank] ?? 0);
   });
 
-  // Calculate net changes
+  // Calculate changes
   const changes = {};
   banks.forEach(bank => changes[bank] = 0);
   entries.forEach(e => {
-    if (changes[e.bank] != null) {
+    if (e.bank in changes) {
       changes[e.bank] += e.type === 'income' ? e.amount : -e.amount;
     }
   });
   banks.forEach(bank => {
-    changeRow.push(changes[bank].toFixed(2));
+    changeRow.push((changes[bank] ?? 0).toFixed(2));
   });
 
+  // Build CSV
   const csvSections = [];
   csvSections.push('Entries');
   csvSections.push(entryHeaders.join(','));
@@ -702,9 +710,18 @@ function restoreBackup(e) {
       }
     }
 
-    if (data.initialBankBalances) {
-      localStorage.setItem('initialBankBalances', JSON.stringify(data.initialBankBalances));
-    }
+if (data.initialBankBalances) {
+  localStorage.setItem('initialBankBalances', JSON.stringify(data.initialBankBalances));
+
+  await fetch(`${backend}/api/balances`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data.initialBankBalances)
+  });
+}
 
     alert('✅ Backup restored!');
     fetchEntries();
@@ -712,6 +729,7 @@ function restoreBackup(e) {
 
   reader.readAsText(file);
 }
+renderBankBalanceForm(); // 🧮 Re-render updated balances
 
 
 
@@ -1156,3 +1174,16 @@ function applyValueColor(input, value) {
   else input.classList.add('neutral');
   input.value = value.toFixed(2);
 }
+
+
+function clearSearch(id) {
+  const el = document.getElementById(id);
+  if (!el) {
+    console.warn(`No element found with id "${id}"`);
+    return;
+  }
+  el.value = '';
+  renderEntries();
+}
+
+
