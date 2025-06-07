@@ -7,11 +7,13 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
 // ✅ CORS config
-app.use(cors({
-  origin: 'https://we-search.ch',
+const corsOptions = {
+  origin: ['https://we-search.ch'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
-}));
-app.options('*', cors());
+};
+
+app.use(cors(corsOptions));
 
 const SECRET = 'rudi-bookkeeping-secret'; // replace with env var for production
 
