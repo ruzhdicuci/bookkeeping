@@ -96,31 +96,64 @@ overflow: hidden;
 </head>
 <body>
   <div class="box">
-    <h2>🔐 Login</h2>
-    <form id="loginForm">
-      <label for="loginUserSelect">User</label>
-      <select id="loginUserSelect"></select>
+  <h2>🔐 Login</h2>
+  <form id="loginForm" autocomplete="off">
+    <label for="loginUserSelect">User</label>
+    <input
+      type="email"
+      id="loginUserSelect"
+      name="email"
+      placeholder="Email"
+      autocomplete="off"
+      required
+    />
 
-      <label for="loginPassword">Password</label>
-      <input type="password" id="loginPassword" placeholder="Password" required />
+    <label for="loginPassword">Password</label>
+    <input
+      type="password"
+      id="loginPassword"
+      name="password"
+      placeholder="Password"
+      autocomplete="new-password"
+      required
+    />
 
-      <button id="b1" type="submit">Login</button>
-    </form>
-  </div>
+    <button id="b1" type="submit">Login</button>
+  </form>
+</div>
 
-  <div class="box">
-    <h2>🆕 Register</h2>
-    <form id="registerForm">
-      <label for="registerEmail">Email</label>
-      <input type="text" id="registerEmail" placeholder="New user email" />
+<div class="box">
+  <h2>🆕 Register</h2>
+  <form id="registerForm" autocomplete="off">
+    <label for="registerEmail">Email</label>
+    <input
+      type="email"
+      id="registerEmail"
+      name="email"
+      placeholder="New user email"
+      autocomplete="off"
+      required
+    />
 
-      <label for="registerPassword">Password</label>
-      <input type="password" id="registerPassword" placeholder="Password" />
+    <label for="registerPassword">Password</label>
+    <input
+      type="password"
+      id="registerPassword"
+      name="password"
+      placeholder="Password"
+      autocomplete="new-password"
+      required
+    />
 
-      <button type="submit">Register</button>
-    </form>
-  </div>
+    <button type="submit">Register</button>
+  </form>
+</div>
 
+<input list="users" id="loginUserSelect" name="email" autocomplete="off" />
+<datalist id="users">
+  <option value="user1@example.com">
+  <option value="user2@example.com">
+</datalist>
   <script src="login.js"></script>
 </body>
 </html>
