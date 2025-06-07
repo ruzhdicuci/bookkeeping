@@ -24,9 +24,7 @@ app.options('*', cors(corsOptions)); // 👈 Important for preflight
 app.use(express.json());
 
 app.use((req, res, next) => {
-  res.on('finish', () => {
-    console.log(`🧾 Response headers for ${req.method} ${req.url}:`, res.getHeaders());
-  });
+  console.log(`🔍 ${req.method} ${req.url}`);
   next();
 });
 
@@ -153,11 +151,17 @@ app.delete('/api/entries/delete-all', auth, async (req, res) => {
   res.json({ success: true });
 });
 
+const mongoose = require('mongoose');
+
 app.delete('/api/entries/:id', auth, async (req, res) => {
-  await Entry.deleteOne({ _id: req.params.id, userId: req.userId });
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ message: 'Invalid entry ID' });
+  }
+
+  await Entry.deleteOne({ _id: id, userId: req.userId });
   res.json({ success: true });
 });
-
 
 
 // Balances per user
