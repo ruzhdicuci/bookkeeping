@@ -1,5 +1,6 @@
 const express = require('express');
-const app = express();
+const app = express(); // ✅ This MUST come before app.use(...)
+
 const path = require('path');
 const cors = require('cors');
 const mongoose = require('mongoose');
@@ -15,9 +16,11 @@ const corsOptions = {
   optionsSuccessStatus: 200
 };
 
-app.use(cors(corsOptions));           // 👈 First: attach CORS middleware
-app.options('*', cors(corsOptions));  // 👈 Then: handle preflight requests
+app.use(cors(corsOptions));           // ✅ Attach CORS middleware early
+app.options('*', cors(corsOptions));  // ✅ Handle preflight requests
+
 app.use(express.json());
+
 
 
 const SECRET = 'rudi-bookkeeping-secret'; // replace with env var for production
