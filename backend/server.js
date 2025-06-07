@@ -7,11 +7,12 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
 // ✅ CORS config
-// ✅ CORS config
 const corsOptions = {
-  origin: 'https://we-search.ch', // Or use an array if needed
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true
+  origin: 'https://we-search.ch',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+  optionsSuccessStatus: 200
 };
 
 app.use(cors(corsOptions));           // 👈 First: attach CORS middleware
