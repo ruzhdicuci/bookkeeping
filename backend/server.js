@@ -32,7 +32,7 @@ const Balance = mongoose.model('Balance', new mongoose.Schema({
 }));
 
 const User = mongoose.model('User', new mongoose.Schema({
-  email: String,
+  email: { type: String, unique: true },
   password: String
 }));
 
