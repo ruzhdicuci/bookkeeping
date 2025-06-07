@@ -5,25 +5,21 @@ app.use((req, res, next) => {
 
 
 const express = require('express');
-const app = express(); // ✅ This MUST come before app.use(...)
-
-const path = require('path');
+const app = express();
 const cors = require('cors');
-const mongoose = require('mongoose');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
 
-// ✅ CORS config
+// ✅ CORRECT CORS CONFIG
 const corsOptions = {
   origin: 'https://we-search.ch',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
-  optionsSuccessStatus: 200
+  optionsSuccessStatus: 204
 };
 
-app.use(cors(corsOptions));           // ✅ Attach CORS middleware early
-app.options('*', cors(corsOptions));  // ✅ Handle preflight requests
+// ✅ MUST be before all routes
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // 👈 Important for preflight
 
 app.use(express.json());
 
