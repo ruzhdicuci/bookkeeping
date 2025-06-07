@@ -134,15 +134,18 @@ app.put('/api/entries/:id', auth, async (req, res) => {
   res.json(updated);
 });
 
-app.delete('/api/entries/:id', auth, async (req, res) => {
-  await Entry.deleteOne({ _id: req.params.id, userId: req.userId });
-  res.json({ success: true });
-});
 
 app.delete('/api/entries/delete-all', auth, async (req, res) => {
   await Entry.deleteMany({ userId: req.userId });
   res.json({ success: true });
 });
+
+app.delete('/api/entries/:id', auth, async (req, res) => {
+  await Entry.deleteOne({ _id: req.params.id, userId: req.userId });
+  res.json({ success: true });
+});
+
+
 
 // Balances per user
 app.post('/api/balances', auth, async (req, res) => {
