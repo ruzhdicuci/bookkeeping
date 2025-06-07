@@ -44,15 +44,31 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
 
 // ✅ Populate dropdown
 async function populateLoginUserDropdown() {
-  const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/users');
-  const users = await res.json();
-
   const loginSelect = document.getElementById('loginUserSelect');
-  loginSelect.innerHTML = users.map(email => `<option value="${email}">${email}</option>`).join('');
+  loginSelect.innerHTML = '<option value="">Loading...</option>';
 
-  const lastUser = localStorage.getItem('lastLoginUser');
-  if (lastUser && users.includes(lastUser)) {
-    loginSelect.value = lastUser;
+  try {
+    const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/users');
+    if (!res.ok) throw new Error(`Status ${res.status}`);
+
+    const users = await res.json();
+
+    if (!Array.isArray(users) || users.length === 0) {
+      loginSelect.innerHTML = '<option value="">No users found</option>';
+      return;
+    }
+
+    loginSelect.innerHTML = `<option value="">Select a user</option>` +
+      users.map(email => `<option value="${email}">${email}</option>`).join('');
+
+    const lastUser = localStorage.getItem('lastLoginUser');
+    if (lastUser && users.includes(lastUser)) {
+      loginSelect.value = lastUser;
+    }
+
+  } catch (err) {
+    console.error('❌ Failed to fetch users:', err);
+    loginSelect.innerHTML = '<option value="">Error loading users</option>';
   }
 }
 
