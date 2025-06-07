@@ -97,26 +97,14 @@ overflow: hidden;
 <body>
   <div class="box">
   <h2>🔐 Login</h2>
-  <form id="loginForm" autocomplete="off">
+  <form id="loginForm">
     <label for="loginUserSelect">User</label>
-    <input
-      type="email"
-      id="loginUserSelect"
-      name="email"
-      placeholder="Email"
-      autocomplete="off"
-      required
-    />
+    <select id="loginUserSelect">
+      <option value="">Select a user</option>
+    </select>
 
     <label for="loginPassword">Password</label>
-    <input
-      type="password"
-      id="loginPassword"
-      name="password"
-      placeholder="Password"
-      autocomplete="new-password"
-      required
-    />
+    <input type="password" id="loginPassword" placeholder="Password" required />
 
     <button id="b1" type="submit">Login</button>
   </form>
@@ -149,11 +137,7 @@ overflow: hidden;
   </form>
 </div>
 
-<input list="users" id="loginUserSelect" name="email" autocomplete="off" />
-<datalist id="users">
-  <option value="user1@example.com">
-  <option value="user2@example.com">
-</datalist>
+
   <script src="login.js"></script>
 </body>
 </html>
