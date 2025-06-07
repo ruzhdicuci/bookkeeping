@@ -146,7 +146,9 @@ app.put('/api/entries/:id', auth, async (req, res) => {
 
 
 app.delete('/api/entries/delete-all', auth, async (req, res) => {
+  console.log("🧹 Reached DELETE-ALL route");
   console.log(`🔴 DELETE all entries for user: ${req.userId}`);
+
   await Entry.deleteMany({ userId: req.userId });
   res.json({ success: true });
 });
