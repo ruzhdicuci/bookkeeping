@@ -1,3 +1,9 @@
+app.use((req, res, next) => {
+  console.log(`📥 ${req.method} ${req.path}`);
+  next();
+});
+
+
 const express = require('express');
 const app = express(); // ✅ This MUST come before app.use(...)
 
@@ -21,7 +27,12 @@ app.options('*', cors(corsOptions));  // ✅ Handle preflight requests
 
 app.use(express.json());
 
-
+app.use((req, res, next) => {
+  res.on('finish', () => {
+    console.log(`🧾 Response headers for ${req.method} ${req.url}:`, res.getHeaders());
+  });
+  next();
+});
 
 const SECRET = 'rudi-bookkeeping-secret'; // replace with env var for production
 
@@ -141,6 +152,7 @@ app.put('/api/entries/:id', auth, async (req, res) => {
 
 
 app.delete('/api/entries/delete-all', auth, async (req, res) => {
+  console.log(`🔴 DELETE all entries for user: ${req.userId}`);
   await Entry.deleteMany({ userId: req.userId });
   res.json({ success: true });
 });
