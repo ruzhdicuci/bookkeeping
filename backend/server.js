@@ -16,12 +16,10 @@ const corsOptions = {
 
 app.use(cors(corsOptions));           // 👈 First: attach CORS middleware
 app.options('*', cors(corsOptions));  // 👈 Then: handle preflight requests
-
-const SECRET = 'rudi-bookkeeping-secret'; // replace with env var for production
-
-
 app.use(express.json());
 
+
+const SECRET = 'rudi-bookkeeping-secret'; // replace with env var for production
 
 mongoose.connect('mongodb+srv://ruzhdicuci:9BgBDMYEJBjMGFid@bookkeeping.bcakntz.mongodb.net/bookkeeping?retryWrites=true&w=majority&appName=bookkeeping', {
   useNewUrlParser: true,
