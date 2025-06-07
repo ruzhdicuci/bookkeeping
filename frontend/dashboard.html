@@ -138,14 +138,14 @@
   <div class="entry-fields">
    
   
-  <input id="newAmount" type="number" placeholder="Amount" />
+
  
 
 
    <input type="text" id="newDate" placeholder="Select Date" class="flatpickr-input">
     <input type="text" id="newDescription" placeholder="Description" required />
    
-    <input  type="number" id="newAmount" placeholder="Amount" autocomplete="off" required/>
+    <input  type="number" id="newAmount" placeholder="Amount" required/>
     <select id="newCurrency" required>
       <option value="CHF">CHF</option>
       <option value="EUR">EUR</option>
@@ -204,9 +204,9 @@
         <th class="th4" style="border: none;">Post Master</th>
         <th class="th4" style="border: none;">Cembra</th>
         <th class="th4" style="border: none;">Total Limit</th>
-        <th class="th4" style="border: none;">Limit Now</th>
-        <th class="th4" style="border: none;">Difference</th>
-        <th class="th4" style="border: none;">Limit Now + Total Plus</th>
+        <th class="th4" style="border: none;">Limit Minus</th>
+        <th class="th4" style="border: none;">Mbetja</th>
+        <th class="th4" style="border: none;">Mbetja + Total Plus</th>
       </tr>
     </thead>
     <tbody>
@@ -658,143 +658,8 @@ window.addEventListener('scroll', () => {
 
 
 
-<script>
-function renderCreditLimitTable() {
-  const limits = {
-    "UBS Master": parseFloat(document.getElementById("creditLimit-ubs")?.value || 0),
-    "Corner": parseFloat(document.getElementById("creditLimit-corner")?.value || 0),
-    "Postfinance Master": parseFloat(document.getElementById("creditLimit-pfm")?.value || 0),
-    "Cembra": parseFloat(document.getElementById("creditLimit-cembra")?.value || 0)
-  };
-
-  const banks = Object.keys(limits);
-  const changes = {};     // Only for banks in limits
-  const allChanges = {};  // All banks (used for totalPlus)
-
-  // Grab data from your #bankBalanceTableContainer Change row
-  const headerCells = document.querySelectorAll("#bankBalanceTableContainer thead th");
-  const changeCells = document.querySelectorAll("#bankBalanceTableContainer tbody tr:nth-child(2) td");
 
 
-headerCells.forEach((th, i) => {
-  const bank = th.textContent.trim();
-  const val = parseFloat(changeCells[i]?.textContent) || 0;
-  allChanges[bank] = val;
-  if (banks.includes(bank)) {
-    changes[bank] = val;
-  }
-});
-
-
-
-  // ✅ Compute Limit Now
-  let totalLimit = 0, totalUsed = 0;
-
-  banks.forEach(bank => {
-    const credit = limits[bank];
-    const used = Math.abs(changes[bank] || 0); // Use abs in case of negative values
-    totalLimit += credit;
-    totalUsed += used;
-  });
-
-  // ✅ Compute Total Plus across ALL banks (not just ones in creditLimit)
-  const totalPlus = Object.values(allChanges)
-    .filter(v => v > 0)
-    .reduce((sum, v) => sum + v, 0);
-
-  // ✅ Compute totals
-  const difference = totalLimit - totalUsed;
-  const limitPlusTotal = totalUsed + totalPlus;
-
-  // ✅ Update fields
-  document.getElementById("totalLimit").value = totalLimit.toFixed(2);
-  document.getElementById("totalUsed").value = totalUsed.toFixed(2);
-  document.getElementById("diffUsed").value = difference.toFixed(2);
-  document.getElementById("limitPlusTotal").value = limitPlusTotal.toFixed(2);
-
-  // Optional styling
-  applyValueColor(document.getElementById('totalUsed'), totalUsed);
-  applyValueColor(document.getElementById('limitPlusTotal'), limitPlusTotal);
-  applyValueColor(document.getElementById("diffUsed"), difference);
-
-  console.log("✅ allChanges:", allChanges);
-  console.log("✅ totalUsed:", totalUsed, "✅ totalPlus:", totalPlus, "✅ Combined:", limitPlusTotal);
-}
-
-
-
-['creditLimit-ubs', 'creditLimit-corner', 'creditLimit-pfm', 'creditLimit-cembra'].forEach(id => {
-  const input = document.getElementById(id);
-  if (input) {
-    input.addEventListener('input', renderCreditLimitTable);
-  }
-});
-
-window.addEventListener('entriesUpdated', renderCreditLimitTable);
-window.addEventListener('bankBalanceUpdated', renderCreditLimitTable);
-
-// Optional: auto-dispatch after entry/balance refresh
-async function fetchEntries() {
-  // your existing fetch logic...
-  window.dispatchEvent(new Event('entriesUpdated'));
-}
-
-function renderBankBalanceForm() {
-  // your existing render logic...
-  window.dispatchEvent(new Event('bankBalanceUpdated'));
-}
-
-async function loadCreditLimits() {
-  try {
-    const res = await fetch(`${backend}/api/limits`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    const data = await res.json();
-
-    document.getElementById("creditLimit-ubs").value = data.ubs ?? 3000;
-    document.getElementById("creditLimit-corner").value = data.corner ?? 9900;
-    document.getElementById("creditLimit-pfm").value = data.pfm ?? 1000;
-    document.getElementById("creditLimit-cembra").value = data.cembra ?? 10000;
-
-    window.initialLocked = data.locked ?? true;
-    toggleLockInputs(window.initialLocked);
-    renderCreditLimitTable();
-  } catch (err) {
-    console.error("❌ Failed to load limits:", err);
-  }
-}
-</script>
-
-
-<script>
-function saveCreditLimits() {
-  const limits = {
-    ubs: parseFloat(document.getElementById("creditLimit-ubs")?.value || "0"),
-    corner: parseFloat(document.getElementById("creditLimit-corner")?.value || "0"),
-    pfm: parseFloat(document.getElementById("creditLimit-pfm")?.value || "0"),
-    cembra: parseFloat(document.getElementById("creditLimit-cembra")?.value || "0"),
-    locked: window.initialLocked ?? true
-  };
-
-  fetch(`${backend}/api/limits`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    },
-    body: JSON.stringify(limits)
-  })
-    .then(res => {
-      if (!res.ok) throw new Error("Failed to save credit limits.");
-      alert("✅ Kredit limits saved");
-      renderCreditLimitTable(); // Refresh totals
-    })
-    .catch(err => {
-      console.error("❌ Failed to save limits:", err);
-      alert("❌ Could not save limits");
-    });
-}
-</script>
 
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>

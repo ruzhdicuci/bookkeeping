@@ -23,13 +23,15 @@ input[type="number"] {
   font-size: 1.2rem;
   text-align: center;
   background-color: #ededed;
-
+  color: rgb(20, 102, 156);
+font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
 
 /* Colors based on value */
 input.positive {
   color: rgb(140, 131, 112);
   font-weight: bold;
+
 }
 
 input.negative {
@@ -68,14 +70,14 @@ font-size: 1.2rem;
  text-align: center;       /* Center the text horizontally */
   vertical-align: middle;   /* Center the text vertically */
     padding: 8px;  
-    color: black;
+   
 
 }
  .dark input[type="number"]  { 
   background-color: #2c2c2c; 
-font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+
  
-    
+    color: yellowgreen;
  
     }
  
@@ -165,6 +167,7 @@ overflow: hidden;
 
 #center1 {
  text-align: center;
+ font-size: 1.2rem;
 }
 
 .filter-group {
@@ -656,7 +659,7 @@ text-align: center;
  text-align: center;
  background-color: rgb(245, 245, 248);
 font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-
+font-size: 1.2rem !important;
  color: blue;
 
 }
@@ -1356,48 +1359,6 @@ border-radius: 10px;
 
 
 
-<<<<<<< HEAD
-    #splitModal {
-      position: fixed;
-      top: 10%;
-      left: 50%;
-      transform: translateX(-50%);
-      background: white;
-      border: 1px solid #ccc;
-      padding: 20px;
-      border-radius: 8px;
-      width: 90%;
-      max-width: 600px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
-      z-index: 1000;
-    }
-    #splitModal h3 {
-      margin-top: 0;
-    }
-    #splitModal table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 10px;
-    }
-    #splitModal th, #splitModal td {
-      border: 1px solid #ddd;
-      padding: 8px;
-      text-align: center;
-    }
-    #splitModal input, #splitModal select {
-      width: 100%;
-      padding: 5px;
-    }
-    #splitModal button {
-      margin: 5px;
-      padding: 6px 12px;
-      cursor: pointer;
-    }
-
-=======
->>>>>>> 6e7da26 (✅ new)
-
-  
 
  
    

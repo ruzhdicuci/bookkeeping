@@ -599,10 +599,10 @@ html += `
     
     <div style="display: flex; gap: 1rem; align-items: center;">
       <span>Total Plus:&nbsp; 
-        <span style="color: green; font-size: 22px; ">+${totalPositive.toFixed(2)}</span>
+        <span style="color: rgb(15, 158, 123); font-size: 22px; ">+${totalPositive.toFixed(2)}</span>
       </span>&nbsp;&nbsp;
       <span>Total Minus:&nbsp; 
-        <span style="color: rgb(255, 85, 0); font-size: 22px; ">${totalNegative.toFixed(2)}</span>
+        <span style="color: rgb(254, 110, 38); font-size: 22px; ">${totalNegative.toFixed(2)}</span>
       </span>
     </div>
   </div>
@@ -993,20 +993,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-
-
+// ✅ Initialization
 window.addEventListener('DOMContentLoaded', async () => {
   await fetchEntries();
   await loadInitialBankBalances();
+  await loadCreditLimits();
+
   populateNewEntryDropdowns();
   populateFilters();
   renderEntries();
   renderBankBalanceForm();
-  renderCreditLimitTable(); // ✅ call it here
 });
 
-
-// lock kredit limit
+// ✅ Lockable inputs
 const limitInputs = {
   ubs: document.getElementById('creditLimit-ubs'),
   corner: document.getElementById('creditLimit-corner'),
@@ -1017,154 +1016,143 @@ const limitInputs = {
 const lockBtn = document.getElementById('lockBtn');
 const unlockBtn = document.getElementById('unlockBtn');
 
-
-fetch(`${backend}/api/limits`, {
-  headers: {
-    Authorization: `Bearer ${token}`
-  }
-})
-.then(res => {
-  if (!res.ok) {
-    throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-  }
-  return res.json();
-})
-
-.then(data => {
-  limitInputs.ubs.value = data.ubs;
-  limitInputs.corner.value = data.corner;
-  limitInputs.pfm.value = data.pfm;
-  // ✅ MISSING:
-  limitInputs.cembra.value = data.cembra;
-
-  setLockState(data.locked);
-  renderCreditLimitTable();
-  applyValueColor(limitPlusTotal, 0);
-})
-.catch(err => {
-  console.error('❌ Failed to load limits:', err);
-});
-
 function setLockState(locked) {
-  Object.values(limitInputs).forEach(input => {
-    input.disabled = locked;
-  });
-
+  Object.values(limitInputs).forEach(input => input.disabled = locked);
   lockBtn.style.display = locked ? 'none' : 'inline-block';
   unlockBtn.style.display = locked ? 'inline-block' : 'none';
 }
 
+// ✅ Render credit limit calculationsunction renderCreditLimitTable() {
+  function renderCreditLimitTable() {
+  const limits = {
+    "UBS Master": parseFloat(document.getElementById("creditLimit-ubs")?.value || 0),
+    "Corner": parseFloat(document.getElementById("creditLimit-corner")?.value || 0),
+    "Postfinance Master": parseFloat(document.getElementById("creditLimit-pfm")?.value || 0),
+    "Cembra": parseFloat(document.getElementById("creditLimit-cembra")?.value || 0)
+  };
 
-// 💾 Save limits + lock state to backend
-function saveLimits(locked) {
-  const data = {
-    ubs: +limitInputs.ubs.value || 0,
-    corner: +limitInputs.corner.value || 0,
-    pfm: +limitInputs.pfm.value || 0,
-    cembra: +limitInputs.cembra.value || 0,
-    locked
+  const banks = Object.keys(limits);
+  const changes = {};
+  const allChanges = {};
+
+  const headerCells = document.querySelectorAll("#bankBalanceTableContainer thead th");
+  const changeCells = document.querySelectorAll("#bankBalanceTableContainer tbody tr:nth-child(2) td");
+console.log("🔍 Parsed bank headers:", [...headerCells].map(th => `[${th.textContent.trim()}]`));
+
+  headerCells.forEach((th, i) => {
+    const bank = th.textContent.trim();
+    const val = parseFloat(changeCells[i]?.textContent) || 0;
+    allChanges[bank] = val;
+    if (banks.includes(bank)) {
+      changes[bank] = val;
+    }
+  });
+
+  if (!("Cembra" in allChanges)) {
+    allChanges["Cembra"] = 0;
+  }
+
+  const totalPlus = Object.entries(allChanges)
+    .filter(([_, value]) => value > 0)
+    .reduce((sum, [, value]) => sum + value, 0);
+
+  let totalLimit = 0, totalUsed = 0;
+  banks.forEach(bank => {
+    const credit = limits[bank];
+    const used = Math.abs(changes[bank] || 0);
+    totalLimit += credit;
+    totalUsed += used;
+  });
+
+  const difference = totalLimit - totalUsed;
+  const limitPlusTotal = difference + totalPlus;
+
+ document.getElementById("totalLimit").value = totalLimit.toFixed(2);
+document.getElementById("totalUsed").value = totalUsed.toFixed(2);
+document.getElementById("diffUsed").value = difference.toFixed(2);
+document.getElementById("limitPlusTotal").value = limitPlusTotal.toFixed(2);
+
+  applyValueColor(document.getElementById('totalUsed'), totalUsed);
+  applyValueColor(document.getElementById('limitPlusTotal'), limitPlusTotal);
+  applyValueColor(document.getElementById("diffUsed"), difference);
+
+ 
+} // ← ✅ END of renderCreditLimitTable
+
+// ✅ Load credit limits from backend
+async function loadCreditLimits() {
+  try {
+    const res = await fetch(`${backend}/api/limits`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const data = await res.json();
+
+    limitInputs.ubs.value = (data.ubs ?? 3000).toString();
+    limitInputs.corner.value = (data.corner ?? 9900).toString();
+    limitInputs.pfm.value = (data.pfm ?? 1000).toString();
+    limitInputs.cembra.value = (data.cembra ?? 10000).toString();
+
+    window.initialLocked = data.locked ?? true;
+    setLockState(window.initialLocked);
+    renderCreditLimitTable();
+  } catch (err) {
+    console.error("❌ Failed to load limits:", err);
+  }
+}
+
+// ✅ Save to backend
+function saveCreditLimits() {
+  const limits = {
+    ubs: parseFloat(limitInputs.ubs.value || 0),
+    corner: parseFloat(limitInputs.corner.value || 0),
+    pfm: parseFloat(limitInputs.pfm.value || 0),
+    cembra: parseFloat(limitInputs.cembra.value || 0),
+    locked: window.initialLocked ?? true
   };
 
   fetch(`${backend}/api/limits`, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`
     },
-    body: JSON.stringify(data)
+    body: JSON.stringify(limits)
   })
     .then(res => {
-      if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-      return res.json();
-    })
-    .then(response => {
-      console.log("✅ Limits saved:", response);
+      if (!res.ok) throw new Error("Failed to save credit limits.");
+      alert("✅ Kredit limits saved");
       renderCreditLimitTable();
     })
     .catch(err => {
       console.error("❌ Failed to save limits:", err);
+      alert("❌ Could not save limits");
     });
 }
 
-// 🔓 Unlock
+// ✅ Hook up lock/unlock
 unlockBtn.addEventListener('click', () => {
-  setLockState(false);
-  saveLimits(false);
+  setLockState(false); // just unlocks inputs
+  // Don't save yet
 });
-
-// 🔒 Lock
 lockBtn.addEventListener('click', () => {
   setLockState(true);
-  saveLimits(true);
+  saveCreditLimits();
 });
 
-const data = {
-  ubs: +limitInputs.ubs.value || 0,
-  corner: +limitInputs.corner.value || 0,
-  pfm: +limitInputs.pfm.value || 0,
-  cembra: +limitInputs.cembra.value || 0,
-  locked
-};
+// ✅ Recalculate on input change
+['creditLimit-ubs', 'creditLimit-corner', 'creditLimit-pfm', 'creditLimit-cembra'].forEach(id => {
+  const input = document.getElementById(id);
+  if (input) input.addEventListener('input', renderCreditLimitTable);
+});
 
-fetch(`${backend}/api/limits`, {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${token}`
-  },
-  body: JSON.stringify(data)
-})
-  .then(res => {
-    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-    return res.json();
-  })
-  .then(response => {
-    console.log("✅ Limits saved:", response);
-    renderCreditLimitTable();
-  })
-  .catch(err => {
-    console.error('❌ Failed to save limits:', err);
-  });
+window.addEventListener('entriesUpdated', renderCreditLimitTable);
+window.addEventListener('bankBalanceUpdated', renderCreditLimitTable);
 
-  
-// Apply the color to the input fields based on their value
+// ✅ Color helper
 function applyValueColor(input, value) {
   input.classList.remove('positive', 'negative', 'neutral');
-
-  if (value > 0) {
-    input.classList.add('positive');
-  } else if (value < 0) {
-    input.classList.add('negative');
-  } else {
-    input.classList.add('neutral');
-  }
-
+  if (value > 0) input.classList.add('positive');
+  else if (value < 0) input.classList.add('negative');
+  else input.classList.add('neutral');
   input.value = value.toFixed(2);
 }
-
-// Monitor changes and apply color dynamically
-document.querySelectorAll('input[type="number"]').forEach(input => {
-  input.addEventListener('input', (event) => {
-    const value = parseFloat(event.target.value) || 0;
-    applyValueColor(event.target, value);
-  });
-
-  // Apply color based on the initial value when page loads
-  const initialValue = parseFloat(input.value) || 0;
-  applyValueColor(input, initialValue);
-});
-
-
-const totalLimit = document.getElementById('totalLimit');
-const totalUsed = document.getElementById('totalUsed');
-const diffUsed = document.getElementById('diffUsed');
-const limitPlusTotal = document.getElementById('limitPlusTotal');
-
-// Example values
-applyValueColor(totalLimit, 13900);
-applyValueColor(totalUsed, 0);
-applyValueColor(diffUsed, 13900);
-applyValueColor(limitPlusTotal, 0);
-
-
-
