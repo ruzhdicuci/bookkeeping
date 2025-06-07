@@ -8,15 +8,17 @@ const bcrypt = require('bcrypt');
 
 // ✅ CORS config
 const corsOptions = {
-  origin: 'https://we-search.ch', // ✅ or use an array if needed
+  origin: ['https://we-search.ch'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 };
 app.use(cors(corsOptions));
 
+app.use(cors(corsOptions));
+
 const SECRET = 'rudi-bookkeeping-secret'; // replace with env var for production
 
-
+app.use(cors());
 app.use(express.json());
 
 
