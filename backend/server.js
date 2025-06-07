@@ -1,11 +1,17 @@
 const express = require('express');
-const app = express(); // ✅ Fix: define the Express app
+const app = express();
 const path = require('path');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
+// ✅ CORS config
+app.use(cors({
+  origin: 'https://we-search.ch',
+  credentials: true
+}));
+app.options('*', cors());
 
 const SECRET = 'rudi-bookkeeping-secret'; // replace with env var for production
 
