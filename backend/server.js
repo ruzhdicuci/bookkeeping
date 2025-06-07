@@ -178,7 +178,7 @@ const Limit = mongoose.model('Limit', new mongoose.Schema({
     ubs: Number,
     corner: Number,
     pfm: Number,
-     cembra: Number
+    cembra: Number
   },
   locked: Boolean
 }));
