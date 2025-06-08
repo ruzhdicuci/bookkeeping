@@ -161,7 +161,7 @@ app.delete('/api/entries/delete-all', auth, async (req, res) => {
   res.json({ success: true });
 });
 
-const mongoose = require('mongoose');
+
 
 app.delete('/api/entries/:id', auth, async (req, res) => {
   const { id } = req.params;
