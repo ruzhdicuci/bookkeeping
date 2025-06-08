@@ -1,14 +1,18 @@
 const express = require('express');
-const app = express();               // ✅ First define app
+const app = express(); // ✅ define app first
+const cors = require('cors');
+const path = require('path');
+const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
-
-// ✅ Logging middleware — now safe
+// Logging middleware - now safe
 app.use((req, res, next) => {
   console.log(`📥 ${req.method} ${req.path}`);
   next();
 });
-const cors = require('cors');
-// ✅ CORS
+
+// CORS setup
 const corsOptions = {
   origin: 'https://we-search.ch',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -16,10 +20,9 @@ const corsOptions = {
   credentials: true,
   optionsSuccessStatus: 204
 };
+
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
-
-// ✅ JSON parsing
 app.use(express.json());
 
 // Optional: second logger
