@@ -54,8 +54,13 @@ const Entry = mongoose.model('Entry', new mongoose.Schema({
   date: String,
   person: String,
   bank: String,
-   category: String,
-  currency: String
+  category: String,
+  currency: String,
+  status: {
+    type: String,
+    enum: ['Open', 'Paid'],
+    default: 'Open'
+  }
 }));
 
 // Auth middleware
