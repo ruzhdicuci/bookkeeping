@@ -1115,6 +1115,7 @@ document.getElementById('statusFilter')?.addEventListener('change', () => {
   renderEntries();             // update the visible entries
   renderBankBalanceForm();     // update the bank balance based on filtered entries
 });
+});
 
 // ✅ Lockable inputs
 const limitInputs = {
