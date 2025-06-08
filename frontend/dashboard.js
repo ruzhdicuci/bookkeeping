@@ -257,13 +257,17 @@ row.innerHTML = `
     <button onclick="deleteEntry('${e._id}')">🗑️</button>
   </td>
  
- <td>
-  <button 
-    onclick="updateStatus('${e._id}', '${e.status === 'Paid' ? 'Open' : 'Paid'}')"
-    style="background:${e.status === 'Paid' ? '#13a07f' : '#ff695d'}; color:white; border:none; border-radius:5px;">
-    ${e.status || 'Open'}
-  </button>
-</td>
+  <td>
+    ${
+      isEditing
+        ? `<button onclick="updateStatus('${e._id}', '${e.status === 'Paid' ? 'Open' : 'Paid'}')" style="background:${e.status === 'Paid' ? '#13a07f' : '#ff695d'}; color:white; border:none; border-radius:5px;">
+             ${e.status}
+           </button>`
+        : `<span style="background:${e.status === 'Paid' ? '#13a07f' : '#ff695d'}; color:white; padding:5px 10px; border-radius:5px;">
+             ${e.status}
+           </span>`
+    }
+  </td>
 `;
     entryTableBody.appendChild(row);
   });
