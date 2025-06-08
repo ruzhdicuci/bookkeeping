@@ -56,11 +56,11 @@ const Entry = mongoose.model('Entry', new mongoose.Schema({
   bank: String,
   category: String,
   currency: String,
-  status: {
-    type: String,
-    enum: ['Open', 'Paid'],
-    default: 'Open'
-  }
+status: {
+  type: String,
+  enum: ['Open', 'Paid'],
+  default: 'Paid'
+}
 }));
 
 // Auth middleware
@@ -141,6 +141,7 @@ app.post('/api/entries', auth, async (req, res) => {
 });
 
 app.put('/api/entries/:id', auth, async (req, res) => {
+  console.log("🔄 Updating entry", req.params.id, req.body);  // ✅ Add this
   const updated = await Entry.findOneAndUpdate(
     { _id: req.params.id, userId: req.userId },
     req.body,
