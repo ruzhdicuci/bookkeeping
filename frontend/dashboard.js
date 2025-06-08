@@ -237,41 +237,41 @@ const entryDay = e.date?.split('-')[2];
 (amountSearch.value === '' || (e.amount + '').toLowerCase().includes(amountSearch.value.toLowerCase()))
 );
   });
+filtered.forEach(e => {
+  const row = document.createElement('tr');
+  const editForm = document.getElementById('entryForm');
+  const isEditing = editForm?.dataset.editId === e._id;
 
-  // ✅ Rebuild table
-  entryTableBody.innerHTML = '';
-  filtered.forEach(e => {
-    const row = document.createElement('tr');
-    const isEditing = document.getElementById('entryForm').dataset.editId === e._id;
-row.innerHTML = `
-  <td>${e.date}</td>
-  <td>${e.description}</td>
-  <td>${e.amount}</td>
-  <td>${e.currency || ''}</td>
-  <td>${e.type}</td>
-  <td>${e.person}</td>
-  <td>${e.bank}</td>
-  <td>${e.category || ''}</td>
-  <td>
-    <button onclick="editEntry('${e._id}')">✏️</button>
-    <button onclick="duplicateEntry('${e._id}')">📄</button>
-    <button onclick="deleteEntry('${e._id}')">🗑️</button>
-  </td>
- 
-  <td>
-    ${
-      isEditing
-        ? `<button onclick="updateStatus('${e._id}', '${e.status === 'Paid' ? 'Open' : 'Paid'}')" style="background:${e.status === 'Paid' ? '#13a07f' : '#ff695d'}; color:white; border:none; border-radius:5px;">
+  row.innerHTML = `
+    <td>${e.date}</td>
+    <td>${e.description}</td>
+    <td>${e.amount}</td>
+    <td>${e.currency || ''}</td>
+    <td>${e.type}</td>
+    <td>${e.person}</td>
+    <td>${e.bank}</td>
+    <td>${e.category || ''}</td>
+    <td>
+      <button onclick="editEntry('${e._id}')">✏️</button>
+      <button onclick="duplicateEntry('${e._id}')">📄</button>
+      <button onclick="deleteEntry('${e._id}')">🗑️</button>
+    </td>
+    <td>
+      ${
+        isEditing
+          ? `<button onclick="updateStatus('${e._id}', '${e.status === 'Paid' ? 'Open' : 'Paid'}')" 
+               style="background:${e.status === 'Paid' ? '#13a07f' : '#ff695d'}; color:white; border:none; border-radius:5px;">
              ${e.status}
            </button>`
-        : `<span style="background:${e.status === 'Paid' ? '#13a07f' : '#ff695d'}; color:white; padding:5px 10px; border-radius:5px;">
+          : `<span style="background:${e.status === 'Paid' ? '#13a07f' : '#ff695d'}; color:white; padding:5px 10px; border-radius:5px;">
              ${e.status}
            </span>`
-    }
-  </td>
-`;
-    entryTableBody.appendChild(row);
-  });
+      }
+    </td>
+  `;
+
+  entryTableBody.appendChild(row);
+});
 
   // ✅ Update totals
   let incomeTotal = 0, expenseTotal = 0;
