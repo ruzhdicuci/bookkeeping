@@ -196,6 +196,14 @@
 <datalist id="newCategoryList"></datalist>
 </label>
 
+<label>
+  Status:
+  <select id="newStatus">
+    <option value="Paid" selected>Paid</option>
+    <option value="Open">Open</option>
+  </select>
+</label>
+
  </div>
 </div>
   <div class="entry-button">
@@ -356,6 +364,15 @@
             <option value="">All</option>
           </select>
         </label>
+
+        <label for="statusFilter">Status:
+<select id="statusFilter">
+  <option value="All">All</option>
+  <option value="Paid">Paid</option>
+  <option value="Open">Open</option>
+</select>
+  </label>
+
       </div>
     </td>
 
@@ -428,7 +445,7 @@
     const isoDate = inputDate ? formatDateToLocalISO(inputDate) : '';
 
     console.log('📥 Submitting entry...');
- const entry = {
+const entry = {
   date: isoDate,
   description: document.getElementById('newDescription').value,
   category: document.getElementById('newCategory').value,
@@ -437,7 +454,7 @@
   type: document.getElementById('newType').value,
   person: document.getElementById('newPerson').value,
   bank: document.getElementById('newBank').value,
-  status: 'Open' // ✅ Add this
+  status: document.getElementById('newStatus').value // ✅ capture the status
 };
 
     try {

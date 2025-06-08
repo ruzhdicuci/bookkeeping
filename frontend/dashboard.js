@@ -203,6 +203,7 @@ function renderEntries() {
   const categoryFilter = document.getElementById('categoryFilter');
   const categoryValue = categoryFilter?.value || "All";
 const dayQuery = dateSearch.value.trim();
+const statusValue = document.getElementById('statusFilter')?.value || 'All';
 let selectedDays = new Set();
 
 dayQuery.split(',').forEach(part => {
@@ -232,6 +233,7 @@ const entryDay = e.date?.split('-')[2];
   (!currencyFilter.value || e.currency === currencyFilter.value) &&
   (!descSearch.value || (e.description || '').toLowerCase().includes(descSearch.value.toLowerCase())) &&
   (categoryValue === "All" || e.category === categoryValue) &&
+  (statusValue === 'All' || e.status === statusValue) &&
 (amountSearch.value === '' || (e.amount + '').toLowerCase().includes(amountSearch.value.toLowerCase()))
 );
   });
@@ -254,12 +256,14 @@ row.innerHTML = `
     <button onclick="duplicateEntry('${e._id}')">📄</button>
     <button onclick="deleteEntry('${e._id}')">🗑️</button>
   </td>
-  <td>
-    <button onclick="updateStatus('${e._id}', '${e.status === 'Paid' ? 'Open' : 'Paid'}')"
-      style="background-color: ${e.status === 'Paid' ? '#13a07f' : '#ffab00'}; color: white;">
-      ${e.status || 'Open'}
-    </button>
-  </td>
+ 
+ <td>
+  <button 
+    onclick="updateStatus('${e._id}', '${e.status === 'Paid' ? 'Open' : 'Paid'}')"
+    style="background:${e.status === 'Paid' ? '#13a07f' : '#ff695d'}; color:white; border:none; border-radius:5px;">
+    ${e.status || 'Open'}
+  </button>
+</td>
 `;
     entryTableBody.appendChild(row);
   });
@@ -285,9 +289,7 @@ function editEntry(id) {
   if (!entry) return alert("Entry not found.");
 
   // Prefill form fields
-  
   document.getElementById('newDate')._flatpickr.setDate(new Date(entry.date));
-
   document.getElementById('newDescription').value = entry.description;
   document.getElementById('newCategory').value = entry.category || '';
   document.getElementById('newAmount').value = entry.amount;
@@ -295,6 +297,9 @@ function editEntry(id) {
   document.getElementById('newType').value = entry.type;
   document.getElementById('newPerson').value = entry.person;
   document.getElementById('newBank').value = entry.bank;
+
+  // ✅ Add this to support status editing
+  document.getElementById('newStatus').value = entry.status || 'Paid';
 
   document.getElementById('entryForm').dataset.editId = id;
   document.getElementById('newDescription').focus();
@@ -1078,6 +1083,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 // ✅ Initialization
+// ✅ Initialization
 window.addEventListener('DOMContentLoaded', async () => {
   await fetchEntries();
   await loadInitialBankBalances();
@@ -1087,6 +1093,9 @@ window.addEventListener('DOMContentLoaded', async () => {
   populateFilters();
   renderEntries();
   renderBankBalanceForm();
+
+  // ✅ Add this line for status filter
+  document.getElementById('statusFilter')?.addEventListener('change', renderEntries);
 });
 
 // ✅ Lockable inputs
