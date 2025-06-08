@@ -1,14 +1,14 @@
+const express = require('express');
+const app = express();               // ✅ First define app
+const cors = require('cors');
+
+// ✅ Logging middleware — now safe
 app.use((req, res, next) => {
   console.log(`📥 ${req.method} ${req.path}`);
   next();
 });
 
-
-const express = require('express');
-const app = express();
-const cors = require('cors');
-
-// ✅ CORRECT CORS CONFIG
+// ✅ CORS
 const corsOptions = {
   origin: 'https://we-search.ch',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -16,13 +16,13 @@ const corsOptions = {
   credentials: true,
   optionsSuccessStatus: 204
 };
-
-// ✅ MUST be before all routes
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // 👈 Important for preflight
+app.options('*', cors(corsOptions));
 
+// ✅ JSON parsing
 app.use(express.json());
 
+// Optional: second logger
 app.use((req, res, next) => {
   console.log(`🔍 ${req.method} ${req.url}`);
   next();
