@@ -632,19 +632,27 @@ function renderBankBalanceForm() {
     return;
   }
 
-  // ✅ Calculate net changes for each bank
-  const changes = {};
-  banks.forEach(bank => changes[bank] = 0);
+// ✅ Apply status filtering for balance calculations
+const statusFilter = document.getElementById('statusFilter')?.value || 'All';
 
-  entries.forEach(e => {
-    const bank = e.bank;
-    const type = (e.type || '').trim().toLowerCase();
-    const amount = Math.abs(parseFloat(e.amount)) || 0;
+const changes = {};
+banks.forEach(bank => changes[bank] = 0);
 
-    if (changes[bank] != null) {
-      changes[bank] += (type === 'income') ? amount : -amount;
-    }
-  });
+entries.forEach(e => {
+  const bank = e.bank;
+  const type = (e.type || '').trim().toLowerCase();
+  const amount = Math.abs(parseFloat(e.amount)) || 0;
+  const status = e.status || 'Open';
+
+  const include =
+    statusFilter === 'All' ||
+    (statusFilter === 'Paid' && status === 'Paid') ||
+    (statusFilter === 'Open' && status === 'Open');
+
+  if (include && bank in changes) {
+    changes[bank] += type === 'income' ? amount : -amount;
+  }
+});
 
   // Create table HTML
   let html = '<table><thead><tr><th></th>';
@@ -1103,7 +1111,9 @@ window.addEventListener('DOMContentLoaded', async () => {
   renderBankBalanceForm();
 
   // ✅ Add this line for status filter
-  document.getElementById('statusFilter')?.addEventListener('change', renderEntries);
+document.getElementById('statusFilter')?.addEventListener('change', () => {
+  renderEntries();             // update the visible entries
+  renderBankBalanceForm();     // update the bank balance based on filtered entries
 });
 
 // ✅ Lockable inputs
