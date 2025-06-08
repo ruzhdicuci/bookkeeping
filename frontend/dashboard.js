@@ -237,6 +237,9 @@ const entryDay = e.date?.split('-')[2];
 (amountSearch.value === '' || (e.amount + '').toLowerCase().includes(amountSearch.value.toLowerCase()))
 );
   });
+
+
+  entryTableBody.innerHTML = '';
 filtered.forEach(e => {
   const row = document.createElement('tr');
   const editForm = document.getElementById('entryForm');
@@ -259,13 +262,13 @@ filtered.forEach(e => {
     <td>
       ${
         isEditing
-          ? `<button onclick="updateStatus('${e._id}', '${e.status === 'Paid' ? 'Open' : 'Paid'}')" 
+          ? `<button onclick="updateStatus('${e._id}', '${e.status === 'Paid' ? 'Open' : 'Paid'}')"
                style="background:${e.status === 'Paid' ? '#13a07f' : '#ff695d'}; color:white; border:none; border-radius:5px;">
-             ${e.status}
-           </button>`
+               ${e.status}
+             </button>`
           : `<span style="background:${e.status === 'Paid' ? '#13a07f' : '#ff695d'}; color:white; padding:5px 10px; border-radius:5px;">
-             ${e.status}
-           </span>`
+               ${e.status}
+             </span>`
       }
     </td>
   `;
