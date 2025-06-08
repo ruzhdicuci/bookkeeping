@@ -1,13 +1,13 @@
 const express = require('express');
 const app = express();               // ✅ First define app
-const cors = require('cors');
+
 
 // ✅ Logging middleware — now safe
 app.use((req, res, next) => {
   console.log(`📥 ${req.method} ${req.path}`);
   next();
 });
-
+const cors = require('cors');
 // ✅ CORS
 const corsOptions = {
   origin: 'https://we-search.ch',
