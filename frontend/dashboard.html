@@ -199,8 +199,8 @@
 <label>
   Status:
   <select id="newStatus">
-    <option value="Paid" selected>Paid</option>
     <option value="Open">Open</option>
+    <option value="Paid">Paid</option>
   </select>
 </label>
 
@@ -454,7 +454,8 @@ const entry = {
   type: document.getElementById('newType').value,
   person: document.getElementById('newPerson').value,
   bank: document.getElementById('newBank').value,
-  status: document.getElementById('newStatus').value // ✅ capture the status
+  status: document.getElementById('newStatus')?.value || 'Paid' // ✅ add this
+
 };
 
     try {
