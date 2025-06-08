@@ -242,6 +242,7 @@ const entryDay = e.date?.split('-')[2];
   entryTableBody.innerHTML = '';
   filtered.forEach(e => {
     const row = document.createElement('tr');
+    const isEditing = document.getElementById('entryForm').dataset.editId === e._id;
 row.innerHTML = `
   <td>${e.date}</td>
   <td>${e.description}</td>
