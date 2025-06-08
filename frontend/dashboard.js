@@ -1,4 +1,4 @@
-
+const apiBase = 'https://bookkeeping-i8e0.onrender.com';
 const token = localStorage.getItem('token');
 
 if (!token) {
@@ -6,7 +6,7 @@ if (!token) {
   // Optionally redirect:
   // window.location.href = '/login.html';
 }
-const backend = 'https://bookkeeping-i8e0.onrender.com';
+
 
 
 
@@ -240,20 +240,27 @@ const entryDay = e.date?.split('-')[2];
   entryTableBody.innerHTML = '';
   filtered.forEach(e => {
     const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>${e.date}</td>
-      <td>${e.description}</td>
-      <td>${e.amount}</td>
-      <td>${e.currency || ''}</td>
-      <td>${e.type}</td>
-      <td>${e.person}</td>
-      <td>${e.bank}</td>
-      <td>${e.category || ''}</td>
-      <td>
-        <button onclick="editEntry('${e._id}')">✏️</button>
-        <button onclick="deleteEntry('${e._id}')">🗑️</button>
-      </td>
-    `;
+row.innerHTML = `
+  <td>${e.date}</td>
+  <td>${e.description}</td>
+  <td>${e.amount}</td>
+  <td>${e.currency || ''}</td>
+  <td>${e.type}</td>
+  <td>${e.person}</td>
+  <td>${e.bank}</td>
+  <td>${e.category || ''}</td>
+  <td>
+    <button onclick="editEntry('${e._id}')">✏️</button>
+    <button onclick="duplicateEntry('${e._id}')">📄</button>
+    <button onclick="deleteEntry('${e._id}')">🗑️</button>
+  </td>
+  <td>
+    <button onclick="updateStatus('${e._id}', '${e.status === 'Paid' ? 'Open' : 'Paid'}')"
+      style="background-color: ${e.status === 'Paid' ? '#13a07f' : '#ffab00'}; color: white;">
+      ${e.status || 'Open'}
+    </button>
+  </td>
+`;
     entryTableBody.appendChild(row);
   });
 
@@ -294,7 +301,29 @@ function editEntry(id) {
 }
 
 
+async function updateStatus(id, newStatus) {
+  console.log("Sending status update", id, newStatus); // ✅ Log request info
 
+  const res = await fetch(`${apiBase}/api/entries/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify({ status: newStatus })
+  });
+
+  const data = await res.clone().json(); // Clone so we can read response twice
+  console.log("Server response", data);  // ✅ Log server response
+
+  if (res.ok) {
+    const index = entries.findIndex(e => e._id === id);
+    if (index !== -1) entries[index] = data;
+    renderEntries();
+  } else {
+    alert("❌ Failed to update status");
+  }
+}
 
 
 async function saveEdit(row) {
@@ -343,6 +372,32 @@ async function saveEdit(row) {
   } catch (err) {
     console.error('❌ Save error:', err);
     alert('❌ Could not save changes.');
+  }
+}
+
+async function duplicateEntry(id) {
+  const entry = entries.find(e => e._id === id);
+  if (!entry) return alert("Entry not found");
+
+  const copy = { ...entry };
+  delete copy._id;
+
+  // Optional: mark the description to show it's a copy
+  copy.description = copy.description + ' (Copy)';
+
+  const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(copy)
+  });
+
+  if (res.ok) {
+    await fetchEntries(); // ✅ Reload entries list after duplication
+  } else {
+    alert("❌ Failed to duplicate entry");
   }
 }
 
@@ -451,6 +506,8 @@ document.getElementById('importCSV').addEventListener('change', async (e) => {
   renderBankBalanceForm();
 });
 
+
+
 function exportCombinedCSV() {
   const entryHeaders = ['date', 'description', 'amount', 'currency', 'type', 'person', 'bank'];
   const entryRows = entries.map(e => [
@@ -468,17 +525,23 @@ function exportCombinedCSV() {
     initialRow.push(initialBankBalances[bank] ?? 0);
   });
 
-  // Calculate changes
-  const changes = {};
-  banks.forEach(bank => changes[bank] = 0);
-  entries.forEach(e => {
-    if (e.bank in changes) {
-      changes[e.bank] += e.type === 'income' ? e.amount : -e.amount;
-    }
-  });
-  banks.forEach(bank => {
-    changeRow.push((changes[bank] ?? 0).toFixed(2));
-  });
+  // Calculate net balance changes per bank
+const changes = {};
+banks.forEach(bank => (changes[bank] = 0));
+
+entries.forEach(e => {
+  const bank = e.bank;
+  const type = (e.type || '').trim().toLowerCase();
+  const amount = Math.abs(parseFloat(e.amount)) || 0;
+
+  if (changes[bank] != null) {
+    changes[bank] += (type === 'income') ? amount : -amount;
+  }
+});
+
+banks.forEach(bank => {
+  changeRow.push(changes[bank].toFixed(2));
+});
 
   // Build CSV
   const csvSections = [];
@@ -490,12 +553,17 @@ function exportCombinedCSV() {
   csvSections.push(initialRow.join(','));
   csvSections.push(changeRow.join(','));
 
+  // Generate timestamped filename
+  const now = new Date();
+  const timestamp = now.toISOString().replace(/[:.]/g, '-'); // e.g. "2025-06-08T11-45-30-123Z"
+  const filename = `bookkeeping_combined_${timestamp}.csv`;
+
   const csvContent = csvSections.join('\n');
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.setAttribute('href', url);
-  link.setAttribute('download', 'bookkeeping_combined.csv');
+  link.setAttribute('download', filename);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -551,9 +619,9 @@ function renderBankBalanceForm() {
     return;
   }
 
-  // Collect net changes
+  // ✅ Calculate net changes for each bank
   const changes = {};
-  banks.forEach(bank => (changes[bank] = 0));
+  banks.forEach(bank => changes[bank] = 0);
 
   entries.forEach(e => {
     const bank = e.bank;
@@ -590,7 +658,6 @@ function renderBankBalanceForm() {
   html += '</tr>';
   html += '</tbody></table>';
 
-
   // ✅ Calculate totals
   let totalPositive = 0;
   let totalNegative = 0;
@@ -600,30 +667,29 @@ function renderBankBalanceForm() {
   });
 
   // ✅ Append summary
-html += `
-  <div style="display: flex; align-items: center; gap: 1.5rem; margin-top: 1rem; flex-wrap: wrap;">
-    <button id="saveBankBalances" onclick="saveBankBalances()">Save</button>
-    <button id="lockbalance" onclick="toggleLock()">${window.initialLocked ? 'Unlock' : 'Lock'}</button>
-    
-    <div style="display: flex; gap: 1rem; align-items: center;">
-      <span>Total Plus:&nbsp; 
-        <span style="color: rgb(15, 158, 123); font-size: 22px; ">+${totalPositive.toFixed(2)}</span>
-      </span>&nbsp;&nbsp;
-      <span>Total Minus:&nbsp; 
-        <span style="color: rgb(254, 110, 38); font-size: 22px; ">${totalNegative.toFixed(2)}</span>
-      </span>
+  html += `
+    <div style="display: flex; align-items: center; gap: 1.5rem; margin-top: 1rem; flex-wrap: wrap;">
+      <button id="saveBankBalances" onclick="saveBankBalances()">Save</button>
+      <button id="lockbalance" onclick="toggleLock()">${window.initialLocked ? 'Unlock' : 'Lock'}</button>
+      
+      <div style="display: flex; gap: 1rem; align-items: center;">
+        <span>Total Plus:&nbsp; 
+          <span style="color: rgb(15, 158, 123); font-size: 22px;">+${totalPositive.toFixed(2)}</span>
+        </span>
+        <span>Total Minus:&nbsp; 
+          <span style="color: rgb(254, 110, 38); font-size: 22px;">${totalNegative.toFixed(2)}</span>
+        </span>
+      </div>
     </div>
-  </div>
-`;
+  `;
 
   container.innerHTML = html;
-    // ✅ Trigger update for dependent components (like credit limit table)
+
+  // ✅ Trigger update for dependent components
   window.dispatchEvent(new Event('bankBalanceUpdated'));
 }
 
 window.initialLocked = true;
-
-
 
 async function saveBankBalances() {
   const inputs = document.querySelectorAll('[data-bank]');
@@ -1100,9 +1166,7 @@ document.getElementById("limitPlusTotal").value = limitPlusTotal.toFixed(2);
 // ✅ Load credit limits from backend
 async function loadCreditLimits() {
   try {
-    const res = await fetch(`${backend}/api/limits`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
+   const res = await fetch(`https://bookkeeping-i8e0.onrender.com/api/limits`, { headers: { Authorization: `Bearer ${token}` } });
     const data = await res.json();
 
     limitInputs.ubs.value = (data.ubs ?? 3000).toString();
