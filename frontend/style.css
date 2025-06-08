@@ -203,8 +203,9 @@ text-align: left;
 
 
 #th3 {
-  background: white;
-color: rgb(16, 156, 72);
+  background: rgb(245, 245, 243);
+
+
 }
 
 
@@ -1347,7 +1348,7 @@ font-size: 1rem;
     }
     canvas {
       display: block;
-      max-width: 100%;
+      width: 1200px;
       margin: 2rem auto;
       background: #fff;
       border: 1px solid #ddd;

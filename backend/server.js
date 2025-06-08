@@ -141,7 +141,7 @@ app.post('/api/entries', auth, async (req, res) => {
 });
 
 app.put('/api/entries/:id', auth, async (req, res) => {
-  console.log("🔄 Updating entry", req.params.id, req.body);  // ✅ Add this
+  console.log("🛠️ Received update:", req.body); // 👈 see what's coming in
   const updated = await Entry.findOneAndUpdate(
     { _id: req.params.id, userId: req.userId },
     req.body,
@@ -149,7 +149,6 @@ app.put('/api/entries/:id', auth, async (req, res) => {
   );
   res.json(updated);
 });
-
 
 app.delete('/api/entries/delete-all', auth, async (req, res) => {
   console.log("🧹 Reached DELETE-ALL route");

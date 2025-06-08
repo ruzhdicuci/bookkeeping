@@ -198,7 +198,7 @@
 
 <label>
   Status:
-  <select id="newStatus">
+  <select id="newStatus" required>
     <option value="Open">Open</option>
     <option value="Paid">Paid</option>
   </select>
@@ -411,7 +411,7 @@
        <th id="th3">Category</th>
       
     <th id="th3">Actions</th>
-     <th>Status</th>
+     <th id="th3">Status</th>
   </tr>
   
 
@@ -433,31 +433,32 @@
   <div id="dashboardTab" class="tab-content active">
    
   <script>
+
 // Add entries
-  document.getElementById('entryForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
+document.getElementById('entryForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
 
-    const inputDate = document.getElementById('newDate')._flatpickr?.selectedDates[0];
-    function formatDateToLocalISO(date) {
-      const offsetDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
-      return offsetDate.toISOString().split('T')[0];
-    }
-    const isoDate = inputDate ? formatDateToLocalISO(inputDate) : '';
+  const inputDate = document.getElementById('newDate')._flatpickr?.selectedDates[0];
+  function formatDateToLocalISO(date) {
+    const offsetDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+    return offsetDate.toISOString().split('T')[0];
+  }
+  const isoDate = inputDate ? formatDateToLocalISO(inputDate) : '';
 
-    console.log('📥 Submitting entry...');
-const entry = {
-  date: isoDate,
-  description: document.getElementById('newDescription').value,
-  category: document.getElementById('newCategory').value,
-  amount: parseFloat(document.getElementById('newAmount').value),
-  currency: document.getElementById('newCurrency').value,
-  type: document.getElementById('newType').value,
-  person: document.getElementById('newPerson').value,
-  bank: document.getElementById('newBank').value,
-  status: document.getElementById('newStatus')?.value || 'Paid' // ✅ add this
-
-};
-
+  console.log('📥 Submitting entry...');
+  const entry = {
+    date: isoDate,
+    description: document.getElementById('newDescription').value,
+    category: document.getElementById('newCategory').value,
+    amount: parseFloat(document.getElementById('newAmount').value),
+    currency: document.getElementById('newCurrency').value,
+    type: document.getElementById('newType').value,
+    person: document.getElementById('newPerson').value,
+    bank: document.getElementById('newBank').value,
+    status: document.getElementById('newStatus')?.value || 'Paid' // ✅ Add this line
+  };
+// ✅ Log the entry before sending
+console.log("🧾 Entry being submitted:", entry);
     try {
       const form = document.getElementById('entryForm');
       const editId = form.dataset.editId;
@@ -467,7 +468,8 @@ const entry = {
         ? `https://bookkeeping-i8e0.onrender.com/api/entries/${editId}`
         : 'https://bookkeeping-i8e0.onrender.com/api/entries';
 
-      console.log('📦 Payload being sent:', entry);
+ console.log('🧾 Entry being submitted:', entry);
+
       const res = await fetch(url, {
         method,
         headers: {

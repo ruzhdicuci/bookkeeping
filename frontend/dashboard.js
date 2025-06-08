@@ -299,7 +299,7 @@ function editEntry(id) {
   document.getElementById('newBank').value = entry.bank;
 
   // ✅ Add this to support status editing
-  document.getElementById('newStatus').value = entry.status || 'Paid';
+  document.getElementById('newStatus').value = entry.status || 'aid';
 
   document.getElementById('entryForm').dataset.editId = id;
   document.getElementById('newDescription').focus();
