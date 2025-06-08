@@ -300,9 +300,8 @@ function editEntry(id) {
   document.getElementById('newDescription').focus();
 }
 
-
 async function updateStatus(id, newStatus) {
-  console.log("Sending status update", id, newStatus); // ✅ Log request info
+  console.log("Sending status update", id, newStatus);
 
   const res = await fetch(`${apiBase}/api/entries/${id}`, {
     method: 'PUT',
@@ -313,18 +312,19 @@ async function updateStatus(id, newStatus) {
     body: JSON.stringify({ status: newStatus })
   });
 
-  const data = await res.clone().json(); // Clone so we can read response twice
-  console.log("Server response", data);  // ✅ Log server response
+  const data = await res.json();
+  console.log("Server response", data);
 
   if (res.ok) {
     const index = entries.findIndex(e => e._id === id);
-    if (index !== -1) entries[index] = data;
-    renderEntries();
+    if (index !== -1) {
+      entries[index] = data;
+      renderEntries(); // Re-render the table with updated status
+    }
   } else {
     alert("❌ Failed to update status");
   }
 }
-
 
 async function saveEdit(row) {
   const id = row.dataset.id;

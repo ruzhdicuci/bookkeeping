@@ -428,16 +428,17 @@
     const isoDate = inputDate ? formatDateToLocalISO(inputDate) : '';
 
     console.log('📥 Submitting entry...');
-    const entry = {
-      date: isoDate,
-      description: document.getElementById('newDescription').value,
-      category: document.getElementById('newCategory').value,
-      amount: parseFloat(document.getElementById('newAmount').value),
-      currency: document.getElementById('newCurrency').value,
-      type: document.getElementById('newType').value,
-      person: document.getElementById('newPerson').value,
-      bank: document.getElementById('newBank').value,
-    };
+ const entry = {
+  date: isoDate,
+  description: document.getElementById('newDescription').value,
+  category: document.getElementById('newCategory').value,
+  amount: parseFloat(document.getElementById('newAmount').value),
+  currency: document.getElementById('newCurrency').value,
+  type: document.getElementById('newType').value,
+  person: document.getElementById('newPerson').value,
+  bank: document.getElementById('newBank').value,
+  status: 'Open' // ✅ Add this
+};
 
     try {
       const form = document.getElementById('entryForm');
