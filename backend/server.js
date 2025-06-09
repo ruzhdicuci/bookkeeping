@@ -12,14 +12,11 @@ if (!MONGO_URI) {
   process.exit(1);
 }
 
-// ✅ Logging for MONGO_URI (for debugging only, remove later)
-console.log('🔧 MONGO_URI =', MONGO_URI);
 
 // ✅ MongoDB Connection
 mongoose.connect(MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-  keepAlive: true,
   socketTimeoutMS: 45000
 }).then(() => {
   console.log('✅ MongoDB connected');
