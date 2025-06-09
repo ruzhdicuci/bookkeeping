@@ -1,5 +1,11 @@
-require('dotenv').config(); // Only needed if testing locally
+require('dotenv').config(); // Only needed for local development
 const mongoose = require('mongoose');
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+
 const MONGO_URI = process.env.MONGO_URI;
 
 if (!MONGO_URI) {
@@ -7,20 +13,22 @@ if (!MONGO_URI) {
   process.exit(1);
 }
 
-const express = require('express');
-const app = express(); // ✅ define app first
-const cors = require('cors');
-const path = require('path');
-const mongoose = require('mongoose');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
+// ✅ Logging for MONGO_URI (for debugging only, remove later)
+console.log('🔧 MONGO_URI =', MONGO_URI);
 
-// Logging middleware - now safe
-app.use((req, res, next) => {
-  console.log(`📥 ${req.method} ${req.path}`);
-  next();
+// ✅ MongoDB Connection
+mongoose.connect(MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  keepAlive: true,
+  socketTimeoutMS: 45000
+}).then(() => {
+  console.log('✅ MongoDB connected');
+}).catch(err => {
+  console.error('❌ MongoDB initial connection error:', err);
 });
 
+const app = express(); // ✅ Define app AFTER all setup
 // CORS setup
 const corsOptions = {
   origin: 'https://we-search.ch',
@@ -259,21 +267,3 @@ app.post('/api/limits', auth, async (req, res) => {
 
 
 
-mongoose.connect(MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-}).then(() => {
-  console.log('✅ MongoDB connected');
-}).catch(err => {
-  console.error('❌ MongoDB initial connection error:', err);
-});
-
-mongoose.connection.on('disconnected', () => {
-  console.warn('⚠️ MongoDB disconnected. Attempting to reconnect...');
-  setTimeout(() => {
-    mongoose.connect(MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true
-    });
-  }, 5000);
-});
