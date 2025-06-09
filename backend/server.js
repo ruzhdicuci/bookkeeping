@@ -246,3 +246,19 @@ app.post('/api/limits', auth, async (req, res) => {
   res.json({ success: true });
 });
 
+
+
+mongoose.connection.on('disconnected', () => {
+  console.warn('⚠️ MongoDB disconnected. Attempting to reconnect...');
+  setTimeout(() => {
+    mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+  }, 5000); // retry after 5 sec
+});
+
+
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  keepAlive: true,
+  socketTimeoutMS: 45000
+});
