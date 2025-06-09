@@ -1384,8 +1384,11 @@ border-radius: 10px;
   position: relative;
   display: inline-block;
 }
-.dropdown-toggle {
+.dropdown2 .dropdown-toggle {
   padding: 5px 10px;
+ 
+  border: 1px solid #ccc;
+  cursor: pointer;
 }
 .dropdown-content2 {
   display: none;
@@ -1396,7 +1399,7 @@ padding-bottom: 10px;
   overflow-y: auto;
 padding-top: 15px;
   overflow-y: auto;
-  z-index: 999;
+  z-index: 1000;
     border-radius: 10px;
  
   box-shadow: 0 4px 6px rgba(165, 163, 163, 0.931);
@@ -1408,7 +1411,7 @@ padding-top: 15px;
 
 
 .dropdown-content2 label {
-  display: flex;
+  display: block;
 user-select: none;
   justify-content: flex-start;
   width: 160px;
