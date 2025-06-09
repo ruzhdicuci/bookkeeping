@@ -115,10 +115,10 @@
         <option value="line">Line</option>
       </select>
 
-      <label for="filterPerson">Person:</label>
-      <select id="filterPerson">
-        <option value="All">All</option>
-      </select>
+    <div class="dropdown">
+  <button class="dropdown-toggle">👤 Person</button>
+  <div class="dropdown-content" id="personDropdown"></div>
+</div>
 
       <button onclick="downloadChart('monthlyChart')">⬇️ Monthly</button>
       <button onclick="downloadChart('personChart')">⬇️ Person</button>
@@ -521,11 +521,12 @@ renderBankBalanceForm();                // ✅ re-render balance inputs
       const entries = (window.entries || []).filter(e => typeof e === 'object');
       const monthlyIncome = {}, monthlyExpense = {}, personIncome = {}, personExpense = {}, expenseByCategory = {};
 
-      const selectedPerson = document.getElementById('filterPerson')?.value || 'All';
+      const selectedPersons = Array.from(document.querySelectorAll('.personChartFilter:checked')).map(cb => cb.value);
+
 
       entries.forEach(e => {
     if (categoryFilter && categoryFilter !== 'All' && (e.category || 'Uncategorized') !== categoryFilter) return;
-        if (selectedPerson !== 'All' && e.person !== selectedPerson) return;
+    if (selectedPersons.length && !selectedPersons.includes(e.person)) return;
 
         const month = e.date?.slice(0, 7);
         const person = e.person || 'Unknown';
@@ -624,13 +625,19 @@ renderBankBalanceForm();                // ✅ re-render balance inputs
       populatePersonFilter(persons);
     }
 
-    function populatePersonFilter(persons) {
-  populateCategoryFilter(window.entries || []);
-      const select = document.getElementById('filterPerson');
-      const current = select.value;
-      select.innerHTML = '<option value="All">All</option>' + persons.map(p => `<option value="${p}">${p}</option>`).join('');
-      select.value = current;
-    }
+function populatePersonFilter(persons) {
+  const container = document.getElementById('personDropdown');
+  if (!container) return;
+
+  container.innerHTML = persons.map(p => `
+    <label style="display:block">
+      <input type="checkbox" class="personChartFilter" value="${p}" checked />
+      ${p}
+    </label>
+  `).join('');
+
+  container.addEventListener('change', drawCharts);
+}
 
     function populateCategoryFilter(entries) {
   const select = document.getElementById('categoryFilter');
