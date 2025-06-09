@@ -1371,7 +1371,9 @@ border-radius: 10px;
 
 
     
-#duplicate:hover {
-background-color: red;
-
+.action-btn:hover {
+  background-color: #ffd4d4;
+  border: 1px solid red;
+  cursor: pointer;
+  transform: scale(1.1);
 }
