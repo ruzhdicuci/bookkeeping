@@ -688,21 +688,29 @@ entries.forEach(e => {
   });
 
   // ✅ Append summary
-  html += `
-    <div style="display: flex; align-items: center; gap: 1.5rem; margin-top: 1rem; flex-wrap: wrap;">
-      <button id="saveBankBalances" onclick="saveBankBalances()">Save</button>
-      <button id="lockbalance" onclick="toggleLock()">${window.initialLocked ? 'Unlock' : 'Lock'}</button>
-      
-      <div style="display: flex; gap: 1rem; align-items: center;">
-        <span>Total Plus:&nbsp; 
-          <span style="color: rgb(15, 158, 123); font-size: 22px;">+${totalPositive.toFixed(2)}</span>
+const difference = totalPositive + totalNegative;
+const formattedDifference = (difference >= 0 ? '+' : '') + difference.toFixed(2);
+
+html += `
+  <div style="display: flex; align-items: center; gap: 1.5rem; margin-top: 1rem; flex-wrap: wrap;">
+    <button id="saveBankBalances" onclick="saveBankBalances()">Save</button>
+    <button id="lockbalance" onclick="toggleLock()">${window.initialLocked ? 'Unlock' : 'Lock'}</button>
+
+    <div style="display: flex; gap: 1.5rem; align-items: center;">
+      <span>Total Plus:&nbsp; 
+        <span style="color: #00bfff; font-size: 22px;">+${totalPositive.toFixed(2)}</span>
+      </span>
+      <span>Total Minus:&nbsp; 
+        <span style="color: rgb(254, 110, 38); font-size: 22px;">${totalNegative.toFixed(2)}</span>
+      </span>
+      <span>Difference:&nbsp;
+        <span style="color: ${difference >= 0 ? '#13a07f' : '#ff695d'}; font-size: 22px;">
+          ${formattedDifference}
         </span>
-        <span>Total Minus:&nbsp; 
-          <span style="color: rgb(254, 110, 38); font-size: 22px;">${totalNegative.toFixed(2)}</span>
-        </span>
-      </div>
+      </span>
     </div>
-  `;
+  </div>
+`;
 
   container.innerHTML = html;
 

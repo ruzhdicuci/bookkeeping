@@ -490,7 +490,7 @@ border: 1px solid #373535;
   padding-right: 30px;
   padding-top: 10px;
   padding-bottom: 20px;
-   width: 1290px;
+
    margin-bottom: 10px;
 
 }
@@ -1025,8 +1025,8 @@ color: rgb(213, 79, 79);
 
 .styled-select {
   position: relative;
- height: 23px;
- margin-top: 8px;
+ height: 22px;
+ margin-top: 6px;
    border: 1px solid #f4f2f2;
   border-radius: 4px;
   font-size: 1rem;
