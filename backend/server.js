@@ -1,3 +1,12 @@
+require('dotenv').config(); // Only needed if testing locally
+const mongoose = require('mongoose');
+const MONGO_URI = process.env.MONGO_URI;
+
+if (!MONGO_URI) {
+  console.error('❌ MONGO_URI not set. Please check environment variables.');
+  process.exit(1);
+}
+
 const express = require('express');
 const app = express(); // ✅ define app first
 const cors = require('cors');
@@ -248,13 +257,11 @@ app.post('/api/limits', auth, async (req, res) => {
 
 
 
-const MONGO_URI = process.env.MONGO_URI;
+
 
 mongoose.connect(MONGO_URI, {
   useNewUrlParser: true,
-  useUnifiedTopology: true,
-  keepAlive: true,
-  socketTimeoutMS: 45000
+  useUnifiedTopology: true
 }).then(() => {
   console.log('✅ MongoDB connected');
 }).catch(err => {
@@ -266,10 +273,7 @@ mongoose.connection.on('disconnected', () => {
   setTimeout(() => {
     mongoose.connect(MONGO_URI, {
       useNewUrlParser: true,
-      useUnifiedTopology: true,
-      keepAlive: true,
-      socketTimeoutMS: 45000
+      useUnifiedTopology: true
     });
-  }, 5000); // wait 5 seconds before retry
+  }, 5000);
 });
-
