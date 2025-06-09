@@ -490,7 +490,7 @@ border: 1px solid #373535;
   padding-right: 30px;
   padding-top: 10px;
   padding-bottom: 20px;
-
+   width: 1290px;
    margin-bottom: 10px;
 
 }
@@ -1301,11 +1301,7 @@ font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
   height: 1px;
 }
 
-.sections2 {
-  overflow-x: auto;
-  white-space: nowrap;
-  border: 1px solid #ddd;
-}
+
 
 
 .tabs {
@@ -1374,4 +1370,8 @@ border-radius: 10px;
 
 
 
+    
+#duplicate:hover {
+background-color: red;
 
+}

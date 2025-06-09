@@ -255,9 +255,9 @@ filtered.forEach(e => {
     <td>${e.bank}</td>
     <td>${e.category || ''}</td>
     <td>
-      <button onclick="editEntry('${e._id}')">✏️</button>
-      <button onclick="duplicateEntry('${e._id}')">📄</button>
-      <button onclick="deleteEntry('${e._id}')">🗑️</button>
+      <button class="action-btn" onclick="editEntry('${e._id}')" title="Edit">✏️</button>
+        <button class="action-btn" onclick="duplicateEntry('${e._id}')" title="Duplicate">📄</button>
+      <button class="action-btn" onclick="deleteEntry('${e._id}')" title="Delete">🗑️</button>
     </td>
     <td>
       ${
@@ -1277,4 +1277,6 @@ function clearSearch(id) {
   el.value = '';
   renderEntries();
 }
+
+
 
