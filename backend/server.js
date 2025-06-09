@@ -1,4 +1,3 @@
-require('dotenv').config(); // Only needed for local development
 const mongoose = require('mongoose');
 const express = require('express');
 const cors = require('cors');
