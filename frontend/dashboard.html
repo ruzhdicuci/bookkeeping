@@ -521,130 +521,139 @@ renderBankBalanceForm();                // ✅ re-render balance inputs
       if (tabId === 'chartsTab') drawCharts();
     }
 
-    function drawCharts() {
+function drawCharts() {
   const categoryFilter = document.getElementById('categoryFilter')?.value || 'All';
-      const entries = (window.entries || []).filter(e => typeof e === 'object');
-      const monthlyIncome = {}, monthlyExpense = {}, personIncome = {}, personExpense = {}, expenseByCategory = {};
+  const entries = (window.entries || []).filter(e => typeof e === 'object');
 
+  const monthlyIncome = {}, monthlyExpense = {}, personIncome = {}, personExpense = {}, expenseByCategory = {};
   const selectedPersons = Array.from(document.querySelectorAll('.personChartFilter:checked')).map(cb => cb.value);
 
-const incomeTotal = Object.values(monthlyIncome).reduce((a, b) => a + b, 0);
-const expenseTotal = Object.values(monthlyExpense).reduce((a, b) => a + b, 0);
-const diff = incomeTotal - expenseTotal;
+  entries.forEach(e => {
+    if (categoryFilter !== 'All' && (e.category || 'Uncategorized') !== categoryFilter) return;
+    if (selectedPersons.length && !selectedPersons.includes(e.person)) return;
 
-document.getElementById('chartSummary').innerHTML = `
-  Total Income: <span style="color:green">+${incomeTotal.toFixed(2)}</span> | 
-  Total Expense: <span style="color:red">-${expenseTotal.toFixed(2)}</span> | 
-  Difference: <strong style="color:${diff >= 0 ? 'green' : 'red'}">${diff >= 0 ? '+' : ''}${diff.toFixed(2)}</strong>
-`;
-const summaryEl = document.getElementById('chartSummary');
-if (summaryEl) {
-  summaryEl.innerHTML = `
-    Total Income: <span style="color:green">+${incomeTotal.toFixed(2)}</span> |
-    Total Expense: <span style="color:red">-${expenseTotal.toFixed(2)}</span> |
-    Difference: <strong style="color:${diff >= 0 ? 'green' : 'red'}">${diff >= 0 ? '+' : ''}${diff.toFixed(2)}</strong>
-  `;
-}
-      entries.forEach(e => {
-    if (categoryFilter && categoryFilter !== 'All' && (e.category || 'Uncategorized') !== categoryFilter) return;
-  if (selectedPersons.length && !selectedPersons.includes(e.person)) return;
+    const month = e.date?.slice(0, 7);
+    const person = e.person || 'Unknown';
+    const value = parseFloat(e.amount) || 0;
+    const key = e.category || 'Other';
 
-        const month = e.date?.slice(0, 7);
-        const person = e.person || 'Unknown';
-        const value = parseFloat(e.amount) || 0;
-        const key = e.category || 'Other';
-
-        if (e.type === 'Income') {
-          monthlyIncome[month] = (monthlyIncome[month] || 0) + value;
-          personIncome[person] = (personIncome[person] || 0) + value;
-        } else if (e.type === 'Expense') {
-          monthlyExpense[month] = (monthlyExpense[month] || 0) + value;
-          personExpense[person] = (personExpense[person] || 0) + value;
-          expenseByCategory[key] = (expenseByCategory[key] || 0) + value;
-        }
-      });
-
-      const months = [...new Set([...Object.keys(monthlyIncome), ...Object.keys(monthlyExpense)])].sort();
-      const persons = [...new Set([...Object.keys(personIncome), ...Object.keys(personExpense)])];
-      const categories = Object.keys(expenseByCategory);
-
-      const incomeMonthVals = months.map(m => monthlyIncome[m] || 0);
-      const expenseMonthVals = months.map(m => monthlyExpense[m] || 0);
-      const incomePersonVals = persons.map(p => personIncome[p] || 0);
-      const expensePersonVals = persons.map(p => personExpense[p] || 0);
-      const pieValues = categories.map(k => expenseByCategory[k]);
-
-      const type = document.getElementById('chartType').value;
-      const ctx1 = document.getElementById('monthlyChart').getContext('2d');
-      const ctx2 = document.getElementById('personChart').getContext('2d');
-      const ctx3 = document.getElementById('comparisonChart').getContext('2d');
-      const ctx4 = document.getElementById('pieChart').getContext('2d');
-
-      monthlyChartInstance?.destroy();
-      personChartInstance?.destroy();
-      comparisonChartInstance?.destroy();
-      pieChartInstance?.destroy();
-
-      monthlyChartInstance = new Chart(ctx1, {
-        type,
-        data: {
-          labels: months,
-          datasets: [
-            { label: 'Income', data: incomeMonthVals, backgroundColor: '#4caf50', borderColor: '#2e7d32', borderWidth: 1 },
-            { label: 'Expense', data: expenseMonthVals, backgroundColor: '#f44336', borderColor: '#c62828', borderWidth: 1 }
-          ]
-        },
-        options: chartOptions()
-      });
-
-      personChartInstance = new Chart(ctx2, {
-        type,
-        data: {
-          labels: persons,
-          datasets: [
-            { label: 'Income', data: incomePersonVals, backgroundColor: '#4caf50', borderColor: '#2e7d32', borderWidth: 1 },
-            { label: 'Expense', data: expensePersonVals, backgroundColor: '#f44336', borderColor: '#c62828', borderWidth: 1 }
-          ]
-        },
-        options: chartOptions()
-      });
-
-      comparisonChartInstance = new Chart(ctx3, {
-        type,
-        data: {
-          labels: persons,
-          datasets: [
-            { label: 'Net Balance', data: persons.map(p => (personIncome[p] || 0) - (personExpense[p] || 0)), backgroundColor: '#2196f3', borderColor: '#1976d2', borderWidth: 1 }
-          ]
-        },
-        options: chartOptions()
-      });
-
-      pieChartInstance = new Chart(ctx4, {
-        type: 'pie',
-        data: {
-          labels: categories,
-          datasets: [{
-            label: 'Spending Distribution',
-            data: pieValues,
-            backgroundColor: categories.map((_, i) => `hsl(${i * 35}, 70%, 60%)`)
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            tooltip: {
-              callbacks: {
-                label: context => `${context.label}: CHF ${context.raw.toFixed(2)}`
-              }
-            },
-            legend: { position: 'bottom' }
-          }
-        }
-      });
-
-      populatePersonFilter(persons);
+    if (e.type === 'Income') {
+      monthlyIncome[month] = (monthlyIncome[month] || 0) + value;
+      personIncome[person] = (personIncome[person] || 0) + value;
+    } else if (e.type === 'Expense') {
+      monthlyExpense[month] = (monthlyExpense[month] || 0) + value;
+      personExpense[person] = (personExpense[person] || 0) + value;
+      expenseByCategory[key] = (expenseByCategory[key] || 0) + value;
     }
+  });
+
+  // ✅ Calculate summary
+  const incomeTotal = Object.values(monthlyIncome).reduce((a, b) => a + b, 0);
+  const expenseTotal = Object.values(monthlyExpense).reduce((a, b) => a + b, 0);
+  const difference = incomeTotal - expenseTotal;
+
+  const summary = document.getElementById('chartSummary');
+  if (summary) {
+    summary.innerHTML = `
+      <div style="margin-bottom: 1rem; font-size: 1.2rem;">
+        Total Income: <span style="color: green;">+${incomeTotal.toFixed(2)}</span> |
+        Total Expense: <span style="color: red;">-${expenseTotal.toFixed(2)}</span> |
+        Difference: <strong style="color: ${difference >= 0 ? 'green' : 'red'};">
+          ${difference >= 0 ? '+' : ''}${difference.toFixed(2)}
+        </strong>
+      </div>
+    `;
+  }
+
+  const months = [...new Set([...Object.keys(monthlyIncome), ...Object.keys(monthlyExpense)])].sort();
+  const persons = [...new Set([...Object.keys(personIncome), ...Object.keys(personExpense)])];
+  const categories = Object.keys(expenseByCategory);
+
+  const incomeMonthVals = months.map(m => monthlyIncome[m] || 0);
+  const expenseMonthVals = months.map(m => monthlyExpense[m] || 0);
+  const incomePersonVals = persons.map(p => personIncome[p] || 0);
+  const expensePersonVals = persons.map(p => personExpense[p] || 0);
+  const pieValues = categories.map(k => expenseByCategory[k]);
+
+  const type = document.getElementById('chartType').value;
+  const ctx1 = document.getElementById('monthlyChart')?.getContext('2d');
+  const ctx2 = document.getElementById('personChart')?.getContext('2d');
+  const ctx3 = document.getElementById('comparisonChart')?.getContext('2d');
+  const ctx4 = document.getElementById('pieChart')?.getContext('2d');
+
+  monthlyChartInstance?.destroy();
+  personChartInstance?.destroy();
+  comparisonChartInstance?.destroy();
+  pieChartInstance?.destroy();
+
+  if (ctx1) {
+    monthlyChartInstance = new Chart(ctx1, {
+      type,
+      data: {
+        labels: months,
+        datasets: [
+          { label: 'Income', data: incomeMonthVals, backgroundColor: '#4caf50', borderColor: '#2e7d32', borderWidth: 1 },
+          { label: 'Expense', data: expenseMonthVals, backgroundColor: '#f44336', borderColor: '#c62828', borderWidth: 1 }
+        ]
+      },
+      options: chartOptions()
+    });
+  }
+
+  if (ctx2) {
+    personChartInstance = new Chart(ctx2, {
+      type,
+      data: {
+        labels: persons,
+        datasets: [
+          { label: 'Income', data: incomePersonVals, backgroundColor: '#4caf50', borderColor: '#2e7d32', borderWidth: 1 },
+          { label: 'Expense', data: expensePersonVals, backgroundColor: '#f44336', borderColor: '#c62828', borderWidth: 1 }
+        ]
+      },
+      options: chartOptions()
+    });
+  }
+
+  if (ctx3) {
+    comparisonChartInstance = new Chart(ctx3, {
+      type,
+      data: {
+        labels: persons,
+        datasets: [
+          { label: 'Net Balance', data: persons.map(p => (personIncome[p] || 0) - (personExpense[p] || 0)), backgroundColor: '#2196f3', borderColor: '#1976d2', borderWidth: 1 }
+        ]
+      },
+      options: chartOptions()
+    });
+  }
+
+  if (ctx4) {
+    pieChartInstance = new Chart(ctx4, {
+      type: 'pie',
+      data: {
+        labels: categories,
+        datasets: [{
+          label: 'Spending Distribution',
+          data: pieValues,
+          backgroundColor: categories.map((_, i) => `hsl(${i * 35}, 70%, 60%)`)
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: context => `${context.label}: CHF ${context.raw.toFixed(2)}`
+            }
+          },
+          legend: { position: 'bottom' }
+        }
+      }
+    });
+  }
+
+  populatePersonFilter(persons);
+}
 
 function populatePersonFilter(persons) {
   const container = document.getElementById('personDropdown');
