@@ -284,6 +284,20 @@ filtered.forEach(e => {
     else expenseTotal += amount;
   });
 
+    // ✅ Monthly Averages
+  const monthsUsed = [...new Set(filtered.map(e => e.date?.slice(0, 7)))].filter(Boolean);
+  const avgIncome = incomeTotal / monthsUsed.length || 0;
+  const avgExpense = expenseTotal / monthsUsed.length || 0;
+  const avgBalance = avgIncome - avgExpense;
+
+  document.getElementById('monthlyAverageSummary').innerHTML = `
+    <div style="font-size: 1rem;">
+      Avg. Monthly <b>Income:</b> <span style="color: green;">${avgIncome.toFixed(2)}</span>
+      &nbsp;&nbsp; <b>Expenses:</b> <span style="color: red;">${avgExpense.toFixed(2)}</span>
+      &nbsp;&nbsp; <b>Balance:</b> <span style="color: dodgerblue;">${avgBalance.toFixed(2)}</span>
+    </div>
+  `;
+
   document.getElementById('totalIncome').textContent = incomeTotal.toFixed(2);
   document.getElementById('totalExpense').textContent = expenseTotal.toFixed(2);
   document.getElementById('totalBalance').textContent = (incomeTotal - expenseTotal).toFixed(2);
