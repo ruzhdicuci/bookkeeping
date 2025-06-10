@@ -132,6 +132,7 @@
     </div>
 
     <canvas id="monthlyChart" height="200" width="600"></canvas>
+    <canvas id="summaryChart" height="100"></canvas>
     <canvas id="personChart" height="200" width="600"></canvas>
     <canvas id="comparisonChart" height="200" width="600">></canvas>
     <canvas id="pieChart" height="200" >></canvas>
@@ -528,21 +529,47 @@ renderBankBalanceForm();                // ✅ re-render balance inputs
 
   const selectedPersons = Array.from(document.querySelectorAll('.personChartFilter:checked')).map(cb => cb.value);
 // ✅ Total Summary Calculation
+// ✅ Calculate totals
 const totalIncome = Object.values(monthlyIncome).reduce((a, b) => a + b, 0);
 const totalExpense = Object.values(monthlyExpense).reduce((a, b) => a + b, 0);
-const net = totalIncome - totalExpense;
+const totalNet = totalIncome - totalExpense;
 
-// ✅ Display above the chart
-const summaryDiv = document.getElementById('chartSummary');
-summaryDiv.innerHTML = `
-  <div style="font-weight: bold; margin-bottom: 1rem;">
-    Total Income: <span style="color:green">CHF ${totalIncome.toFixed(2)}</span> &nbsp;|&nbsp;
-    Total Expenses: <span style="color:red">CHF ${totalExpense.toFixed(2)}</span> &nbsp;|&nbsp;
-    Net: <span style="color:${net >= 0 ? 'green' : 'red'}">CHF ${net.toFixed(2)}</span>
-  </div>
-`;
+// ✅ Destroy old chart if it exists
+window.summaryChartInstance?.destroy();
 
-
+// ✅ Draw Summary Chart
+const summaryCtx = document.getElementById('summaryChart').getContext('2d');
+window.summaryChartInstance = new Chart(summaryCtx, {
+  type: 'bar',
+  data: {
+    labels: ['Income', 'Expenses', 'Net'],
+    datasets: [{
+      label: 'Total Summary',
+      data: [totalIncome, totalExpense, totalNet],
+      backgroundColor: [
+        '#4caf50', // green for income
+        '#f44336', // red for expenses
+        totalNet >= 0 ? '#2196f3' : '#ff9800' // blue or orange for net
+      ]
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: context => `CHF ${context.raw.toFixed(2)}`
+        }
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    }
+  }
+});
       entries.forEach(e => {
     if (categoryFilter && categoryFilter !== 'All' && (e.category || 'Uncategorized') !== categoryFilter) return;
   if (selectedPersons.length && !selectedPersons.includes(e.person)) return;
