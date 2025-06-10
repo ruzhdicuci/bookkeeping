@@ -285,19 +285,30 @@ filtered.forEach(e => {
   });
 
     // ✅ Monthly Averages
-  const monthsUsed = [...new Set(filtered.map(e => e.date?.slice(0, 7)))].filter(Boolean);
-  const avgIncome = incomeTotal / monthsUsed.length || 0;
-  const avgExpense = expenseTotal / monthsUsed.length || 0;
-  const avgBalance = avgIncome - avgExpense;
+const monthsUsed = [...new Set(filtered.map(e => e.date?.slice(0, 7)))].filter(Boolean);
+const avgIncome = incomeTotal / monthsUsed.length || 0;
+const avgExpense = expenseTotal / monthsUsed.length || 0;
+const avgBalance = avgIncome - avgExpense;
 
-  document.getElementById('monthlyAverageSummary').innerHTML = `
-    <div style="font-size: 1rem;">
-      Avg. Monthly <b>Income:</b> <span style="color: green;">${avgIncome.toFixed(2)}</span>
-      &nbsp;&nbsp; <b>Expenses:</b> <span style="color: red;">${avgExpense.toFixed(2)}</span>
-      &nbsp;&nbsp; <b>Balance:</b> <span style="color: dodgerblue;">${avgBalance.toFixed(2)}</span>
+document.getElementById('monthlyAverageCard').innerHTML = `
+  <div style="
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 1rem 1.5rem;
+    max-width: 500px;
+    margin: 1rem auto;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    text-align: center;
+  ">
+    <h3 style="margin-bottom: 1rem;">📊 Average Per Month</h3>
+    <div style="display: flex; justify-content: space-around; font-size: 1.1rem;">
+      <div><b>Income</b><br><span style="color: green;">${avgIncome.toFixed(2)}</span></div>
+      <div><b>Expenses</b><br><span style="color: red;">${avgExpense.toFixed(2)}</span></div>
+      <div><b>Balance</b><br><span style="color: dodgerblue;">${avgBalance.toFixed(2)}</span></div>
     </div>
-  `;
-
+  </div>
+`;
   document.getElementById('totalIncome').textContent = incomeTotal.toFixed(2);
   document.getElementById('totalExpense').textContent = expenseTotal.toFixed(2);
   document.getElementById('totalBalance').textContent = (incomeTotal - expenseTotal).toFixed(2);
