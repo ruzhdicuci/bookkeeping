@@ -291,21 +291,18 @@ const avgExpense = expenseTotal / monthsUsed.length || 0;
 const avgBalance = avgIncome - avgExpense;
 
 document.getElementById('monthlyAverageCard').innerHTML = `
-  <div style="
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    padding: 1rem 1.5rem;
-    max-width: 500px;
-    margin: 1rem auto;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    text-align: center;
-  ">
-    <h3 style="margin-bottom: 1rem;">📊 Average Per Month</h3>
-    <div style="display: flex; justify-content: space-around; font-size: 1.1rem;">
-      <div><b>Income</b><br><span style="color: green;">${avgIncome.toFixed(2)}</span></div>
-      <div><b>Expenses</b><br><span style="color: red;">${avgExpense.toFixed(2)}</span></div>
-      <div><b>Balance</b><br><span style="color: dodgerblue;">${avgBalance.toFixed(2)}</span></div>
+  <div class="average-card-container">
+    <div class="average-card">
+      Avg Income
+      <span class="income-color">+${avgIncome.toFixed(2)}</span>
+    </div>
+    <div class="average-card">
+      Avg Expenses
+      <span class="expense-color">-${avgExpense.toFixed(2)}</span>
+    </div>
+    <div class="average-card">
+      Avg Balance
+      <span class="balance-color">${(avgIncome - avgExpense).toFixed(2)}</span>
     </div>
   </div>
 `;
