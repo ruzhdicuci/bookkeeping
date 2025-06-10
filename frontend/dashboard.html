@@ -27,6 +27,7 @@
   
       <link rel="stylesheet" href="style.css">
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 
 </head>
 <body>
@@ -108,6 +109,7 @@
 
  <!-- Charts Tab -->
   <div id="chartsTab" class="tab-content">
+   
     <div class="chart-controls">
       <label for="chartType">Chart Type:</label>
       <select id="chartType">
@@ -130,11 +132,12 @@
       <button onclick="downloadChart('pieChart')">⬇️ Pie</button>
     </div>
 
-    <canvas id="monthlyChart" height="200" width="600"></canvas>
-    <canvas id="summaryChart" height="100"></canvas>
-    <canvas id="personChart" height="200" width="600"></canvas>
-    <canvas id="comparisonChart" height="200" width="600">></canvas>
-    <canvas id="pieChart" height="200" >></canvas>
+    <canvas id="monthlyChart" height="200" ></canvas>
+   
+  <canvas id="chartSummary" height="200" width="1200px"></canvas>
+    <canvas id="personChart" height="200" width="1200px"></canvas>
+    <canvas id="comparisonChart" height="200" width="1200px"></canvas>
+    <canvas id="pieChart" height="200" width="1200px"></canvas>
   </div></div>  
 
 
@@ -512,6 +515,7 @@ renderBankBalanceForm();                // ✅ re-render balance inputs
     let personChartInstance = null;
     let comparisonChartInstance = null;
     let pieChartInstance = null;
+    let summaryChartInstance = null;
 
     function openTab(tabId, btn) {
       document.querySelectorAll('.tab-content').forEach(div => div.classList.remove('active'));
@@ -547,23 +551,48 @@ function drawCharts() {
     }
   });
 
-  // ✅ Calculate summary
-  const incomeTotal = Object.values(monthlyIncome).reduce((a, b) => a + b, 0);
-  const expenseTotal = Object.values(monthlyExpense).reduce((a, b) => a + b, 0);
-  const difference = incomeTotal - expenseTotal;
 
-  const summary = document.getElementById('chartSummary');
-  if (summary) {
-    summary.innerHTML = `
-      <div style="margin-bottom: 1rem; font-size: 1.2rem;">
-        Total Income: <span style="color: green;">+${incomeTotal.toFixed(2)}</span> |
-        Total Expense: <span style="color: red;">-${expenseTotal.toFixed(2)}</span> |
-        Difference: <strong style="color: ${difference >= 0 ? 'green' : 'red'};">
-          ${difference >= 0 ? '+' : ''}${difference.toFixed(2)}
-        </strong>
-      </div>
-    `;
+// ✅ Calculate summary
+const incomeTotal = Object.values(monthlyIncome).reduce((a, b) => a + b, 0);
+const expenseTotal = Object.values(monthlyExpense).reduce((a, b) => a + b, 0);
+const difference = incomeTotal - expenseTotal;
+
+
+
+// ✅ Render summary bar chart
+const summaryCtx = document.getElementById('chartSummary').getContext('2d');
+summaryChartInstance = new Chart(summaryCtx, {
+  type: 'bar',
+  data: {
+    labels: ['Income', 'Expenses', 'Difference'],
+    datasets: [{
+      label: 'Summary',
+      data: [incomeTotal, expenseTotal, difference],
+      backgroundColor: [
+        '#4caf50', // income
+        '#f44336', // expenses
+        '#2196f3'  // difference
+      ]
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: context => `CHF ${context.raw.toFixed(2)}`
+        }
+      }
+    },
+    scales: {
+      y: { beginAtZero: true }
+    }
   }
+});
+
+
+ 
 
   const months = [...new Set([...Object.keys(monthlyIncome), ...Object.keys(monthlyExpense)])].sort();
   const persons = [...new Set([...Object.keys(personIncome), ...Object.keys(personExpense)])];
@@ -574,17 +603,22 @@ function drawCharts() {
   const incomePersonVals = persons.map(p => personIncome[p] || 0);
   const expensePersonVals = persons.map(p => personExpense[p] || 0);
   const pieValues = categories.map(k => expenseByCategory[k]);
-
+console.log("🧪 Months:", months);
+console.log("🧪 Income values:", incomeMonthVals);
+console.log("🧪 Expense values:", expenseMonthVals);
   const type = document.getElementById('chartType').value;
+  
   const ctx1 = document.getElementById('monthlyChart')?.getContext('2d');
   const ctx2 = document.getElementById('personChart')?.getContext('2d');
   const ctx3 = document.getElementById('comparisonChart')?.getContext('2d');
   const ctx4 = document.getElementById('pieChart')?.getContext('2d');
+   const ctx5 = document.getElementById('summaryChart')?.getContext('2d');
 
   monthlyChartInstance?.destroy();
   personChartInstance?.destroy();
   comparisonChartInstance?.destroy();
-  pieChartInstance?.destroy();
+  pieChartInstance?.destroy();// ✅ Destroy old chart if it exists
+summaryChartInstance?.destroy();
 
   if (ctx1) {
     monthlyChartInstance = new Chart(ctx1, {
@@ -596,7 +630,8 @@ function drawCharts() {
           { label: 'Expense', data: expenseMonthVals, backgroundColor: '#f44336', borderColor: '#c62828', borderWidth: 1 }
         ]
       },
-      options: chartOptions()
+      options: chartOptions(),
+       plugins: [ChartDataLabels]  // ✅ Add this line
     });
   }
 
@@ -610,7 +645,8 @@ function drawCharts() {
           { label: 'Expense', data: expensePersonVals, backgroundColor: '#f44336', borderColor: '#c62828', borderWidth: 1 }
         ]
       },
-      options: chartOptions()
+      options: chartOptions(),
+       plugins: [ChartDataLabels]  // ✅ Add this line
     });
   }
 
@@ -623,9 +659,30 @@ function drawCharts() {
           { label: 'Net Balance', data: persons.map(p => (personIncome[p] || 0) - (personExpense[p] || 0)), backgroundColor: '#2196f3', borderColor: '#1976d2', borderWidth: 1 }
         ]
       },
-      options: chartOptions()
+      options: chartOptions(),
+       plugins: [ChartDataLabels]  // ✅ Add this line
     });
   }
+
+  if (ctx5) {
+  summaryChartInstance = new Chart(ctx5, {
+    type,
+    data: {
+      labels: persons,
+      datasets: [
+        {
+          label: 'Net Balance',
+          data: persons.map(p => (personIncome[p] || 0) - (personExpense[p] || 0)),
+          backgroundColor: '#2196f3',
+          borderColor: '#1976d2',
+          borderWidth: 1
+        }
+      ]
+    },
+    options: chartOptions(),
+    plugins: [ChartDataLabels]  // ✅ Correct placement
+  });
+}
 
   if (ctx4) {
     pieChartInstance = new Chart(ctx4, {
@@ -707,21 +764,32 @@ function populatePersonFilter(persons) {
 }
 
 function chartOptions() {
-      return {
-        responsive: true,
-        plugins: {
-          tooltip: {
-            callbacks: {
-              label: context => `CHF ${context.raw.toFixed(2)}`
-            }
-          },
-          legend: { display: true }
-        },
-        scales: {
-          y: { beginAtZero: true }
+  return {
+    responsive: true,
+    plugins: {
+      tooltip: {
+        callbacks: {
+          label: context => `CHF ${context.raw.toFixed(2)}`
         }
-      };
+      },
+      legend: { display: true },
+      datalabels: {
+        color: '#000',
+        anchor: 'end',
+        align: 'top',
+        font: {
+          weight: 'bold'
+        },
+        formatter: value => value.toFixed(2)
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true
+      }
     }
+  };
+}
 
     function downloadChart(id) {
       const canvas = document.getElementById(id);
@@ -731,7 +799,7 @@ function chartOptions() {
       link.click();
     }
 
-    
+
     document.getElementById('chartType')?.addEventListener('change', drawCharts);
     document.getElementById('filterPerson')?.addEventListener('change', drawCharts);
 document.getElementById('categoryFilter')?.addEventListener('change', drawCharts);
