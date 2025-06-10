@@ -134,7 +134,7 @@
 
     <canvas id="monthlyChart" height="300px" ></canvas>
    
-  <canvas id="chartSummary" height="300px"></canvas>
+  <canvas id="summaryChart" height="300px"></canvas>
     <canvas id="personChart" height="300px"></canvas>
     <canvas id="comparisonChart" height="300px"></canvas>
     <canvas id="pieChart" height="300px"></canvas>
@@ -561,7 +561,7 @@ const difference = incomeTotal - expenseTotal;
 
 
 // ✅ Render summary bar chart
-const summaryCtx = document.getElementById('chartSummary').getContext('2d');
+const summaryCtx = document.getElementById('summaryChart').getContext('2d');
 summaryChartInstance = new Chart(summaryCtx, {
   type: 'bar',
   data: {
@@ -612,8 +612,9 @@ console.log("🧪 Expense values:", expenseMonthVals);
   const ctx1 = document.getElementById('monthlyChart')?.getContext('2d');
   const ctx2 = document.getElementById('personChart')?.getContext('2d');
   const ctx3 = document.getElementById('comparisonChart')?.getContext('2d');
+     const ctx5 = document.getElementById('summaryChart')?.getContext('2d');
   const ctx4 = document.getElementById('pieChart')?.getContext('2d');
-   const ctx5 = document.getElementById('summaryChart')?.getContext('2d');
+
 
   monthlyChartInstance?.destroy();
   personChartInstance?.destroy();
@@ -664,27 +665,39 @@ summaryChartInstance?.destroy();
        plugins: [ChartDataLabels]  // ✅ Add this line
     });
   }
+
 if (ctx5) {
-  monthlyChartInstance = new Chart(ctx5, {
-    type,
-    data: {
-      labels: persons,
-      datasets: [
-        {
-          label: 'Net Balance',
-          data: persons.map(p => (personIncome[p] || 0) - (personExpense[p] || 0)),
-          backgroundColor: '#2196f3',
-          borderColor: '#1976d2',
-          borderWidth: 1
-        }
-      ]
+summaryChartInstance = new Chart(ctx5, {
+  type: 'bar',
+  data: {
+    labels: ['Income', 'Expenses', 'Difference'],
+    datasets: [{
+      label: 'Summary',
+      data: [incomeTotal, expenseTotal, difference],
+      backgroundColor: ['#4caf50', '#f44336', '#2196f3']
+    }]
+  },
+  options: {
+    plugins: {
+      datalabels: {
+        anchor: 'end',
+        align: 'top',
+        font: {
+          weight: 'bold'
+        },
+        formatter: value => value.toLocaleString('en-US', {
+          minimumFractionDigits: 0
+        })
+      }
     },
-    options: chartOptions(),
-    plugins: [ChartDataLabels]  // ✅ Correct placement
-  });
-}
+    responsive: true,
+    scales: {
+      y: { beginAtZero: true }
+    }
+  }
+});
 
-
+  }
 
   if (ctx4) {
     pieChartInstance = new Chart(ctx4, {
