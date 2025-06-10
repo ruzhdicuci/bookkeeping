@@ -132,12 +132,12 @@
       <button onclick="downloadChart('pieChart')">⬇️ Pie</button>
     </div>
 
-    <canvas id="monthlyChart" height="300" ></canvas>
+    <canvas id="monthlyChart" height="300px" ></canvas>
    
-  <canvas id="chartSummary" height="300"></canvas>
-    <canvas id="personChart" height="300"></canvas>
-    <canvas id="comparisonChart" height="300"></canvas>
-    <canvas id="pieChart" height="300"></canvas>
+  <canvas id="chartSummary" height="300px"></canvas>
+    <canvas id="personChart" height="300px"></canvas>
+    <canvas id="comparisonChart" height="300px"></canvas>
+    <canvas id="pieChart" height="300px"></canvas>
   </div></div>  
 
 
@@ -676,17 +676,14 @@ summaryChartInstance = new Chart(ctx5, {
       backgroundColor: ['#4caf50', '#f44336', '#2196f3']
     }]
   },
+  plugins: [ChartDataLabels], // ✅ Important
   options: {
     plugins: {
       datalabels: {
         anchor: 'end',
         align: 'top',
-        font: {
-          weight: 'bold'
-        },
-        formatter: value => value.toLocaleString('en-US', {
-          minimumFractionDigits: 0
-        })
+        font: { weight: 'bold' },
+        formatter: v => v.toLocaleString('en-US', { minimumFractionDigits: 0 })
       }
     },
     responsive: true,
