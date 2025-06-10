@@ -108,7 +108,6 @@
 
  <!-- Charts Tab -->
   <div id="chartsTab" class="tab-content">
-    <div id="chartSummary"></div>
     <div class="chart-controls">
       <label for="chartType">Chart Type:</label>
       <select id="chartType">
@@ -528,48 +527,24 @@ renderBankBalanceForm();                // ✅ re-render balance inputs
       const monthlyIncome = {}, monthlyExpense = {}, personIncome = {}, personExpense = {}, expenseByCategory = {};
 
   const selectedPersons = Array.from(document.querySelectorAll('.personChartFilter:checked')).map(cb => cb.value);
-// ✅ Total Summary Calculation
-// ✅ Calculate totals
-const totalIncome = Object.values(monthlyIncome).reduce((a, b) => a + b, 0);
-const totalExpense = Object.values(monthlyExpense).reduce((a, b) => a + b, 0);
-const totalNet = totalIncome - totalExpense;
 
-// ✅ Destroy old chart if it exists
-window.summaryChartInstance?.destroy();
+const incomeTotal = Object.values(monthlyIncome).reduce((a, b) => a + b, 0);
+const expenseTotal = Object.values(monthlyExpense).reduce((a, b) => a + b, 0);
+const diff = incomeTotal - expenseTotal;
 
-// ✅ Draw Summary Chart
-const summaryCtx = document.getElementById('summaryChart').getContext('2d');
-window.summaryChartInstance = new Chart(summaryCtx, {
-  type: 'bar',
-  data: {
-    labels: ['Income', 'Expenses', 'Net'],
-    datasets: [{
-      label: 'Total Summary',
-      data: [totalIncome, totalExpense, totalNet],
-      backgroundColor: [
-        '#4caf50', // green for income
-        '#f44336', // red for expenses
-        totalNet >= 0 ? '#2196f3' : '#ff9800' // blue or orange for net
-      ]
-    }]
-  },
-  options: {
-    responsive: true,
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        callbacks: {
-          label: context => `CHF ${context.raw.toFixed(2)}`
-        }
-      }
-    },
-    scales: {
-      y: {
-        beginAtZero: true
-      }
-    }
-  }
-});
+document.getElementById('chartSummary').innerHTML = `
+  Total Income: <span style="color:green">+${incomeTotal.toFixed(2)}</span> | 
+  Total Expense: <span style="color:red">-${expenseTotal.toFixed(2)}</span> | 
+  Difference: <strong style="color:${diff >= 0 ? 'green' : 'red'}">${diff >= 0 ? '+' : ''}${diff.toFixed(2)}</strong>
+`;
+const summaryEl = document.getElementById('chartSummary');
+if (summaryEl) {
+  summaryEl.innerHTML = `
+    Total Income: <span style="color:green">+${incomeTotal.toFixed(2)}</span> |
+    Total Expense: <span style="color:red">-${expenseTotal.toFixed(2)}</span> |
+    Difference: <strong style="color:${diff >= 0 ? 'green' : 'red'}">${diff >= 0 ? '+' : ''}${diff.toFixed(2)}</strong>
+  `;
+}
       entries.forEach(e => {
     if (categoryFilter && categoryFilter !== 'All' && (e.category || 'Uncategorized') !== categoryFilter) return;
   if (selectedPersons.length && !selectedPersons.includes(e.person)) return;
