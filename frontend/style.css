@@ -590,7 +590,7 @@ font-size: 1.1rem;
 
 .entry-fields input, 
 .entry-fields select {
-  flex: 1 1 32px;
+
 margin-top: 7px;
   padding: 0.5rem;
   font-size: 1.1rem;
@@ -1476,6 +1476,17 @@ color:  #71d0ff !important; /* optional: blue checkmark */
 }
 .balance-color {
   color: #2196f3;
+}
+
+@media (max-width: 600px) {
+  .average-card {
+    flex: 1 1 100%;
+    padding: 0.8rem;
+  }
+
+  .average-card span {
+    font-size: 1.2rem;
+  }
 }
 
 
