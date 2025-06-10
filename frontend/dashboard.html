@@ -135,6 +135,7 @@
     <canvas id="monthlyChart" height="300" width="1200" ></canvas>
    
   <canvas id="summaryChart" height="300" width="1200"></canvas>
+  <canvas id="averageChart" height="300" width="1200"></canvas>
     <canvas id="personChart" height="300" width="1200"></canvas>
     <canvas id="comparisonChart" height="300" width="1200"></canvas>
     <canvas id="pieChart" height="300" width="1200"></canvas>
@@ -301,7 +302,7 @@
 </div>
 
 
-<div id="monthlyAverageCard" style="margin-top: 1rem;"></div>
+<div id="monthlyAverageCard" style="margin-top: 10px;"></div>
   
 
 
@@ -518,6 +519,7 @@ renderBankBalanceForm();                // ✅ re-render balance inputs
     let comparisonChartInstance = null;
     let pieChartInstance = null;
     let summaryChartInstance = null;
+    let averageChartInstance = null;
 
     function openTab(tabId, btn) {
       document.querySelectorAll('.tab-content').forEach(div => div.classList.remove('active'));
@@ -583,13 +585,50 @@ console.log("🧪 Expense values:", expenseMonthVals);
   const ctx3 = document.getElementById('comparisonChart')?.getContext('2d');
      const ctx5 = document.getElementById('summaryChart')?.getContext('2d');
   const ctx4 = document.getElementById('pieChart')?.getContext('2d');
+const avgCtx = document.getElementById('averageChart')?.getContext('2d');
 
-
+averageChartInstance?.destroy();
   monthlyChartInstance?.destroy();
   personChartInstance?.destroy();
   comparisonChartInstance?.destroy();
   pieChartInstance?.destroy();// ✅ Destroy old chart if it exists
 summaryChartInstance?.destroy();
+
+
+if (avgCtx) {
+  const monthsCount = new Set(entries.map(e => e.date?.slice(0, 7))).size;
+  const avgIncome = monthsCount ? incomeTotal / monthsCount : 0;
+  const avgExpense = monthsCount ? expenseTotal / monthsCount : 0;
+  const avgDiff = avgIncome - avgExpense;
+
+  averageChartInstance = new Chart(avgCtx, {
+    type: 'bar',
+    data: {
+      labels: ['Avg Income', 'Avg Expense', 'Avg Balance'],
+      datasets: [{
+        label: 'Average',
+        data: [avgIncome, avgExpense, avgDiff],
+        backgroundColor: ['#4caf50', '#f44336', '#2196f3']
+      }]
+    },
+    plugins: [ChartDataLabels], // if you want value labels on top
+    options: {
+      plugins: {
+        datalabels: {
+          anchor: 'end',
+          align: 'top',
+          font: { weight: 'bold' },
+          formatter: v => v.toLocaleString('en-US', { minimumFractionDigits: 2 })
+        }
+      },
+      responsive: true,
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
+  });
+}
+
 
   if (ctx1) {
     monthlyChartInstance = new Chart(ctx1, {

@@ -294,11 +294,11 @@ document.getElementById('monthlyAverageCard').innerHTML = `
   <div class="average-card-container">
     <div class="average-card">
       Avg Income
-      <span class="income-color">+${avgIncome.toFixed(2)}</span>
+      <span class="income-color">${avgIncome.toFixed(2)}</span>
     </div>
     <div class="average-card">
       Avg Expenses
-      <span class="expense-color">-${avgExpense.toFixed(2)}</span>
+      <span class="expense-color">${avgExpense.toFixed(2)}</span>
     </div>
     <div class="average-card">
       Avg Balance
