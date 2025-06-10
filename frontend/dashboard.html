@@ -108,6 +108,7 @@
 
  <!-- Charts Tab -->
   <div id="chartsTab" class="tab-content">
+    <div id="chartSummary"></div>
     <div class="chart-controls">
       <label for="chartType">Chart Type:</label>
       <select id="chartType">
@@ -526,7 +527,20 @@ renderBankBalanceForm();                // ✅ re-render balance inputs
       const monthlyIncome = {}, monthlyExpense = {}, personIncome = {}, personExpense = {}, expenseByCategory = {};
 
   const selectedPersons = Array.from(document.querySelectorAll('.personChartFilter:checked')).map(cb => cb.value);
+// ✅ Total Summary Calculation
+const totalIncome = Object.values(monthlyIncome).reduce((a, b) => a + b, 0);
+const totalExpense = Object.values(monthlyExpense).reduce((a, b) => a + b, 0);
+const net = totalIncome - totalExpense;
 
+// ✅ Display above the chart
+const summaryDiv = document.getElementById('chartSummary');
+summaryDiv.innerHTML = `
+  <div style="font-weight: bold; margin-bottom: 1rem;">
+    Total Income: <span style="color:green">CHF ${totalIncome.toFixed(2)}</span> &nbsp;|&nbsp;
+    Total Expenses: <span style="color:red">CHF ${totalExpense.toFixed(2)}</span> &nbsp;|&nbsp;
+    Net: <span style="color:${net >= 0 ? 'green' : 'red'}">CHF ${net.toFixed(2)}</span>
+  </div>
+`;
 
 
       entries.forEach(e => {
@@ -669,6 +683,9 @@ function populatePersonFilter(persons) {
     });
   });
 }
+
+
+
     function populateCategoryFilter(entries) {
   const select = document.getElementById('categoryFilter');
   if (!select) return;
