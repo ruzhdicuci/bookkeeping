@@ -665,24 +665,32 @@ summaryChartInstance?.destroy();
   }
 
   if (ctx5) {
-  summaryChartInstance = new Chart(ctx5, {
-    type,
-    data: {
-      labels: persons,
-      datasets: [
-        {
-          label: 'Net Balance',
-          data: persons.map(p => (personIncome[p] || 0) - (personExpense[p] || 0)),
-          backgroundColor: '#2196f3',
-          borderColor: '#1976d2',
-          borderWidth: 1
-        }
-      ]
+summaryChartInstance = new Chart(ctx5, {
+  type: 'bar',
+  data: {
+    labels: ['Income', 'Expenses', 'Difference'],
+    datasets: [{
+      label: 'Summary',
+      data: [incomeTotal, expenseTotal, difference],
+      backgroundColor: ['#4caf50', '#f44336', '#2196f3']
+    }]
+  },
+  plugins: [ChartDataLabels], // ✅ Important
+  options: {
+    plugins: {
+      datalabels: {
+        anchor: 'end',
+        align: 'top',
+        font: { weight: 'bold' },
+        formatter: v => v.toLocaleString('en-US', { minimumFractionDigits: 0 })
+      }
     },
-    options: chartOptions(),
-    plugins: [ChartDataLabels]  // ✅ Correct placement
-  });
-}
+    responsive: true,
+    scales: {
+      y: { beginAtZero: true }
+    }
+  }
+});
 
   if (ctx4) {
     pieChartInstance = new Chart(ctx4, {
