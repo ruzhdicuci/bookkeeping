@@ -526,6 +526,7 @@ renderBankBalanceForm();                // ✅ re-render balance inputs
     }
 
 function drawCharts() {
+  Chart.register(ChartDataLabels); // Required once at top of your chart setup
   const categoryFilter = document.getElementById('categoryFilter')?.value || 'All';
   const entries = (window.entries || []).filter(e => typeof e === 'object');
 
@@ -691,6 +692,8 @@ summaryChartInstance = new Chart(ctx5, {
     }
   }
 });
+
+   }  // ✅ closing brace for if (ctx5)
 
   if (ctx4) {
     pieChartInstance = new Chart(ctx4, {
