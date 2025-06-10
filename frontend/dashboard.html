@@ -132,12 +132,12 @@
       <button onclick="downloadChart('pieChart')">⬇️ Pie</button>
     </div>
 
-    <canvas id="monthlyChart" height="300px" ></canvas>
+    <canvas id="monthlyChart" height="300" width="1200" ></canvas>
    
-  <canvas id="summaryChart" height="300px"></canvas>
-    <canvas id="personChart" height="300px"></canvas>
-    <canvas id="comparisonChart" height="300px"></canvas>
-    <canvas id="pieChart" height="300px"></canvas>
+  <canvas id="summaryChart" height="300" width="1200"></canvas>
+    <canvas id="personChart" height="300" width="1200"></canvas>
+    <canvas id="comparisonChart" height="300" width="1200"></canvas>
+    <canvas id="pieChart" height="300" width="1200"></canvas>
   </div></div>  
 
 
@@ -560,40 +560,7 @@ const difference = incomeTotal - expenseTotal;
 
 
 
-// ✅ Render summary bar chart
-const summaryCtx = document.getElementById('summaryChart').getContext('2d');
-summaryChartInstance = new Chart(summaryCtx, {
-  type: 'bar',
-  data: {
-    labels: ['Income', 'Expenses', 'Difference'],
-    datasets: [{
-      label: 'Summary',
-      data: [incomeTotal, expenseTotal, difference],
-      backgroundColor: [
-        '#4caf50', // income
-        '#f44336', // expenses
-        '#2196f3'  // difference
-      ]
-    }]
-  },
-  options: {
-    responsive: true,
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        callbacks: {
-          label: context => `CHF ${context.raw.toFixed(2)}`
-        }
-      }
-    },
-    scales: {
-      y: { beginAtZero: true }
-    }
-  }
-});
 
-
- 
 
   const months = [...new Set([...Object.keys(monthlyIncome), ...Object.keys(monthlyExpense)])].sort();
   const persons = [...new Set([...Object.keys(personIncome), ...Object.keys(personExpense)])];
