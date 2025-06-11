@@ -837,22 +837,29 @@ document.getElementById('categoryFilter')?.addEventListener('change', drawCharts
 <button id="scrollBottomBtn" class="scroll-btn" title="Scroll to bottom" style="color:rgb(22, 173, 118)">⬇</button>
 
 <script>
-  document.getElementById('scrollTopBtn').onclick = () => {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-};
+  const topBtn = document.getElementById('scrollTopBtn');
+  const bottomBtn = document.getElementById('scrollBottomBtn');
 
-document.getElementById('scrollBottomBtn').onclick = () => {
-  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-};
+  // Attach click handlers only if buttons exist
+  if (topBtn) {
+    topBtn.onclick = () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+  }
 
+  if (bottomBtn) {
+    bottomBtn.onclick = () => {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    };
+  }
 
-window.addEventListener('scroll', () => {
-  const show = window.scrollY > 100;
-  document.getElementById('scrollTopBtn').style.opacity = show ? 1 : 0;
-  document.getElementById('scrollBottomBtn').style.opacity = show ? 1 : 0;
-});
+  // Scroll visibility toggle
+  window.addEventListener('scroll', () => {
+    const show = window.scrollY > 100;
 
-
+    if (topBtn) topBtn.style.opacity = show ? 1 : 0;
+    if (bottomBtn) bottomBtn.style.opacity = show ? 1 : 0;
+  });
 </script>
 
 
