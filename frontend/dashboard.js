@@ -41,10 +41,12 @@ document.querySelectorAll('.monthOption, #selectAllMonths').forEach(cb => {
   cb.addEventListener('change', renderEntries);
 });
 
+// Attach event listener to month checkboxes
 document.querySelectorAll('#monthOptions input[type="checkbox"]').forEach(cb => {
-  cb.addEventListener('change', renderBankBalanceForm);
+  cb.addEventListener('change', () => {
+    renderBankBalanceForm(); // ✅ re-calculate table
+  });
 });
-
 // Person checkboxes
 document.addEventListener('change', (e) => {
   if (e.target.matches('#personOptions input[type="checkbox"]')) {
@@ -150,13 +152,13 @@ function populateFilters() {
   const categories = [...new Set(entries.map(e => e.category).filter(Boolean))];
   const persons = [...new Set(entries.map(e => e.person).filter(Boolean))];
 
-  // ✅ Month dropdown
- // ✅ MONTH CHECKBOX FILTER
+// ✅ MONTH CHECKBOX FILTER
 const uniqueMonths = [...new Set(entries.map(e => e.date?.slice(0, 7)))].filter(Boolean).sort();
 const monthContainer = document.getElementById('monthOptions');
 
 monthContainer.innerHTML = `
   <label><input type="checkbox" id="selectAllMonths" checked /> <strong>All</strong></label>
+  <hr style="margin: 4px 0;">
   ${uniqueMonths.map(m => `
     <label>
       <input type="checkbox" class="monthOption" value="${m}" checked />
@@ -165,18 +167,23 @@ monthContainer.innerHTML = `
   `).join('')}
 `;
 
+// ✅ Handle Select All
 document.getElementById('selectAllMonths').addEventListener('change', function () {
   const allChecked = this.checked;
   document.querySelectorAll('.monthOption').forEach(cb => cb.checked = allChecked);
   renderEntries();
+  renderBankBalanceForm(); // ✅ update banks too
 });
 
+// ✅ Handle individual changes
 document.querySelectorAll('.monthOption').forEach(cb => {
   cb.addEventListener('change', () => {
     const all = document.querySelectorAll('.monthOption');
     const checked = document.querySelectorAll('.monthOption:checked');
     document.getElementById('selectAllMonths').checked = all.length === checked.length;
+
     renderEntries();
+    renderBankBalanceForm(); // ✅ update banks too
   });
 });
 
