@@ -1014,9 +1014,14 @@ color: rgb(213, 79, 79);
   background: white;
 }
 
+#bt1  {
 
-  
-
+ border: 1px solid #f4f2f2;
+  border-radius: 4px;
+   color: #333;
+   width: 140px;
+   text-align: left;
+}
 
 
 .styled-select {
