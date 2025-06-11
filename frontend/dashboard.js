@@ -1313,116 +1313,83 @@ function clearSearch(id) {
 
 
   //split
-  function openSplitModal(entryId) {
-  const entry = entries.find(e => e._id === entryId);
-  if (!entry) return alert("Entry not found");
+  // ✅ Split Entry Modal UI
+function showSplitModal(originalEntry) {
+  const modalHtml = `
+    <div id="splitModal" class="modal-overlay">
+      <div class="modal-content">
+        <h3>Split Entry: ${originalEntry.description} (${originalEntry.amount} ${originalEntry.currency})</h3>
+        <div id="splitLinesContainer"></div>
+        <button onclick="addSplitLine()">➕ Add Split</button>
+        <div style="margin-top: 1rem;">
+          <button onclick="confirmSplit('${originalEntry._id}')">✅ Confirm Split</button>
+          <button onclick="closeSplitModal()">❌ Cancel</button>
+        </div>
+      </div>
+    </div>`;
 
-  window.currentSplitEntry = entry;
-
-  document.getElementById('splitRows').innerHTML = `
-    <div style="margin-bottom: 0.5rem;">
-      <input type="text" placeholder="Person" class="split-person" />
-      <input type="number" placeholder="Amount" class="split-amount" />
-    </div>
-  `;
-  document.getElementById('splitModal').style.display = 'block';
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+  addSplitLine();
 }
 
-function addSplitRow() {
-  document.getElementById('splitRows').insertAdjacentHTML('beforeend', `
-    <div style="margin-bottom: 0.5rem;">
-      <input type="text" placeholder="Person" class="split-person" />
-      <input type="number" placeholder="Amount" class="split-amount" />
-    </div>
-  `);
+function addSplitLine() {
+  const container = document.getElementById('splitLinesContainer');
+  const line = document.createElement('div');
+  line.classList.add('split-line');
+  line.innerHTML = `
+    <input type="number" step="0.01" placeholder="Amount" class="split-amount" required />
+    <input list="personList" placeholder="Person" class="split-person" required />
+    <input list="newCategoryList" placeholder="Category" class="split-category" required />
+    <button onclick="this.parentElement.remove()">🗑️</button>
+  `;
+  container.appendChild(line);
 }
 
 function closeSplitModal() {
-  document.getElementById('splitModal').style.display = 'none';
-  window.currentSplitEntry = null;
+  const modal = document.getElementById('splitModal');
+  if (modal) modal.remove();
 }
 
-async function saveSplit() {
-  const persons = Array.from(document.querySelectorAll('.split-person')).map(e => e.value.trim());
-  const amounts = Array.from(document.querySelectorAll('.split-amount')).map(e => parseFloat(e.value));
+async function confirmSplit(originalId) {
+  const lines = Array.from(document.querySelectorAll('.split-line'));
+  const original = window.entries.find(e => e._id === originalId);
+  if (!original) return alert('Original entry not found.');
 
-  const total = amounts.reduce((a, b) => a + b, 0);
-  if (Math.abs(total - window.currentSplitEntry.amount) > 0.01) {
-    return alert(`Split total must match ${window.currentSplitEntry.amount} CHF`);
+  const splitData = lines.map(line => ({
+    amount: parseFloat(line.querySelector('.split-amount').value || '0'),
+    person: line.querySelector('.split-person').value,
+    category: line.querySelector('.split-category').value
+  })).filter(s => s.amount && s.person && s.category);
+
+  const totalSplit = splitData.reduce((sum, s) => sum + s.amount, 0).toFixed(2);
+  const originalAmount = parseFloat(original.amount).toFixed(2);
+
+  if (totalSplit != originalAmount) {
+    return alert(`Split total (${totalSplit}) must equal original amount (${originalAmount})`);
   }
 
-  // Delete original entry
-  await fetch(`${apiBase}/api/entries/${window.currentSplitEntry._id}`, {
-    method: 'DELETE',
-    headers: {
-      'Authorization': `Bearer ${token}`
-    }
-  });
-
-  // Create new split entries
-  for (let i = 0; i < persons.length; i++) {
-    await fetch(`${apiBase}/api/entries`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        ...window.currentSplitEntry,
-        person: persons[i],
-        amount: amounts[i],
-        description: `${window.currentSplitEntry.description} (Split)`
-      })
-    });
-  }
-
-  closeSplitModal();
-  await fetchEntries();
-}
-
-
-function splitEntryFromForm() {
-  const date = document.getElementById('newDate').value;
-  const description = document.getElementById('newDescription').value;
-  const amount = parseFloat(document.getElementById('newAmount').value);
-  const currency = document.getElementById('newCurrency').value;
-  const type = document.getElementById('newType').value;
-  const bank = document.getElementById('newBank').value;
-
-  if (!description || isNaN(amount) || amount <= 0) {
-    return alert("Please fill out the form correctly before splitting.");
-  }
-
-  const splitCount = prompt("How many people should this be split between?", "2");
-  const people = prompt("Enter names separated by commas (e.g., Vanessa,Nora)", "");
-
-  if (!splitCount || !people) return;
-
-  const names = people.split(',').map(p => p.trim()).filter(Boolean);
-  const splitAmount = parseFloat((amount / names.length).toFixed(2));
-
-  names.forEach(person => {
-    const splitEntry = {
-      date,
-      description: `${description} (${person})`,
-      amount: splitAmount,
-      currency,
-      type,
-      person,
-      bank,
-      status: 'Paid'
+  for (const split of splitData) {
+    const newEntry = {
+      ...original,
+      amount: split.amount,
+      person: split.person,
+      category: split.category,
+      parent: originalId // Optional for linking
     };
+    delete newEntry._id; // Create new one
 
-    fetch(`https://bookkeeping-i8e0.onrender.com/api/entries`, {
+    await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`
       },
-      body: JSON.stringify(splitEntry)
+      body: JSON.stringify(newEntry)
     });
-  });
+  }
 
-  alert("Split entry added!");
-  fetchEntries();
+  await fetchEntries();
+  closeSplitModal();
 }
+
+// ✅ Optional: Add CSS styles for modal and layout if not already present.
