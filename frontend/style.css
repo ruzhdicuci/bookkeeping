@@ -1467,23 +1467,29 @@ color:  #71d0ff !important; /* optional: blue checkmark */
   background: white;
   box-shadow: 0 4px 10px rgba(0,0,0,0.05);
   text-align: center;
-  font-weight: bold;
+
+   font-size:  1rem;
+ 
 }
 
-.average-card span {
-  display: block;
-  margin-top: 0.5rem;
-  font-size: 1.5rem;
-}
 
 .income-color {
   color: #13a07f;
+font-size:  1.7rem;
+     font-weight: bold;
+        margin-left: 10px;
 }
 .expense-color {
   color: #ff695d;
+   font-size:  1.7rem;
+         font-weight: bold;
+        margin-left: 10px;
 }
 .balance-color {
   color: #2196f3;
+ font-size:  1.7rem;
+         font-weight: bold;
+        margin-left: 10px;
 }
 
 
@@ -1504,7 +1510,7 @@ color:  #71d0ff !important; /* optional: blue checkmark */
   box-shadow: 0 4px 10px rgba(0,0,0,0.05);
   text-align: center;
   padding: 1rem;
-  font-weight: bold;
+  font-size: 1rem;
 }
 
 .summary-card span {
@@ -1515,11 +1521,20 @@ color:  #71d0ff !important; /* optional: blue checkmark */
 
 .income-color {
   color: #13a07f;
+      font-size:  1.7rem;
+
+        margin-left: 10px;
 }
 .expense-color {
-  color: #ff695d;
+  color: #e71608;
+      font-size:  1.7rem;
+    
+        margin-left: 10px;
 }
 .balance-color {
   color: #2196f3;
+      font-size:  1.7rem;
+    
+        margin-left: 10px;
 }
 
