@@ -144,12 +144,34 @@ function populateFilters() {
   const persons = [...new Set(entries.map(e => e.person).filter(Boolean))];
 
   // ✅ Month dropdown
-  const monthSelect = document.getElementById('monthSelect');
-  if (monthSelect) {
-    const prevMonth = monthSelect.value;
-    monthSelect.innerHTML = `<option value="">All</option>` + months.map(m => `<option value="${m}">${m}</option>`).join('');
-    monthSelect.value = months.includes(prevMonth) ? prevMonth : "";
-  }
+ // ✅ MONTH CHECKBOX FILTER
+const uniqueMonths = [...new Set(entries.map(e => e.date?.slice(0, 7)))].filter(Boolean).sort();
+const monthContainer = document.getElementById('monthOptions');
+
+monthContainer.innerHTML = `
+  <label><input type="checkbox" id="selectAllMonths" checked /> <strong>All</strong></label>
+  ${uniqueMonths.map(m => `
+    <label>
+      <input type="checkbox" class="monthOption" value="${m}" checked />
+      ${m}
+    </label>
+  `).join('')}
+`;
+
+document.getElementById('selectAllMonths').addEventListener('change', function () {
+  const allChecked = this.checked;
+  document.querySelectorAll('.monthOption').forEach(cb => cb.checked = allChecked);
+  renderEntries();
+});
+
+document.querySelectorAll('.monthOption').forEach(cb => {
+  cb.addEventListener('change', () => {
+    const all = document.querySelectorAll('.monthOption');
+    const checked = document.querySelectorAll('.monthOption:checked');
+    document.getElementById('selectAllMonths').checked = all.length === checked.length;
+    renderEntries();
+  });
+});
 
   // ✅ Bank dropdown
   const bankFilter = document.getElementById('bankFilter');
@@ -204,6 +226,7 @@ function populateFilters() {
 function renderEntries() {
   const dateQuery = dateSearch.value.trim().toLowerCase();
   const searchAmount = parseFloat(amountSearch.value || "0");
+  const selectedMonths = Array.from(document.querySelectorAll('.monthOption:checked')).map(cb => cb.value);
   const selectedPersons = Array.from(document.querySelectorAll('.personOption:checked')).map(cb => cb.value);
   const categoryFilter = document.getElementById('categoryFilter');
   const categoryValue = categoryFilter?.value || "All";
@@ -231,7 +254,7 @@ const entryDay = e.date?.split('-')[2];
 
  return (
   (selectedDays.size === 0 || selectedDays.has(entryDay)) &&
-  (!monthSelect.value || e.date.startsWith(monthSelect.value)) &&
+  (selectedMonths.length === 0 || selectedMonths.includes(e.date?.slice(0, 7))) &&
   (selectedPersons.length === 0 || selectedPersons.includes(e.person)) &&
   (!bankFilter.value || e.bank === bankFilter.value) &&
   (!typeFilter.value || e.type === typeFilter.value) &&
