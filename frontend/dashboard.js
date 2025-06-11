@@ -1357,13 +1357,17 @@ const plannedItems = [];
 
   window.addEventListener('DOMContentLoaded', populateBudgetDropdowns);
 
-function openSplitModal(entryId) {
+
+
+  //split
+  function openSplitModal(entryId) {
   const entry = entries.find(e => e._id === entryId);
   if (!entry) return alert("Entry not found");
 
   window.currentSplitEntry = entry;
+
   document.getElementById('splitRows').innerHTML = `
-    <div>
+    <div style="margin-bottom: 0.5rem;">
       <input type="text" placeholder="Person" class="split-person" />
       <input type="number" placeholder="Amount" class="split-amount" />
     </div>
@@ -1373,7 +1377,7 @@ function openSplitModal(entryId) {
 
 function addSplitRow() {
   document.getElementById('splitRows').insertAdjacentHTML('beforeend', `
-    <div>
+    <div style="margin-bottom: 0.5rem;">
       <input type="text" placeholder="Person" class="split-person" />
       <input type="number" placeholder="Amount" class="split-amount" />
     </div>
@@ -1388,20 +1392,23 @@ function closeSplitModal() {
 async function saveSplit() {
   const persons = Array.from(document.querySelectorAll('.split-person')).map(e => e.value.trim());
   const amounts = Array.from(document.querySelectorAll('.split-amount')).map(e => parseFloat(e.value));
-  
+
   const total = amounts.reduce((a, b) => a + b, 0);
   if (Math.abs(total - window.currentSplitEntry.amount) > 0.01) {
-    return alert(`Total must equal ${window.currentSplitEntry.amount} CHF`);
+    return alert(`Split total must match ${window.currentSplitEntry.amount} CHF`);
   }
 
-  // Delete original and create new entries per person
-  await fetch(`https://bookkeeping-i8e0.onrender.com/api/entries/${window.currentSplitEntry._id}`, {
+  // Delete original entry
+  await fetch(`${apiBase}/api/entries/${window.currentSplitEntry._id}`, {
     method: 'DELETE',
-    headers: { 'Authorization': `Bearer ${token}` }
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
   });
 
+  // Create new split entries
   for (let i = 0; i < persons.length; i++) {
-    await fetch(`https://bookkeeping-i8e0.onrender.com/api/entries`, {
+    await fetch(`${apiBase}/api/entries`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

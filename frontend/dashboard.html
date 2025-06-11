@@ -216,18 +216,13 @@
 </div>
   <div class="entry-button">
     <button id="eb" type="submit">Add</button>
-    <button onclick="openSplitModal('${e._id}')">➗ Split</button>
+  <button type="button" onclick="openSplitModal('${e._id}')">➗ Split</button>
+    
    
      
   </div>
 
-  <div id="splitModal" style="display:none; position: fixed; background: white; border: 1px solid #ccc; padding: 1rem;">
-  <h3>Split Entry</h3>
-  <div id="splitRows"></div>
-  <button onclick="addSplitRow()">➕ Add Split</button>
-  <button onclick="saveSplit()">💾 Save</button>
-  <button onclick="closeSplitModal()">✖️ Cancel</button>
-</div>
+
 
 </form>
 </div>
@@ -236,7 +231,6 @@
      </div>
   </div>
 
- 
 
  <div class="sections3">
 
@@ -453,6 +447,16 @@
   <!-- Dashboard Tab -->
   <div id="dashboardTab" class="tab-content active">
    
+
+
+
+ <div id="splitModal" style="display:none; position: fixed; top: 20%; left: 50%; transform: translateX(-50%); background: white; padding: 1rem; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.2); z-index: 9999;">
+  <h3>Split Entry</h3>
+  <div id="splitRows"></div>
+  <button onclick="addSplitRow()">➕ Add Split</button>
+  <button onclick="saveSplit()">💾 Save</button>
+  <button onclick="closeSplitModal()">✖ Cancel</button>
+</div>
   <script>
 
 // Add entries
