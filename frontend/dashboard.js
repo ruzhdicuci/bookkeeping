@@ -41,6 +41,9 @@ document.querySelectorAll('.monthOption, #selectAllMonths').forEach(cb => {
   cb.addEventListener('change', renderEntries);
 });
 
+document.querySelectorAll('#monthOptions input[type="checkbox"]').forEach(cb => {
+  cb.addEventListener('change', renderBankBalanceForm);
+});
 
 // Person checkboxes
 document.addEventListener('change', (e) => {
@@ -680,6 +683,7 @@ async function fetchBalancesFromBackend() {
 function renderBankBalanceForm() {
   const container = document.getElementById('bankBalanceTableContainer');
   const banks = [...new Set(entries.map(e => e.bank).filter(Boolean))];
+  const selectedMonths = Array.from(document.querySelectorAll('#monthOptions input[type="checkbox"]:checked')).map(cb => cb.value);
 
   if (!banks.length) {
     container.innerHTML = `<p>No bank data available yet.</p>`;
@@ -703,9 +707,12 @@ entries.forEach(e => {
     (statusFilter === 'Paid' && status === 'Paid') ||
     (statusFilter === 'Open' && status === 'Open');
 
-  if (include && bank in changes) {
-    changes[bank] += type === 'income' ? amount : -amount;
-  }
+const month = e.date?.slice(0, 7);
+const monthMatch = selectedMonths.length === 0 || selectedMonths.includes(month);
+
+if (include && monthMatch && bank in changes) {
+  changes[bank] += type === 'income' ? amount : -amount;
+}
 });
 
   // Create table HTML
