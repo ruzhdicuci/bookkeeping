@@ -1310,53 +1310,6 @@ function clearSearch(id) {
 
 
 
-// Budget section
-const plannedItems = [];
-
-  function addBudgetItem(e) {
-    e.preventDefault();
-    const name = document.getElementById('budgetName').value;
-    const amount = parseFloat(document.getElementById('budgetAmount').value);
-    const person = document.getElementById('budgetPerson').value;
-    const category = document.getElementById('budgetCategory').value;
-
-    plannedItems.push({ name, amount, person, category });
-    renderBudgetTable();
-    e.target.reset();
-  }
-
-  function deleteBudgetItem(index) {
-    plannedItems.splice(index, 1);
-    renderBudgetTable();
-  }
-
-  function renderBudgetTable() {
-    const tbody = document.querySelector('#budgetTable tbody');
-    tbody.innerHTML = '';
-
-    plannedItems.forEach((item, i) => {
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td>${item.name}</td>
-        <td>${item.amount.toFixed(2)}</td>
-        <td>${item.person}</td>
-        <td>${item.category}</td>
-        <td><button onclick="deleteBudgetItem(${i})">🗑️</button></td>
-      `;
-      tbody.appendChild(row);
-    });
-  }
-
-  // ✅ Populate dropdowns from existing people/categories
-  function populateBudgetDropdowns() {
-    const personSelect = document.getElementById('budgetPerson');
-    const categorySelect = document.getElementById('budgetCategory');
-    personSelect.innerHTML += (window.persons || []).map(p => `<option>${p}</option>`).join('');
-    categorySelect.innerHTML += (window.categories || []).map(c => `<option>${c}</option>`).join('');
-  }
-
-  window.addEventListener('DOMContentLoaded', populateBudgetDropdowns);
-
 
 
   //split
