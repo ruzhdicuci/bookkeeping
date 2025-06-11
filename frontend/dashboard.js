@@ -1379,3 +1379,50 @@ async function saveSplit() {
   closeSplitModal();
   await fetchEntries();
 }
+
+
+function splitEntryFromForm() {
+  const date = document.getElementById('newDate').value;
+  const description = document.getElementById('newDescription').value;
+  const amount = parseFloat(document.getElementById('newAmount').value);
+  const currency = document.getElementById('newCurrency').value;
+  const type = document.getElementById('newType').value;
+  const bank = document.getElementById('newBank').value;
+
+  if (!description || isNaN(amount) || amount <= 0) {
+    return alert("Please fill out the form correctly before splitting.");
+  }
+
+  const splitCount = prompt("How many people should this be split between?", "2");
+  const people = prompt("Enter names separated by commas (e.g., Vanessa,Nora)", "");
+
+  if (!splitCount || !people) return;
+
+  const names = people.split(',').map(p => p.trim()).filter(Boolean);
+  const splitAmount = parseFloat((amount / names.length).toFixed(2));
+
+  names.forEach(person => {
+    const splitEntry = {
+      date,
+      description: `${description} (${person})`,
+      amount: splitAmount,
+      currency,
+      type,
+      person,
+      bank,
+      status: 'Paid'
+    };
+
+    fetch(`https://bookkeeping-i8e0.onrender.com/api/entries`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify(splitEntry)
+    });
+  });
+
+  alert("Split entry added!");
+  fetchEntries();
+}
