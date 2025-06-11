@@ -11,7 +11,7 @@ if (!token) {
 
 
 const entryTableBody = document.getElementById('entryTableBody');
-const monthSelect = document.getElementById('monthSelect');
+
 const catgorySelect = document.getElementById('categorySelect');
 const personFilter = document.getElementById('personFilter');
 const bankFilter = document.getElementById('bankFilter');
@@ -27,15 +27,19 @@ const amountSearch = document.getElementById('amountSearch');
 
 
 
-monthSelect.onchange =
-  bankFilter.onchange =
+// Set up event listeners for other filters
+bankFilter.onchange =
   typeFilter.onchange =
   currencyFilter.onchange =
   categoryFilter.onchange =
   descSearch.oninput =
-   dateSearch.oninput =
- 
-   amountSearch.oninput = renderEntries;
+  dateSearch.oninput =
+  amountSearch.oninput = renderEntries;
+
+// ✅ Setup for new checkbox-based month filter
+document.querySelectorAll('.monthOption, #selectAllMonths').forEach(cb => {
+  cb.addEventListener('change', renderEntries);
+});
 
 
 // Person checkboxes
