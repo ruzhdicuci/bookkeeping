@@ -707,12 +707,12 @@ entries.forEach(e => {
     (statusFilter === 'Paid' && status === 'Paid') ||
     (statusFilter === 'Open' && status === 'Open');
 
-const month = e.date?.slice(0, 7);
-const monthMatch = selectedMonths.length === 0 || selectedMonths.includes(month);
+  const month = e.date?.slice(0, 7);
+  const monthMatch = selectedMonths.length === 0 || selectedMonths.includes(month);
 
-if (include && monthMatch && bank in changes) {
-  changes[bank] += type === 'income' ? amount : -amount;
-}
+  if (include && monthMatch && bank in changes) {
+    changes[bank] += type === 'income' ? amount : -amount;
+  }
 });
 
   // Create table HTML
