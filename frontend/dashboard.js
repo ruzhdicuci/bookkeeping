@@ -135,64 +135,69 @@ console.log("🏦 Bank headers found:", banks);
 }
 
 
-
 function populateFilters() {
-  const months = [...new Set(entries.map(e => e.date.slice(0, 7)))].sort();
-  const prevMonth = monthSelect.value;
-  const prevBank = bankFilter.value;
+  if (!window.entries || !Array.isArray(window.entries)) return;
 
-  monthSelect.innerHTML = `<option value="">All</option>` +
-    months.map(m => `<option value="${m}">${m}</option>`).join('');
-  monthSelect.value = months.includes(prevMonth) ? prevMonth : "";
+  const months = [...new Set(entries.map(e => e.date?.slice(0, 7)))].sort();
+  const banks = [...new Set(entries.map(e => e.bank).filter(Boolean))];
+  const categories = [...new Set(entries.map(e => e.category).filter(Boolean))];
+  const persons = [...new Set(entries.map(e => e.person).filter(Boolean))];
 
-  const banks = [...new Set(entries.map(e => e.bank))].filter(Boolean);
-  bankFilter.innerHTML = `<option value="">All</option>` +
-    banks.map(b => `<option value="${b}">${b}</option>`).join('');
-  bankFilter.value = banks.includes(prevBank) ? prevBank : "";
-
-  // ✅ CATEGORY FILTER — THIS IS MISSING
-  const categoryFilter = document.getElementById('categoryFilter');
-  if (categoryFilter) {
-    const categories = [...new Set(entries.map(e => e.category).filter(Boolean))];
-    categoryFilter.innerHTML =
-      `<option value="All">All</option>` +
-      categories.map(c => `<option value="${c}">${c}</option>`).join('');
+  // ✅ Month dropdown
+  const monthSelect = document.getElementById('monthSelect');
+  if (monthSelect) {
+    const prevMonth = monthSelect.value;
+    monthSelect.innerHTML = `<option value="">All</option>` + months.map(m => `<option value="${m}">${m}</option>`).join('');
+    monthSelect.value = months.includes(prevMonth) ? prevMonth : "";
   }
 
-  // ✅ PERSON CHECKBOX FILTERS
-  const persons = [...new Set(entries.map(e => e.person))].filter(Boolean);
+  // ✅ Bank dropdown
+  const bankFilter = document.getElementById('bankFilter');
+  if (bankFilter) {
+    const prevBank = bankFilter.value;
+    bankFilter.innerHTML = `<option value="">All</option>` + banks.map(b => `<option value="${b}">${b}</option>`).join('');
+    bankFilter.value = banks.includes(prevBank) ? prevBank : "";
+  }
+
+  // ✅ Category dropdown
+  const categoryFilter = document.getElementById('categoryFilter');
+  if (categoryFilter) {
+    categoryFilter.innerHTML = `<option value="All">All</option>` + categories.map(c => `<option value="${c}">${c}</option>`).join('');
+  }
+
+  // ✅ Person checkboxes
   const personOptions = document.getElementById('personOptions');
+  if (personOptions) {
+    personOptions.innerHTML = `
+      <div class="personOptionGroup">
+        <label><input type="checkbox" id="selectAllPersons" /> <strong>All</strong></label>
+        ${persons.map(p => `
+          <label>
+            <input type="checkbox" class="personOption" name="personFilter" value="${p}" checked />
+            ${p}
+          </label>
+        `).join('')}
+      </div>
+    `;
 
-  personOptions.innerHTML = `
-    <div class="personOptionGroup">
-      <label><input type="checkbox" id="selectAllPersons" /> <strong>All</strong></label>
-      ${persons.map(p => `
-        <label>
-          <input type="checkbox" class="personOption" name="personFilter" value="${p}" checked />
-          ${p}
-        </label>
-      `).join('')}
-    </div>
-  `;
+    const selectAllBox = document.getElementById('selectAllPersons');
+    if (selectAllBox) {
+      selectAllBox.addEventListener('change', function () {
+        document.querySelectorAll('.personOption').forEach(cb => cb.checked = this.checked);
+        renderEntries();
+      });
+    }
 
-  // Handle "Select All"
-  document.getElementById('selectAllPersons').addEventListener('change', function () {
-    const allChecked = this.checked;
-    document.querySelectorAll('.personOption').forEach(cb => cb.checked = allChecked);
-    renderEntries();
-  });
-
-  // Handle individual checkboxes
-  document.querySelectorAll('.personOption').forEach(cb => {
-    cb.addEventListener('change', () => {
-      const all = document.querySelectorAll('.personOption');
-      const checked = document.querySelectorAll('.personOption:checked');
-      document.getElementById('selectAllPersons').checked = all.length === checked.length;
-      renderEntries();
+    document.querySelectorAll('.personOption').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const all = document.querySelectorAll('.personOption');
+        const checked = document.querySelectorAll('.personOption:checked');
+        if (selectAllBox) selectAllBox.checked = all.length === checked.length;
+        renderEntries();
+      });
     });
-  });
+  }
 }
-
 
 
 
