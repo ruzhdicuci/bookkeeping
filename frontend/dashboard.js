@@ -1357,3 +1357,65 @@ const plannedItems = [];
 
   window.addEventListener('DOMContentLoaded', populateBudgetDropdowns);
 
+function openSplitModal(entryId) {
+  const entry = entries.find(e => e._id === entryId);
+  if (!entry) return alert("Entry not found");
+
+  window.currentSplitEntry = entry;
+  document.getElementById('splitRows').innerHTML = `
+    <div>
+      <input type="text" placeholder="Person" class="split-person" />
+      <input type="number" placeholder="Amount" class="split-amount" />
+    </div>
+  `;
+  document.getElementById('splitModal').style.display = 'block';
+}
+
+function addSplitRow() {
+  document.getElementById('splitRows').insertAdjacentHTML('beforeend', `
+    <div>
+      <input type="text" placeholder="Person" class="split-person" />
+      <input type="number" placeholder="Amount" class="split-amount" />
+    </div>
+  `);
+}
+
+function closeSplitModal() {
+  document.getElementById('splitModal').style.display = 'none';
+  window.currentSplitEntry = null;
+}
+
+async function saveSplit() {
+  const persons = Array.from(document.querySelectorAll('.split-person')).map(e => e.value.trim());
+  const amounts = Array.from(document.querySelectorAll('.split-amount')).map(e => parseFloat(e.value));
+  
+  const total = amounts.reduce((a, b) => a + b, 0);
+  if (Math.abs(total - window.currentSplitEntry.amount) > 0.01) {
+    return alert(`Total must equal ${window.currentSplitEntry.amount} CHF`);
+  }
+
+  // Delete original and create new entries per person
+  await fetch(`https://bookkeeping-i8e0.onrender.com/api/entries/${window.currentSplitEntry._id}`, {
+    method: 'DELETE',
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+
+  for (let i = 0; i < persons.length; i++) {
+    await fetch(`https://bookkeeping-i8e0.onrender.com/api/entries`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        ...window.currentSplitEntry,
+        person: persons[i],
+        amount: amounts[i],
+        description: `${window.currentSplitEntry.description} (Split)`
+      })
+    });
+  }
+
+  closeSplitModal();
+  await fetchEntries();
+}

@@ -216,11 +216,17 @@
 </div>
   <div class="entry-button">
     <button id="eb" type="submit">Add</button>
-    
+ 
      
   </div>
 
+    <div id="splitModal" style="display:none; position: fixed; background: white; border: 1px solid #ccc; padding: 1rem;">
  
+  <div id="splitRows"></div>
+  <button onclick="addSplitRow()">➕ Add Split</button>
+  <button onclick="saveSplit()">💾 Save</button>
+  <button onclick="closeSplitModal()">✖️ Cancel</button>
+</div>
 
 </form>
 </div>
