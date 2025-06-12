@@ -275,6 +275,12 @@ background-color: transparent;
   color: orangered;
 }
 
+.dark #bt1 {
+
+  border: 1px solid  #373535;
+  color: white;
+}
+
 .dark #dateSearch {
   background: #222;
   border: 1px solid  #373535;
@@ -628,7 +634,7 @@ font-weight: bold;
          border-radius: 10px;
   
             color: rgb(20, 157, 91);            
-     
+     margin-top: -9px;
           }
 
          #eb:hover {
@@ -746,7 +752,7 @@ font-weight: bold;
   color: rgb(171, 32, 94);
 padding-bottom: 2px;
 font-size: 1rem;
- 
+    margin-top: -9px;
   cursor: pointer;
 margin-left: 10px;
    width: 80px;
@@ -774,7 +780,7 @@ margin-left: -13px;
    width: 80px;
  height: 44px;
           font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-
+   margin-top: -9px;
           }
 
           #lockbalance:hover {
