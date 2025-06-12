@@ -36,6 +36,8 @@ bankFilter.onchange =
   dateSearch.oninput =
   amountSearch.oninput = renderEntries;
 
+document.getElementById('categorySearch').addEventListener('input', renderEntries);
+
 // ✅ Setup for new checkbox-based month filter
 document.querySelectorAll('.monthOption, #selectAllMonths').forEach(cb => {
   cb.addEventListener('change', renderEntries);
@@ -243,6 +245,7 @@ function renderEntries() {
   const selectedMonths = Array.from(document.querySelectorAll('.monthOption:checked')).map(cb => cb.value);
   const selectedPersons = Array.from(document.querySelectorAll('.personOption:checked')).map(cb => cb.value);
   const categoryFilter = document.getElementById('categoryFilter');
+  const categorySearch = document.getElementById('categorySearch')?.value.trim().toLowerCase();
   const categoryValue = categoryFilter?.value || "All";
 const dayQuery = dateSearch.value.trim();
 const statusValue = document.getElementById('statusFilter')?.value || 'All';
@@ -274,7 +277,8 @@ const entryDay = e.date?.split('-')[2];
   (!typeFilter.value || e.type === typeFilter.value) &&
   (!currencyFilter.value || e.currency === currencyFilter.value) &&
   (!descSearch.value || (e.description || '').toLowerCase().includes(descSearch.value.toLowerCase())) &&
-  (categoryValue === "All" || e.category === categoryValue) &&
+(categoryValue === "All" || e.category === categoryValue) &&
+(!categorySearch || (e.category || '').toLowerCase().includes(categorySearch)) &&
   (statusValue === 'All' || e.status === statusValue) &&
 (amountSearch.value === '' || (e.amount + '').toLowerCase().includes(amountSearch.value.toLowerCase()))
 );
