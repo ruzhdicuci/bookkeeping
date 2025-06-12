@@ -361,7 +361,32 @@ color:  white;
 border: 1px solid #373535;
 }
 
+.dark #descSearch{
+  background: #2c2c2c;
+color:  white;
+border: 1px solid #373535;
+}
+.dark #amountSearch{
+  background: #2c2c2c;
+color:  white;
+border: 1px solid #373535;
+}
+.dark #dateSearch{
+  background: #2c2c2c;
+color:  white;
+border: 1px solid #373535;
+}
+.dark #bt1 {
+  background: #2c2c2c;
+color:  white;
+border: 1px solid #373535;
+}
 
+.dark #personMultiSelect{
+  background: #2c2c2c;
+color:  white;
+border: 1px solid #373535;
+}
 
 
 .dark #th1  {
@@ -1040,7 +1065,7 @@ color: rgb(213, 79, 79);
  border: 1px solid #f4f2f2;
   border-radius: 4px;
    color: #333;
-   width: 140px;
+   width: 179px;
    text-align: left;
 }
 
@@ -1139,6 +1164,14 @@ color:  white;
 border: 1px solid #373535;
 
 }
+
+.dark #categorySearch{
+  background: #2c2c2c;
+color:  white;
+border: 1px solid #373535;
+
+}
+
 .dark .dropdown-options label {
  background: #232323;
 color:  white;
@@ -1207,7 +1240,7 @@ padding-top: 15px;
 
 .right-filters   {
   display: block;
- width:170px;
+margin-right: 20px;
  border: none;
  text-align: left;
  font-weight: normal;
