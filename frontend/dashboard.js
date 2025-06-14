@@ -1406,62 +1406,62 @@ function resetFilters() {
 
 document.addEventListener('DOMContentLoaded', () => {
   // ✅ personSearch logic
- document.getElementById('personSearch')?.addEventListener('input', () => {
-  const value = document.getElementById('personSearch').value.trim();
-  const checkboxes = document.querySelectorAll('.personOption');
-  const selectAllBox = document.getElementById('selectAllPersons');
-  const disabled = value.length > 0;
+  document.getElementById('personSearch')?.addEventListener('input', () => {
+    const value = document.getElementById('personSearch').value.trim();
+    const checkboxes = document.querySelectorAll('.personOption');
+    const selectAllBox = document.getElementById('selectAllPersons');
+    const disabled = value.length > 0;
 
-  checkboxes.forEach(cb => cb.disabled = disabled);
-  if (selectAllBox) selectAllBox.disabled = disabled;
+    checkboxes.forEach(cb => cb.disabled = disabled);
+    if (selectAllBox) selectAllBox.disabled = disabled;
 
-  if (!disabled) showToast("Person filters re-enabled");
-  renderEntries();
-});
+    if (!disabled) showToast("Person filters re-enabled");
+    renderEntries();
+  });
 
-document.getElementById('bankSearch')?.addEventListener('input', () => {
-  const value = document.getElementById('bankSearch').value.trim();
-  const bankDropdown = document.getElementById('bankFilter');
+  document.getElementById('bankSearch')?.addEventListener('input', () => {
+    const value = document.getElementById('bankSearch').value.trim();
+    const bankDropdown = document.getElementById('bankFilter');
 
-  if (bankDropdown) {
-    bankDropdown.disabled = value.length > 0;
-    if (!value) {
-      bankDropdown.selectedIndex = 0;
-      showToast("Bank filter re-enabled");
+    if (bankDropdown) {
+      bankDropdown.disabled = value.length > 0;
+      if (!value) {
+        bankDropdown.selectedIndex = 0;
+        showToast("Bank filter re-enabled");
+      }
     }
+
+    renderEntries();
+  });
+
+  // delete entries
+  let entryToDelete = null;
+
+  function showDeleteModal(id) {
+    entryToDelete = id;
+    document.getElementById('confirmModal').classList.remove('hidden');
   }
 
-  renderEntries();
-});
-
-//delete entries
-let entryToDelete = null;
-
-function showDeleteModal(id) {
-  entryToDelete = id;
-  document.getElementById('confirmModal').classList.remove('hidden');
-}
-
-document.getElementById('cancelDelete').addEventListener('click', () => {
-  entryToDelete = null;
-  document.getElementById('confirmModal').classList.add('hidden');
-});
-
-document.getElementById('confirmDelete').addEventListener('click', async () => {
-  if (entryToDelete) {
-    await deleteEntry(entryToDelete); // your existing function
+  document.getElementById('cancelDelete').addEventListener('click', () => {
     entryToDelete = null;
     document.getElementById('confirmModal').classList.add('hidden');
+  });
+
+  document.getElementById('confirmDelete').addEventListener('click', async () => {
+    if (entryToDelete) {
+      await deleteEntry(entryToDelete); // your existing function
+      entryToDelete = null;
+      document.getElementById('confirmModal').classList.add('hidden');
+    }
+  });
+
+  function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.style.opacity = '1';
+
+    setTimeout(() => {
+      toast.style.opacity = '0';
+    }, 2000);
   }
-});
-
-
-function showToast(message) {
-  const toast = document.getElementById('toast');
-  toast.textContent = message;
-  toast.style.opacity = '1';
-
-  setTimeout(() => {
-    toast.style.opacity = '0';
-  }, 2000);
-}
+}); // ✅ This was missing
