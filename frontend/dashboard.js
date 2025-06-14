@@ -260,6 +260,8 @@ const categorySearch = document.getElementById('categorySearch')?.value.trim();
       .some(val => (target || '').toLowerCase().includes(val));
 
   // ✅ Filter entries
+  if (!matchesMulti(bankSearch, e.bank)) console.log('✖ no match for bank:', e.bank, 'search:', bankSearch);
+if (!matchesMulti(personSearch, e.person)) console.log('✖ no match for person:', e.person, 'search:', personSearch);
   const filtered = entries.filter(e => {
     const entryDay = e.date?.split('-')[2];
 
