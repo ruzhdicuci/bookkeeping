@@ -260,29 +260,32 @@ const categorySearch = document.getElementById('categorySearch')?.value.trim();
       .some(val => (target || '').toLowerCase().includes(val));
 
   // ✅ Filter entries
+const filtered = entries.filter(e => {
+  const entryDay = e.date?.split('-')[2];
 
-  const filtered = entries.filter(e => {
-    const entryDay = e.date?.split('-')[2];
-  if (!matchesMulti(bankSearch, e.bank)) console.log('✖ no match for bank:', e.bank, 'search:', bankSearch);
-if (!matchesMulti(personSearch, e.person)) console.log('✖ no match for person:', e.person, 'search:', personSearch);
-    return (
-      matchesMulti(dateSearch, entryDay) &&
-      (selectedMonths.length === 0 || selectedMonths.includes(e.date?.slice(0, 7))) &&
-  (personSearch
-  ? matchesMulti(personSearch, e.person)
-  : (selectedPersons.length === 0 || selectedPersons.includes(e.person))) &&
-     (bankSearch
-  ? matchesMulti(bankSearch, e.bank)
-  : (!bankFilter.value || e.bank === bankFilter.value)) &&
-      (!typeFilter.value || e.type === typeFilter.value) &&
-      (!currencyFilter.value || e.currency === currencyFilter.value) &&
-      matchesMulti(descSearch, e.description) &&
-      (categoryValue === "All" || e.category === categoryValue) &&
-      matchesMulti(categorySearch, e.category) &&
-      (statusValue === 'All' || e.status === statusValue) &&
-      matchesMulti(amountSearch, e.amount + '')
-    );
-  });
+  return (
+    matchesMulti(dateSearch, entryDay) &&
+    (selectedMonths.length === 0 || selectedMonths.includes(e.date?.slice(0, 7))) &&
+
+    // ✅ Person filter: either search OR checkbox
+    (personSearch
+      ? matchesMulti(personSearch, e.person)
+      : (selectedPersons.length === 0 || selectedPersons.includes(e.person))) &&
+
+    // ✅ Bank filter: either search OR dropdown
+    (bankSearch
+      ? matchesMulti(bankSearch, e.bank)
+      : (!bankFilter.value || e.bank === bankFilter.value)) &&
+
+    (!typeFilter.value || e.type === typeFilter.value) &&
+    (!currencyFilter.value || e.currency === currencyFilter.value) &&
+    matchesMulti(descSearch, e.description) &&
+    (categoryValue === "All" || e.category === categoryValue) &&
+    matchesMulti(categorySearch, e.category) &&
+    (statusValue === 'All' || e.status === statusValue) &&
+    matchesMulti(amountSearch, e.amount + '')
+  );
+});
 
   // ✅ Render filtered rows
   entryTableBody.innerHTML = '';
