@@ -242,9 +242,9 @@ function renderEntries() {
   const dateSearch = document.getElementById('dateSearch')?.value.trim();
   const descSearch = document.getElementById('descSearch')?.value.trim();
   const amountSearch = document.getElementById('amountSearch')?.value.trim();
-  const categorySearch = document.getElementById('categorySearch')?.value.trim().toLowerCase();
-  const bankSearch = document.getElementById('bankSearch')?.value.trim().toLowerCase();
-  const personSearch = document.getElementById('personSearch')?.value.trim().toLowerCase();
+const bankSearch = document.getElementById('bankSearch')?.value.trim();
+const personSearch = document.getElementById('personSearch')?.value.trim();
+const categorySearch = document.getElementById('categorySearch')?.value.trim();
 
   const selectedMonths = Array.from(document.querySelectorAll('.monthOption:checked')).map(cb => cb.value);
   const selectedPersons = Array.from(document.querySelectorAll('.personOption:checked')).map(cb => cb.value);
