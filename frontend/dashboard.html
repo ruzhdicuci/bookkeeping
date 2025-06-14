@@ -575,7 +575,7 @@ function drawCharts() {
 
   const monthlyIncome = {}, monthlyExpense = {}, personIncome = {}, personExpense = {}, expenseByCategory = {};
 // 🔍 For filtering the entry table:
-const selectedPersons = Array.from(document.querySelectorAll('.personOption:checked')).map(cb => cb.value);
+const selectedPersons = Array.from(document.querySelectorAll('.personChartFilter:checked')).map(cb => cb.value);
 
   entries.forEach(e => {
     if (categoryFilter !== 'All' && (e.category || 'Uncategorized') !== categoryFilter) return;
@@ -787,7 +787,7 @@ function populatePersonFilter(persons) {
     <hr style="margin: 6px 0;">
     ${persons.map(p => `
       <label>
-       <input type="checkbox" class="personOption" value="${p}" checked />
+        <input type="checkbox" class="personChartFilter" value="${p}" checked />
         
         ${p}
       </label>
@@ -800,7 +800,7 @@ function populatePersonFilter(persons) {
   });
 
   const selectAll = document.getElementById('selectAllPersons');
-  const checkboxes = container.querySelectorAll('personOption');
+  const checkboxes = container.querySelectorAll('.personChartFilter');
 
   selectAll.addEventListener('change', () => {
     checkboxes.forEach(cb => cb.checked = selectAll.checked);
