@@ -1368,54 +1368,47 @@ function clearSearch(id) {
 }
 
 function resetFilters() {
-  const resetInput = id => {
+  // Clear search inputs
+  document.getElementById('dateSearch').value = '';
+  document.getElementById('descSearch').value = '';
+  document.getElementById('amountSearch').value = '';
+  document.getElementById('categorySearch').value = '';
+  document.getElementById('bankSearch').value = '';
+  document.getElementById('personSearch').value = '';
+
+  // ✅ Re-enable and reset dropdown filters
+  ['categoryFilter', 'typeFilter', 'currencyFilter', 'statusFilter', 'bankFilter'].forEach(id => {
     const el = document.getElementById(id);
     if (el) {
-      el.value = '';
-      el.dispatchEvent(new Event('input'));
+      el.disabled = false;
+      el.selectedIndex = 0;
     }
-  };
+  });
 
-  // Clear input fields
-  resetInput('dateSearch');
-  resetInput('descSearch');
-  resetInput('amountSearch');
-  resetInput('categorySearch');
-  resetInput('bankSearch');
-  resetInput('personSearch');
+  // ✅ Re-enable and re-check all person checkboxes
+  const personCheckboxes = document.querySelectorAll('.personOption');
+  personCheckboxes.forEach(cb => {
+    cb.disabled = false;
+    cb.checked = true;
+  });
 
-  // Reset dropdown filters to first option
- ['categoryFilter', 'typeFilter', 'currencyFilter', 'bankFilter', 'statusFilter'].forEach(id => {
-  const el = document.getElementById(id);
-  if (el) {
-    el.selectedIndex = 0;
-    el.disabled = false; // ✅ re-enable
+  const selectAllPersons = document.getElementById('selectAllPersons');
+  if (selectAllPersons) {
+    selectAllPersons.disabled = false;
+    selectAllPersons.checked = true;
   }
-});
 
+  // ✅ Re-check all month checkboxes
+  const monthCheckboxes = document.querySelectorAll('.monthOption');
+  monthCheckboxes.forEach(cb => cb.checked = true);
 
-  // Reset month checkboxes
-  document.querySelectorAll('.monthOption').forEach(cb => cb.checked = true);
   const selectAllMonths = document.getElementById('selectAllMonths');
   if (selectAllMonths) selectAllMonths.checked = true;
 
- // Reset and re-enable person checkboxes
-document.querySelectorAll('.personOption').forEach(cb => {
-  cb.checked = true;
-  cb.disabled = false; // ✅ re-enable
-});
-
-const selectAllPersons = document.getElementById('selectAllPersons');
-if (selectAllPersons) {
-  selectAllPersons.checked = true;
-  selectAllPersons.disabled = false; // ✅ re-enable
+  // ✅ Toast and render refresh
+  renderEntries();
+  showToast("All filters re-enabled");
 }
-
-  renderEntries(); // Just in case
-    // ✅ Show feedback
-  showToast("All filters Cleared");
-}
-
 
 document.addEventListener('DOMContentLoaded', () => {
   // ✅ personSearch logic
