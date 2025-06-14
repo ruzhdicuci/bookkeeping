@@ -267,29 +267,31 @@ dayQuery.split(',').forEach(part => {
 
   // ✅ Filter entries
   const filtered = entries.filter(e => {
-    const daySearch = dateSearch.value.trim();
-const entryDay = e.date?.split('-')[2];
-    const description = (e.description || '').toLowerCase();
+  const entryDay = e.date?.split('-')[2];
 
- return (
-  (selectedDays.size === 0 || selectedDays.has(entryDay)) &&
-  (selectedMonths.length === 0 || selectedMonths.includes(e.date?.slice(0, 7))) &&
+  // Multi-search helpers
+  const matchesMulti = (query, target) =>
+    !query || query
+      .split(',')
+      .map(s => s.trim().toLowerCase())
+      .some(val => (target || '').toLowerCase().includes(val));
 
-  (selectedPersons.length === 0 || selectedPersons.includes(e.person)) &&
-(!personSearch || (e.person || '').toLowerCase().includes(personSearch)) &&
-  (!bankFilter.value || e.bank === bankFilter.value) &&
-(!bankSearch || (e.bank || '').toLowerCase().includes(bankSearch)) &&
-  (!typeFilter.value || e.type === typeFilter.value) &&
-  (!currencyFilter.value || e.currency === currencyFilter.value) &&
-  (!descSearch.value || (e.description || '').toLowerCase().includes(descSearch.value.toLowerCase())) &&
-(categoryValue === "All" || e.category === categoryValue) &&
-(!categorySearch || (e.category || '').toLowerCase().includes(categorySearch)) &&
-  (statusValue === 'All' || e.status === statusValue) &&
-(amountSearch.value === '' || (e.amount + '').toLowerCase().includes(amountSearch.value.toLowerCase()))
-);
-  });
-['bankSearch', 'personSearch'].forEach(id => {
-  document.getElementById(id).addEventListener('input', renderEntries);
+  return (
+    (selectedDays.size === 0 || selectedDays.has(entryDay)) &&
+    (selectedMonths.length === 0 || selectedMonths.includes(e.date?.slice(0, 7))) &&
+
+    (selectedPersons.length === 0 || selectedPersons.includes(e.person)) &&
+    matchesMulti(personSearch, e.person) &&
+    (!bankFilter.value || e.bank === bankFilter.value) &&
+    matchesMulti(bankSearch, e.bank) &&
+    (!typeFilter.value || e.type === typeFilter.value) &&
+    (!currencyFilter.value || e.currency === currencyFilter.value) &&
+    matchesMulti(descSearch?.value, e.description) &&
+    (categoryValue === "All" || e.category === categoryValue) &&
+    matchesMulti(categorySearch, e.category) &&
+    (statusValue === 'All' || e.status === statusValue) &&
+    (amountSearch.value === '' || matchesMulti(amountSearch.value, e.amount + ''))
+  );
 });
 
   entryTableBody.innerHTML = '';

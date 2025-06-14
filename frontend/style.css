@@ -1169,8 +1169,22 @@ border: 1px solid #373535;
   background: #2c2c2c;
 color:  white;
 border: 1px solid #373535;
-
 }
+.dark #bankSearch{
+  background: #2c2c2c;
+color:  white;
+border: 1px solid #373535;
+}
+
+.dark #personSearch{
+  background: #2c2c2c;
+color:  white;
+border: 1px solid #373535;
+}
+
+
+
+
 
 .dark .dropdown-options label {
  background: #232323;
