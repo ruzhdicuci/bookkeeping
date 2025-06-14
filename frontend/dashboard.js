@@ -247,6 +247,8 @@ function renderEntries() {
   const categoryFilter = document.getElementById('categoryFilter');
   const categorySearch = document.getElementById('categorySearch')?.value.trim().toLowerCase();
   const categoryValue = categoryFilter?.value || "All";
+  const bankSearch = document.getElementById('bankSearch')?.value.trim().toLowerCase();
+const personSearch = document.getElementById('personSearch')?.value.trim().toLowerCase();
 const dayQuery = dateSearch.value.trim();
 const statusValue = document.getElementById('statusFilter')?.value || 'All';
 let selectedDays = new Set();
@@ -272,8 +274,11 @@ const entryDay = e.date?.split('-')[2];
  return (
   (selectedDays.size === 0 || selectedDays.has(entryDay)) &&
   (selectedMonths.length === 0 || selectedMonths.includes(e.date?.slice(0, 7))) &&
+
   (selectedPersons.length === 0 || selectedPersons.includes(e.person)) &&
+(!personSearch || (e.person || '').toLowerCase().includes(personSearch)) &&
   (!bankFilter.value || e.bank === bankFilter.value) &&
+(!bankSearch || (e.bank || '').toLowerCase().includes(bankSearch)) &&
   (!typeFilter.value || e.type === typeFilter.value) &&
   (!currencyFilter.value || e.currency === currencyFilter.value) &&
   (!descSearch.value || (e.description || '').toLowerCase().includes(descSearch.value.toLowerCase())) &&
@@ -283,7 +288,9 @@ const entryDay = e.date?.split('-')[2];
 (amountSearch.value === '' || (e.amount + '').toLowerCase().includes(amountSearch.value.toLowerCase()))
 );
   });
-
+['bankSearch', 'personSearch'].forEach(id => {
+  document.getElementById(id).addEventListener('input', renderEntries);
+});
 
   entryTableBody.innerHTML = '';
 filtered.forEach(e => {
