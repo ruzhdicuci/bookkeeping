@@ -317,7 +317,7 @@ function renderEntries() {
 
     entryTableBody.appendChild(row);
   });
-}
+
   // ✅ Update totals
   let incomeTotal = 0, expenseTotal = 0;
   filtered.forEach(e => {
@@ -326,33 +326,32 @@ function renderEntries() {
     else expenseTotal += amount;
   });
 
-    // ✅ Monthly Averages
-const monthsUsed = [...new Set(filtered.map(e => e.date?.slice(0, 7)))].filter(Boolean);
-const avgIncome = incomeTotal / monthsUsed.length || 0;
-const avgExpense = expenseTotal / monthsUsed.length || 0;
-const avgBalance = avgIncome - avgExpense;
+  // ✅ Monthly Averages
+  const monthsUsed = [...new Set(filtered.map(e => e.date?.slice(0, 7)))].filter(Boolean);
+  const avgIncome = incomeTotal / monthsUsed.length || 0;
+  const avgExpense = expenseTotal / monthsUsed.length || 0;
 
-document.getElementById('monthlyAverageCard').innerHTML = `
-  <div class="average-card-container">
-    <div class="average-card">
-      Avg Income
-      <a class="income-color">${avgIncome.toFixed(2)}</a>
+  document.getElementById('monthlyAverageCard').innerHTML = `
+    <div class="average-card-container">
+      <div class="average-card">
+        Avg Income
+        <a class="income-color">${avgIncome.toFixed(2)}</a>
+      </div>
+      <div class="average-card">
+        Avg Expenses
+        <a class="expense-color">${avgExpense.toFixed(2)}</a>
+      </div>
+      <div class="average-card">
+        Avg Balance
+       <a class="balance-color">${(avgIncome - avgExpense).toFixed(2)}</a>
+      </div>
     </div>
-    <div class="average-card">
-      Avg Expenses
-      <a class="expense-color">${avgExpense.toFixed(2)}</a>
-    </div>
-    <div class="average-card">
-      Avg Balance
-     <a class="balance-color">${(avgIncome - avgExpense).toFixed(2)}</a>
-    </div>
-  </div>
-`;
+  `;
+
   document.getElementById('totalIncome').textContent = incomeTotal.toFixed(2);
   document.getElementById('totalExpense').textContent = expenseTotal.toFixed(2);
   document.getElementById('totalBalance').textContent = (incomeTotal - expenseTotal).toFixed(2);
-}
-
+} // ✅ final closing brace for renderEntries
 
 
 
