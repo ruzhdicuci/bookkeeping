@@ -263,20 +263,21 @@ const categorySearch = document.getElementById('categorySearch')?.value.trim();
 const filtered = entries.filter(e => {
   const entryDay = e.date?.split('-')[2];
 
+  const personMatches =
+    personSearch?.length > 0
+      ? matchesMulti(personSearch, e.person)
+      : selectedPersons.length === 0 || selectedPersons.includes(e.person);
+
+  const bankMatches =
+    bankSearch?.length > 0
+      ? matchesMulti(bankSearch, e.bank)
+      : !bankFilter.value || e.bank === bankFilter.value;
+
   return (
     matchesMulti(dateSearch, entryDay) &&
     (selectedMonths.length === 0 || selectedMonths.includes(e.date?.slice(0, 7))) &&
-
-    // ✅ Person filter: either search OR checkbox
-    (personSearch
-      ? matchesMulti(personSearch, e.person)
-      : (selectedPersons.length === 0 || selectedPersons.includes(e.person))) &&
-
-    // ✅ Bank filter: either search OR dropdown
-    (bankSearch
-      ? matchesMulti(bankSearch, e.bank)
-      : (!bankFilter.value || e.bank === bankFilter.value)) &&
-
+    personMatches &&
+    bankMatches &&
     (!typeFilter.value || e.type === typeFilter.value) &&
     (!currencyFilter.value || e.currency === currencyFilter.value) &&
     matchesMulti(descSearch, e.description) &&
