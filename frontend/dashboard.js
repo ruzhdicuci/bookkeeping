@@ -1359,5 +1359,34 @@ function clearSearch(id) {
 }
 
 
+function resetTopFilters() {
+  // List of input IDs you want to skip
+  const excludeIds = new Set([
+    'limitInput1', 'limitInput2', // replace with actual IDs from your lower section
+    'mbetjaField', 'totalPlusField'
+  ]);
 
+  // Clear all inputs inside the filters section
+  document.querySelectorAll('.filters input').forEach(input => {
+    if (!excludeIds.has(input.id)) {
+      input.value = '';
+    }
+  });
+
+  // Reset dropdowns too if needed
+  document.querySelectorAll('.filters select').forEach(select => {
+    if (!excludeIds.has(select.id)) {
+      select.selectedIndex = 0;
+    }
+  });
+
+  // Uncheck all checkboxes (e.g., month/person filters)
+  document.querySelectorAll('.filters input[type="checkbox"]').forEach(cb => {
+    if (!excludeIds.has(cb.id)) {
+      cb.checked = true;
+    }
+  });
+
+  renderEntries(); // Refresh table
+}
 
