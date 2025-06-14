@@ -1436,7 +1436,21 @@ document.addEventListener('DOMContentLoaded', () => {
     renderEntries();
   });
 
-  // delete entries
+  
+
+  function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.style.opacity = '1';
+
+    setTimeout(() => {
+      toast.style.opacity = '0';
+    }, 2000);
+  }
+}); // ✅ This was missing
+
+
+// delete entries
   let entryToDelete = null;
 
   function showDeleteModal(id) {
@@ -1456,14 +1470,3 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('confirmModal').classList.add('hidden');
     }
   });
-
-  function showToast(message) {
-    const toast = document.getElementById('toast');
-    toast.textContent = message;
-    toast.style.opacity = '1';
-
-    setTimeout(() => {
-      toast.style.opacity = '0';
-    }, 2000);
-  }
-}); // ✅ This was missing
