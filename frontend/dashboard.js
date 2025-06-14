@@ -1399,39 +1399,43 @@ function resetFilters() {
 }
 
 
-document.getElementById('personSearch')?.addEventListener('input', () => {
-  const value = document.getElementById('personSearch').value.trim();
-  const checkboxes = document.querySelectorAll('.personOption');
-  const selectAllBox = document.getElementById('selectAllPersons');
+document.addEventListener('DOMContentLoaded', () => {
+  // ✅ personSearch logic
+  document.getElementById('personSearch')?.addEventListener('input', () => {
+    const value = document.getElementById('personSearch').value.trim();
+    const checkboxes = document.querySelectorAll('.personOption');
+    const selectAllBox = document.getElementById('selectAllPersons');
 
-  if (value.length > 0) {
-    checkboxes.forEach(cb => cb.disabled = true);
-    if (selectAllBox) selectAllBox.disabled = true;
-  } else {
-    checkboxes.forEach(cb => cb.disabled = false);
-    if (selectAllBox) selectAllBox.disabled = false;
-  }
-
-  renderEntries();
-});
-
-
-document.getElementById('bankSearch')?.addEventListener('input', () => {
-  const value = document.getElementById('bankSearch').value.trim();
-  const bankDropdown = document.getElementById('bankFilter');
-
-  if (bankDropdown) {
     if (value.length > 0) {
-      bankDropdown.disabled = true;
+      checkboxes.forEach(cb => cb.disabled = true);
+      if (selectAllBox) selectAllBox.disabled = true;
     } else {
-      bankDropdown.disabled = false;
-      bankDropdown.selectedIndex = 0; // Optional reset
+      checkboxes.forEach(cb => cb.disabled = false);
+      if (selectAllBox) selectAllBox.disabled = false;
     }
-  }
 
-  renderEntries();
+    renderEntries();
+  });
+
+  // ✅ bankSearch logic
+  document.getElementById('bankSearch')?.addEventListener('input', () => {
+    const value = document.getElementById('bankSearch').value.trim();
+    const bankDropdown = document.getElementById('bankFilter');
+
+    if (bankDropdown) {
+      if (value.length > 0) {
+        bankDropdown.disabled = true;
+      } else {
+        bankDropdown.disabled = false;
+        bankDropdown.selectedIndex = 0; // optional reset
+      }
+    }
+
+    renderEntries();
+  });
 });
 
+//delete entries
 let entryToDelete = null;
 
 function showDeleteModal(id) {
