@@ -1358,7 +1358,12 @@ function clearSearch(id) {
     console.warn(`No element found with id "${id}"`);
     return;
   }
+
   el.value = '';
+
+  // ✅ Trigger the 'input' event to re-run any logic tied to input listeners
+  el.dispatchEvent(new Event('input'));
+
   renderEntries();
 }
 
@@ -1401,38 +1406,32 @@ function resetFilters() {
 
 document.addEventListener('DOMContentLoaded', () => {
   // ✅ personSearch logic
-  document.getElementById('personSearch')?.addEventListener('input', () => {
-    const value = document.getElementById('personSearch').value.trim();
-    const checkboxes = document.querySelectorAll('.personOption');
-    const selectAllBox = document.getElementById('selectAllPersons');
+ document.getElementById('personSearch')?.addEventListener('input', () => {
+  const value = document.getElementById('personSearch').value.trim();
+  const checkboxes = document.querySelectorAll('.personOption');
+  const selectAllBox = document.getElementById('selectAllPersons');
+  const disabled = value.length > 0;
 
-    if (value.length > 0) {
-      checkboxes.forEach(cb => cb.disabled = true);
-      if (selectAllBox) selectAllBox.disabled = true;
-    } else {
-      checkboxes.forEach(cb => cb.disabled = false);
-      if (selectAllBox) selectAllBox.disabled = false;
+  checkboxes.forEach(cb => cb.disabled = disabled);
+  if (selectAllBox) selectAllBox.disabled = disabled;
+
+  if (!disabled) showToast("Person filters re-enabled");
+  renderEntries();
+});
+
+document.getElementById('bankSearch')?.addEventListener('input', () => {
+  const value = document.getElementById('bankSearch').value.trim();
+  const bankDropdown = document.getElementById('bankFilter');
+
+  if (bankDropdown) {
+    bankDropdown.disabled = value.length > 0;
+    if (!value) {
+      bankDropdown.selectedIndex = 0;
+      showToast("Bank filter re-enabled");
     }
+  }
 
-    renderEntries();
-  });
-
-  // ✅ bankSearch logic
-  document.getElementById('bankSearch')?.addEventListener('input', () => {
-    const value = document.getElementById('bankSearch').value.trim();
-    const bankDropdown = document.getElementById('bankFilter');
-
-    if (bankDropdown) {
-      if (value.length > 0) {
-        bankDropdown.disabled = true;
-      } else {
-        bankDropdown.disabled = false;
-        bankDropdown.selectedIndex = 0; // optional reset
-      }
-    }
-
-    renderEntries();
-  });
+  renderEntries();
 });
 
 //delete entries
@@ -1455,3 +1454,14 @@ document.getElementById('confirmDelete').addEventListener('click', async () => {
     document.getElementById('confirmModal').classList.add('hidden');
   }
 });
+
+
+function showToast(message) {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.style.opacity = '1';
+
+  setTimeout(() => {
+    toast.style.opacity = '0';
+  }, 2000);
+}
