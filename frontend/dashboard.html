@@ -800,7 +800,7 @@ function populatePersonFilter(persons) {
   });
 
   const selectAll = document.getElementById('selectAllPersons');
-  const checkboxes = container.querySelectorAll('.personOption');
+  const checkboxes = container.querySelectorAll('personOption');
 
   selectAll.addEventListener('change', () => {
     checkboxes.forEach(cb => cb.checked = selectAll.checked);
