@@ -1359,34 +1359,29 @@ function clearSearch(id) {
 }
 
 
-function resetTopFilters() {
-  // List of input IDs you want to skip
-  const excludeIds = new Set([
-    'limitInput1', 'limitInput2', // replace with actual IDs from your lower section
-    'mbetjaField', 'totalPlusField'
-  ]);
+function resetFilters() {
+  // Clear input fields
+  document.getElementById('dateSearch').value = '';
+  document.getElementById('descSearch').value = '';
+  document.getElementById('amountSearch').value = '';
+  document.getElementById('categorySearch').value = '';
 
-  // Clear all inputs inside the filters section
-  document.querySelectorAll('.filters input').forEach(input => {
-    if (!excludeIds.has(input.id)) {
-      input.value = '';
-    }
-  });
+  // Reset dropdown filters
+  document.getElementById('categoryFilter').value = 'All';
+  document.getElementById('typeFilter').value = 'All';
+  document.getElementById('currencyFilter').value = 'All';
+  document.getElementById('bankFilter').value = 'All';
+  document.getElementById('statusFilter').value = 'All';
 
-  // Reset dropdowns too if needed
-  document.querySelectorAll('.filters select').forEach(select => {
-    if (!excludeIds.has(select.id)) {
-      select.selectedIndex = 0;
-    }
-  });
+  // Reset month checkboxes
+  document.querySelectorAll('.monthOption').forEach(cb => cb.checked = true);
+  const selectAllMonths = document.getElementById('selectAllMonths');
+  if (selectAllMonths) selectAllMonths.checked = true;
 
-  // Uncheck all checkboxes (e.g., month/person filters)
-  document.querySelectorAll('.filters input[type="checkbox"]').forEach(cb => {
-    if (!excludeIds.has(cb.id)) {
-      cb.checked = true;
-    }
-  });
+  // Reset person checkboxes
+  document.querySelectorAll('.personOption').forEach(cb => cb.checked = true);
+  const selectAllPersons = document.getElementById('selectAllPersons');
+  if (selectAllPersons) selectAllPersons.checked = true;
 
-  renderEntries(); // Refresh table
+  renderEntries(); // Reapply filters to show all
 }
-
