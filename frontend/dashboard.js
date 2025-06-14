@@ -268,10 +268,12 @@ if (!matchesMulti(personSearch, e.person)) console.log('✖ no match for person:
     return (
       matchesMulti(dateSearch, entryDay) &&
       (selectedMonths.length === 0 || selectedMonths.includes(e.date?.slice(0, 7))) &&
-      (selectedPersons.length === 0 || selectedPersons.includes(e.person)) &&
-      matchesMulti(personSearch, e.person) &&
-      (!bankFilter.value || e.bank === bankFilter.value) &&
-      matchesMulti(bankSearch, e.bank) &&
+  (personSearch
+  ? matchesMulti(personSearch, e.person)
+  : (selectedPersons.length === 0 || selectedPersons.includes(e.person))) &&
+     (bankSearch
+  ? matchesMulti(bankSearch, e.bank)
+  : (!bankFilter.value || e.bank === bankFilter.value)) &&
       (!typeFilter.value || e.type === typeFilter.value) &&
       (!currencyFilter.value || e.currency === currencyFilter.value) &&
       matchesMulti(descSearch, e.description) &&
