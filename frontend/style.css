@@ -1667,3 +1667,45 @@ font-size:  1.7rem;
   opacity: 1;
 }
 
+
+
+.modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+.modal.hidden {
+  display: none;
+}
+.modal-content {
+  background: #fff;
+  padding: 20px 30px;
+  border-radius: 12px;
+  max-width: 320px;
+  text-align: center;
+}
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 15px;
+}
+.btn.cancel {
+  background-color: #999;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+}
+.btn.confirm {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+}

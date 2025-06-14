@@ -900,7 +900,15 @@ document.getElementById('categoryFilter')?.addEventListener('change', drawCharts
 </script>
 
 
-
+<div id="confirmModal" class="modal hidden">
+  <div class="modal-content">
+    <p>🗑️ Are you sure you want to delete this entry?</p>
+    <div class="modal-actions">
+      <button id="cancelDelete" class="btn cancel">Cancel</button>
+      <button id="confirmDelete" class="btn confirm">Delete</button>
+    </div>
+  </div>
+</div>
 
 
 

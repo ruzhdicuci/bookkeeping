@@ -307,7 +307,7 @@ const filtered = entries.filter(e => {
       <td>
         <button class="action-btn" onclick="editEntry('${e._id}')" title="Edit">✏️</button>
         <button class="action-btn" onclick="duplicateEntry('${e._id}')" title="Duplicate">📄</button>
-        <button class="action-btn" onclick="deleteEntry('${e._id}')" title="Delete">🗑️</button>
+       <button class="action-btn" onclick="showDeleteModal('${e._id}')" title="Delete">🗑️</button>
       </td>
       <td>
         ${
@@ -487,6 +487,9 @@ async function duplicateEntry(id) {
 
 
 async function deleteEntry(id) {
+  const confirmed = confirm("🗑️ Are you sure you want to delete this entry?");
+  if (!confirmed) return;
+
   await fetch(`https://bookkeeping-i8e0.onrender.com/api/entries/${id}`, {
     method: 'DELETE',
     headers: { Authorization: `Bearer ${token}` }
@@ -498,7 +501,6 @@ async function deleteEntry(id) {
   populateFilters();               // Rebuild filters
   renderBankBalanceForm();         // ✅ Refresh bank balance table
 }
-
 
 
 
@@ -1415,4 +1417,43 @@ document.getElementById('personSearch')?.addEventListener('input', () => {
   }
 
   renderEntries();
+});
+
+
+
+document.getElementById('bankSearch')?.addEventListener('input', () => {
+  const value = document.getElementById('bankSearch').value.trim();
+  const bankDropdown = document.getElementById('bankFilter');
+
+  const disabled = value.length > 0;
+  if (bankDropdown) bankDropdown.disabled = disabled;
+
+  // ✅ Restore dropdown if input is cleared
+  if (value.length === 0 && bankDropdown) {
+    bankDropdown.disabled = false;
+    bankDropdown.selectedIndex = 0; // Optional: reset selection to "All"
+  }
+
+  renderEntries();
+});
+
+
+let entryToDelete = null;
+
+function showDeleteModal(id) {
+  entryToDelete = id;
+  document.getElementById('confirmModal').classList.remove('hidden');
+}
+
+document.getElementById('cancelDelete').addEventListener('click', () => {
+  entryToDelete = null;
+  document.getElementById('confirmModal').classList.add('hidden');
+});
+
+document.getElementById('confirmDelete').addEventListener('click', async () => {
+  if (entryToDelete) {
+    await deleteEntry(entryToDelete); // your existing function
+    entryToDelete = null;
+    document.getElementById('confirmModal').classList.add('hidden');
+  }
 });
