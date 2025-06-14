@@ -1366,12 +1366,12 @@ function resetFilters() {
   document.getElementById('amountSearch').value = '';
   document.getElementById('categorySearch').value = '';
 
-  // Reset dropdown filters
-  document.getElementById('categoryFilter').value = 'All';
-  document.getElementById('typeFilter').value = 'All';
-  document.getElementById('currencyFilter').value = 'All';
-  document.getElementById('bankFilter').value = 'All';
-  document.getElementById('statusFilter').value = 'All';
+  // Reset dropdown filters to first option
+  document.getElementById('categoryFilter').selectedIndex = 0;
+  document.getElementById('typeFilter').selectedIndex = 0;
+  document.getElementById('currencyFilter').selectedIndex = 0;
+  document.getElementById('bankFilter').selectedIndex = 0;
+  document.getElementById('statusFilter').selectedIndex = 0;
 
   // Reset month checkboxes
   document.querySelectorAll('.monthOption').forEach(cb => cb.checked = true);
@@ -1383,5 +1383,5 @@ function resetFilters() {
   const selectAllPersons = document.getElementById('selectAllPersons');
   if (selectAllPersons) selectAllPersons.checked = true;
 
-  renderEntries(); // Reapply filters to show all
+  renderEntries(); // Refresh
 }
