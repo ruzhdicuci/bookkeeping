@@ -1365,13 +1365,14 @@ function clearSearch(id) {
   renderEntries();
 }
 
-
 function resetFilters() {
   // Clear input fields
   document.getElementById('dateSearch').value = '';
   document.getElementById('descSearch').value = '';
   document.getElementById('amountSearch').value = '';
   document.getElementById('categorySearch').value = '';
+  document.getElementById('bankSearch').value = '';
+  document.getElementById('personSearch').value = '';
 
   // Reset dropdown filters to first option
   document.getElementById('categoryFilter').selectedIndex = 0;
