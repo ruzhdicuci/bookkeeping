@@ -1396,3 +1396,23 @@ function resetFilters() {
 
   renderEntries(); // Just in case
 }
+
+
+document.getElementById('personSearch')?.addEventListener('input', () => {
+  const value = document.getElementById('personSearch').value.trim();
+  const checkboxes = document.querySelectorAll('.personOption');
+  const selectAllBox = document.getElementById('selectAllPersons');
+
+  const disabled = value.length > 0;
+
+  checkboxes.forEach(cb => cb.disabled = disabled);
+  if (selectAllBox) selectAllBox.disabled = disabled;
+
+  // ✅ Restore checkbox state if input is cleared
+  if (value.length === 0) {
+    checkboxes.forEach(cb => cb.checked = true);
+    if (selectAllBox) selectAllBox.checked = true;
+  }
+
+  renderEntries();
+});
