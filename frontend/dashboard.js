@@ -487,8 +487,7 @@ async function duplicateEntry(id) {
 
 
 async function deleteEntry(id) {
-  const confirmed = confirm("🗑️ Are you sure you want to delete this entry?");
-  if (!confirmed) return;
+
 
   await fetch(`https://bookkeeping-i8e0.onrender.com/api/entries/${id}`, {
     method: 'DELETE',
@@ -1405,38 +1404,33 @@ document.getElementById('personSearch')?.addEventListener('input', () => {
   const checkboxes = document.querySelectorAll('.personOption');
   const selectAllBox = document.getElementById('selectAllPersons');
 
-  const disabled = value.length > 0;
-
-  checkboxes.forEach(cb => cb.disabled = disabled);
-  if (selectAllBox) selectAllBox.disabled = disabled;
-
-  // ✅ Restore checkbox state if input is cleared
-  if (value.length === 0) {
-    checkboxes.forEach(cb => cb.checked = true);
-    if (selectAllBox) selectAllBox.checked = true;
+  if (value.length > 0) {
+    checkboxes.forEach(cb => cb.disabled = true);
+    if (selectAllBox) selectAllBox.disabled = true;
+  } else {
+    checkboxes.forEach(cb => cb.disabled = false);
+    if (selectAllBox) selectAllBox.disabled = false;
   }
 
   renderEntries();
 });
-
 
 
 document.getElementById('bankSearch')?.addEventListener('input', () => {
   const value = document.getElementById('bankSearch').value.trim();
   const bankDropdown = document.getElementById('bankFilter');
 
-  const disabled = value.length > 0;
-  if (bankDropdown) bankDropdown.disabled = disabled;
-
-  // ✅ Restore dropdown if input is cleared
-  if (value.length === 0 && bankDropdown) {
-    bankDropdown.disabled = false;
-    bankDropdown.selectedIndex = 0; // Optional: reset selection to "All"
+  if (bankDropdown) {
+    if (value.length > 0) {
+      bankDropdown.disabled = true;
+    } else {
+      bankDropdown.disabled = false;
+      bankDropdown.selectedIndex = 0; // Optional reset
+    }
   }
 
   renderEntries();
 });
-
 
 let entryToDelete = null;
 
