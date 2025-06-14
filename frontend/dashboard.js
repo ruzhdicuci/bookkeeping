@@ -1384,21 +1384,26 @@ function resetFilters() {
   resetInput('bankSearch');
   resetInput('personSearch');
 
-  // Reset dropdown filters to first option
-  ['categoryFilter', 'typeFilter', 'currencyFilter', 'bankFilter', 'statusFilter'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.selectedIndex = 0;
-  });
+// Reset and re-enable dropdown filters
+['categoryFilter', 'typeFilter', 'currencyFilter', 'bankFilter', 'statusFilter'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) {
+    el.selectedIndex = 0;
+    el.disabled = false; // ✅ re-enable
+  }
+});
 
-  // Reset month checkboxes
-  document.querySelectorAll('.monthOption').forEach(cb => cb.checked = true);
-  const selectAllMonths = document.getElementById('selectAllMonths');
-  if (selectAllMonths) selectAllMonths.checked = true;
+// Reset and re-enable person checkboxes
+document.querySelectorAll('.personOption').forEach(cb => {
+  cb.checked = true;
+  cb.disabled = false; // ✅ re-enable
+});
 
-  // Reset person checkboxes
-  document.querySelectorAll('.personOption').forEach(cb => cb.checked = true);
-  const selectAllPersons = document.getElementById('selectAllPersons');
-  if (selectAllPersons) selectAllPersons.checked = true;
+const selectAllPersons = document.getElementById('selectAllPersons');
+if (selectAllPersons) {
+  selectAllPersons.checked = true;
+  selectAllPersons.disabled = false; // ✅ re-enable
+}
 
   renderEntries(); // Just in case
     // ✅ Show feedback
