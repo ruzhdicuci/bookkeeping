@@ -1384,8 +1384,8 @@ function resetFilters() {
   resetInput('bankSearch');
   resetInput('personSearch');
 
-// Reset and re-enable dropdown filters
-['categoryFilter', 'typeFilter', 'currencyFilter', 'bankFilter', 'statusFilter'].forEach(id => {
+  // Reset dropdown filters to first option
+ ['categoryFilter', 'typeFilter', 'currencyFilter', 'bankFilter', 'statusFilter'].forEach(id => {
   const el = document.getElementById(id);
   if (el) {
     el.selectedIndex = 0;
@@ -1393,7 +1393,13 @@ function resetFilters() {
   }
 });
 
-// Reset and re-enable person checkboxes
+
+  // Reset month checkboxes
+  document.querySelectorAll('.monthOption').forEach(cb => cb.checked = true);
+  const selectAllMonths = document.getElementById('selectAllMonths');
+  if (selectAllMonths) selectAllMonths.checked = true;
+
+ // Reset and re-enable person checkboxes
 document.querySelectorAll('.personOption').forEach(cb => {
   cb.checked = true;
   cb.disabled = false; // ✅ re-enable
