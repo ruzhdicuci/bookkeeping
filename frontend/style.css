@@ -1072,12 +1072,12 @@ color: rgb(213, 79, 79);
 
 .styled-select {
   position: relative;
- height: 22px;
- margin-top: 6px;
+ height: 17px;
+ margin-top: 8px;
    border: 1px solid #f4f2f2;
   border-radius: 4px;
   font-size: 1rem;
-  padding:  6px 12px;
+  padding:  8px 12px;
   background: white;
   cursor: pointer;
   display: flex;
