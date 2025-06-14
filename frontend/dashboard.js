@@ -1401,6 +1401,8 @@ function resetFilters() {
   if (selectAllPersons) selectAllPersons.checked = true;
 
   renderEntries(); // Just in case
+    // ✅ Show feedback
+  showToast("All filters Cleared");
 }
 
 
