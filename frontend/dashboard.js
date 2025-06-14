@@ -238,99 +238,86 @@ document.querySelectorAll('.monthOption').forEach(cb => {
 }
 
 
-
 function renderEntries() {
-  const dateQuery = dateSearch.value.trim().toLowerCase();
-  const searchAmount = parseFloat(amountSearch.value || "0");
+  const dateSearch = document.getElementById('dateSearch')?.value.trim();
+  const descSearch = document.getElementById('descSearch')?.value.trim();
+  const amountSearch = document.getElementById('amountSearch')?.value.trim();
+  const categorySearch = document.getElementById('categorySearch')?.value.trim().toLowerCase();
+  const bankSearch = document.getElementById('bankSearch')?.value.trim().toLowerCase();
+  const personSearch = document.getElementById('personSearch')?.value.trim().toLowerCase();
+
   const selectedMonths = Array.from(document.querySelectorAll('.monthOption:checked')).map(cb => cb.value);
   const selectedPersons = Array.from(document.querySelectorAll('.personOption:checked')).map(cb => cb.value);
   const categoryFilter = document.getElementById('categoryFilter');
-  const categorySearch = document.getElementById('categorySearch')?.value.trim().toLowerCase();
   const categoryValue = categoryFilter?.value || "All";
-  const bankSearch = document.getElementById('bankSearch')?.value.trim().toLowerCase();
-const personSearch = document.getElementById('personSearch')?.value.trim().toLowerCase();
-const dayQuery = dateSearch.value.trim();
-const statusValue = document.getElementById('statusFilter')?.value || 'All';
-let selectedDays = new Set();
+  const statusValue = document.getElementById('statusFilter')?.value || 'All';
 
-dayQuery.split(',').forEach(part => {
-  const trimmed = part.trim();
-  if (trimmed.includes('-')) {
-    const [start, end] = trimmed.split('-').map(Number);
-    for (let i = start; i <= end; i++) {
-      selectedDays.add(i.toString().padStart(2, '0'));
-    }
-  } else if (trimmed) {
-    selectedDays.add(trimmed.padStart(2, '0'));
-  }
-});
-
-  // ✅ Filter entries
-  const filtered = entries.filter(e => {
-  const entryDay = e.date?.split('-')[2];
-
-  // Multi-search helpers
+  // Multi-search helper
   const matchesMulti = (query, target) =>
     !query || query
       .split(',')
       .map(s => s.trim().toLowerCase())
       .some(val => (target || '').toLowerCase().includes(val));
 
-  return (
-    (selectedDays.size === 0 || selectedDays.has(entryDay)) &&
-    (selectedMonths.length === 0 || selectedMonths.includes(e.date?.slice(0, 7))) &&
+  // ✅ Filter entries
+  const filtered = entries.filter(e => {
+    const entryDay = e.date?.split('-')[2];
 
-    (selectedPersons.length === 0 || selectedPersons.includes(e.person)) &&
-    matchesMulti(personSearch, e.person) &&
-    (!bankFilter.value || e.bank === bankFilter.value) &&
-    matchesMulti(bankSearch, e.bank) &&
-    (!typeFilter.value || e.type === typeFilter.value) &&
-    (!currencyFilter.value || e.currency === currencyFilter.value) &&
-    matchesMulti(descSearch?.value, e.description) &&
-    (categoryValue === "All" || e.category === categoryValue) &&
-    matchesMulti(categorySearch, e.category) &&
-    (statusValue === 'All' || e.status === statusValue) &&
-    (amountSearch.value === '' || matchesMulti(amountSearch.value, e.amount + ''))
-  );
-});
+    return (
+      matchesMulti(dateSearch, entryDay) &&
+      (selectedMonths.length === 0 || selectedMonths.includes(e.date?.slice(0, 7))) &&
+      (selectedPersons.length === 0 || selectedPersons.includes(e.person)) &&
+      matchesMulti(personSearch, e.person) &&
+      (!bankFilter.value || e.bank === bankFilter.value) &&
+      matchesMulti(bankSearch, e.bank) &&
+      (!typeFilter.value || e.type === typeFilter.value) &&
+      (!currencyFilter.value || e.currency === currencyFilter.value) &&
+      matchesMulti(descSearch, e.description) &&
+      (categoryValue === "All" || e.category === categoryValue) &&
+      matchesMulti(categorySearch, e.category) &&
+      (statusValue === 'All' || e.status === statusValue) &&
+      matchesMulti(amountSearch, e.amount + '')
+    );
+  });
 
+  // ✅ Render filtered rows
   entryTableBody.innerHTML = '';
-filtered.forEach(e => {
-  const row = document.createElement('tr');
-  const editForm = document.getElementById('entryForm');
-  const isEditing = editForm?.dataset.editId === e._id;
+  filtered.forEach(e => {
+    const row = document.createElement('tr');
+    const editForm = document.getElementById('entryForm');
+    const isEditing = editForm?.dataset.editId === e._id;
 
-  row.innerHTML = `
-    <td>${e.date}</td>
-    <td>${e.description}</td>
-    <td>${e.amount}</td>
-    <td>${e.currency || ''}</td>
-    <td>${e.type}</td>
-    <td>${e.person}</td>
-    <td>${e.bank}</td>
-    <td>${e.category || ''}</td>
-    <td>
-      <button class="action-btn" onclick="editEntry('${e._id}')" title="Edit">✏️</button>
+    row.innerHTML = `
+      <td>${e.date}</td>
+      <td>${e.description}</td>
+      <td>${e.amount}</td>
+      <td>${e.currency || ''}</td>
+      <td>${e.type}</td>
+      <td>${e.person}</td>
+      <td>${e.bank}</td>
+      <td>${e.category || ''}</td>
+      <td>
+        <button class="action-btn" onclick="editEntry('${e._id}')" title="Edit">✏️</button>
         <button class="action-btn" onclick="duplicateEntry('${e._id}')" title="Duplicate">📄</button>
-      <button class="action-btn" onclick="deleteEntry('${e._id}')" title="Delete">🗑️</button>
-    </td>
-    <td>
-      ${
-        isEditing
-          ? `<button onclick="updateStatus('${e._id}', '${e.status === 'Paid' ? 'Open' : 'Paid'}')"
-               style="background:${e.status === 'Paid' ? '#13a07f' : '#ff695d'}; color:white; border:none; border-radius:5px;">
-               ${e.status}
-             </button>`
-          : `<span style="background:${e.status === 'Paid' ? '#13a07f' : '#ff695d'}; color:white; padding:5px 10px; border-radius:5px;">
-               ${e.status}
-             </span>`
-      }
-    </td>
-  `;
+        <button class="action-btn" onclick="deleteEntry('${e._id}')" title="Delete">🗑️</button>
+      </td>
+      <td>
+        ${
+          isEditing
+            ? `<button onclick="updateStatus('${e._id}', '${e.status === 'Paid' ? 'Open' : 'Paid'}')"
+                 style="background:${e.status === 'Paid' ? '#13a07f' : '#ff695d'}; color:white; border:none; border-radius:5px;">
+                 ${e.status}
+               </button>`
+            : `<span style="background:${e.status === 'Paid' ? '#13a07f' : '#ff695d'}; color:white; padding:5px 10px; border-radius:5px;">
+                 ${e.status}
+               </span>`
+        }
+      </td>
+    `;
 
-  entryTableBody.appendChild(row);
-});
-
+    entryTableBody.appendChild(row);
+  });
+}
   // ✅ Update totals
   let incomeTotal = 0, expenseTotal = 0;
   filtered.forEach(e => {
