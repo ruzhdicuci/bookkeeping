@@ -575,7 +575,7 @@ function drawCharts() {
 
   const monthlyIncome = {}, monthlyExpense = {}, personIncome = {}, personExpense = {}, expenseByCategory = {};
 // 🔍 For filtering the entry table:
-const selectedPersons = Array.from(document.querySelectorAll('.personOption:checked')).map(cb => cb.value);
+const selectedPersons = Array.from(document.querySelectorAll('.personChartFilter:checked')).map(cb => cb.value);
 
 // 📊 For filtering the charts:
 const selectedPersonsForChart = Array.from(document.querySelectorAll('.personChartFilter:checked')).map(cb => cb.value);
