@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>📒 Bookkeeping (Mobile)</title>
+  <link rel="stylesheet" href="mobile.css" />
+  <script defer src="mobile.js"></script>
+</head>
+<body>
+  <header>
+    <button id="desktopBtn" onclick="window.location.href='dashboard.html'">💻 Desktop View</button>
+  </header>
+
+  <main>
+    <form id="entry-form">
+      <input type="date" id="newDate" placeholder="Date" required />
+      <input type="text" id="newDescription" placeholder="Description" required />
+      <input type="number" id="newAmount" placeholder="Amount" required />
+      <input type="text" id="newCurrency" placeholder="Currency" />
+      <input type="text" id="newType" placeholder="Type (Income/Expense)" required />
+      <input type="text" id="newPerson" placeholder="Person" />
+      <input type="text" id="newBank" placeholder="Bank" />
+      <input type="text" id="newCategory" placeholder="Category" />
+      <select id="newStatus">
+        <option value="Paid">Paid</option>
+        <option value="Open">Open</option>
+      </select>
+      <button type="submit" id="addMobileEntry">➕ Add Entry</button>
+    </form>
+
+    <div id="summary">
+      <span>Income: <strong id="mobileIncome">0.00</strong></span>
+      <span>Expenses: <strong id="mobileExpenses">0.00</strong></span>
+      <span>Balance: <strong id="mobileBalance">0.00</strong></span>
+    </div>
+
+    <div id="filters">
+      <input type="text" id="descFilter" placeholder="🔍 Description Filter" />
+      <input type="text" id="typeFilter" placeholder="🔍 Type Filter" />
+      <input type="date" id="dateFilter" />
+    </div>
+
+    <ul id="mobileEntryList">
+      <!-- Entries will be dynamically inserted here -->
+    </ul>
+  </main>
+
+  <div id="toast">Toast message here</div>
+</body>
+</html>
