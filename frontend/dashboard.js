@@ -308,7 +308,7 @@ filtered.forEach(e => {
     <td>
       ${
         isEditing
-          ? `<button onclick="cancelEdit()" class="action-btn" style="background: gray;" title="Cancel Edit">❌ Cancel</button>`
+     ? `<button onclick="cancelEdit()" class="action-btn" style="background: #dc3545; color: white; padding: 6px 12px; border: none; border-radius: 6px; font-weight: bold;" title="Cancel Edit">❌ Cancel</button>`
           : `<button class="action-btn" onclick="editEntry('${e._id}')" title="Edit">✏️</button>`
       }
       <button class="action-btn" onclick="duplicateEntry('${e._id}')" title="Duplicate">📄</button>
@@ -392,6 +392,16 @@ function editEntry(id) {
   document.getElementById('newDescription').focus();
 
   renderEntries(); // ✅ Highlight row and show cancel button
+  setTimeout(() => {
+  const rows = document.querySelectorAll('#entryTableBody tr');
+  for (const row of rows) {
+    const descCell = row.querySelector('td:nth-child(2)');
+    if (descCell && descCell.textContent?.trim() === document.getElementById('newDescription').value.trim()) {
+      row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      break;
+    }
+  }
+}, 150);
 }
 
 async function updateStatus(id, newStatus) {
@@ -1515,8 +1525,37 @@ window.showDeleteModal = function(id) {
   }); // ✅ Close the second DOMContentLoaded
 
 
-  function cancelEdit() {
+function cancelEdit() {
   const form = document.getElementById('entryForm');
   if (form) form.dataset.editId = '';
+
+  // Clear form fields
+  document.getElementById('newDate')._flatpickr.setDate(new Date());
+  document.getElementById('newDescription').value = '';
+  document.getElementById('newCategory').value = '';
+  document.getElementById('newAmount').value = '';
+  document.getElementById('newCurrency').value = 'CHF';
+  document.getElementById('newType').value = 'Expense';
+  document.getElementById('newPerson').value = '';
+  document.getElementById('newBank').value = '';
+  document.getElementById('newStatus').value = 'Paid';
+
+  showToast('✋ Edit cancelled');
   renderEntries();
 }
+
+
+function updateEntryButtonLabel() {
+  const form = document.getElementById('entryForm');
+  const btn = document.getElementById('entrySubmitBtn');
+  btn.textContent = form?.dataset.editId ? '💾 Save Changes' : '➕ Add Entry';
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    const form = document.getElementById('entryForm');
+    if (form?.dataset.editId) {
+      cancelEdit();
+    }
+  }
+});

@@ -1728,3 +1728,12 @@ select:disabled {
   background-color: #fff3cd !important; /* pale yellow highlight */
   transition: background-color 0.3s ease;
 }
+
+.cancel-btn {
+  background: #dc3545;
+  color: white;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+}
