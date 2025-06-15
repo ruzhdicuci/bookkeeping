@@ -1715,15 +1715,6 @@ select:disabled {
 }
 
 .cancel-btn {
-  background: white;
-  border: 1px solid #dc3545;
-  color: black;
-  padding: 6px 12px;
- 
-  border-radius: 6px;
-  font-weight: bold;
-}
-.cancelEditBtn{
 background-color:     #fdf6de;
 font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 font-weight: bold;
