@@ -1,91 +1,221 @@
-/* mobile/mobile.css */
-
+/* mobile.css */
 body {
-  font-family: 'Segoe UI', sans-serif;
   margin: 0;
   padding: 0;
-  background: #f9f9f9;
-  color: #222;
+  font-family: system-ui, sans-serif;
+  background: #f5f5f5;
+  color: #333;
 }
 
 header {
-  background: #1e1e1e;
-  color: #fff;
-  padding: 1rem;
+ 
+  padding: 12px;
   text-align: center;
+ 
 }
+#mobileEntryList {
+  list-style: none;
+  padding: 0;
+}
+
+.entry-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  background: #fff;
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.entry-date {
+  text-align: left;
+  min-width: 50px;
+
+}
+
+.entry-date .day {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.entry-date .month,
+.entry-date .year {
+  color: grey;
+  font-size: 0.8rem;
+}
+
+.entry-main {
+  flex: 1;
+  padding-left: 10px;
+}
+
+.description {
+  font-weight: bold;
+  font-size: 1rem;
+  margin-bottom: 4px;
+}
+
+.meta {
+  font-size: 0.85rem;
+  color: #444;
+  margin-bottom: 2px;
+}
+
+.meta .category {
+  color: grey;
+}
+
+.meta .person {
+   color: grey;
+}
+
+.meta .bank {
+color: grey;
+}
+
+.status {
+  font-size: 0.8rem;
+  color: grey;
+}
+
+.entry-amount {
+  text-align: right;
+  min-width: 70px;
+}
+
+.currency {
+  font-size: 0.75rem;
+  color: grey;
+}
+
+.amount {
+  font-size: 1rem;
+  color: red;
+  font-weight: bold;
+}
+
+.buttons {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.buttons button {
+  background-color: #f4f2f2;
+  border: none;
+  padding: 3px 6px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.amount.income {
+  color: rgb(0, 128, 117);
+  font-weight: bold;
+}
+
+.amount.expense {
+  color: orangered;
+  font-weight: bold;
+}
+
+
+.hidden {
+  display: none !important;
+}
+
+.top-controls {
+  display: flex;
+  justify-content:center;
+  gap: 10px;
+  margin-bottom: 1rem;
+}
+.top-controls button {
+  padding: 8px 12px;
+  border: none;
+  background: #2f8fda;
+  color: white;
+  border-radius: 6px;
+}
+
+
+#filters,
+#entry-form {
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+  overflow: hidden;
+}
+
 
 #desktopBtn {
-  margin-top: 0.5rem;
+  background: #d34662;
+  color: white;
   padding: 6px 12px;
   border: none;
-  background: #444;
-  color: #fff;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
+  border-radius: 5px;
+  font-size: 0.9rem;
 }
 
-main {
-  padding: 1rem;
+form#entry-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: white;
+  border-radius: 10px;
+  margin: 10px;
 }
 
-#entry-form input,
-#entry-form select,
-#filters input {
-  display: block;
-  width: 100%;
-  padding: 0.6rem 0.75rem;
-  margin: 0.5rem 0;
-  font-size: 1rem;
+form#entry-form input,
+form#entry-form select,
+form#entry-form button {
+  padding: 8px;
+  font-size: 0.95rem;
   border: 1px solid #ccc;
-  border-radius: 8px;
-  box-sizing: border-box;
+  border-radius: 6px;
+  width: 100%;
 }
 
-#addMobileEntry {
-  width: 100%;
-  background: #1abc9c;
+form#entry-form button {
+  background-color: #14b8a6;
   color: white;
-  padding: 0.75rem;
-  font-size: 1.1rem;
+  font-weight: bold;
   border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  margin-top: 0.75rem;
 }
 
 #summary {
   display: flex;
-  justify-content: space-between;
-  margin: 1rem 0;
-  padding: 0.5rem;
-  background: #fff;
-  border-radius: 6px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  font-weight: bold;
-  font-size: 1.1rem;
+  justify-content: space-around;
+  font-size: 0.95rem;
+  padding: 10px 0;
+  margin: 0 10px;
 }
 
-#filters input {
-  margin-top: 0.3rem;
-}
-
-#mobileEntryList {
-  list-style: none;
-  padding: 0;
-  margin-top: 1rem;
-}
-
-#mobileEntryList li {
-  background: #fff;
-  padding: 0.75rem;
-  margin-bottom: 0.5rem;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+#filters {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 12px;
+}
+
+.mobile-entry {
+  background: white;
+  border-radius: 10px;
+  margin: 10px;
+  padding: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.mobile-entry button {
+  background: #eee;
+  border: none;
+  padding: 3px 6px;
+  border-radius: 4px;
+  margin-left: 4px;
+  font-size: 0.9rem;
 }
 
 #toast {
@@ -93,41 +223,61 @@ main {
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background: #444;
-  color: #fff;
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-size: 16px;
+  background: #333;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
   opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-  z-index: 999;
+  transition: opacity 0.3s ease-in-out;
 }
 
-/* Responsive tweaks */
-@media (min-width: 600px) {
-  #summary {
-    font-size: 1.2rem;
-  }
+#filters {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+}
 
-  #entry-form input,
-  #entry-form select,
-  #filters input {
+#filters input {
+  padding: 10px 12px;
+  font-size: 0.95rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+  transition: border-color 0.2s ease;
+}
+
+#filters input:focus {
+  outline: none;
+  border-color: #2f8fda;
+  background-color: white;
+}
+
+
+#summary {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  text-align: center;
+  font-size: 0.75rem;
+  padding: 10px 0;
+  margin: 0 10px;
+}
+
+
+
+#mobileIncome {
+  color: rgb(0, 128, 117); /* green */
+  font-size: 1.1rem;
+}
+
+#mobileExpenses {
+  color: orangered; /* red */
     font-size: 1.1rem;
-  }
 }
 
-
-input, select {
-  font-size: 16px;
-  margin-bottom: 8px;
-  padding: 10px;
-}
-
-button.add-entry {
-  position: sticky;
-  bottom: 12px;
-  width: 100%;
-  font-size: 18px;
-  padding: 12px;
+#mobileBalance {
+  color: #007bff; /* blue */
+    font-size: 1.1rem;
 }

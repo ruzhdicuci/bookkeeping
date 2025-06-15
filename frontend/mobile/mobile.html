@@ -9,11 +9,16 @@
 </head>
 <body>
   <header>
-    <button id="desktopBtn" onclick="window.location.href='bookkeeping/client/dashboard.html'">💻 Desktop View</button>
+   
   </header>
-
+<div class="top-controls">
+   <button id="desktopBtn" onclick="window.location.href='bookkeeping/client/dashboard.html'">💻 Desktop</button>
+  <button id="toggleEntryForm"> + Add Entry</button>
+  <button id="toggleFilters">🔍 Filters</button>
+</div>
   <main>
-    <form id="entry-form">
+  <form id="entry-form" class="hidden">
+
       <input type="date" id="newDate" placeholder="Date" required />
       <input type="text" id="newDescription" placeholder="Description" required />
       <input type="number" id="newAmount" placeholder="Amount" required />
@@ -26,7 +31,7 @@
         <option value="Paid">Paid</option>
         <option value="Open">Open</option>
       </select>
-      <button type="submit" id="addMobileEntry">➕ Add Entry</button>
+      <button type="submit" id="addMobileEntry">Add Entry</button>
     </form>
 
     <div id="summary">
@@ -47,5 +52,7 @@
   </main>
 
   <div id="toast">Toast message here</div>
+
+  
 </body>
 </html>

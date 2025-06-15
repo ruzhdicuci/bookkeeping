@@ -14,7 +14,9 @@ function showToast(message) {
 document.addEventListener('DOMContentLoaded', () => {
   const entryForm = document.getElementById('entry-form');
   const mobileEntryList = document.getElementById('mobileEntryList');
+   
   const toast = document.getElementById('toast');
+
   let mobileEntries = [];
 
   function renderMobileEntries(entries) {
@@ -22,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     mobileEntryList.innerHTML = '';
     mobileEntries.forEach((entry, index) => {
       const li = document.createElement('li');
+       const amountColor = entry.type.toLowerCase() === 'income' ? 'rgb(0, 128, 117)' : 'orangered';
       li.className = 'mobile-entry';
       li.innerHTML = `
         <div class="entry-card">
@@ -39,9 +42,10 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             <div class="status">Status: ${entry.status}</div>
           </div>
-          <div class="entry-amount">
-            <div class="currency">CHF</div>
-            <div class="amount">${parseFloat(entry.amount).toFixed(2)}</div>
+    <div class="entry-amount">
+    <div class="currency">CHF</div>
+    <div class="amount" style="color: ${amountColor}; font-weight: bold;">
+      ${parseFloat(entry.amount).toFixed(2)}
             <div class="buttons">
               <button onclick="editMobileEntry(${index})">✏️</button>
               <button onclick="deleteMobileEntry(${index})">🗑️</button>
@@ -150,4 +154,12 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   fetchMobileEntries();
+});
+
+document.getElementById('toggleEntryForm').addEventListener('click', () => {
+  document.getElementById('entry-form').classList.toggle('hidden');
+});
+
+document.getElementById('toggleFilters').addEventListener('click', () => {
+  document.getElementById('filters').classList.toggle('hidden');
 });
