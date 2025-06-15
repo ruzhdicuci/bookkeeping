@@ -104,6 +104,36 @@ function populateSelect(id, values) {
   });
 }
 
+['categoryFilterMobile', 'currencyFilterMobile', 'bankFilterMobile', 'personFilterMobile', 'typeFilterMobile', 'statusFilterMobile'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) {
+    el.addEventListener('change', applyMobileFilters);
+  }
+});
+
+
+function applyMobileFilters() {
+  const category = document.getElementById('categoryFilterMobile')?.value;
+  const currency = document.getElementById('currencyFilterMobile')?.value;
+  const bank = document.getElementById('bankFilterMobile')?.value;
+  const person = document.getElementById('personFilterMobile')?.value;
+  const type = document.getElementById('typeFilterMobile')?.value;
+  const status = document.getElementById('statusFilterMobile')?.value;
+
+  const filtered = mobileEntries.filter(e => {
+    return (
+      (category === 'All' || e.category === category) &&
+      (currency === 'All' || e.currency === currency) &&
+      (bank === 'All' || e.bank === bank) &&
+      (person === 'All' || e.person === person) &&
+      (type === 'All' || e.type === type) &&
+      (status === 'All' || e.status === status)
+    );
+  });
+
+  renderMobileEntries(filtered);
+}
+
   function updateSummary() {
     let income = 0;
     let expenses = 0;
@@ -199,4 +229,13 @@ document.getElementById('toggleEntryForm').addEventListener('click', () => {
 
 document.getElementById('toggleFilters').addEventListener('click', () => {
   document.getElementById('filters').classList.toggle('hidden');
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  fetchMobileEntries(); // ← this loads all entries
+
+  // ... later in your success handler:
+  // renderMobileEntries(entries);
+  // populateFilterOptions(entries);
+  // applyMobileFilters(); ✅ to show everything filtered
 });
