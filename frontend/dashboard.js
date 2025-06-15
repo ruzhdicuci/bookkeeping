@@ -489,32 +489,31 @@ async function duplicateEntry(id) {
     body: JSON.stringify(copy)
   });
 
-  if (res.ok) {
-    await fetchEntries();
-    renderEntries();
-    populateNewEntryDropdowns();
-    populateFilters();
-    renderBankBalanceForm();
-    showToast("✅ Entry duplicated");
+ if (res.ok) {
+  await fetchEntries();
+  renderEntries();
+  populateNewEntryDropdowns();
+  populateFilters();
+  renderBankBalanceForm();
+  showToast("✅ Entry duplicated");
 
-    // ✅ Delay to ensure table is fully rendered
-    setTimeout(() => {
-      const tbody = document.getElementById('entryTableBody');
-      const firstRow = tbody?.querySelector('tr');
+  // ✅ Scroll to the duplicated entry by description
+  const targetDescription = copy.description;
 
-      if (firstRow) {
-        firstRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        firstRow.classList.add('highlight-row');
-
-        // Optional: remove highlight after 2s
-        setTimeout(() => firstRow.classList.remove('highlight-row'), 2000);
+  // Slight delay to ensure DOM is updated
+  setTimeout(() => {
+    const rows = document.querySelectorAll('#entryTableBody tr');
+    for (const row of rows) {
+      const descCell = row.querySelector('td:nth-child(2)'); // assuming 2nd <td> is Description
+      if (descCell && descCell.textContent?.trim() === targetDescription) {
+        row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        row.classList.add('highlight-row');
+        setTimeout(() => row.classList.remove('highlight-row'), 2000);
+        break;
       }
-    }, 200);
-  } else {
-    alert("❌ Failed to duplicate entry");
-  }
+    }
+  }, 150); // slight delay to let renderEntries() complete
 }
-
 
 async function deleteEntry(id) {
 
