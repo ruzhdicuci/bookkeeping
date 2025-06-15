@@ -44,7 +44,7 @@ app.use((req, res, next) => {
   next();
 });
 
-const path = require('path');
+
 
 // Serve static frontend
 app.use(express.static(path.join(__dirname, '../frontend')));
