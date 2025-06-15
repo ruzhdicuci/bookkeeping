@@ -471,7 +471,6 @@ function showToast(message) {
 
 
 
-
 async function duplicateEntry(id) {
   const entry = entries.find(e => e._id === id);
   if (!entry) return alert("Entry not found");
@@ -489,31 +488,37 @@ async function duplicateEntry(id) {
     body: JSON.stringify(copy)
   });
 
- if (res.ok) {
-  await fetchEntries();
-  renderEntries();
-  populateNewEntryDropdowns();
-  populateFilters();
-  renderBankBalanceForm();
-  showToast("✅ Entry duplicated");
+  if (res.ok) {
+    await fetchEntries();
+    renderEntries();
+    populateNewEntryDropdowns();
+    populateFilters();
+    renderBankBalanceForm();
+    showToast("✅ Entry duplicated");
 
-  // ✅ Scroll to the duplicated entry by description
-  const targetDescription = copy.description;
+    // ✅ Scroll to the duplicated entry by description
+    const targetDescription = copy.description;
 
-  // Slight delay to ensure DOM is updated
-  setTimeout(() => {
-    const rows = document.querySelectorAll('#entryTableBody tr');
-    for (const row of rows) {
-      const descCell = row.querySelector('td:nth-child(2)'); // assuming 2nd <td> is Description
-      if (descCell && descCell.textContent?.trim() === targetDescription) {
-        row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        row.classList.add('highlight-row');
-        setTimeout(() => row.classList.remove('highlight-row'), 2000);
-        break;
+    setTimeout(() => {
+      const rows = document.querySelectorAll('#entryTableBody tr');
+      for (const row of rows) {
+        const descCell = row.querySelector('td:nth-child(2)');
+        if (descCell && descCell.textContent?.trim().includes('(Copy)')) {
+          row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          row.classList.add('highlight-row');
+          setTimeout(() => row.classList.remove('highlight-row'), 2000);
+          break;
+        }
       }
-    }
-  }, 150); // slight delay to let renderEntries() complete
-}
+    }, 300); // ✅ longer delay to ensure DOM is fully rendered
+  } else {
+    alert("❌ Failed to duplicate entry");
+  }
+} // ✅ this is the closing bracket for the entire function
+
+
+
+
 
 async function deleteEntry(id) {
 
