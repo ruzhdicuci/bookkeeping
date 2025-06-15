@@ -308,7 +308,7 @@ filtered.forEach(e => {
     <td>
       ${
         isEditing
-     ? `<button onclick="cancelEdit()" class="action-btn" title="Cancel Edit">❌ Cancel</button>`
+     ? `<button onclick="cancelEdit()" class="action-btn" style=" background: white; border: 1px solid #dc3545; padding: 6px 12px;  border-radius: 6px;   font-weight: bold;"title="Cancel Edit">❌ Cancel</button>`
           : `<button class="action-btn" onclick="editEntry('${e._id}')" title="Edit">✏️</button>`
       }
       <button class="action-btn" onclick="duplicateEntry('${e._id}')" title="Duplicate">📄</button>
