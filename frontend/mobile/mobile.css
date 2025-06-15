@@ -309,7 +309,7 @@ form#entry-form button {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  background: #fff;
+ 
   padding: 12px;
   border-radius: 10px;
   margin: 10px;

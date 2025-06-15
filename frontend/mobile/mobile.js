@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function renderMobileEntries(entries) {
     mobileEntries = entries;
+    populateFilterOptions(entries); // ✅ Call this here
     mobileEntryList.innerHTML = '';
     mobileEntries.forEach((entry, index) => {
       const li = document.createElement('li');
@@ -71,6 +72,37 @@ document.addEventListener('DOMContentLoaded', () => {
       showToast("❌ Error loading data");
     }
   }
+
+  function populateFilterOptions(entries) {
+  const categories = new Set();
+  const currencies = new Set();
+  const banks = new Set();
+  const persons = new Set();
+
+  entries.forEach(e => {
+    if (e.category) categories.add(e.category);
+    if (e.currency) currencies.add(e.currency);
+    if (e.bank) banks.add(e.bank);
+    if (e.person) persons.add(e.person);
+  });
+
+  populateSelect('categoryFilterMobile', categories);
+  populateSelect('currencyFilterMobile', currencies);
+  populateSelect('bankFilterMobile', banks);
+  populateSelect('personFilterMobile', persons);
+}
+
+function populateSelect(id, values) {
+  const select = document.getElementById(id);
+  if (!select) return;
+  select.innerHTML = `<option value="All">All</option>`;
+  Array.from(values).sort().forEach(val => {
+    const opt = document.createElement('option');
+    opt.value = val;
+    opt.textContent = val;
+    select.appendChild(opt);
+  });
+}
 
   function updateSummary() {
     let income = 0;
