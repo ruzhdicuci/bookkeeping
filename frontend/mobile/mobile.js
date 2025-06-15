@@ -1,8 +1,36 @@
+// ✅ Always define token first
+const token = localStorage.getItem('token');
+
+// ✅ Optional: redirect if not logged in
 if (!token) {
   alert("🔒 Please log in first.");
-  window.location.href = '/'; // redirect to desktop login
+  window.location.href = '/';
 }
-const token = localStorage.getItem('token'); // or however you store the JWT
+
+// ✅ Now fetch entries
+async function fetchMobileEntries() {
+  try {
+    const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
+    const entries = await res.json();
+    renderMobileEntries(entries);
+  } catch (err) {
+    console.error("❌ Failed to load mobile entries", err);
+    showToast("❌ Error loading data");
+  }
+}
+
+// ✅ Toast function
+function showToast(message) {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.style.opacity = '1';
+  setTimeout(() => {
+    toast.style.opacity = '0';
+  }, 2000);
+}
 document.addEventListener('DOMContentLoaded', () => {
   const entryForm = document.getElementById('entry-form');
   const mobileEntryList = document.getElementById('mobileEntryList');
@@ -129,21 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-async function fetchMobileEntries() {
-  try {
-    const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
-      headers: { Authorization: `Bearer ${token}` }
-    });
 
-    if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
-
-    const entries = await res.json();
-    renderMobileEntries(entries);
-  } catch (err) {
-    console.error("❌ Failed to load mobile entries", err);
-    showToast("❌ Failed to load data");
-  }
-}
 
 function renderMobileEntries(entries) {
   const list = document.getElementById('mobileEntryList');
@@ -174,12 +188,3 @@ function renderMobileEntries(entries) {
 document.addEventListener('DOMContentLoaded', fetchMobileEntries);
 
 
-function showToast(message) {
-  const toast = document.getElementById('toast');
-  toast.textContent = message;
-  toast.style.opacity = '1';
-
-  setTimeout(() => {
-    toast.style.opacity = '0';
-  }, 2000);
-}
