@@ -666,18 +666,22 @@ margin-top: 7px;
 
 
 
- #eb {background-color:     #fdf6de;
+ #entrySubmitBtn {background-color:     #fdf6de;
 font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 font-weight: bold;
- font-size: 1rem;
+
         border: 1px solid transparent;
          border-radius: 10px;
-  
+           cursor: pointer;
+  white-space: nowrap;
+   height: 44px;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
             color: rgb(20, 157, 91);            
      margin-top: -9px;
           }
 
-         #eb:hover {
+         #entrySubmitBtn:hover {
             background-color: white; 
             color: #00CDAC;
            
@@ -686,25 +690,6 @@ font-weight: bold;
 
 
 
-.entry-button {
-  margin-top: 0.5rem;
-}
-
-.entry-button button {
-  height: 44px;
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
-  background-color: #f1f1f1;
-    border: 1px solid #f4f2f2;
-    
- border-radius: 10px;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.entry-button button:hover {
-  background-color: #e0e0e0;
-}
 
 .table-container table th {
   font-size: 1.0rem;
