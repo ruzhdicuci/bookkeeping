@@ -1,22 +1,7 @@
 // ✅ Always define token first
 const token = localStorage.getItem('token');
 
-
-
-// ✅ Now fetch entries
-async function fetchMobileEntries() {
-  try {
-    const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
-    const entries = await res.json();
-    renderMobileEntries(entries);
-  } catch (err) {
-    console.error("❌ Failed to load mobile entries", err);
-    showToast("❌ Error loading data");
-  }
-}
+let mobileEntries = []; // Global state
 
 // ✅ Toast function
 function showToast(message) {
@@ -27,20 +12,26 @@ function showToast(message) {
     toast.style.opacity = '0';
   }, 2000);
 }
+
+// ✅ Now fetch entries
+async function fetchMobileEntries() {
+  try {
+    const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
+    const entries = await res.json();
+    mobileEntries = entries;
+    renderMobileEntries();
+  } catch (err) {
+    console.error("❌ Failed to load mobile entries", err);
+    showToast("❌ Error loading data");
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const entryForm = document.getElementById('entry-form');
   const mobileEntryList = document.getElementById('mobileEntryList');
-  const toast = document.getElementById('toast');
-
-  let mobileEntries = []; // Local state for mobile entries
-
-  function showToast(message) {
-    toast.textContent = message;
-    toast.style.opacity = '1';
-    setTimeout(() => {
-      toast.style.opacity = '0';
-    }, 2000);
-  }
 
   function renderMobileEntries() {
     mobileEntryList.innerHTML = '';
@@ -48,12 +39,18 @@ document.addEventListener('DOMContentLoaded', () => {
       const li = document.createElement('li');
       li.className = 'mobile-entry';
       li.innerHTML = `
-        <div><strong>${entry.date}</strong> - ${entry.description}</div>
-        <div>${entry.amount} ${entry.currency} | ${entry.type}</div>
-        <div>${entry.person} | ${entry.bank} | ${entry.category}</div>
-        <div>Status: ${entry.status}</div>
-        <button onclick="editMobileEntry(${index})">✏️</button>
-        <button onclick="deleteMobileEntry(${index})">🗑️</button>
+        <div class="entry-date">${entry.date}</div>
+        <div class="entry-description">${entry.description} <span class="entry-amount">(${entry.amount} ${entry.currency})</span> - ${entry.type}</div>
+        <div class="entry-meta">
+          <span class="entry-person">${entry.person}</span>
+          <span class="entry-bank">${entry.bank}</span>
+          <span class="entry-category">${entry.category}</span>
+        </div>
+        <div class="entry-status">${entry.status}</div>
+        <div class="entry-actions">
+          <button onclick="editMobileEntry(${index})">✏️</button>
+          <button onclick="deleteMobileEntry(${index})">🗑️</button>
+        </div>
       `;
       mobileEntryList.appendChild(li);
     });
@@ -91,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
     entryForm.reset();
   }
 
-  function editMobileEntry(index) {
+  window.editMobileEntry = function(index) {
     const entry = mobileEntries[index];
     document.getElementById('newDate').value = entry.date;
     document.getElementById('newDescription').value = entry.description;
@@ -106,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
     showToast("Editing entry...");
   }
 
-  function deleteMobileEntry(index) {
+  window.deleteMobileEntry = function(index) {
     mobileEntries.splice(index, 1);
     renderMobileEntries();
     showToast("Entry deleted");
@@ -148,39 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
       li.style.display = li.textContent.includes(value) ? '' : 'none';
     });
   });
+
+  // ✅ Fetch data on load
+  fetchMobileEntries();
 });
-
-
-
-
-
-
-function renderMobileEntries(entries) {
-  const list = document.getElementById('mobileEntryList');
-  list.innerHTML = '';
-
-  let income = 0, expenses = 0;
-
-  entries.forEach(e => {
-    const li = document.createElement('li');
-    li.innerHTML = `
-      <strong>${e.date}</strong> - ${e.description} 
-      (${e.amount} ${e.currency}) - ${e.type}
-      <br><small>${e.person} - ${e.bank} - ${e.category}</small>
-    `;
-    list.appendChild(li);
-
-    if (e.type.toLowerCase() === 'income') income += parseFloat(e.amount);
-    else expenses += parseFloat(e.amount);
-  });
-
-  const balance = income - expenses;
-
-  document.getElementById('mobileIncome').textContent = income.toFixed(2);
-  document.getElementById('mobileExpenses').textContent = expenses.toFixed(2);
-  document.getElementById('mobileBalance').textContent = balance.toFixed(2);
-}
-
-document.addEventListener('DOMContentLoaded', fetchMobileEntries);
-
-
