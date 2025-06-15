@@ -308,7 +308,7 @@ filtered.forEach(e => {
     <td>
       ${
         isEditing
-     ? `<button onclick="cancelEdit()" class="action-btn" style="background: #dc3545; color: white; padding: 6px 12px; border: none; border-radius: 6px; font-weight: bold;" title="Cancel Edit">❌ Cancel</button>`
+     ? `<button onclick="cancelEdit()" class="action-btn" title="Cancel Edit">❌ Cancel</button>`
           : `<button class="action-btn" onclick="editEntry('${e._id}')" title="Edit">✏️</button>`
       }
       <button class="action-btn" onclick="duplicateEntry('${e._id}')" title="Duplicate">📄</button>
@@ -1555,7 +1555,7 @@ updateEntryButtonLabel(); // revert Add/Save button
 function updateEntryButtonLabel() {
   const form = document.getElementById('entryForm');
   const btn = document.getElementById('entrySubmitBtn');
-  btn.textContent = form?.dataset.editId ? '💾 Save Changes' : '➕ Add Entry';
+  btn.textContent = form?.dataset.editId ? 'Save Changes' : 'Add Entry';
 }
 
 document.addEventListener('keydown', e => {
