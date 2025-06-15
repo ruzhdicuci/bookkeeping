@@ -44,6 +44,21 @@ app.use((req, res, next) => {
   next();
 });
 
+const path = require('path');
+
+// Serve static frontend
+app.use(express.static(path.join(__dirname, '../frontend')));
+
+// Route to mobile version
+app.get('/mobile', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/mobile/mobile.html'));
+});
+
+// Default route
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dashboard.html'));
+});
+
 const SECRET = 'rudi-bookkeeping-secret'; // replace with env var for production
 
 mongoose.connect('mongodb+srv://ruzhdicuci:9BgBDMYEJBjMGFid@bookkeeping.bcakntz.mongodb.net/bookkeeping?retryWrites=true&w=majority&appName=bookkeeping', {
