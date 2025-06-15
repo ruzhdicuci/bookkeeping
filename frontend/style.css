@@ -1722,3 +1722,9 @@ select:disabled {
   background-color: #ffffcc !important;
   transition: background-color 0.3s ease;
 }
+
+
+.editing-row {
+  background-color: #fff3cd !important; /* pale yellow highlight */
+  transition: background-color 0.3s ease;
+}

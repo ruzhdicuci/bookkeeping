@@ -288,43 +288,52 @@ const filtered = entries.filter(e => {
   );
 });
 
-  // ✅ Render filtered rows
-  entryTableBody.innerHTML = '';
-  filtered.forEach(e => {
-    const row = document.createElement('tr');
-    const editForm = document.getElementById('entryForm');
-    const isEditing = editForm?.dataset.editId === e._id;
+// ✅ Render filtered rows
+entryTableBody.innerHTML = '';
+filtered.forEach(e => {
+  const row = document.createElement('tr');
+  const editForm = document.getElementById('entryForm');
+  const isEditing = editForm?.dataset.editId === e._id;
 
-    row.innerHTML = `
-      <td>${e.date}</td>
-      <td>${e.description}</td>
-      <td>${e.amount}</td>
-      <td>${e.currency || ''}</td>
-      <td>${e.type}</td>
-      <td>${e.person}</td>
-      <td>${e.bank}</td>
-      <td>${e.category || ''}</td>
-      <td>
-        <button class="action-btn" onclick="editEntry('${e._id}')" title="Edit">✏️</button>
-        <button class="action-btn" onclick="duplicateEntry('${e._id}')" title="Duplicate">📄</button>
-       <button class="action-btn" onclick="showDeleteModal('${e._id}')" title="Delete">🗑️</button>
-      </td>
-      <td>
-        ${
-          isEditing
-            ? `<button onclick="updateStatus('${e._id}', '${e.status === 'Paid' ? 'Open' : 'Paid'}')"
-                 style="background:${e.status === 'Paid' ? '#13a07f' : '#ff695d'}; color:white; border:none; border-radius:5px;">
-                 ${e.status}
-               </button>`
-            : `<span style="background:${e.status === 'Paid' ? '#13a07f' : '#ff695d'}; color:white; padding:5px 10px; border-radius:5px;">
-                 ${e.status}
-               </span>`
-        }
-      </td>
-    `;
+  // ✅ Highlight if editing
+  if (isEditing) row.classList.add('editing-row');
 
-    entryTableBody.appendChild(row);
-  });
+  row.innerHTML = `
+    <td>${e.date}</td>
+    <td>${e.description}</td>
+    <td>${e.amount}</td>
+    <td>${e.currency || ''}</td>
+    <td>${e.type}</td>
+    <td>${e.person}</td>
+    <td>${e.bank}</td>
+    <td>${e.category || ''}</td>
+    <td>
+      ${
+        isEditing
+          ? `<button onclick="cancelEdit()" class="action-btn" style="background: gray;" title="Cancel Edit">❌ Cancel</button>`
+          : `<button class="action-btn" onclick="editEntry('${e._id}')" title="Edit">✏️</button>`
+      }
+      <button class="action-btn" onclick="duplicateEntry('${e._id}')" title="Duplicate">📄</button>
+      <button class="action-btn" onclick="showDeleteModal('${e._id}')" title="Delete">🗑️</button>
+    </td>
+    <td>
+      ${
+        isEditing
+          ? `<button onclick="updateStatus('${e._id}', '${e.status === 'Paid' ? 'Open' : 'Paid'}')"
+               style="background:${e.status === 'Paid' ? '#13a07f' : '#ff695d'}; color:white; border:none; border-radius:5px;">
+               ${e.status}
+             </button>`
+          : `<span style="background:${e.status === 'Paid' ? '#13a07f' : '#ff695d'}; color:white; padding:5px 10px; border-radius:5px;">
+               ${e.status}
+             </span>`
+      }
+    </td>
+  `;
+
+  entryTableBody.appendChild(row);
+});
+
+
 
   // ✅ Update totals
   let incomeTotal = 0, expenseTotal = 0;
@@ -1503,3 +1512,10 @@ window.showDeleteModal = function(id) {
     }
   });
   }); // ✅ Close the second DOMContentLoaded
+
+
+  function cancelEdit() {
+  const form = document.getElementById('entryForm');
+  if (form) form.dataset.editId = '';
+  renderEntries();
+}
