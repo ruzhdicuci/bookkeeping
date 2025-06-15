@@ -465,8 +465,6 @@ async function duplicateEntry(id) {
 
   const copy = { ...entry };
   delete copy._id;
-
-  // Optional: mark the description to show it's a copy
   copy.description = copy.description + ' (Copy)';
 
   const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
@@ -479,7 +477,22 @@ async function duplicateEntry(id) {
   });
 
   if (res.ok) {
-    await fetchEntries(); // ✅ Reload entries list after duplication
+    await fetchEntries();
+    renderEntries();
+    populateNewEntryDropdowns();
+    populateFilters();
+    renderBankBalanceForm();
+    showToast("✅ Entry duplicated");
+
+    // ✅ Auto-scroll to the top row
+    setTimeout(() => {
+      const firstRow = document.querySelector('#entryTableBody tr');
+      if (firstRow) {
+        firstRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        firstRow.style.backgroundColor = '#ffffcc'; // optional: temporary highlight
+        setTimeout(() => firstRow.style.backgroundColor = '', 1500);
+      }
+    }, 100);
   } else {
     alert("❌ Failed to duplicate entry");
   }
