@@ -1,5 +1,8 @@
 // ✅ Always define token first
 const token = localStorage.getItem('token');
+if (!token) {
+  window.location.href = '/client/login.html'; // 👈 your actual login path
+}
 
 // ✅ Toast function
 function showToast(message) {
