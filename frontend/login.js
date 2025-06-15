@@ -15,7 +15,10 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     localStorage.setItem('token', data.token);
     localStorage.setItem('currentUser', email);
     localStorage.setItem('lastLoginUser', email);
-    window.location.href = 'dashboard.html';
+localStorage.setItem('viewMode', 'mobile'); // or 'desktop'
+window.location.href = localStorage.getItem('viewMode') === 'mobile'
+  ? '/mobile'
+  : 'dashboard.html';
   } else {
     alert(data.message || 'Login failed');
   }
