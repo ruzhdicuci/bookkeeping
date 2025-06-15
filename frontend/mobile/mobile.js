@@ -1,11 +1,7 @@
 // ✅ Always define token first
 const token = localStorage.getItem('token');
 
-// ✅ Optional: redirect if not logged in
-if (!token) {
-  alert("🔒 Please log in first.");
-  window.location.href = '/';
-}
+
 
 // ✅ Now fetch entries
 async function fetchMobileEntries() {
