@@ -370,8 +370,12 @@ filtered.forEach(e => {
 
 
 function editEntry(id) {
-  const entry = window.entries.find(e => e._id === id);
-  if (!entry) return alert("Entry not found.");
+  const form = document.getElementById('entryForm');
+  if (form) {
+    form.dataset.editId = id;
+    renderEntries();
+  }
+}
 
   // Prefill form fields
   document.getElementById('newDate')._flatpickr.setDate(new Date(entry.date));
