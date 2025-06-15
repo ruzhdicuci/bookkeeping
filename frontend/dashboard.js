@@ -390,6 +390,8 @@ function editEntry(id) {
   document.getElementById('newStatus').value = entry.status || 'Paid';
 
   document.getElementById('newDescription').focus();
+  document.getElementById('cancelEditBtn')?.classList.remove('hidden');
+updateEntryButtonLabel(); // still update Add/Save text
 
   renderEntries(); // ✅ Highlight row and show cancel button
   setTimeout(() => {
@@ -1539,7 +1541,8 @@ function cancelEdit() {
   document.getElementById('newPerson').value = '';
   document.getElementById('newBank').value = '';
   document.getElementById('newStatus').value = 'Paid';
-
+document.getElementById('cancelEditBtn')?.classList.add('hidden');
+updateEntryButtonLabel(); // revert Add/Save button
   showToast('✋ Edit cancelled');
   renderEntries();
 }
