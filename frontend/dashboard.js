@@ -375,7 +375,7 @@ function editEntry(id) {
     form.dataset.editId = id;
     renderEntries();
   }
-}
+
 
   // Prefill form fields
   document.getElementById('newDate')._flatpickr.setDate(new Date(entry.date));
