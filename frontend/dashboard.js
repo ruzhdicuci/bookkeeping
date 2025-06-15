@@ -373,9 +373,10 @@ function editEntry(id) {
   const form = document.getElementById('entryForm');
   if (form) {
     form.dataset.editId = id;
-    renderEntries();
   }
 
+  const entry = entries.find(e => e._id === id);
+  if (!entry) return alert("❌ Entry not found");
 
   // Prefill form fields
   document.getElementById('newDate')._flatpickr.setDate(new Date(entry.date));
@@ -386,12 +387,11 @@ function editEntry(id) {
   document.getElementById('newType').value = entry.type;
   document.getElementById('newPerson').value = entry.person;
   document.getElementById('newBank').value = entry.bank;
+  document.getElementById('newStatus').value = entry.status || 'Paid';
 
-  // ✅ Add this to support status editing
-  document.getElementById('newStatus').value = entry.status || 'aid';
-
-  document.getElementById('entryForm').dataset.editId = id;
   document.getElementById('newDescription').focus();
+
+  renderEntries(); // ✅ Highlight row and show cancel button
 }
 
 async function updateStatus(id, newStatus) {
