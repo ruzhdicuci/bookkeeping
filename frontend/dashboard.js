@@ -394,17 +394,20 @@ function editEntry(id) {
 updateEntryButtonLabel(); // still update Add/Save text
 
   renderEntries(); // ✅ Highlight row and show cancel button
-  setTimeout(() => {
+setTimeout(() => {
   const rows = document.querySelectorAll('#entryTableBody tr');
+  const editForm = document.getElementById('entryForm');
+  const editingId = editForm?.dataset.editId;
+
   for (const row of rows) {
-    const descCell = row.querySelector('td:nth-child(2)');
-    if (descCell && descCell.textContent?.trim() === document.getElementById('newDescription').value.trim()) {
+    const idAttr = row.querySelector('button[onclick^="editEntry("]')?.getAttribute('onclick');
+    const rowId = idAttr?.match(/'([^']+)'/)?.[1];
+    if (rowId === editingId) {
       row.scrollIntoView({ behavior: 'smooth', block: 'center' });
       break;
     }
   }
 }, 150);
-}
 
 async function updateStatus(id, newStatus) {
   console.log("Sending status update", id, newStatus);
