@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const mobileEntryList = document.getElementById('mobileEntryList');
   const toast = document.getElementById('toast');
 
-  let mobileEntries = []; // Local state for mobile entries
+  let mobileEntries = [];
 
   function renderMobileEntries(entries) {
     mobileEntries = entries;
@@ -61,6 +61,22 @@ document.addEventListener('DOMContentLoaded', () => {
     updateSummary();
   }
 
+  async function fetchMobileEntries() {
+    try {
+      const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
+      const entries = await res.json();
+      renderMobileEntries(entries);
+    } catch (err) {
+      console.error("❌ Failed to load mobile entries", err);
+      showToast("❌ Error loading data");
+    }
+  }
+
+  fetchMobileEntries();
+});
   function updateSummary() {
     let income = 0;
     let expenses = 0;
