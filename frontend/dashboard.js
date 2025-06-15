@@ -459,6 +459,19 @@ async function saveEdit(row) {
   }
 }
 
+function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.style.opacity = '1';
+
+    setTimeout(() => {
+      toast.style.opacity = '0';
+    }, 2000);
+  }
+
+
+
+
 async function duplicateEntry(id) {
   const entry = entries.find(e => e._id === id);
   if (!entry) return alert("Entry not found");
@@ -1462,16 +1475,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   
 
-  function showToast(message) {
-    const toast = document.getElementById('toast');
-    toast.textContent = message;
-    toast.style.opacity = '1';
-
-    setTimeout(() => {
-      toast.style.opacity = '0';
-    }, 2000);
-  }
-}); // ✅ This was missing
+  
 
 
 // delete entries
@@ -1494,3 +1498,4 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('confirmModal').classList.add('hidden');
     }
   });
+  }); // ✅ Close the second DOMContentLoaded
