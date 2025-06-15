@@ -288,14 +288,12 @@ const filtered = entries.filter(e => {
   );
 });
 
-// ✅ Render filtered rows
 entryTableBody.innerHTML = '';
 filtered.forEach(e => {
   const row = document.createElement('tr');
   const editForm = document.getElementById('entryForm');
   const isEditing = editForm?.dataset.editId === e._id;
 
-  // ✅ Highlight if editing
   if (isEditing) row.classList.add('editing-row');
 
   row.innerHTML = `
@@ -332,7 +330,6 @@ filtered.forEach(e => {
 
   entryTableBody.appendChild(row);
 });
-
 
 
   // ✅ Update totals
