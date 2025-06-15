@@ -120,3 +120,50 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
+
+
+const token = localStorage.getItem('token'); // or however you store the JWT
+
+async function fetchMobileEntries() {
+  try {
+    const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
+
+    const entries = await res.json();
+    renderMobileEntries(entries);
+  } catch (err) {
+    console.error("❌ Failed to load mobile entries", err);
+    showToast("❌ Failed to load data");
+  }
+}
+
+function renderMobileEntries(entries) {
+  const list = document.getElementById('mobileEntryList');
+  list.innerHTML = '';
+
+  let income = 0, expenses = 0;
+
+  entries.forEach(e => {
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <strong>${e.date}</strong> - ${e.description} 
+      (${e.amount} ${e.currency}) - ${e.type}
+      <br><small>${e.person} - ${e.bank} - ${e.category}</small>
+    `;
+    list.appendChild(li);
+
+    if (e.type.toLowerCase() === 'income') income += parseFloat(e.amount);
+    else expenses += parseFloat(e.amount);
+  });
+
+  const balance = income - expenses;
+
+  document.getElementById('mobileIncome').textContent = income.toFixed(2);
+  document.getElementById('mobileExpenses').textContent = expenses.toFixed(2);
+  document.getElementById('mobileBalance').textContent = balance.toFixed(2);
+}
+
+document.addEventListener('DOMContentLoaded', fetchMobileEntries);
