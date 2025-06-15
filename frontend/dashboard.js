@@ -408,6 +408,7 @@ setTimeout(() => {
     }
   }
 }, 150);
+}
 
 async function updateStatus(id, newStatus) {
   console.log("Sending status update", id, newStatus);
