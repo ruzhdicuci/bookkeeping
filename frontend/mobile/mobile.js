@@ -1,3 +1,8 @@
+if (!token) {
+  alert("🔒 Please log in first.");
+  window.location.href = '/'; // redirect to desktop login
+}
+const token = localStorage.getItem('token'); // or however you store the JWT
 document.addEventListener('DOMContentLoaded', () => {
   const entryForm = document.getElementById('entry-form');
   const mobileEntryList = document.getElementById('mobileEntryList');
@@ -122,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-const token = localStorage.getItem('token'); // or however you store the JWT
+
 
 async function fetchMobileEntries() {
   try {
@@ -167,3 +172,14 @@ function renderMobileEntries(entries) {
 }
 
 document.addEventListener('DOMContentLoaded', fetchMobileEntries);
+
+
+function showToast(message) {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.style.opacity = '1';
+
+  setTimeout(() => {
+    toast.style.opacity = '0';
+  }, 2000);
+}
