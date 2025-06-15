@@ -11,27 +11,27 @@ function showToast(message) {
   }, 2000);
 }
 
-// ✅ Now fetch entries
-async function fetchMobileEntries() {
-  try {
-    const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
-    const entries = await res.json();
-    renderMobileEntries(entries);
-  } catch (err) {
-    console.error("❌ Failed to load mobile entries", err);
-    showToast("❌ Error loading data");
-  }
-}
-
 document.addEventListener('DOMContentLoaded', () => {
   const entryForm = document.getElementById('entry-form');
   const mobileEntryList = document.getElementById('mobileEntryList');
   const toast = document.getElementById('toast');
 
   let mobileEntries = []; // Local state for mobile entries
+
+  // ✅ Fetch entries from API
+  async function fetchMobileEntries() {
+    try {
+      const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
+      const entries = await res.json();
+      renderMobileEntries(entries);
+    } catch (err) {
+      console.error("❌ Failed to load mobile entries", err);
+      showToast("❌ Error loading data");
+    }
+  }
 
   function renderMobileEntries(entries) {
     mobileEntries = entries;
@@ -52,8 +52,10 @@ document.addEventListener('DOMContentLoaded', () => {
           <span style="color: green;">${entry.category}</span>
         </div>
         <div style="font-size: 0.8rem; color: grey; margin-bottom: 4px;">Status: ${entry.status}</div>
-        <button onclick="editMobileEntry(${index})" style="font-size: 0.75rem; padding: 3px 6px; margin-right: 4px;">✏️</button>
-        <button onclick="deleteMobileEntry(${index})" style="font-size: 0.75rem; padding: 3px 6px;">🗑️</button>
+        <div style="margin-bottom: 10px;">
+          <button onclick="editMobileEntry(${index})" style="font-size: 0.75rem; padding: 3px 6px; margin-right: 4px;">✏️</button>
+          <button onclick="deleteMobileEntry(${index})" style="font-size: 0.75rem; padding: 3px 6px;">🗑️</button>
+        </div>
       `;
       mobileEntryList.appendChild(li);
     });
@@ -149,5 +151,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // ✅ Finally fetch entries after everything is defined
   fetchMobileEntries();
 });
