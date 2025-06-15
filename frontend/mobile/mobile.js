@@ -15,8 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const entryForm = document.getElementById('entry-form');
   const mobileEntryList = document.getElementById('mobileEntryList');
   const toast = document.getElementById('toast');
-
-  let mobileEntries = []; // Local state
+  let mobileEntries = [];
 
   function renderMobileEntries(entries) {
     mobileEntries = entries;
@@ -25,28 +24,45 @@ document.addEventListener('DOMContentLoaded', () => {
       const li = document.createElement('li');
       li.className = 'mobile-entry';
       li.innerHTML = `
-        <div style="font-size: 0.8rem; color: grey; margin-bottom: 2px;">${entry.date}</div>
-        <div style="font-weight: bold; font-size: 1rem; color: black; margin-bottom: 2px;">${entry.description}</div>
-        <div style="font-size: 0.85rem; color: #555; margin-bottom: 2px;">
-          <span style="margin-right: 4px; color: red;">${entry.amount}</span>
-          <span style="color: grey;">${entry.currency}</span>
-          <span style="margin-left: 8px;">${entry.type}</span>
-        </div>
-        <div style="font-size: 0.85rem; margin-bottom: 2px;">
-          <span style="color: blue; margin-right: 8px;">${entry.person}</span>
-          <span style="color: orange; margin-right: 8px;">${entry.bank}</span>
-          <span style="color: green;">${entry.category}</span>
-        </div>
-        <div style="font-size: 0.8rem; color: grey; margin-bottom: 4px;">Status: ${entry.status}</div>
-        <div style="margin-top: 6px;">
-          <button onclick="editMobileEntry(${index})" style="font-size: 0.75rem; padding: 3px 6px; margin-right: 4px; background-color: #eee; border: none;">✏️</button>
-          <button onclick="deleteMobileEntry(${index})" style="font-size: 0.75rem; padding: 3px 6px; margin-right: 4px; background-color: #eee; border: none;">🗑️</button>
-          <button onclick="duplicateMobileEntry(${index})" style="font-size: 0.75rem; padding: 3px 6px; background-color: #eee; border: none;">📄</button>
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; padding: 10px; background: #fff; border-radius: 10px; margin-bottom: 8px; font-family: system-ui, sans-serif;">
+          <div style="text-align: left;">
+            <div style="font-size: 1.2rem; font-weight: bold;">${new Date(entry.date).getDate().toString().padStart(2, '0')}</div>
+            <div style="color: grey; font-size: 0.9rem;">${new Date(entry.date).toLocaleString('default', { month: 'short' })}</div>
+            <div style="color: grey; font-size: 0.85rem;">${new Date(entry.date).getFullYear()}</div>
+          </div>
+          <div style="flex: 1; padding-left: 10px;">
+            <div style="font-weight: bold; font-size: 1rem;">${entry.description}</div>
+            <div style="font-size: 0.85rem; color: #444;">${entry.category} • <span style="color: blue;">${entry.person}</span> • <span style="color: orange;">${entry.bank}</span></div>
+            <div style="font-size: 0.8rem; color: grey;">Status: ${entry.status}</div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 0.75rem; color: grey;">CHF</div>
+            <div style="font-size: 1rem; color: red; font-weight: bold;">${parseFloat(entry.amount).toFixed(2)}</div>
+            <div style="margin-top: 8px; display: flex; gap: 4px;">
+              <button onclick="editMobileEntry(${index})" style="background-color: #f1f1f1; border: none; padding: 3px 6px;">✏️</button>
+              <button onclick="deleteMobileEntry(${index})" style="background-color: #f1f1f1; border: none; padding: 3px 6px;">🗑️</button>
+              <button onclick="duplicateMobileEntry(${index})" style="background-color: #f1f1f1; border: none; padding: 3px 6px;">📄</button>
+            </div>
+          </div>
         </div>
       `;
       mobileEntryList.appendChild(li);
     });
     updateSummary();
+  }
+
+  async function fetchMobileEntries() {
+    try {
+      const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
+      const entries = await res.json();
+      renderMobileEntries(entries);
+    } catch (err) {
+      console.error("❌ Failed to load mobile entries", err);
+      showToast("❌ Error loading data");
+    }
   }
 
   function updateSummary() {
@@ -93,20 +109,22 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('newStatus').value = entry.status;
     entryForm.dataset.editIndex = index;
     showToast("Editing entry...");
-  };
+  }
 
   window.deleteMobileEntry = function(index) {
     mobileEntries.splice(index, 1);
     renderMobileEntries(mobileEntries);
     showToast("Entry deleted");
-  };
+  }
 
   window.duplicateMobileEntry = function(index) {
     const copy = { ...mobileEntries[index] };
-    mobileEntries.splice(index + 1, 0, copy);
+    delete copy._id;
+    copy.description += ' (Copy)';
+    mobileEntries.push(copy);
     renderMobileEntries(mobileEntries);
-    showToast("Entry duplicated");
-  };
+    showToast("✅ Entry duplicated");
+  }
 
   entryForm.addEventListener('submit', e => {
     e.preventDefault();
@@ -144,21 +162,6 @@ document.addEventListener('DOMContentLoaded', () => {
       li.style.display = li.textContent.includes(value) ? '' : 'none';
     });
   });
-
-  // ✅ Now fetch entries
-  async function fetchMobileEntries() {
-    try {
-      const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
-      const entries = await res.json();
-      renderMobileEntries(entries);
-    } catch (err) {
-      console.error("❌ Failed to load mobile entries", err);
-      showToast("❌ Error loading data");
-    }
-  }
 
   fetchMobileEntries();
 });
