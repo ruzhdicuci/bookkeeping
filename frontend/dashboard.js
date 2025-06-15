@@ -1481,10 +1481,10 @@ document.addEventListener('DOMContentLoaded', () => {
 // delete entries
   let entryToDelete = null;
 
-  function showDeleteModal(id) {
-    entryToDelete = id;
-    document.getElementById('confirmModal').classList.remove('hidden');
-  }
+window.showDeleteModal = function(id) {
+  entryToDelete = id;
+  document.getElementById('confirmModal').classList.remove('hidden');
+};
 
   document.getElementById('cancelDelete').addEventListener('click', () => {
     entryToDelete = null;
