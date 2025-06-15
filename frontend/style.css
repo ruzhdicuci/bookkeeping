@@ -1718,3 +1718,7 @@ select:disabled {
   opacity: 0.7;
 }
 
+.highlight-row {
+  background-color: #ffffcc !important;
+  transition: background-color 0.3s ease;
+}
