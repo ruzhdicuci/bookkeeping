@@ -1,8 +1,5 @@
 // ✅ Always define token first
 const token = localStorage.getItem('token');
-if (!token) {
-  window.location.href = '/client/login.html'; // 👈 your actual login path
-}
 
 // ✅ Toast function
 function showToast(message) {
@@ -14,6 +11,21 @@ function showToast(message) {
   }, 2000);
 }
 
+// ✅ Now fetch entries
+async function fetchMobileEntries() {
+  try {
+    const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
+    const entries = await res.json();
+    renderMobileEntries(entries);
+  } catch (err) {
+    console.error("❌ Failed to load mobile entries", err);
+    showToast("❌ Error loading data");
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const entryForm = document.getElementById('entry-form');
   const mobileEntryList = document.getElementById('mobileEntryList');
@@ -21,68 +33,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let mobileEntries = []; // Local state for mobile entries
 
-  // ✅ Fetch entries from API
-  async function fetchMobileEntries() {
-    try {
-      const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
-      const entries = await res.json();
-      renderMobileEntries(entries);
-    } catch (err) {
-      console.error("❌ Failed to load mobile entries", err);
-      showToast("❌ Error loading data");
-    }
+  function renderMobileEntries(entries) {
+    mobileEntries = entries;
+    mobileEntryList.innerHTML = '';
+    mobileEntries.forEach((entry, index) => {
+      const li = document.createElement('li');
+      li.className = 'mobile-entry';
+      li.innerHTML = `
+        <div style="font-size: 0.8rem; color: grey; margin-bottom: 2px;">${entry.date}</div>
+        <div style="font-weight: bold; font-size: 1rem; color: black; margin-bottom: 2px;">${entry.description}</div>
+        <div style="font-size: 0.85rem; color: #555; margin-bottom: 2px;">
+          <span style="margin-right: 8px; color: grey;">CHF</span>
+          <span style="color: red;">${entry.amount}</span>
+        </div>
+        <div style="font-size: 0.85rem; margin-bottom: 2px;">
+          <span style="color: blue; margin-right: 8px;">${entry.person}</span>
+          <span style="color: orange; margin-right: 8px;">${entry.bank}</span>
+          <span style="color: green;">${entry.category}</span>
+        </div>
+        <div style="font-size: 0.8rem; color: grey; margin-bottom: 4px;">Status: ${entry.status}</div>
+        <button onclick="editMobileEntry(${index})" style="font-size: 0.75rem; padding: 3px 6px; margin-right: 4px; background-color: #eee; border: none;">✏️</button>
+        <button onclick="deleteMobileEntry(${index})" style="font-size: 0.75rem; padding: 3px 6px; margin-right: 4px; background-color: #eee; border: none;">🗑️</button>
+        <button onclick="duplicateMobileEntry(${index})" style="font-size: 0.75rem; padding: 3px 6px; background-color: #eee; border: none;">📄</button>
+      `;
+      mobileEntryList.appendChild(li);
+    });
+    updateSummary();
   }
 
-function renderMobileEntries(entries) {
-  mobileEntries = entries;
-  mobileEntryList.innerHTML = '';
-  mobileEntries.forEach((entry, index) => {
-    const li = document.createElement('li');
-    li.className = 'mobile-entry';
-    li.style.display = 'flex';
-    li.style.justifyContent = 'space-between';
-    li.style.alignItems = 'center';
-    li.style.padding = '12px';
-    li.style.borderBottom = '1px solid #ddd';
-    li.style.background = '#fff';
-
-    const amountColor = entry.type.toLowerCase() === 'income' ? 'green' : 'red';
-
-    li.innerHTML = `
-      <!-- Left: Date -->
-      <div style="flex-shrink: 0; text-align: center; width: 50px; font-size: 0.85rem; color: #666;">
-        <div style="font-weight: bold; font-size: 1.2rem;">${entry.date.slice(8, 10)}</div>
-        <div>${new Date(entry.date).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}</div>
-      </div>
-
-      <!-- Middle: Description & Details -->
-      <div style="flex: 1; margin: 0 10px;">
-        <div style="font-weight: bold; font-size: 1rem;">${entry.description}</div>
-        <div style="font-size: 0.85rem; color: #888;">
-          ${entry.category} • ${entry.person} • ${entry.bank}
-        </div>
-        <div style="font-size: 0.8rem; color: #aaa;">${entry.status}</div>
-      </div>
-
-      <!-- Right: Amount -->
-      <div style="text-align: right; flex-shrink: 0;">
-        <div style="color: ${amountColor}; font-weight: bold;">${entry.currency} ${parseFloat(entry.amount).toFixed(2)}</div>
-        <div>
-          <button onclick="editMobileEntry(${index})" style="font-size: 0.7rem; padding: 2px 4px;">✏️</button>
-          <button onclick="deleteMobileEntry(${index})" style="font-size: 0.7rem; padding: 2px 4px;">🗑️</button>
-        </div>
-      </div>
-    `;
-
-    mobileEntryList.appendChild(li);
-  });
-
-  updateSummary();
-}
-  
   function updateSummary() {
     let income = 0;
     let expenses = 0;
@@ -135,6 +113,14 @@ function renderMobileEntries(entries) {
     showToast("Entry deleted");
   }
 
+  window.duplicateMobileEntry = function(index) {
+    const original = mobileEntries[index];
+    const copy = { ...original, description: original.description + ' (Copy)' };
+    mobileEntries.push(copy);
+    renderMobileEntries(mobileEntries);
+    showToast("Entry duplicated");
+  }
+
   entryForm.addEventListener('submit', e => {
     e.preventDefault();
     const data = getFormData();
@@ -172,6 +158,5 @@ function renderMobileEntries(entries) {
     });
   });
 
-  // ✅ Finally fetch entries after everything is defined
   fetchMobileEntries();
 });
