@@ -1,7 +1,7 @@
-// ✅ Always define token first
+// mobile.js
+
 const token = localStorage.getItem('token');
 
-// ✅ Toast function
 function showToast(message) {
   const toast = document.getElementById('toast');
   toast.textContent = message;
@@ -24,28 +24,31 @@ document.addEventListener('DOMContentLoaded', () => {
       const li = document.createElement('li');
       li.className = 'mobile-entry';
       li.innerHTML = `
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; padding: 10px; background: #fff; border-radius: 10px; margin-bottom: 8px; font-family: system-ui, sans-serif;">
-          <div style="text-align: left;">
-            <div style="font-size: 1.2rem; font-weight: bold;">${new Date(entry.date).getDate().toString().padStart(2, '0')}</div>
-            <div style="color: grey; font-size: 0.9rem;">${new Date(entry.date).toLocaleString('default', { month: 'short' })}</div>
-            <div style="color: grey; font-size: 0.85rem;">${new Date(entry.date).getFullYear()}</div>
+        <div class="entry-card">
+          <div class="entry-date">
+            <div class="day">${new Date(entry.date).getDate().toString().padStart(2, '0')}</div>
+            <div class="month">${new Date(entry.date).toLocaleString('default', { month: 'short' })}</div>
+            <div class="year">${new Date(entry.date).getFullYear()}</div>
           </div>
-          <div style="flex: 1; padding-left: 10px;">
-            <div style="font-weight: bold; font-size: 1rem;">${entry.description}</div>
-            <div style="font-size: 0.85rem; color: #444;">${entry.category} • <span style="color: blue;">${entry.person}</span> • <span style="color: orange;">${entry.bank}</span></div>
-            <div style="font-size: 0.8rem; color: grey;">Status: ${entry.status}</div>
+          <div class="entry-main">
+            <div class="description">${entry.description}</div>
+            <div class="meta">
+              <span class="category">${entry.category}</span> •
+              <span class="person">${entry.person}</span> •
+              <span class="bank">${entry.bank}</span>
+            </div>
+            <div class="status">Status: ${entry.status}</div>
           </div>
-          <div style="text-align: right;">
-            <div style="font-size: 0.75rem; color: grey;">CHF</div>
-            <div style="font-size: 1rem; color: red; font-weight: bold;">${parseFloat(entry.amount).toFixed(2)}</div>
-            <div style="margin-top: 8px; display: flex; gap: 4px;">
-              <button onclick="editMobileEntry(${index})" style="background-color: #f1f1f1; border: none; padding: 3px 6px;">✏️</button>
-              <button onclick="deleteMobileEntry(${index})" style="background-color: #f1f1f1; border: none; padding: 3px 6px;">🗑️</button>
-              <button onclick="duplicateMobileEntry(${index})" style="background-color: #f1f1f1; border: none; padding: 3px 6px;">📄</button>
+          <div class="entry-amount">
+            <div class="currency">CHF</div>
+            <div class="amount">${parseFloat(entry.amount).toFixed(2)}</div>
+            <div class="buttons">
+              <button onclick="editMobileEntry(${index})">✏️</button>
+              <button onclick="deleteMobileEntry(${index})">🗑️</button>
+              <button onclick="duplicateMobileEntry(${index})">📄</button>
             </div>
           </div>
-        </div>
-      `;
+        </div>`;
       mobileEntryList.appendChild(li);
     });
     updateSummary();
@@ -98,15 +101,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window.editMobileEntry = function(index) {
     const entry = mobileEntries[index];
-    document.getElementById('newDate').value = entry.date;
-    document.getElementById('newDescription').value = entry.description;
-    document.getElementById('newAmount').value = entry.amount;
-    document.getElementById('newCurrency').value = entry.currency;
-    document.getElementById('newType').value = entry.type;
-    document.getElementById('newPerson').value = entry.person;
-    document.getElementById('newBank').value = entry.bank;
-    document.getElementById('newCategory').value = entry.category;
-    document.getElementById('newStatus').value = entry.status;
+    Object.entries(entry).forEach(([key, val]) => {
+      const el = document.getElementById(`new${key.charAt(0).toUpperCase() + key.slice(1)}`);
+      if (el) el.value = val;
+    });
     entryForm.dataset.editIndex = index;
     showToast("Editing entry...");
   }
@@ -142,24 +140,12 @@ document.addEventListener('DOMContentLoaded', () => {
     renderMobileEntries(mobileEntries);
   });
 
-  document.getElementById('descFilter').addEventListener('input', () => {
-    const value = document.getElementById('descFilter').value.toLowerCase();
-    document.querySelectorAll('#mobileEntryList .mobile-entry').forEach(li => {
-      li.style.display = li.textContent.toLowerCase().includes(value) ? '' : 'none';
-    });
-  });
-
-  document.getElementById('typeFilter').addEventListener('input', () => {
-    const value = document.getElementById('typeFilter').value.toLowerCase();
-    document.querySelectorAll('#mobileEntryList .mobile-entry').forEach(li => {
-      li.style.display = li.textContent.toLowerCase().includes(value) ? '' : 'none';
-    });
-  });
-
-  document.getElementById('dateFilter').addEventListener('input', () => {
-    const value = document.getElementById('dateFilter').value;
-    document.querySelectorAll('#mobileEntryList .mobile-entry').forEach(li => {
-      li.style.display = li.textContent.includes(value) ? '' : 'none';
+  ['descFilter', 'typeFilter', 'dateFilter'].forEach(id => {
+    document.getElementById(id)?.addEventListener('input', () => {
+      const value = document.getElementById(id).value.toLowerCase();
+      document.querySelectorAll('#mobileEntryList .mobile-entry').forEach(li => {
+        li.style.display = li.textContent.toLowerCase().includes(value) ? '' : 'none';
+      });
     });
   });
 

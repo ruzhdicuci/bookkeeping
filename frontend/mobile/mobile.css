@@ -1,133 +1,107 @@
-/* mobile/mobile.css */
+/* mobile.css */
 
 body {
-  font-family: 'Segoe UI', sans-serif;
+  font-family: system-ui, sans-serif;
+  background-color: #f8f9fa;
   margin: 0;
-  padding: 0;
-  background: #f9f9f9;
-  color: #222;
-}
-
-header {
-  background: #1e1e1e;
-  color: #fff;
-  padding: 1rem;
-  text-align: center;
-}
-
-#desktopBtn {
-  margin-top: 0.5rem;
-  padding: 6px 12px;
-  border: none;
-  background: #444;
-  color: #fff;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-main {
-  padding: 1rem;
-}
-
-#entry-form input,
-#entry-form select,
-#filters input {
-  display: block;
-  width: 100%;
-  padding: 0.6rem 0.75rem;
-  margin: 0.5rem 0;
-  font-size: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  box-sizing: border-box;
-}
-
-#addMobileEntry {
-  width: 100%;
-  background: #1abc9c;
-  color: white;
-  padding: 0.75rem;
-  font-size: 1.1rem;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  margin-top: 0.75rem;
-}
-
-#summary {
-  display: flex;
-  justify-content: space-between;
-  margin: 1rem 0;
-  padding: 0.5rem;
-  background: #fff;
-  border-radius: 6px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  font-weight: bold;
-  font-size: 1.1rem;
-}
-
-#filters input {
-  margin-top: 0.3rem;
+  padding: 10px;
 }
 
 #mobileEntryList {
   list-style: none;
   padding: 0;
-  margin-top: 1rem;
 }
 
-#mobileEntryList li {
-  background: #fff;
-  padding: 0.75rem;
-  margin-bottom: 0.5rem;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+.entry-card {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-}
-
-#toast {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #444;
-  color: #fff;
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-size: 16px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-  z-index: 999;
-}
-
-/* Responsive tweaks */
-@media (min-width: 600px) {
-  #summary {
-    font-size: 1.2rem;
-  }
-
-  #entry-form input,
-  #entry-form select,
-  #filters input {
-    font-size: 1.1rem;
-  }
-}
-
-
-input, select {
-  font-size: 16px;
-  margin-bottom: 8px;
+  align-items: flex-start;
+  background: #fff;
+  border-radius: 10px;
   padding: 10px;
+  margin-bottom: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-button.add-entry {
-  position: sticky;
-  bottom: 12px;
-  width: 100%;
-  font-size: 18px;
-  padding: 12px;
+.entry-date {
+  text-align: left;
+  min-width: 50px;
+}
+
+.entry-date .day {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.entry-date .month,
+.entry-date .year {
+  color: grey;
+  font-size: 0.8rem;
+}
+
+.entry-main {
+  flex: 1;
+  padding-left: 10px;
+}
+
+.description {
+  font-weight: bold;
+  font-size: 1rem;
+  margin-bottom: 4px;
+}
+
+.meta {
+  font-size: 0.85rem;
+  color: #444;
+  margin-bottom: 2px;
+}
+
+.meta .category {
+  color: green;
+}
+
+.meta .person {
+  color: blue;
+}
+
+.meta .bank {
+  color: orange;
+}
+
+.status {
+  font-size: 0.8rem;
+  color: grey;
+}
+
+.entry-amount {
+  text-align: right;
+  min-width: 70px;
+}
+
+.currency {
+  font-size: 0.75rem;
+  color: grey;
+}
+
+.amount {
+  font-size: 1rem;
+  color: red;
+  font-weight: bold;
+}
+
+.buttons {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.buttons button {
+  background-color: #eee;
+  border: none;
+  padding: 3px 6px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  border-radius: 4px;
 }
