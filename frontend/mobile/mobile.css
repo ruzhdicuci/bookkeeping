@@ -137,7 +137,7 @@ color: grey;
 .top-controls button {
   padding: 8px 12px;
   border: none;
-  background: #2f8fda;
+  background: linear-gradient(135deg, #96dcf4, #67d0f3);
   color: white;
   border-radius: 6px;
 }
@@ -151,7 +151,7 @@ color: grey;
 
 
 #desktopBtn {
-  background: #d34662;
+  background: linear-gradient(135deg, #ff416c, #ff4b2b);
   color: white;
   padding: 6px 12px;
   border: none;
