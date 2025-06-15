@@ -11,27 +11,12 @@ function showToast(message) {
   }, 2000);
 }
 
-// ✅ Now fetch entries
-async function fetchMobileEntries() {
-  try {
-    const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
-    const entries = await res.json();
-    renderMobileEntries(entries);
-  } catch (err) {
-    console.error("❌ Failed to load mobile entries", err);
-    showToast("❌ Error loading data");
-  }
-}
-
 document.addEventListener('DOMContentLoaded', () => {
   const entryForm = document.getElementById('entry-form');
   const mobileEntryList = document.getElementById('mobileEntryList');
   const toast = document.getElementById('toast');
 
-  let mobileEntries = [];
+  let mobileEntries = []; // Local state
 
   function renderMobileEntries(entries) {
     mobileEntries = entries;
@@ -43,8 +28,9 @@ document.addEventListener('DOMContentLoaded', () => {
         <div style="font-size: 0.8rem; color: grey; margin-bottom: 2px;">${entry.date}</div>
         <div style="font-weight: bold; font-size: 1rem; color: black; margin-bottom: 2px;">${entry.description}</div>
         <div style="font-size: 0.85rem; color: #555; margin-bottom: 2px;">
-          <span style="margin-right: 8px; color: grey;">CHF</span>
-          <span style="color: red;">${entry.amount}</span>
+          <span style="margin-right: 4px; color: red;">${entry.amount}</span>
+          <span style="color: grey;">${entry.currency}</span>
+          <span style="margin-left: 8px;">${entry.type}</span>
         </div>
         <div style="font-size: 0.85rem; margin-bottom: 2px;">
           <span style="color: blue; margin-right: 8px;">${entry.person}</span>
@@ -52,31 +38,17 @@ document.addEventListener('DOMContentLoaded', () => {
           <span style="color: green;">${entry.category}</span>
         </div>
         <div style="font-size: 0.8rem; color: grey; margin-bottom: 4px;">Status: ${entry.status}</div>
-        <button onclick="editMobileEntry(${index})" style="font-size: 0.75rem; padding: 3px 6px; margin-right: 4px; background-color: #eee; border: none;">✏️</button>
-        <button onclick="deleteMobileEntry(${index})" style="font-size: 0.75rem; padding: 3px 6px; margin-right: 4px; background-color: #eee; border: none;">🗑️</button>
-        <button onclick="duplicateMobileEntry(${index})" style="font-size: 0.75rem; padding: 3px 6px; background-color: #eee; border: none;">📄</button>
+        <div style="margin-top: 6px;">
+          <button onclick="editMobileEntry(${index})" style="font-size: 0.75rem; padding: 3px 6px; margin-right: 4px; background-color: #eee; border: none;">✏️</button>
+          <button onclick="deleteMobileEntry(${index})" style="font-size: 0.75rem; padding: 3px 6px; margin-right: 4px; background-color: #eee; border: none;">🗑️</button>
+          <button onclick="duplicateMobileEntry(${index})" style="font-size: 0.75rem; padding: 3px 6px; background-color: #eee; border: none;">📄</button>
+        </div>
       `;
       mobileEntryList.appendChild(li);
     });
     updateSummary();
   }
 
-  async function fetchMobileEntries() {
-    try {
-      const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
-      const entries = await res.json();
-      renderMobileEntries(entries);
-    } catch (err) {
-      console.error("❌ Failed to load mobile entries", err);
-      showToast("❌ Error loading data");
-    }
-  }
-
-  fetchMobileEntries();
-});
   function updateSummary() {
     let income = 0;
     let expenses = 0;
@@ -121,21 +93,20 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('newStatus').value = entry.status;
     entryForm.dataset.editIndex = index;
     showToast("Editing entry...");
-  }
+  };
 
   window.deleteMobileEntry = function(index) {
     mobileEntries.splice(index, 1);
     renderMobileEntries(mobileEntries);
     showToast("Entry deleted");
-  }
+  };
 
   window.duplicateMobileEntry = function(index) {
-    const original = mobileEntries[index];
-    const copy = { ...original, description: original.description + ' (Copy)' };
-    mobileEntries.push(copy);
+    const copy = { ...mobileEntries[index] };
+    mobileEntries.splice(index + 1, 0, copy);
     renderMobileEntries(mobileEntries);
     showToast("Entry duplicated");
-  }
+  };
 
   entryForm.addEventListener('submit', e => {
     e.preventDefault();
@@ -173,6 +144,21 @@ document.addEventListener('DOMContentLoaded', () => {
       li.style.display = li.textContent.includes(value) ? '' : 'none';
     });
   });
+
+  // ✅ Now fetch entries
+  async function fetchMobileEntries() {
+    try {
+      const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
+      const entries = await res.json();
+      renderMobileEntries(entries);
+    } catch (err) {
+      console.error("❌ Failed to load mobile entries", err);
+      showToast("❌ Error loading data");
+    }
+  }
 
   fetchMobileEntries();
 });
