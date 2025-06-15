@@ -58,19 +58,22 @@ document.addEventListener('DOMContentLoaded', () => {
     updateSummary();
   }
 
-  async function fetchMobileEntries() {
-    try {
-      const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
-      const entries = await res.json();
-      renderMobileEntries(entries);
-    } catch (err) {
-      console.error("❌ Failed to load mobile entries", err);
-      showToast("❌ Error loading data");
-    }
+ async function fetchMobileEntries() {
+  try {
+    const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    console.log("🔍 Status:", res.status); // ✅ log status
+    if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
+
+    const entries = await res.json();
+    renderMobileEntries(entries);
+  } catch (err) {
+    console.error("❌ Failed to load mobile entries:", err);
+    showToast("❌ Error loading data");
   }
+}
 
   function updateSummary() {
     let income = 0;
