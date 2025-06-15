@@ -10,18 +10,15 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     body: JSON.stringify({ email, password })
   });
 
-  const data = await res.json();
-  if (res.ok) {
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('currentUser', email);
-    localStorage.setItem('lastLoginUser', email);
-localStorage.setItem('viewMode', 'mobile'); // or 'desktop'
-window.location.href = localStorage.getItem('viewMode') === 'mobile'
-  ? '/mobile'
-  : 'dashboard.html';
-  } else {
-    alert(data.message || 'Login failed');
-  }
+const data = await res.json();
+if (res.ok) {
+  localStorage.setItem('token', data.token);
+  localStorage.setItem('currentUser', email);
+  localStorage.setItem('lastLoginUser', email);
+  window.location.href = '/bookkeeping/client/dashboard.html';
+} else {
+  alert(data.message || 'Login failed');
+}
 });
 
 // ✅ REGISTER

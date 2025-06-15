@@ -36,34 +36,46 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function renderMobileEntries(entries) {
-    mobileEntries = entries;
-    mobileEntryList.innerHTML = '';
-    mobileEntries.forEach((entry, index) => {
-      const li = document.createElement('li');
-      li.className = 'mobile-entry';
-      li.innerHTML = `
-        <div style="font-size: 0.8rem; color: grey; margin-bottom: 2px;">${entry.date}</div>
-        <div style="font-weight: bold; font-size: 1rem; color: black; margin-bottom: 2px;">${entry.description}</div>
-        <div style="font-size: 0.85rem; color: #555; margin-bottom: 2px;">
-          <span style="margin-right: 8px;">${entry.amount} ${entry.currency}</span>
-          <span>${entry.type}</span>
+ function renderMobileEntries(entries) {
+  mobileEntries = entries;
+  mobileEntryList.innerHTML = '';
+  mobileEntries.forEach((entry, index) => {
+    const li = document.createElement('li');
+    li.className = 'mobile-entry';
+    li.style.padding = '8px';
+    li.style.border = '1px solid #ccc';
+    li.style.borderRadius = '8px';
+    li.style.marginBottom = '10px';
+    li.style.backgroundColor = '#f9f9f9';
+
+    li.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div style="font-size: 0.8rem; color: grey;">${entry.date}</div>
+        <div>
+          <button onclick="editMobileEntry(${index})" style="font-size: 0.75rem; margin-right: 4px;">✏️</button>
+          <button onclick="deleteMobileEntry(${index})" style="font-size: 0.75rem;">🗑️</button>
         </div>
-        <div style="font-size: 0.85rem; margin-bottom: 2px;">
-          <span style="color: blue; margin-right: 8px;">${entry.person}</span>
-          <span style="color: orange; margin-right: 8px;">${entry.bank}</span>
-          <span style="color: green;">${entry.category}</span>
-        </div>
-        <div style="font-size: 0.8rem; color: grey; margin-bottom: 4px;">Status: ${entry.status}</div>
-        <div style="margin-bottom: 10px;">
-          <button onclick="editMobileEntry(${index})" style="font-size: 0.75rem; padding: 3px 6px; margin-right: 4px;">✏️</button>
-          <button onclick="deleteMobileEntry(${index})" style="font-size: 0.75rem; padding: 3px 6px;">🗑️</button>
-        </div>
-      `;
-      mobileEntryList.appendChild(li);
-    });
-    updateSummary();
-  }
+      </div>
+
+      <div style="font-weight: bold; font-size: 1rem; color: black; margin: 4px 0;">${entry.description}</div>
+
+      <div style="font-size: 0.85rem; color: #333; margin-bottom: 2px;">
+        ${entry.amount} ${entry.currency} – ${entry.type}
+      </div>
+
+      <div style="font-size: 0.85rem; margin-bottom: 2px;">
+        <span style="color: blue;">${entry.person}</span> – 
+        <span style="color: orange;">${entry.bank}</span> – 
+        <span style="color: green;">${entry.category}</span>
+      </div>
+
+      <div style="font-size: 0.8rem; color: grey;">Status: ${entry.status}</div>
+    `;
+    
+    mobileEntryList.appendChild(li);
+  });
+  updateSummary();
+}
 
   function updateSummary() {
     let income = 0;

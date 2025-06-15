@@ -1740,3 +1740,31 @@ font-weight: bold;
 .hidden {
   display: none;
 }
+
+
+#mobile  {
+  background: linear-gradient(135deg, #96dcf4, #67d0f3);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 5px 12px;
+
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+#mobile:hover  {
+  background: linear-gradient(135deg, #ffffff, #dceff1);
+  color: blue;
+  border: none;
+  border-radius: 8px;
+  padding: 5px 12px;
+
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
