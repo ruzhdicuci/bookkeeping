@@ -14,7 +14,8 @@
 <div class="top-controls">
    <button id="desktopBtn" onclick="window.location.href='/client/dashboard.html'">💻 Desktop</button>
   <button id="toggleEntryForm"> + Add Entry</button>
-  <button id="toggleFilters">🔍 Filters</button>
+  <button id="toggleFilters">🔍 Search</button>
+  <button id="toggleAdvancedFilters">⚙️ Filters</button>
 </div>
   <main>
   <form id="entry-form" class="hidden">
@@ -40,11 +41,63 @@
       <span>Balance: <strong id="mobileBalance">0.00</strong></span>
     </div>
 
+  
     <div id="filters">
       <input type="text" id="descFilter" placeholder="🔍 Description Filter" />
       <input type="text" id="typeFilter" placeholder="🔍 Type Filter" />
       <input type="date" id="dateFilter" />
     </div>
+
+    <!-- Advanced Filters Container -->
+<div id="advancedFilters" class="hidden">
+  <label>Months:
+    <select id="monthFilter">
+      <option>All</option>
+      <!-- Dynamically populate if needed -->
+    </select>
+  </label>
+
+  <label>Category:
+    <select id="categoryFilterMobile">
+      <option>All</option>
+    </select>
+  </label>
+
+  <label>Type:
+    <select id="typeFilterMobile">
+      <option>All</option>
+      <option>Income</option>
+      <option>Expense</option>
+    </select>
+  </label>
+
+  <label>Currency:
+    <select id="currencyFilterMobile">
+      <option>All</option>
+    </select>
+  </label>
+
+  <label>Bank:
+    <select id="bankFilterMobile">
+      <option>All</option>
+    </select>
+  </label>
+
+  <label>Status:
+    <select id="statusFilterMobile">
+      <option>All</option>
+      <option>Paid</option>
+      <option>Open</option>
+    </select>
+  </label>
+
+  <label>Persons:
+    <select id="personFilterMobile">
+      <option>All</option>
+    </select>
+  </label>
+</div>
+
 
     <ul id="mobileEntryList">
       <!-- Entries will be dynamically inserted here -->
