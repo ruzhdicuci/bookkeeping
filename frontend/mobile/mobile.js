@@ -11,60 +11,58 @@ function showToast(message) {
   }, 2000);
 }
 
+// ✅ Now fetch entries
+async function fetchMobileEntries() {
+  try {
+    const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
+    const entries = await res.json();
+    renderMobileEntries(entries);
+  } catch (err) {
+    console.error("❌ Failed to load mobile entries", err);
+    showToast("❌ Error loading data");
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const entryForm = document.getElementById('entry-form');
   const mobileEntryList = document.getElementById('mobileEntryList');
   const toast = document.getElementById('toast');
 
-  let mobileEntries = []; // Local state
+  let mobileEntries = []; // Local state for mobile entries
 
   function renderMobileEntries(entries) {
     mobileEntries = entries;
     mobileEntryList.innerHTML = '';
-
-    entries.forEach((entry, index) => {
+    mobileEntries.forEach((entry, index) => {
       const li = document.createElement('li');
       li.className = 'mobile-entry';
       li.innerHTML = `
-        <div class="entry-date">${entry.date}</div>
-        <div class="entry-description"><strong>${entry.description}</strong></div>
-        <div class="entry-details">
-          <span class="entry-amount">${entry.amount} ${entry.currency}</span> |
-          <span class="entry-type">${entry.type}</span>
+        <div style="font-size: 0.8rem; color: grey; margin-bottom: 2px;">${entry.date}</div>
+        <div style="font-weight: bold; font-size: 1rem; color: black; margin-bottom: 2px;">${entry.description}</div>
+        <div style="font-size: 0.85rem; color: #555; margin-bottom: 2px;">
+          <span style="margin-right: 8px;">${entry.amount} ${entry.currency}</span>
+          <span>${entry.type}</span>
         </div>
-        <div class="entry-meta">
-          <span class="entry-person">${entry.person}</span> |
-          <span class="entry-bank">${entry.bank}</span> |
-          <span class="entry-category">${entry.category}</span>
+        <div style="font-size: 0.85rem; margin-bottom: 2px;">
+          <span style="color: blue; margin-right: 8px;">${entry.person}</span>
+          <span style="color: orange; margin-right: 8px;">${entry.bank}</span>
+          <span style="color: green;">${entry.category}</span>
         </div>
-        <div class="entry-status">Status: ${entry.status}</div>
-        <div class="entry-actions">
-          <button onclick="editMobileEntry(${index})">✏️</button>
-          <button onclick="deleteMobileEntry(${index})">🗑️</button>
-        </div>
+        <div style="font-size: 0.8rem; color: grey; margin-bottom: 4px;">Status: ${entry.status}</div>
+        <button onclick="editMobileEntry(${index})" style="font-size: 0.75rem; padding: 3px 6px; margin-right: 4px;">✏️</button>
+        <button onclick="deleteMobileEntry(${index})" style="font-size: 0.75rem; padding: 3px 6px;">🗑️</button>
       `;
       mobileEntryList.appendChild(li);
     });
-
     updateSummary();
   }
 
-  async function fetchMobileEntries() {
-    try {
-      const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
-      const entries = await res.json();
-      renderMobileEntries(entries);
-    } catch (err) {
-      console.error("❌ Failed to load mobile entries", err);
-      showToast("❌ Error loading data");
-    }
-  }
-
   function updateSummary() {
-    let income = 0, expenses = 0;
+    let income = 0;
+    let expenses = 0;
     mobileEntries.forEach(e => {
       const amt = parseFloat(e.amount);
       if (e.type.toLowerCase() === 'income') income += amt;
@@ -91,7 +89,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function clearForm() {
     entryForm.reset();
-    delete entryForm.dataset.editIndex;
   }
 
   window.editMobileEntry = function(index) {
@@ -107,13 +104,13 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('newStatus').value = entry.status;
     entryForm.dataset.editIndex = index;
     showToast("Editing entry...");
-  };
+  }
 
   window.deleteMobileEntry = function(index) {
     mobileEntries.splice(index, 1);
     renderMobileEntries(mobileEntries);
     showToast("Entry deleted");
-  };
+  }
 
   entryForm.addEventListener('submit', e => {
     e.preventDefault();
@@ -121,6 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const index = entryForm.dataset.editIndex;
     if (index !== undefined) {
       mobileEntries[parseInt(index)] = data;
+      delete entryForm.dataset.editIndex;
       showToast("Entry updated");
     } else {
       mobileEntries.push(data);
@@ -151,5 +149,5 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  fetchMobileEntries(); // ✅ Run after everything is defined
+  fetchMobileEntries();
 });
