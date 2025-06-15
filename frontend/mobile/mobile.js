@@ -36,52 +36,53 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-
-  function renderMobileEntries(entries) {
+function renderMobileEntries(entries) {
   mobileEntries = entries;
   mobileEntryList.innerHTML = '';
   mobileEntries.forEach((entry, index) => {
     const li = document.createElement('li');
     li.className = 'mobile-entry';
-    li.style.padding = '10px';
-    li.style.border = '1px solid #ccc';
-    li.style.borderRadius = '8px';
-    li.style.marginBottom = '10px';
-    li.style.backgroundColor = '#f9f9f9';
+    li.style.display = 'flex';
+    li.style.justifyContent = 'space-between';
+    li.style.alignItems = 'center';
+    li.style.padding = '12px';
+    li.style.borderBottom = '1px solid #ddd';
+    li.style.background = '#fff';
+
+    const amountColor = entry.type.toLowerCase() === 'income' ? 'green' : 'red';
 
     li.innerHTML = `
-      <!-- Line 1: Date and Description -->
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <div style="font-size: 0.8rem; color: grey;">${entry.date}</div>
-        <div style="font-weight: bold; font-size: 1rem; color: black;">${entry.description}</div>
+      <!-- Left: Date -->
+      <div style="flex-shrink: 0; text-align: center; width: 50px; font-size: 0.85rem; color: #666;">
+        <div style="font-weight: bold; font-size: 1.2rem;">${entry.date.slice(8, 10)}</div>
+        <div>${new Date(entry.date).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}</div>
       </div>
 
-      <!-- Line 2: Amount, Currency, Type, Status -->
-      <div style="margin-top: 4px; font-size: 0.85rem; color: #333;">
-        ${entry.amount} ${entry.currency} • ${entry.type} • 
-        <span style="color: ${entry.status === 'Paid' ? 'green' : 'red'};">${entry.status}</span>
+      <!-- Middle: Description & Details -->
+      <div style="flex: 1; margin: 0 10px;">
+        <div style="font-weight: bold; font-size: 1rem;">${entry.description}</div>
+        <div style="font-size: 0.85rem; color: #888;">
+          ${entry.category} • ${entry.person} • ${entry.bank}
+        </div>
+        <div style="font-size: 0.8rem; color: #aaa;">${entry.status}</div>
       </div>
 
-      <!-- Line 3: Person, Bank, Category -->
-      <div style="margin-top: 2px; font-size: 0.85rem;">
-        <span style="color: blue;">${entry.person}</span> • 
-        <span style="color: orange;">${entry.bank}</span> • 
-        <span style="color: green;">${entry.category}</span>
-      </div>
-
-      <!-- Action buttons -->
-      <div style="margin-top: 6px;">
-        <button onclick="editMobileEntry(${index})" style="font-size: 0.75rem; padding: 3px 6px; margin-right: 4px;">✏️</button>
-        <button onclick="deleteMobileEntry(${index})" style="font-size: 0.75rem; padding: 3px 6px;">🗑️</button>
+      <!-- Right: Amount -->
+      <div style="text-align: right; flex-shrink: 0;">
+        <div style="color: ${amountColor}; font-weight: bold;">${entry.currency} ${parseFloat(entry.amount).toFixed(2)}</div>
+        <div>
+          <button onclick="editMobileEntry(${index})" style="font-size: 0.7rem; padding: 2px 4px;">✏️</button>
+          <button onclick="deleteMobileEntry(${index})" style="font-size: 0.7rem; padding: 2px 4px;">🗑️</button>
+        </div>
       </div>
     `;
 
     mobileEntryList.appendChild(li);
   });
+
   updateSummary();
 }
-
-
+  
   function updateSummary() {
     let income = 0;
     let expenses = 0;
