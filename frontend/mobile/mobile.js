@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
   entryForm = document.getElementById('entry-form');
   const mobileEntryList = document.getElementById('mobileEntryList');
 
-  window.ChoicesInstances = {};
+
 
 // Filter configuration
 const filterDropdowns = [
