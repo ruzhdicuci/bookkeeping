@@ -98,37 +98,63 @@ async function fetchMobileEntries() {
   }
 }
 
+// ✅ Initialize Choices instance map
 window.ChoicesInstances = {};
 
 function populateSelect(id, values) {
   const selectEl = document.getElementById(id);
   if (!selectEl) return;
 
-  selectEl.innerHTML = ''; // Clear previous
-
-  const defaultOption = new Option('All', 'All', true, true);
-  selectEl.add(defaultOption);
-
-  Array.from(values).sort().forEach(val => {
-    const opt = new Option(val, val);
-    selectEl.add(opt);
-  });
-
-  // Reinitialize Choices for this select
+  // Destroy previous Choices instance if it exists
   if (window.ChoicesInstances[id]) {
     window.ChoicesInstances[id].destroy();
   }
 
+  // Clear previous options and add default "All"
+  selectEl.innerHTML = '';
+  selectEl.add(new Option('All', 'All', true, true));
+
+  Array.from(values).sort().forEach(val => {
+    selectEl.add(new Option(val, val));
+  });
+
+  // Initialize new Choices instance
   window.ChoicesInstances[id] = new Choices(selectEl, {
     removeItemButton: true,
     shouldSort: false,
     placeholder: true,
-    placeholderValue: 'Select...',
-    searchPlaceholderValue: 'Search...'
+    placeholderValue: 'Select...'
   });
 }
 
-// ✅ Attach event listeners (once per element)
+function populateFilterOptions(entries) {
+  const categories = new Set();
+  const currencies = new Set();
+  const banks = new Set();
+  const persons = new Set();
+  const types = new Set();
+  const statuses = new Set();
+  const months = new Set();
+
+  entries.forEach(e => {
+    if (e.category) categories.add(e.category);
+    if (e.currency) currencies.add(e.currency);
+    if (e.bank) banks.add(e.bank);
+    if (e.person) persons.add(e.person);
+    if (e.type) types.add(e.type);
+    if (e.status) statuses.add(e.status);
+    if (e.date) months.add(e.date.slice(0, 7));
+  });
+
+  populateSelect('monthFilter', months);
+  populateSelect('categoryFilterMobile', categories);
+  populateSelect('currencyFilterMobile', currencies);
+  populateSelect('bankFilterMobile', banks);
+  populateSelect('personFilterMobile', persons);
+  populateSelect('typeFilterMobile', types);
+  populateSelect('statusFilterMobile', statuses);
+}
+
 [
   'monthFilter',
   'categoryFilterMobile',
@@ -143,6 +169,7 @@ function populateSelect(id, values) {
     el.addEventListener('change', applyMobileFilters);
   }
 });
+
 
 // ✅ Define renderMobileEntries first
  function renderMobileEntries(entries) {
@@ -192,33 +219,6 @@ function populateSelect(id, values) {
 }
   
 
-function populateFilterOptions(entries) {
-  const categories = new Set();
-  const currencies = new Set();
-  const banks = new Set();
-  const persons = new Set();
-  const types = new Set();
-  const statuses = new Set();
-  const months = new Set();
-
-  entries.forEach(e => {
-    if (e.category) categories.add(e.category);
-    if (e.currency) currencies.add(e.currency);
-    if (e.bank) banks.add(e.bank);
-    if (e.person) persons.add(e.person);
-    if (e.type) types.add(e.type);
-    if (e.status) statuses.add(e.status);
-    if (e.date?.length >= 7) months.add(e.date.slice(0, 7)); // YYYY-MM
-  });
-
-  populateSelect('monthFilter', months);
-  populateSelect('categoryFilterMobile', categories);
-  populateSelect('currencyFilterMobile', currencies);
-  populateSelect('bankFilterMobile', banks);
-  populateSelect('personFilterMobile', persons);
-  populateSelect('typeFilterMobile', types);
-  populateSelect('statusFilterMobile', statuses);
-}
 
   // ✅ Call the fetch once DOM is ready
   fetchMobileEntries();
