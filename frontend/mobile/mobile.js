@@ -119,51 +119,52 @@ function populateSelect(id, values) {
   }
 });
 // ✅ Define renderMobileEntries first
-  function renderMobileEntries(entries) {
-     window.renderMobileEntries = renderMobileEntries;
-    mobileEntries = entries;
-    populateFilterOptions(entries); // Make sure this function is also defined somewhere
-    mobileEntryList.innerHTML = '';
-    mobileEntries.forEach((entry, index) => {
-      const li = document.createElement('li');
-      const amountClass = entry.type.toLowerCase() === 'income' ? 'income' : 'expense';
-      li.className = 'mobile-entry';
-      li.innerHTML = `
-        <div class="entry-card">
-          <div class="entry-date">
-            <div class="day">${new Date(entry.date).getDate().toString().padStart(2, '0')}</div>
-            <div class="month">${new Date(entry.date).toLocaleString('default', { month: 'short' })}</div>
-            <div class="year">${new Date(entry.date).getFullYear()}</div>
+ function renderMobileEntries(entries) {
+  window.renderMobileEntries = renderMobileEntries;
+  mobileEntries = entries;
+  populateFilterOptions(entries);
+  mobileEntryList.innerHTML = '';
+
+  mobileEntries.forEach((entry, index) => {
+    const li = document.createElement('li');
+    const amountClass = entry.type.toLowerCase() === 'income' ? 'income' : 'expense';
+    li.className = 'mobile-entry';
+    li.innerHTML = `
+      <div class="entry-card">
+        <div class="entry-date">
+          <div class="day">${new Date(entry.date).getDate().toString().padStart(2, '0')}</div>
+          <div class="month">${new Date(entry.date).toLocaleString('default', { month: 'short' })}</div>
+          <div class="year">${new Date(entry.date).getFullYear()}</div>
+        </div>
+        <div class="entry-main">
+          <div class="description">${entry.description}</div>
+          <div class="meta">
+            <span class="category">${entry.category}</span> •
+            <span class="person">${entry.person}</span> •
+            <span class="bank">${entry.bank}</span>
           </div>
-          <div class="entry-main">
-            <div class="description">${entry.description}</div>
-            <div class="meta">
-              <span class="category">${entry.category}</span> •
-              <span class="person">${entry.person}</span> •
-              <span class="bank">${entry.bank}</span>
-            </div>
-            <div class="status ${entry.status === 'Open' ? 'open' : ''}">Status: ${entry.status}</div>
+          <div class="status ${entry.status === 'Open' ? 'open' : ''}">Status: ${entry.status}</div>
+        </div>
+        <div class="entry-amount">
+          <div class="amount-line">
+            <span class="currency">CHF</span>
+            <span class="amount ${amountClass}">
+              ${parseFloat(entry.amount).toFixed(2)}
+            </span>
           </div>
-          <div class="entry-amount">
-            <div class="amount-line">
-              <span class="currency">CHF</span>
-              <span class="amount ${amountClass}">
-                ${parseFloat(entry.amount).toFixed(2)}
-              </span>
-            </div>
-            <div class="buttons">
-              <button onclick="editMobileEntry(${index})">✏️</button>
-              <button onclick="deleteMobileEntry(${index})">🗑️</button>
-              <button onclick="duplicateMobileEntry(${index})">📄</button>
-            </div>
+          <div class="buttons">
+            <button onclick="editMobileEntry(${index})">✏️</button>
+            <button onclick="deleteMobileEntry(${index})">🗑️</button>
+            <button onclick="duplicateMobileEntry(${index})">📄</button>
           </div>
-        </div>`;
-      mobileEntryList.appendChild(li);
-    });
-renderMobileEntries(filtered);
-updateSummary(filtered); // ✅ Use filtered consistently
-   
-  }
+        </div>
+      </div>`;
+    mobileEntryList.appendChild(li);
+  });
+
+  updateSummary(entries); // ✅ Corrected
+}
+  
 
 function populateFilterOptions(entries) {
   const categories = new Set();
