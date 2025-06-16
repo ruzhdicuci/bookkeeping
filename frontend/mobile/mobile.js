@@ -238,13 +238,19 @@ function renderMobileEntries(entries) {
 }
 
 
-function applyMobileFilters() {
-  console.log('📌 applyMobileFilters triggered');
+// ✅ Place this at the top level (outside of any other function)
+function getSelectedValues(id) {
+  const values = window.ChoicesInstances[id]?.getValue(true) || [];
 
-  function getSelectedValues(id) {
-    const values = window.ChoicesInstances[id]?.getValue(true) || [];
-    return values.includes('All') ? [] : values.map(v => v.trim());
-  }
+  // If "All" is selected (alone or with others), treat it as "no filtering"
+  if (values.includes('All')) return null;
+
+  return values;
+}
+
+
+function applyMobileFilters() {
+  console.log("📌 applyMobileFilters triggered");
 
   const selectedMonths = getSelectedValues('monthFilter');
   const selectedCategories = getSelectedValues('categoryFilterMobile');
@@ -254,31 +260,19 @@ function applyMobileFilters() {
   const selectedTypes = getSelectedValues('typeFilterMobile');
   const selectedStatuses = getSelectedValues('statusFilterMobile');
 
-  console.log('🔍 Filters selected:', {
-    selectedMonths,
-    selectedCategories,
-    selectedCurrencies,
-    selectedBanks,
-    selectedPersons,
-    selectedTypes,
-    selectedStatuses
-  });
-
   const filtered = mobileEntries.filter(e => {
-    const match =
-      (selectedMonths.length === 0 || selectedMonths.includes(e.date?.slice(0, 7))) &&
-      (selectedCategories.length === 0 || selectedCategories.includes(e.category)) &&
-      (selectedCurrencies.length === 0 || selectedCurrencies.includes(e.currency)) &&
-      (selectedBanks.length === 0 || selectedBanks.includes(e.bank)) &&
-      (selectedPersons.length === 0 || selectedPersons.includes(e.person)) &&
-      (selectedTypes.length === 0 || selectedTypes.includes(e.type)) &&
-      (selectedStatuses.length === 0 || selectedStatuses.includes(e.status));
-
-    if (!match) console.log('❌ Filtered out:', e);
-    return match;
+    return (
+      (!selectedMonths || selectedMonths.includes(e.date?.slice(0, 7))) &&
+      (!selectedCategories || selectedCategories.includes(e.category)) &&
+      (!selectedCurrencies || selectedCurrencies.includes(e.currency)) &&
+      (!selectedBanks || selectedBanks.includes(e.bank)) &&
+      (!selectedPersons || selectedPersons.includes(e.person)) &&
+      (!selectedTypes || selectedTypes.includes(e.type)) &&
+      (!selectedStatuses || selectedStatuses.includes(e.status))
+    );
   });
 
-  console.log(`✅ ${filtered.length} entries after filtering`);
+  console.log("✅ Entries after filtering:", filtered.length);
   renderMobileEntries(filtered);
   updateSummary(filtered);
   updateAverages(filtered);
