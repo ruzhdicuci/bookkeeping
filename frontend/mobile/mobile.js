@@ -100,10 +100,12 @@ async function fetchMobileEntries() {
       headers: { Authorization: `Bearer ${token}` }
     });
     if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
-    const entries = await res.json();
 
+    const entries = await res.json();
     window.mobileEntries = entries;
-    renderMobileEntries(entries);      // ✅ Use entries, not filtered
+
+    populateFilterOptions(entries);        // ✅ first: fill the dropdowns
+    renderMobileEntries(entries);          // ✅ then: render filtered view
     updateSummary(entries);
     updateAverages(entries);
     updateBankChanges(entries);
