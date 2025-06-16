@@ -126,19 +126,26 @@ function populateSelect(id, values) {
   const select = document.getElementById(id);
   if (!select) return;
 
-  // Destroy previous instance
-  if (window.ChoicesInstances[id]) {
+  // Destroy existing Choices instance
+  if (window.ChoicesInstances?.[id]) {
     window.ChoicesInstances[id].destroy();
   }
 
-  // Clear and rebuild
+  // Clear old options
   select.innerHTML = '';
-  select.add(new Option('All', 'All'));
 
+  // Add "All" as selected by default
+  const allOption = new Option('All', 'All');
+  allOption.selected = true;
+  select.add(allOption);
+
+  // Add remaining sorted options
   [...values].sort().forEach(val => {
-    select.add(new Option(val, val));
+    const opt = new Option(val, val);
+    select.add(opt);
   });
 
+  // Initialize Choices.js
   const instance = new Choices(select, {
     removeItemButton: true,
     shouldSort: false,
@@ -146,11 +153,11 @@ function populateSelect(id, values) {
     placeholderValue: 'Select...',
     searchPlaceholderValue: 'Search...'
   });
-  window.ChoicesInstances = window.ChoicesInstances || {};
 
+  window.ChoicesInstances = window.ChoicesInstances || {};
   window.ChoicesInstances[id] = instance;
 
-  // Attach filter listener
+  // Remove previous listeners before attaching a fresh one
   select.removeEventListener('change', applyMobileFilters);
   select.addEventListener('change', applyMobileFilters);
 }
