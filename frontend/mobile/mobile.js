@@ -21,6 +21,13 @@ function showToast(message) {
 
 document.addEventListener('DOMContentLoaded', () => {
   entryForm = document.getElementById('entry-form'); // ✅ no `const` here
+  const categorySelect = new Choices('#categoryFilterMobile', {
+  removeItemButton: true,
+  shouldSort: false,
+  placeholder: true,
+  placeholderValue: 'Select Categories',
+  searchPlaceholderValue: 'Search...'
+});
   const mobileEntryList = document.getElementById('mobileEntryList');
 
  // ✅ Wrap these inside DOMContentLoaded
@@ -91,19 +98,37 @@ async function fetchMobileEntries() {
   }
 }
 
+window.ChoicesInstances = {};
 
 function populateSelect(id, values) {
-  const select = document.getElementById(id);
-  if (!select) return;
-  select.innerHTML = `<option value="All">All</option>`;
+  const selectEl = document.getElementById(id);
+  if (!selectEl) return;
+
+  selectEl.innerHTML = ''; // Clear previous
+
+  const defaultOption = new Option('All', 'All', true, true);
+  selectEl.add(defaultOption);
+
   Array.from(values).sort().forEach(val => {
-    const opt = document.createElement('option');
-    opt.value = val;
-    opt.textContent = val;
-    select.appendChild(opt);
+    const opt = new Option(val, val);
+    selectEl.add(opt);
+  });
+
+  // Reinitialize Choices for this select
+  if (window.ChoicesInstances[id]) {
+    window.ChoicesInstances[id].destroy();
+  }
+
+  window.ChoicesInstances[id] = new Choices(selectEl, {
+    removeItemButton: true,
+    shouldSort: false,
+    placeholder: true,
+    placeholderValue: 'Select...',
+    searchPlaceholderValue: 'Search...'
   });
 }
 
+// ✅ Attach event listeners (once per element)
 [
   'monthFilter',
   'categoryFilterMobile',
@@ -118,6 +143,7 @@ function populateSelect(id, values) {
     el.addEventListener('change', applyMobileFilters);
   }
 });
+
 // ✅ Define renderMobileEntries first
  function renderMobileEntries(entries) {
   window.renderMobileEntries = renderMobileEntries;
@@ -199,8 +225,10 @@ function populateFilterOptions(entries) {
 });
 
 function applyMobileFilters() {
+    const selectedCategories = Array.from(document.getElementById('categoryFilterMobile')?.selectedOptions).map(opt => opt.value);
+
   const month = document.getElementById('monthFilter')?.value;
-  const category = document.getElementById('categoryFilterMobile')?.value;
+ 
   const currency = document.getElementById('currencyFilterMobile')?.value;
   const bank = document.getElementById('bankFilterMobile')?.value;
   const person = document.getElementById('personFilterMobile')?.value;
@@ -404,4 +432,6 @@ for (const [bank, change] of Object.entries(bankChanges)) {
   `;
   list.appendChild(row);
 }
+
+
 } // ✅ <--- THIS was missing
