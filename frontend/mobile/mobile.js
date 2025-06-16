@@ -192,6 +192,8 @@ function populateFilterOptions(entries) {
 
 // ✅ Define renderMobileEntries first
 function renderMobileEntries(entries) {
+    console.log('📦 Rendering entries:', entries.length);
+
   mobileEntries = entries;
   mobileEntryList.innerHTML = '';
 
