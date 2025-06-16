@@ -258,18 +258,39 @@ function getSelectedValues(id) {
 function applyMobileFilters() {
   console.log("📌 applyMobileFilters triggered");
 
-  const selectedPersons = getSelectedValues('personFilterMobile');
+  const getValues = (id) => {
+    const values = window.ChoicesInstances[id]?.getValue(true) || [];
+    const cleaned = values.filter(v => v !== 'All');
+    console.log(`🔍 ${id}:`, cleaned.length ? cleaned : '(All)');
+    return cleaned;
+  };
+
+  const selectedMonths = getValues('monthFilter');
+  const selectedCategories = getValues('categoryFilterMobile');
+  const selectedCurrencies = getValues('currencyFilterMobile');
+  const selectedBanks = getValues('bankFilterMobile');
+  const selectedPersons = getValues('personFilterMobile');
+  const selectedTypes = getValues('typeFilterMobile');
+  const selectedStatuses = getValues('statusFilterMobile');
 
   const filtered = mobileEntries.filter(e => {
-    return selectedPersons.length === 0 || selectedPersons.includes(e.person);
+    return (
+      (selectedMonths.length === 0 || selectedMonths.includes(e.date?.slice(0, 7))) &&
+      (selectedCategories.length === 0 || selectedCategories.includes(e.category)) &&
+      (selectedCurrencies.length === 0 || selectedCurrencies.includes(e.currency)) &&
+      (selectedBanks.length === 0 || selectedBanks.includes(e.bank)) &&
+      (selectedPersons.length === 0 || selectedPersons.includes(e.person)) &&
+      (selectedTypes.length === 0 || selectedTypes.includes(e.type)) &&
+      (selectedStatuses.length === 0 || selectedStatuses.includes(e.status))
+    );
   });
 
-  console.log("👥 Filtered persons:", selectedPersons);
-  console.log("✅ Matched entries:", filtered.length);
-
+  console.log("✅ Filtered entries:", filtered.length);
   renderMobileEntries(filtered);
+  updateSummary(filtered);
+  updateAverages(filtered);
+  updateBankChanges(filtered);
 }
-
 
 
 function updateAverages(entries) {
