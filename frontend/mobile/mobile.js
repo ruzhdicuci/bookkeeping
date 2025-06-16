@@ -123,25 +123,23 @@ async function fetchMobileEntries() {
 
 // ✅ Populate a single <select> with values + Choices.js
 function populateSelect(id, values) {
-  const selectEl = document.getElementById(id);
-  if (!selectEl) return;
+  const select = document.getElementById(id);
+  if (!select) return;
 
-  // Destroy any previous Choices instance
-  if (window.ChoicesInstances?.[id]) {
+  // Destroy previous instance
+  if (window.ChoicesInstances[id]) {
     window.ChoicesInstances[id].destroy();
   }
 
-  // Clear and repopulate options
-  selectEl.innerHTML = '';
-  selectEl.add(new Option('All', 'All'));
+  // Clear and rebuild
+  select.innerHTML = '';
+  select.add(new Option('All', 'All'));
 
-  Array.from(values).sort().forEach(val => {
-    const opt = new Option(val, val);
-    selectEl.add(opt);
+  [...values].sort().forEach(val => {
+    select.add(new Option(val, val));
   });
 
-  // Reinitialize Choices
-  const instance = new Choices(selectEl, {
+  const instance = new Choices(select, {
     removeItemButton: true,
     shouldSort: false,
     placeholder: true,
@@ -151,10 +149,10 @@ function populateSelect(id, values) {
 
   window.ChoicesInstances[id] = instance;
 
-  // ✅ Attach filtering logic
-  selectEl.addEventListener('change', applyMobileFilters);
+  // Attach filter listener
+  select.removeEventListener('change', applyMobileFilters);
+  select.addEventListener('change', applyMobileFilters);
 }
-
 
 function populateFilterOptions(entries) {
   const categories = new Set();
@@ -172,7 +170,7 @@ function populateFilterOptions(entries) {
     if (e.person) persons.add(e.person);
     if (e.type) types.add(e.type);
     if (e.status) statuses.add(e.status);
-    if (e.date) months.add(e.date.slice(0, 7)); // format YYYY-MM
+    if (e.date) months.add(e.date.slice(0, 7));
   });
 
   populateSelect('monthFilter', months);
@@ -186,12 +184,12 @@ function populateFilterOptions(entries) {
 
 // ✅ Define renderMobileEntries first
 function renderMobileEntries(entries) {
-  window.renderMobileEntries = renderMobileEntries;
   mobileEntries = entries;
-  populateFilterOptions(entries);
   mobileEntryList.innerHTML = '';
 
-  mobileEntries.forEach((entry, index) => {
+  populateFilterOptions(entries); // ✅ only once here
+
+  entries.forEach((entry, index) => {
     const li = document.createElement('li');
     const amountClass = entry.type.toLowerCase() === 'income' ? 'income' : 'expense';
     li.className = 'mobile-entry';
@@ -228,7 +226,9 @@ function renderMobileEntries(entries) {
     mobileEntryList.appendChild(li);
   });
 
-updateSummary(entries);
+  updateSummary(entries);
+  updateAverages(entries);
+  updateBankChanges(entries);
 }
 
 
