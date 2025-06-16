@@ -446,24 +446,23 @@ body.dark .currency {
 }
 
 
-body.dark select {
+body.dark select,
+body.dark select option {
+  background-color: #1e1e1e !important;
+  color: #f0f0f0 !important;
+  border: 1px solid #444 !important;
+  appearance: none; /* optional: removes default arrow on some devices */
+}
+body.dark #filters,
+body.dark #advancedFilters {
+  background-color: #000 !important;
+}
+body.dark input,
+body.dark textarea {
   background-color: #1e1e1e !important;
   color: #f0f0f0 !important;
   border: 1px solid #444;
 }
-body.dark #filters,
-body.dark #advancedFilters {
-  background-color: #000;
-}
-body.dark {
-  background-color: #000;
-  color: #f0f0f0;
-}
-body.dark select option {
-  background-color: #1e1e1e;
-  color: #f0f0f0;
-}
-
 body.dark #filters input::placeholder {
   color: #aaa;
 }
