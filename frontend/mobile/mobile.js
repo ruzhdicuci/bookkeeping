@@ -197,8 +197,6 @@ function renderMobileEntries(entries) {
   mobileEntries = entries;
   mobileEntryList.innerHTML = '';
 
-  populateFilterOptions(entries); // ✅ only once here
-
   entries.forEach((entry, index) => {
     const li = document.createElement('li');
     const amountClass = entry.type.toLowerCase() === 'income' ? 'income' : 'expense';
