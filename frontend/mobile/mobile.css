@@ -366,3 +366,34 @@ form#entry-form button {
   border: none;
   cursor: pointer;
 }
+
+
+body.dark {
+  background: #121212;
+  color: #eee;
+}
+
+body.dark .entry-card,
+body.dark .mobile-entry,
+body.dark form,
+body.dark #filters {
+  background: #1e1e1e;
+  color: #eee;
+  box-shadow: none;
+}
+
+body.dark .buttons button {
+  background-color: #333;
+  color: #eee;
+}
+
+body.dark .top-controls button,
+body.dark #toggleTheme {
+  background-color: #2c2c2c;
+  color: #fff;
+}
+
+body.dark .status,
+body.dark .currency {
+  color: #aaa;
+}

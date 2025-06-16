@@ -42,3 +42,7 @@ document.getElementById('mobileLoginForm').addEventListener('submit', async e =>
 });
 
 loadUsers();
+
+document.getElementById('toggleTheme').addEventListener('click', () => {
+  document.body.classList.toggle('dark');
+});

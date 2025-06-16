@@ -179,11 +179,14 @@ function applyMobileFilters() {
     showToast("Editing entry...");
   }
 
-  window.deleteMobileEntry = function(index) {
-    mobileEntries.splice(index, 1);
-    renderMobileEntries(mobileEntries);
-    showToast("Entry deleted");
-  }
+ window.deleteMobileEntry = function(index) {
+  const confirmed = confirm("Are you sure you want to delete this entry?");
+  if (!confirmed) return;
+
+  mobileEntries.splice(index, 1);
+  renderMobileEntries(mobileEntries);
+  showToast("Entry deleted");
+};
 
   window.duplicateMobileEntry = function(index) {
     const copy = { ...mobileEntries[index] };
