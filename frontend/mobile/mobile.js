@@ -1,7 +1,8 @@
 // mobile.js
 
 const token = localStorage.getItem('token');
-
+let entryForm; // declared globally
+  let mobileEntries = [];
 if (!token) {
   window.location.href = '/bookkeeping/client/login.html';
 }
@@ -16,13 +17,53 @@ function showToast(message) {
 }
 
 
-let entryForm; // declared globally
+
 
 document.addEventListener('DOMContentLoaded', () => {
   entryForm = document.getElementById('entry-form'); // ✅ no `const` here
   const mobileEntryList = document.getElementById('mobileEntryList');
-  const toast = document.getElementById('toast');
-  let mobileEntries = [];
+
+ // ✅ Wrap these inside DOMContentLoaded
+const advBtn = document.getElementById('toggleAdvancedFilters');
+if (advBtn) {
+  advBtn.addEventListener('click', () => {
+    document.getElementById('advancedFilters')?.classList.toggle('hidden');
+  });
+}
+
+const entryBtn = document.getElementById('toggleEntryForm');
+if (entryBtn) {
+  entryBtn.addEventListener('click', () => {
+    document.getElementById('entry-form')?.classList.toggle('hidden');
+  });
+}
+
+const filterBtn = document.getElementById('toggleFilters');
+if (filterBtn) {
+  filterBtn.addEventListener('click', () => {
+    document.getElementById('filters')?.classList.toggle('hidden');
+  });
+}
+
+const themeBtn = document.getElementById('toggleTheme');
+if (themeBtn) {
+  themeBtn.addEventListener('click', () => {
+    document.body.classList.toggle('dark');
+  });
+}
+
+  // ✅ Define toggle functions here or outside
+  window.toggleMobileSummary = function () {
+    document.getElementById('mobileSummaryCard').classList.toggle('hidden');
+  };
+
+  window.toggleMobileAverage = function () {
+    document.getElementById('mobileAverageCard').classList.toggle('hidden');
+  };
+
+  window.toggleMobileBank = function () {
+    document.getElementById('mobileBankCard').classList.toggle('hidden');
+  };
 
   // ✅ Define renderMobileEntries first
   function renderMobileEntries(entries) {
@@ -70,6 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
+
   // ✅ Now fetchMobileEntries AFTER renderMobileEntries
   async function fetchMobileEntries() {
     try {
@@ -90,28 +132,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
 
-  function populateFilterOptions(entries) {
-  const categories = new Set();
-  const currencies = new Set();
-  const banks = new Set();
-  const persons = new Set();
-
-  entries.forEach(e => {
-    if (e.category) categories.add(e.category);
-    if (e.currency) currencies.add(e.currency);
-    if (e.bank) banks.add(e.bank);
-    if (e.person) persons.add(e.person);
-  });
-
-  populateSelect('categoryFilterMobile', categories);
-  populateSelect('currencyFilterMobile', currencies);
-  populateSelect('bankFilterMobile', banks);
-  populateSelect('personFilterMobile', persons);
-}
-  // ✅ Call the fetch once DOM is ready
-  fetchMobileEntries();
-});
-
 
 function populateSelect(id, values) {
   const select = document.getElementById(id);
@@ -125,7 +145,15 @@ function populateSelect(id, values) {
   });
 }
 
-['categoryFilterMobile', 'currencyFilterMobile', 'bankFilterMobile', 'personFilterMobile', 'typeFilterMobile', 'statusFilterMobile'].forEach(id => {
+[
+  'monthFilter',
+  'categoryFilterMobile',
+  'currencyFilterMobile',
+  'bankFilterMobile',
+  'personFilterMobile',
+  'typeFilterMobile',
+  'statusFilterMobile'
+].forEach(id => {
   const el = document.getElementById(id);
   if (el) {
     el.addEventListener('change', applyMobileFilters);
@@ -133,7 +161,40 @@ function populateSelect(id, values) {
 });
 
 
+function populateFilterOptions(entries) {
+  const categories = new Set();
+  const currencies = new Set();
+  const banks = new Set();
+  const persons = new Set();
+  const types = new Set();
+  const statuses = new Set();
+  const months = new Set();
+
+  entries.forEach(e => {
+    if (e.category) categories.add(e.category);
+    if (e.currency) currencies.add(e.currency);
+    if (e.bank) banks.add(e.bank);
+    if (e.person) persons.add(e.person);
+    if (e.type) types.add(e.type);
+    if (e.status) statuses.add(e.status);
+    if (e.date?.length >= 7) months.add(e.date.slice(0, 7)); // YYYY-MM
+  });
+
+  populateSelect('monthFilter', months);
+  populateSelect('categoryFilterMobile', categories);
+  populateSelect('currencyFilterMobile', currencies);
+  populateSelect('bankFilterMobile', banks);
+  populateSelect('personFilterMobile', persons);
+  populateSelect('typeFilterMobile', types);
+  populateSelect('statusFilterMobile', statuses);
+}
+
+  // ✅ Call the fetch once DOM is ready
+  fetchMobileEntries();
+});
+
 function applyMobileFilters() {
+  const month = document.getElementById('monthFilter')?.value;
   const category = document.getElementById('categoryFilterMobile')?.value;
   const currency = document.getElementById('currencyFilterMobile')?.value;
   const bank = document.getElementById('bankFilterMobile')?.value;
@@ -143,6 +204,7 @@ function applyMobileFilters() {
 
   const filtered = mobileEntries.filter(e => {
     return (
+      (month === 'All' || e.date?.startsWith(month)) &&
       (category === 'All' || e.category === category) &&
       (currency === 'All' || e.currency === currency) &&
       (bank === 'All' || e.bank === bank) &&
@@ -154,19 +216,21 @@ function applyMobileFilters() {
 
   renderMobileEntries(filtered);
 }
-
   function updateSummary() {
-    let income = 0;
-    let expenses = 0;
-    mobileEntries.forEach(e => {
-      const amt = parseFloat(e.amount);
-      if (e.type.toLowerCase() === 'income') income += amt;
-      else if (e.type.toLowerCase() === 'expense') expenses += amt;
-    });
-    document.getElementById('mobileIncome').textContent = income.toFixed(2);
-    document.getElementById('mobileExpenses').textContent = expenses.toFixed(2);
-    document.getElementById('mobileBalance').textContent = (income - expenses).toFixed(2);
-  }
+  let income = 0;
+  let expenses = 0;
+
+  mobileEntries.forEach(e => {
+    const amt = parseFloat(e.amount);
+    if (e.type.toLowerCase() === 'income') income += amt;
+    else if (e.type.toLowerCase() === 'expense') expenses += amt;
+  });
+
+  // ✅ These IDs match your HTML now
+  document.getElementById('summaryIncome').textContent = income.toFixed(2);
+  document.getElementById('summaryExpenses').textContent = expenses.toFixed(2);
+  document.getElementById('summaryBalance').textContent = (income - expenses).toFixed(2);
+}
 
   function getFormData() {
     return {
@@ -214,6 +278,7 @@ function applyMobileFilters() {
     showToast("✅ Entry duplicated");
   }
 
+ if (entryForm) {
   entryForm.addEventListener('submit', e => {
     e.preventDefault();
     const data = getFormData();
@@ -229,6 +294,7 @@ function applyMobileFilters() {
     clearForm();
     renderMobileEntries(mobileEntries);
   });
+}
 
   ['descFilter', 'typeFilter', 'dateFilter'].forEach(id => {
     document.getElementById(id)?.addEventListener('input', () => {
@@ -240,39 +306,10 @@ function applyMobileFilters() {
   });
 
 
-document.getElementById('toggleAdvancedFilters').addEventListener('click', () => {
-  document.getElementById('advancedFilters').classList.toggle('hidden');
-});
 
 
-document.getElementById('toggleEntryForm').addEventListener('click', () => {
-  document.getElementById('entry-form').classList.toggle('hidden');
-});
-
-document.getElementById('toggleFilters').addEventListener('click', () => {
-  document.getElementById('filters').classList.toggle('hidden');
-});
 
 
-document.getElementById('toggleTheme').addEventListener('click', () => {
-  document.body.classList.toggle('dark');
-});
-
-
-function toggleMobileSummary() {
-  const el = document.getElementById('mobileSummaryCard');
-  el.classList.toggle('hidden');
-}
-
-function toggleMobileAverage() {
-  const el = document.getElementById('mobileAverageCard');
-  el.classList.toggle('hidden');
-}
-
-function toggleMobileBank() {
-  const el = document.getElementById('mobileBankCard');
-  el.classList.toggle('hidden');
-}
 
 // 🔁 You already calculate these in dashboard.js; just reuse values from entries
 function populateMobileCards(entries) {
