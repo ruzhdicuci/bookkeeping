@@ -146,6 +146,7 @@ function populateSelect(id, values) {
     placeholderValue: 'Select...',
     searchPlaceholderValue: 'Search...'
   });
+  window.ChoicesInstances = window.ChoicesInstances || {};
 
   window.ChoicesInstances[id] = instance;
 
