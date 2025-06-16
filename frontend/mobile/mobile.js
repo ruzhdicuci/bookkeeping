@@ -239,21 +239,20 @@ function renderMobileEntries(entries) {
 
 
 function getSelectedValues(id) {
-  const instance = window.ChoicesInstances[id];
-  const values = instance?.getValue(true) || [];
+  const values = window.ChoicesInstances[id]?.getValue(true) || [];
 
-  console.log(`🔎 ${id} selected:`, values);
+  // Case 1: Only "All" selected → treat as "no filter"
+  if (values.length === 1 && values[0] === 'All') {
+    return [];
+  }
 
-  // If All is selected (alone or with others), remove it
+  // Case 2: "All" + other values selected → ignore "All"
   if (values.includes('All')) {
-    const cleaned = values.filter(v => v !== 'All');
-    console.log(`🧹 ${id} cleaned:`, cleaned);
-    return cleaned; // allow "All + other" combos
+    return values.filter(v => v !== 'All');
   }
 
   return values;
 }
-
 
 function applyMobileFilters() {
   console.log("📌 applyMobileFilters triggered");
