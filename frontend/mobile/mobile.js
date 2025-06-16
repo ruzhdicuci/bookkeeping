@@ -2,6 +2,10 @@
 
 const token = localStorage.getItem('token');
 
+if (!token) {
+  window.location.href = '/bookkeeping/client/login.html';
+}
+
 function showToast(message) {
   const toast = document.getElementById('toast');
   toast.textContent = message;
