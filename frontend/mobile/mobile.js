@@ -267,10 +267,13 @@ function updateSummary(data = mobileEntries) {
     if (e.type.toLowerCase() === 'income') income += amt;
     else if (e.type.toLowerCase() === 'expense') expenses += amt;
   });
-  document.getElementById('mobileIncome').textContent = income.toFixed(2);
-  document.getElementById('mobileExpenses').textContent = expenses.toFixed(2);
-  document.getElementById('mobileBalance').textContent = (income - expenses).toFixed(2);
+
+  document.getElementById('summaryIncome').textContent = income.toFixed(2);
+  document.getElementById('summaryExpenses').textContent = expenses.toFixed(2);
+  document.getElementById('summaryBalance').textContent = (income - expenses).toFixed(2);
 }
+
+
   function getFormData() {
     return {
       date: document.getElementById('newDate').value,
@@ -381,12 +384,18 @@ function populateMobileCards(entries) {
   document.getElementById('avgBalance').textContent = avgBalance.toFixed(2);
 
   // Bank changes
-  const list = document.getElementById('bankChangesList');
-  list.innerHTML = '';
+const list = document.getElementById('bankChangesList');
+list.innerHTML = '';
 
-  for (const [bank, change] of Object.entries(bankChanges)) {
-    const row = document.createElement('div');
-    row.innerHTML = `<span>${bank}:</span> <span style="color:${change >= 0 ? 'green' : 'red'}">${change.toFixed(2)}</span>`;
-    list.appendChild(row);
-  }
+for (const [bank, change] of Object.entries(bankChanges)) {
+  const row = document.createElement('div');
+  row.className = 'bank-row';
+  row.innerHTML = `
+    <span class="bank-name">${bank}</span>
+    <span class="bank-change ${change > 0 ? 'positive' : change < 0 ? 'negative' : 'neutral'}">
+      ${change.toFixed(2)}
+    </span>
+  `;
+  list.appendChild(row);
+}
 } // ✅ <--- THIS was missing

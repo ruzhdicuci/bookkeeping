@@ -603,3 +603,36 @@ body.dark .summary-card-container {
   color: #3b82f6;
   font-weight: bold;
 }
+
+.bank-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  row-gap: 6px;
+  column-gap: 12px;
+  margin-top: 8px;
+}
+
+.bank-row {
+  display: contents;
+}
+
+.bank-name {
+  font-weight: 500;
+}
+
+.bank-change {
+  font-weight: bold;
+  text-align: right;
+}
+
+.bank-change.positive {
+  color: green;
+}
+
+.bank-change.negative {
+  color: red;
+}
+
+.bank-change.neutral {
+  color: grey;
+}
