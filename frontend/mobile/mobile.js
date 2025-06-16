@@ -246,3 +246,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // populateFilterOptions(entries);
   // applyMobileFilters(); ✅ to show everything filtered
 });
+
+document.getElementById('toggleTheme').addEventListener('click', () => {
+  document.body.classList.toggle('dark');
+});
