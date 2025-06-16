@@ -240,8 +240,9 @@ function renderMobileEntries(entries) {
 }
 
 
-
 function applyMobileFilters() {
+  console.log('📌 applyMobileFilters triggered');
+
   const selectedMonths = Array.from(document.getElementById('monthFilter')?.selectedOptions || []).map(opt => opt.value);
   const selectedCategories = Array.from(document.getElementById('categoryFilterMobile')?.selectedOptions || []).map(opt => opt.value);
   const selectedCurrencies = Array.from(document.getElementById('currencyFilterMobile')?.selectedOptions || []).map(opt => opt.value);
@@ -250,24 +251,40 @@ function applyMobileFilters() {
   const selectedTypes = Array.from(document.getElementById('typeFilterMobile')?.selectedOptions || []).map(opt => opt.value);
   const selectedStatuses = Array.from(document.getElementById('statusFilterMobile')?.selectedOptions || []).map(opt => opt.value);
 
+  console.log('Filters selected:', {
+    selectedMonths,
+    selectedCategories,
+    selectedCurrencies,
+    selectedBanks,
+    selectedPersons,
+    selectedTypes,
+    selectedStatuses
+  });
+
   const filtered = mobileEntries.filter(e => {
-    return (
+    const match =
       (selectedMonths.includes('All') || selectedMonths.includes(e.date?.slice(0, 7))) &&
       (selectedCategories.includes('All') || selectedCategories.includes(e.category)) &&
       (selectedCurrencies.includes('All') || selectedCurrencies.includes(e.currency)) &&
       (selectedBanks.includes('All') || selectedBanks.includes(e.bank)) &&
       (selectedPersons.includes('All') || selectedPersons.includes(e.person)) &&
       (selectedTypes.includes('All') || selectedTypes.includes(e.type)) &&
-      (selectedStatuses.includes('All') || selectedStatuses.includes(e.status))
-    );
+      (selectedStatuses.includes('All') || selectedStatuses.includes(e.status));
+
+    if (!match) {
+      console.log('❌ Entry filtered out:', e);
+    }
+
+    return match;
   });
+
+  console.log(`✅ ${filtered.length} entries after filtering`);
 
   renderMobileEntries(filtered);
   updateSummary(filtered);
   updateAverages(filtered);
   updateBankChanges(filtered);
 }
-
 
 function updateAverages(entries) {
   const months = [...new Set(entries.map(e => e.date?.slice(0, 7)))].filter(Boolean);
