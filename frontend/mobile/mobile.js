@@ -17,18 +17,42 @@ function showToast(message) {
 }
 
 
-
-
 document.addEventListener('DOMContentLoaded', () => {
-  entryForm = document.getElementById('entry-form'); // ✅ no `const` here
-  const categorySelect = new Choices('#categoryFilterMobile', {
-  removeItemButton: true,
-  shouldSort: false,
-  placeholder: true,
-  placeholderValue: 'Select Categories',
-  searchPlaceholderValue: 'Search...'
-});
+  entryForm = document.getElementById('entry-form'); // ✅ global
+
   const mobileEntryList = document.getElementById('mobileEntryList');
+
+  // Store Choices instances globally to manage updates
+  window.ChoicesInstances = {};
+
+  // 🔧 Init Choices for all filter dropdowns
+  const filterDropdowns = [
+    { id: 'categoryFilterMobile', placeholder: 'Select Categories' },
+    { id: 'typeFilterMobile', placeholder: 'Select Types' },
+    { id: 'currencyFilterMobile', placeholder: 'Select Currencies' },
+    { id: 'bankFilterMobile', placeholder: 'Select Banks' },
+    { id: 'statusFilterMobile', placeholder: 'Select Status' },
+    { id: 'personFilterMobile', placeholder: 'Select Persons' },
+    { id: 'monthFilter', placeholder: 'Select Months' }
+  ];
+
+  filterDropdowns.forEach(({ id, placeholder }) => {
+    const el = document.getElementById(id);
+    if (el) {
+      const instance = new Choices(el, {
+        removeItemButton: true,
+        shouldSort: false,
+        placeholder: true,
+        placeholderValue: placeholder,
+        searchPlaceholderValue: 'Search...'
+      });
+      window.ChoicesInstances[id] = instance;
+
+      // Attach filter listener
+      el.addEventListener('change', applyMobileFilters);
+    }
+  });
+});
 
  // ✅ Wrap these inside DOMContentLoaded
 const advBtn = document.getElementById('toggleAdvancedFilters');

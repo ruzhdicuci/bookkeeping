@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+ <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
   <title>📒 Bookkeeping (Mobile)</title>
   <link rel="stylesheet" href="mobile.css" />
@@ -93,52 +93,39 @@
 
 
  
-
-    <!-- Advanced Filters Container -->
+<!-- Advanced Filters Container -->
 <div id="advancedFilters" class="hidden">
-  <label>Months:
-    <select id="monthFilter">
-      <option>All</option>
-      <!-- Dynamically populate if needed -->
-    </select>
-  </label>
 
-<label for="categoryFilterMobile">Category:</label>
-<select id="categoryFilterMobile" multiple></select>
+  <label for="monthFilter">Months:</label>
+  <select id="monthFilter">
+    <option value="All">All</option>
+    <!-- Dynamically populated -->
+  </select>
 
-  <label>Type:
-    <select id="typeFilterMobile">
-      <option>All</option>
-      <option>Income</option>
-      <option>Expense</option>
-    </select>
-  </label>
+  <label for="categoryFilterMobile">Category:</label>
+  <select id="categoryFilterMobile" multiple></select>
 
-  <label>Currency:
-    <select id="currencyFilterMobile">
-      <option>All</option>
-    </select>
-  </label>
+  <label for="typeFilterMobile">Type:</label>
+  <select id="typeFilterMobile" multiple>
+    <option value="Income">Income</option>
+    <option value="Expense">Expense</option>
+  </select>
 
-  <label>Bank:
-    <select id="bankFilterMobile">
-      <option>All</option>
-    </select>
-  </label>
+  <label for="currencyFilterMobile">Currency:</label>
+  <select id="currencyFilterMobile" multiple></select>
 
-  <label>Status:
-    <select id="statusFilterMobile">
-      <option>All</option>
-      <option>Paid</option>
-      <option>Open</option>
-    </select>
-  </label>
+  <label for="bankFilterMobile">Bank:</label>
+  <select id="bankFilterMobile" multiple></select>
 
-  <label>Persons:
-    <select id="personFilterMobile">
-      <option>All</option>
-    </select>
-  </label>
+  <label for="statusFilterMobile">Status:</label>
+  <select id="statusFilterMobile" multiple>
+    <option value="Paid">Paid</option>
+    <option value="Open">Open</option>
+  </select>
+
+  <label for="personFilterMobile">Persons:</label>
+  <select id="personFilterMobile" multiple></select>
+
 </div>
 
 
