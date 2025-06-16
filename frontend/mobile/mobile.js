@@ -66,19 +66,24 @@ document.addEventListener('DOMContentLoaded', () => {
     updateSummary();
   }
 
-  async function fetchMobileEntries() {
-    try {
-      const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
-      const entries = await res.json();
-      renderMobileEntries(entries);
-    } catch (err) {
-      console.error("❌ Failed to load mobile entries", err);
-      showToast("❌ Error loading data");
-    }
+async function fetchMobileEntries() {
+  try {
+    const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
+    const entries = await res.json();
+
+    window.mobileEntries = entries;               // Store globally
+    renderMobileEntries(entries);                 // Render list
+    populateMobileCards(entries);                 // ✅ Fill summary/average cards
+
+  } catch (err) {
+    console.error("❌ Failed to load mobile entries", err);
+    showToast("❌ Error loading data");
   }
+}
+
 
   function populateFilterOptions(entries) {
   const categories = new Set();
@@ -253,3 +258,63 @@ document.addEventListener('DOMContentLoaded', () => {
 document.getElementById('toggleTheme').addEventListener('click', () => {
   document.body.classList.toggle('dark');
 });
+
+
+function toggleMobileSummary() {
+  const el = document.getElementById('mobileSummaryCard');
+  el.classList.toggle('hidden');
+}
+
+function toggleMobileAverage() {
+  const el = document.getElementById('mobileAverageCard');
+  el.classList.toggle('hidden');
+}
+
+function toggleMobileBank() {
+  const el = document.getElementById('mobileBankCard');
+  el.classList.toggle('hidden');
+}
+
+// 🔁 You already calculate these in dashboard.js; just reuse values from entries
+function populateMobileCards(entries) {
+  const months = [...new Set(entries.map(e => e.date?.slice(0, 7)))].filter(Boolean);
+  let income = 0, expense = 0;
+  const bankChanges = {};
+
+  entries.forEach(e => {
+    const amount = parseFloat(e.amount) || 0;
+    if (e.type === 'Income') income += amount;
+    if (e.type === 'Expense') expense += amount;
+
+    const bank = e.bank;
+    if (!bankChanges[bank]) bankChanges[bank] = 0;
+    bankChanges[bank] += (e.type === 'Income' ? amount : -amount);
+  });
+
+  const avgIncome = income / months.length;
+  const avgExpense = expense / months.length;
+  const avgBalance = avgIncome - avgExpense;
+
+  // Summary
+  document.getElementById('mobileSummaryCard').innerHTML = `
+    <strong>Income:</strong> <span style="color:green;">${income.toFixed(2)}</span><br>
+    <strong>Expenses:</strong> <span style="color:red;">${expense.toFixed(2)}</span><br>
+    <strong>Balance:</strong> <span style="color:blue;">${(income - expense).toFixed(2)}</span>
+  `;
+
+  // Averages
+  document.getElementById('mobileAverageCard').innerHTML = `
+    <strong>Avg Income:</strong> <span style="color:green;">${avgIncome.toFixed(2)}</span><br>
+    <strong>Avg Expenses:</strong> <span style="color:red;">${avgExpense.toFixed(2)}</span><br>
+    <strong>Avg Balance:</strong> <span style="color:blue;">${avgBalance.toFixed(2)}</span>
+  `;
+
+  // Bank changes
+  let html = `<strong>Bank Changes:</strong><br>`;
+  for (const [bank, change] of Object.entries(bankChanges)) {
+    const color = change >= 0 ? 'green' : 'red';
+    html += `<span>${bank}:</span> <span style="color:${color}">${change.toFixed(2)}</span><br>`;
+  }
+
+  document.getElementById('mobileBankCard').innerHTML = html;
+}

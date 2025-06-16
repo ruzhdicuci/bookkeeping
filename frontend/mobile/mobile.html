@@ -18,6 +18,11 @@
   <button id="toggleFilters">🔍</button>
   <button id="toggleAdvancedFilters">⚙️</button>
 </div>
+<div class="mobile-toggle-buttons">
+  <button onclick="toggleMobileSummary()">📊 Summary</button>
+  <button onclick="toggleMobileAverage()">📈 Averages</button>
+  <button onclick="toggleMobileBank()">🏦 Balances</button>
+</div>
   <main>
   <form id="entry-form" class="hidden">
 
@@ -42,6 +47,9 @@
       <span>Balance: <strong id="mobileBalance">0.00</strong></span>
     </div>
 
+<div id="mobileSummaryCard" class="mobile-card hidden"></div>
+<div id="mobileAverageCard" class="mobile-card hidden"></div>
+<div id="mobileBankCard" class="mobile-card hidden"></div>
   
     <div id="filters">
       <input type="text" id="descFilter" placeholder="🔍 Description Filter" />

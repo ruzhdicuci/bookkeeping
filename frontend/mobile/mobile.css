@@ -316,7 +316,7 @@ form#entry-form button {
   gap: 8px;
   border: 1px solid #f3f1f1;
 
-  border-radius: 4px;
+ 
 
     padding: 6px 12px;
 }
@@ -335,7 +335,7 @@ form#entry-form button {
     padding: 10px 12px;
   font-size: 0.9rem;
    border: 1px solid #f3f1f1;
-  border-radius: 4px;
+  border-radius: 8px;
 }
 
 .login-form {
@@ -446,23 +446,55 @@ body.dark .currency {
 }
 
 
-body.dark select,
-body.dark select option {
+/* Force select and option fields to dark in dark mode */
+
+body.dark select option,
+body.dark #filters select,
+body.dark #advancedFilters select {
   background-color: #1e1e1e !important;
   color: #f0f0f0 !important;
   border: 1px solid #444 !important;
-  appearance: none; /* optional: removes default arrow on some devices */
 }
-body.dark #filters,
-body.dark #advancedFilters {
-  background-color: #000 !important;
-}
+
+/* Also make sure input fields are consistent */
 body.dark input,
-body.dark textarea {
+body.dark #filters input,
+body.dark #advancedFilters input {
   background-color: #1e1e1e !important;
   color: #f0f0f0 !important;
-  border: 1px solid #444;
+  border: 1px solid #444 !important;
 }
+
+/* Apply dark background behind filters container */
+body.dark #filters,
+body.dark #advancedFilters
+{
+  background-color: #121212!important;
+  border: none;
+}
+body.dark #advancedFilters label {
+color: #cec9ae;
+}
+
+body.dark select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+body.dark #entry-form {
+  background-color: #121212!important;
+  color: #f0f0f0;
+}
+
+body.dark #entry-form input,
+body.dark #entry-form select {
+  background-color: #1e1e1e !important;
+  color: #f0f0f0 !important;
+  border: 1px solid #444 !important;
+}
+
+
 body.dark #filters input::placeholder {
   color: #aaa;
 }
@@ -475,4 +507,29 @@ body.dark #filters input::placeholder {
 
 body.dark .status.open {
   color: #ff4d4d;
+}
+
+
+
+.mobile-toggle-buttons {
+  display: flex;
+  justify-content: space-around;
+  margin: 1rem 0;
+}
+
+.mobile-toggle-buttons button {
+  padding: 6px 10px;
+  font-size: 0.85rem;
+  border: none;
+  border-radius: 6px;
+  background: #14b8a6;
+  color: white;
+}
+
+.mobile-card {
+  background: white;
+  border-radius: 10px;
+  margin: 10px 0;
+  padding: 10px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
 }
