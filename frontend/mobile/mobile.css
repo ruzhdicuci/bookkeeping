@@ -316,7 +316,7 @@ form#entry-form button {
   gap: 8px;
   border: 1px solid #f3f1f1;
 
-  border-radius: 10px;
+  border-radius: 4px;
 
     padding: 6px 12px;
 }
@@ -335,7 +335,7 @@ form#entry-form button {
     padding: 10px 12px;
   font-size: 0.9rem;
    border: 1px solid #f3f1f1;
-  border-radius: 10px;
+  border-radius: 4px;
 }
 
 .login-form {
@@ -443,4 +443,37 @@ body.dark .currency {
   font-size: 0.75rem;
   cursor: pointer;
   border-radius: 4px;
+}
+
+
+body.dark select {
+  background-color: #1e1e1e !important;
+  color: #f0f0f0 !important;
+  border: 1px solid #444;
+}
+body.dark #filters,
+body.dark #advancedFilters {
+  background-color: #000;
+}
+body.dark {
+  background-color: #000;
+  color: #f0f0f0;
+}
+body.dark select option {
+  background-color: #1e1e1e;
+  color: #f0f0f0;
+}
+
+body.dark #filters input::placeholder {
+  color: #aaa;
+}
+
+
+.status.open {
+  color: red;
+  font-weight: bold;
+}
+
+body.dark .status.open {
+  color: #ff4d4d;
 }

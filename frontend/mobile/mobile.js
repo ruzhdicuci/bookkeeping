@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
               <span class="person">${entry.person}</span> •
               <span class="bank">${entry.bank}</span>
             </div>
-            <div class="status">Status: ${entry.status}</div>
+<div class="status ${entry.status === 'Open' ? 'open' : ''}">Status: ${entry.status}</div>
           </div>
 <div class="entry-amount">
   <div class="amount-line">
