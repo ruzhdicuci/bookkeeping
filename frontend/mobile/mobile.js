@@ -158,8 +158,8 @@ function populateSelect(id, values) {
         </div>`;
       mobileEntryList.appendChild(li);
     });
-   renderMobileEntries(filtered);
-updateSummary(entries); // ✅ entries is passed into the function
+renderMobileEntries(filtered);
+updateSummary(filtered); // ✅ Use filtered consistently
    
   }
 
@@ -217,7 +217,7 @@ function applyMobileFilters() {
   });
 
   renderMobileEntries(filtered);       // ✅ Show filtered list
- updateSummary(entries);         // ✅ Show filtered totals
+updateSummary(filtered);           // ✅ Show filtered totals
 }
 
 function updateSummary(data = mobileEntries) {
