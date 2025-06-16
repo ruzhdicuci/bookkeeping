@@ -241,36 +241,22 @@ function renderMobileEntries(entries) {
 function getSelectedValues(id) {
   const values = window.ChoicesInstances[id]?.getValue(true) || [];
 
-  // Case 1: Only "All" selected → treat as "no filter"
-  if (values.length === 1 && values[0] === 'All') {
-    return [];
-  }
+  // If only "All" is selected → treat as no filtering
+  if (values.length === 1 && values[0] === 'All') return [];
 
-  // Case 2: "All" + other values selected → ignore "All"
-  if (values.includes('All')) {
-    return values.filter(v => v !== 'All');
-  }
-
-  return values;
+  // If "All" and others selected → ignore "All"
+  return values.filter(v => v !== 'All');
 }
-
 function applyMobileFilters() {
   console.log("📌 applyMobileFilters triggered");
 
-  const getValues = (id) => {
-    const values = window.ChoicesInstances[id]?.getValue(true) || [];
-    const cleaned = values.filter(v => v !== 'All');
-    console.log(`🔍 ${id}:`, cleaned.length ? cleaned : '(All)');
-    return cleaned;
-  };
-
-  const selectedMonths = getValues('monthFilter');
-  const selectedCategories = getValues('categoryFilterMobile');
-  const selectedCurrencies = getValues('currencyFilterMobile');
-  const selectedBanks = getValues('bankFilterMobile');
-  const selectedPersons = getValues('personFilterMobile');
-  const selectedTypes = getValues('typeFilterMobile');
-  const selectedStatuses = getValues('statusFilterMobile');
+  const selectedMonths = getSelectedValues('monthFilter');
+  const selectedCategories = getSelectedValues('categoryFilterMobile');
+  const selectedCurrencies = getSelectedValues('currencyFilterMobile');
+  const selectedBanks = getSelectedValues('bankFilterMobile');
+  const selectedPersons = getSelectedValues('personFilterMobile');
+  const selectedTypes = getSelectedValues('typeFilterMobile');
+  const selectedStatuses = getSelectedValues('statusFilterMobile');
 
   const filtered = mobileEntries.filter(e => {
     return (
