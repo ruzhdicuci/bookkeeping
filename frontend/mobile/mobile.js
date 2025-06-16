@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     mobileEntryList.innerHTML = '';
     mobileEntries.forEach((entry, index) => {
       const li = document.createElement('li');
-       const amountColor = entry.type.toLowerCase() === 'income' ? 'rgb(0, 128, 117)' : 'orangered';
+    const amountClass = entry.type.toLowerCase() === 'income' ? 'income' : 'expense';
       li.className = 'mobile-entry';
       li.innerHTML = `
         <div class="entry-card">
@@ -47,19 +47,19 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             <div class="status">Status: ${entry.status}</div>
           </div>
-<div class="amount-line">
-  <span class="currency">CHF</span>
-  <span class="amount ${entry.type === 'income' ? 'income' : 'expense'}">
-    ${parseFloat(entry.amount).toFixed(2)}
-  </span>
+<div class="entry-amount">
+  <div class="amount-line">
+    <span class="currency">CHF</span>
+  <span class="amount ${entry.type.toLowerCase() === 'income' ? 'income' : 'expense'}">
+  ${parseFloat(entry.amount).toFixed(2)}
+</span>
+  </div>
+  <div class="buttons">
+    <button onclick="editMobileEntry(${index})">✏️</button>
+    <button onclick="deleteMobileEntry(${index})">🗑️</button>
+    <button onclick="duplicateMobileEntry(${index})">📄</button>
+  </div>
 </div>
-      ${parseFloat(entry.amount).toFixed(2)}
-            <div class="buttons">
-              <button onclick="editMobileEntry(${index})">✏️</button>
-              <button onclick="deleteMobileEntry(${index})">🗑️</button>
-              <button onclick="duplicateMobileEntry(${index})">📄</button>
-            </div>
-          </div>
         </div>`;
       mobileEntryList.appendChild(li);
     });

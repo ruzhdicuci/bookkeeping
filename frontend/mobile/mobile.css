@@ -399,11 +399,20 @@ body.dark .currency {
 }
 
 
+.entry-amount {
+  text-align: right;
+  min-width: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
 .amount-line {
   font-size: 1rem;
   display: flex;
   align-items: baseline;
   gap: 4px;
+  margin-bottom: 4px;
 }
 
 .currency {
@@ -412,11 +421,26 @@ body.dark .currency {
 }
 
 .amount.income {
-  color: rgb(0, 128, 117); /* green */
+  color: rgb(0, 128, 117);
   font-weight: bold;
 }
 
 .amount.expense {
   color: orangered;
   font-weight: bold;
+}
+
+.buttons {
+  display: flex;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.buttons button {
+  background-color: #f4f2f2;
+  border: none;
+  padding: 3px 6px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  border-radius: 4px;
 }
