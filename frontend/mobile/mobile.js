@@ -16,11 +16,12 @@ function showToast(message) {
   }, 2000);
 }
 
+ window.ChoicesInstances = {};
 document.addEventListener('DOMContentLoaded', () => {
   entryForm = document.getElementById('entry-form');
   const mobileEntryList = document.getElementById('mobileEntryList');
 
-
+ 
 
 // Filter configuration
 const filterDropdowns = [
@@ -118,48 +119,42 @@ async function fetchMobileEntries() {
 
 
 
-// 🌐 Global map to track Choices instances
-window.ChoicesInstances = {};
+
 
 // ✅ Populate a single <select> with values + Choices.js
 function populateSelect(id, values) {
   const selectEl = document.getElementById(id);
   if (!selectEl) return;
 
-  // Destroy previous Choices instance
-  if (window.ChoicesInstances[id]) {
+  // Destroy any previous Choices instance
+  if (window.ChoicesInstances?.[id]) {
     window.ChoicesInstances[id].destroy();
   }
 
-  // Clear existing options
+  // Clear and repopulate options
   selectEl.innerHTML = '';
+  selectEl.add(new Option('All', 'All'));
 
-  // Dynamically decide if it's multi-select (via HTML 'multiple' attribute)
-  const isMultiple = selectEl.hasAttribute('multiple');
-
-  // Add default 'All' option
-  const allOption = new Option('All', 'All', !isMultiple, !isMultiple); // selected=true if not multi
-  selectEl.add(allOption);
-
-  // Add other options
   Array.from(values).sort().forEach(val => {
-    selectEl.add(new Option(val, val));
+    const opt = new Option(val, val);
+    selectEl.add(opt);
   });
 
-  // Initialize new Choices.js instance
+  // Reinitialize Choices
   const instance = new Choices(selectEl, {
     removeItemButton: true,
     shouldSort: false,
     placeholder: true,
     placeholderValue: 'Select...',
-    searchPlaceholderValue: 'Search...',
+    searchPlaceholderValue: 'Search...'
   });
 
   window.ChoicesInstances[id] = instance;
 
-  // 🧠 Attach filtering logic on change
+  // ✅ Attach filtering logic
   selectEl.addEventListener('change', applyMobileFilters);
 }
+
 
 function populateFilterOptions(entries) {
   const categories = new Set();
