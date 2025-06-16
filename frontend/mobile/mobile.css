@@ -511,13 +511,8 @@ body.dark .status.open {
 
 
 
-.mobile-toggle-buttons {
-  display: flex;
-  justify-content: space-around;
-  margin: 1rem 0;
-}
 
-.mobile-toggle-buttons button {
+#mobile-toggle-buttons  {
   padding: 6px 10px;
   font-size: 0.85rem;
   border: none;
@@ -532,4 +527,79 @@ body.dark .status.open {
   margin: 10px 0;
   padding: 10px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+
+.average-card-container {
+  display: flex;
+  justify-content: space-around;
+  background: #fff;
+  border-radius: 10px;
+  padding: 12px;
+  margin: 10px;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+body.dark .average-card-container {
+  background: #1a1a1a;
+}
+
+.average-card {
+  flex: 1;
+}
+
+.income-color {
+  color: #22c55e; /* green */
+  font-weight: bold;
+}
+
+.expense-color {
+  color: #f97316; /* red/orange */
+  font-weight: bold;
+}
+
+.balance-color {
+  color: #3b82f6; /* blue */
+  font-weight: bold;
+}
+/* Dark mode support */
+body.dark .average-card-container {
+  background: #1e1e1e;
+  color: #eee;
+}
+
+
+.summary-card-container {
+  display: flex;
+  justify-content: space-around;
+  background: #fff;
+  border-radius: 10px;
+  padding: 12px;
+  margin: 10px;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+body.dark .summary-card-container {
+  background: #1a1a1a;
+}
+
+.summary-card {
+  flex: 1;
+}
+
+.income-color {
+  color: #22c55e;
+  font-weight: bold;
+}
+
+.expense-color {
+  color: #f97316;
+  font-weight: bold;
+}
+
+.balance-color {
+  color: #3b82f6;
+  font-weight: bold;
 }

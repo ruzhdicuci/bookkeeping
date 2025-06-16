@@ -18,18 +18,18 @@ function showToast(message) {
 document.addEventListener('DOMContentLoaded', () => {
   const entryForm = document.getElementById('entry-form');
   const mobileEntryList = document.getElementById('mobileEntryList');
-   
   const toast = document.getElementById('toast');
 
   let mobileEntries = [];
 
+  // ✅ Define renderMobileEntries first
   function renderMobileEntries(entries) {
     mobileEntries = entries;
-    populateFilterOptions(entries); // ✅ Call this here
+    populateFilterOptions(entries); // Make sure this function is also defined somewhere
     mobileEntryList.innerHTML = '';
     mobileEntries.forEach((entry, index) => {
       const li = document.createElement('li');
-    const amountClass = entry.type.toLowerCase() === 'income' ? 'income' : 'expense';
+      const amountClass = entry.type.toLowerCase() === 'income' ? 'income' : 'expense';
       li.className = 'mobile-entry';
       li.innerHTML = `
         <div class="entry-card">
@@ -45,45 +45,49 @@ document.addEventListener('DOMContentLoaded', () => {
               <span class="person">${entry.person}</span> •
               <span class="bank">${entry.bank}</span>
             </div>
-<div class="status ${entry.status === 'Open' ? 'open' : ''}">Status: ${entry.status}</div>
+            <div class="status ${entry.status === 'Open' ? 'open' : ''}">Status: ${entry.status}</div>
           </div>
-<div class="entry-amount">
-  <div class="amount-line">
-    <span class="currency">CHF</span>
-  <span class="amount ${entry.type.toLowerCase() === 'income' ? 'income' : 'expense'}">
-  ${parseFloat(entry.amount).toFixed(2)}
-</span>
-  </div>
-  <div class="buttons">
-    <button onclick="editMobileEntry(${index})">✏️</button>
-    <button onclick="deleteMobileEntry(${index})">🗑️</button>
-    <button onclick="duplicateMobileEntry(${index})">📄</button>
-  </div>
-</div>
+          <div class="entry-amount">
+            <div class="amount-line">
+              <span class="currency">CHF</span>
+              <span class="amount ${amountClass}">
+                ${parseFloat(entry.amount).toFixed(2)}
+              </span>
+            </div>
+            <div class="buttons">
+              <button onclick="editMobileEntry(${index})">✏️</button>
+              <button onclick="deleteMobileEntry(${index})">🗑️</button>
+              <button onclick="duplicateMobileEntry(${index})">📄</button>
+            </div>
+          </div>
         </div>`;
       mobileEntryList.appendChild(li);
     });
     updateSummary();
   }
 
-async function fetchMobileEntries() {
-  try {
-    const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
-    const entries = await res.json();
+  // ✅ Now fetchMobileEntries AFTER renderMobileEntries
+  async function fetchMobileEntries() {
+    try {
+      const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
+      const entries = await res.json();
 
-    window.mobileEntries = entries;               // Store globally
-    renderMobileEntries(entries);                 // Render list
-    populateMobileCards(entries);                 // ✅ Fill summary/average cards
+      window.mobileEntries = entries;
+      renderMobileEntries(entries);
+      populateMobileCards(entries);
 
-  } catch (err) {
-    console.error("❌ Failed to load mobile entries", err);
-    showToast("❌ Error loading data");
+    } catch (err) {
+      console.error("❌ Failed to load mobile entries", err);
+      showToast("❌ Error loading data");
+    }
   }
-}
 
+  // ✅ Call the fetch once DOM is ready
+  fetchMobileEntries();
+});
 
   function populateFilterOptions(entries) {
   const categories = new Set();
@@ -231,7 +235,7 @@ function applyMobileFilters() {
   });
 
   fetchMobileEntries();
-});
+
 
 document.getElementById('toggleAdvancedFilters').addEventListener('click', () => {
   document.getElementById('advancedFilters').classList.toggle('hidden');
@@ -246,14 +250,6 @@ document.getElementById('toggleFilters').addEventListener('click', () => {
   document.getElementById('filters').classList.toggle('hidden');
 });
 
-document.addEventListener('DOMContentLoaded', () => {
-  fetchMobileEntries(); // ← this loads all entries
-
-  // ... later in your success handler:
-  // renderMobileEntries(entries);
-  // populateFilterOptions(entries);
-  // applyMobileFilters(); ✅ to show everything filtered
-});
 
 document.getElementById('toggleTheme').addEventListener('click', () => {
   document.body.classList.toggle('dark');
@@ -296,25 +292,22 @@ function populateMobileCards(entries) {
   const avgBalance = avgIncome - avgExpense;
 
   // Summary
-  document.getElementById('mobileSummaryCard').innerHTML = `
-    <strong>Income:</strong> <span style="color:green;">${income.toFixed(2)}</span><br>
-    <strong>Expenses:</strong> <span style="color:red;">${expense.toFixed(2)}</span><br>
-    <strong>Balance:</strong> <span style="color:blue;">${(income - expense).toFixed(2)}</span>
-  `;
+  document.getElementById('summaryIncome').textContent = income.toFixed(2);
+  document.getElementById('summaryExpenses').textContent = expense.toFixed(2);
+  document.getElementById('summaryBalance').textContent = (income - expense).toFixed(2);
 
   // Averages
-  document.getElementById('mobileAverageCard').innerHTML = `
-    <strong>Avg Income:</strong> <span style="color:green;">${avgIncome.toFixed(2)}</span><br>
-    <strong>Avg Expenses:</strong> <span style="color:red;">${avgExpense.toFixed(2)}</span><br>
-    <strong>Avg Balance:</strong> <span style="color:blue;">${avgBalance.toFixed(2)}</span>
-  `;
+  document.getElementById('avgIncome').textContent = avgIncome.toFixed(2);
+  document.getElementById('avgExpenses').textContent = avgExpense.toFixed(2);
+  document.getElementById('avgBalance').textContent = avgBalance.toFixed(2);
 
   // Bank changes
-  let html = `<strong>Bank Changes:</strong><br>`;
-  for (const [bank, change] of Object.entries(bankChanges)) {
-    const color = change >= 0 ? 'green' : 'red';
-    html += `<span>${bank}:</span> <span style="color:${color}">${change.toFixed(2)}</span><br>`;
-  }
+  const list = document.getElementById('bankChangesList');
+  list.innerHTML = '';
 
-  document.getElementById('mobileBankCard').innerHTML = html;
-}
+  for (const [bank, change] of Object.entries(bankChanges)) {
+    const row = document.createElement('div');
+    row.innerHTML = `<span>${bank}:</span> <span style="color:${change >= 0 ? 'green' : 'red'}">${change.toFixed(2)}</span>`;
+    list.appendChild(row);
+  }
+} // ✅ <--- THIS was missing
