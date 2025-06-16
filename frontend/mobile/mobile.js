@@ -126,26 +126,21 @@ function populateSelect(id, values) {
   const select = document.getElementById(id);
   if (!select) return;
 
-  // Destroy existing Choices instance
-  if (window.ChoicesInstances?.[id]) {
+  // Destroy any previous instance
+  if (window.ChoicesInstances[id]) {
     window.ChoicesInstances[id].destroy();
   }
 
-  // Clear old options
+  // Clear and add "All" option
   select.innerHTML = '';
-
-  // Add "All" as selected by default
-  const allOption = new Option('All', 'All');
-  allOption.selected = true;
+  const allOption = new Option('All', 'All', true, true); // true, true selects it
   select.add(allOption);
 
-  // Add remaining sorted options
   [...values].sort().forEach(val => {
     const opt = new Option(val, val);
     select.add(opt);
   });
 
-  // Initialize Choices.js
   const instance = new Choices(select, {
     removeItemButton: true,
     shouldSort: false,
@@ -154,13 +149,16 @@ function populateSelect(id, values) {
     searchPlaceholderValue: 'Search...'
   });
 
-  window.ChoicesInstances = window.ChoicesInstances || {};
   window.ChoicesInstances[id] = instance;
 
-  // Remove previous listeners before attaching a fresh one
+  // ✅ Manually select "All"
+  instance.setChoiceByValue('All');
+
+  // Always hook listener freshly
   select.removeEventListener('change', applyMobileFilters);
   select.addEventListener('change', applyMobileFilters);
 }
+
 
 function populateFilterOptions(entries) {
   const categories = new Set();
@@ -239,26 +237,20 @@ function renderMobileEntries(entries) {
   updateBankChanges(entries);
 }
 
-
 function applyMobileFilters() {
-  console.log('📌 applyMobileFilters triggered');
+  console.log("📌 applyMobileFilters triggered");
 
-  const selectedMonths = Array.from(document.getElementById('monthFilter')?.selectedOptions || []).map(opt => opt.value);
-  const selectedCategories = Array.from(document.getElementById('categoryFilterMobile')?.selectedOptions || []).map(opt => opt.value);
-  const selectedCurrencies = Array.from(document.getElementById('currencyFilterMobile')?.selectedOptions || []).map(opt => opt.value);
-  const selectedBanks = Array.from(document.getElementById('bankFilterMobile')?.selectedOptions || []).map(opt => opt.value);
-  const selectedPersons = Array.from(document.getElementById('personFilterMobile')?.selectedOptions || []).map(opt => opt.value);
-  const selectedTypes = Array.from(document.getElementById('typeFilterMobile')?.selectedOptions || []).map(opt => opt.value);
-  const selectedStatuses = Array.from(document.getElementById('statusFilterMobile')?.selectedOptions || []).map(opt => opt.value);
+  const selectedMonths = window.ChoicesInstances['monthFilter']?.getValue(true);
+  const selectedCategories = window.ChoicesInstances['categoryFilterMobile']?.getValue(true);
+  const selectedCurrencies = window.ChoicesInstances['currencyFilterMobile']?.getValue(true);
+  const selectedBanks = window.ChoicesInstances['bankFilterMobile']?.getValue(true);
+  const selectedPersons = window.ChoicesInstances['personFilterMobile']?.getValue(true);
+  const selectedTypes = window.ChoicesInstances['typeFilterMobile']?.getValue(true);
+  const selectedStatuses = window.ChoicesInstances['statusFilterMobile']?.getValue(true);
 
-  console.log('Filters selected:', {
-    selectedMonths,
-    selectedCategories,
-    selectedCurrencies,
-    selectedBanks,
-    selectedPersons,
-    selectedTypes,
-    selectedStatuses
+  console.log("Filters selected:", {
+    selectedMonths, selectedCategories, selectedCurrencies,
+    selectedBanks, selectedPersons, selectedTypes, selectedStatuses
   });
 
   const filtered = mobileEntries.filter(e => {
@@ -271,9 +263,7 @@ function applyMobileFilters() {
       (selectedTypes.includes('All') || selectedTypes.includes(e.type)) &&
       (selectedStatuses.includes('All') || selectedStatuses.includes(e.status));
 
-    if (!match) {
-      console.log('❌ Entry filtered out:', e);
-    }
+    if (!match) console.log('❌ Entry filtered out:', e);
 
     return match;
   });
