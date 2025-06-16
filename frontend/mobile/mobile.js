@@ -15,11 +15,13 @@ function showToast(message) {
   }, 2000);
 }
 
+
+let entryForm; // declared globally
+
 document.addEventListener('DOMContentLoaded', () => {
-  const entryForm = document.getElementById('entry-form');
+  entryForm = document.getElementById('entry-form'); // ✅ no `const` here
   const mobileEntryList = document.getElementById('mobileEntryList');
   const toast = document.getElementById('toast');
-
   let mobileEntries = [];
 
   // ✅ Define renderMobileEntries first
@@ -66,6 +68,8 @@ document.addEventListener('DOMContentLoaded', () => {
     updateSummary();
   }
 
+
+
   // ✅ Now fetchMobileEntries AFTER renderMobileEntries
   async function fetchMobileEntries() {
     try {
@@ -85,9 +89,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // ✅ Call the fetch once DOM is ready
-  fetchMobileEntries();
-});
 
   function populateFilterOptions(entries) {
   const categories = new Set();
@@ -107,6 +108,10 @@ document.addEventListener('DOMContentLoaded', () => {
   populateSelect('bankFilterMobile', banks);
   populateSelect('personFilterMobile', persons);
 }
+  // ✅ Call the fetch once DOM is ready
+  fetchMobileEntries();
+});
+
 
 function populateSelect(id, values) {
   const select = document.getElementById(id);
@@ -233,8 +238,6 @@ function applyMobileFilters() {
       });
     });
   });
-
-  fetchMobileEntries();
 
 
 document.getElementById('toggleAdvancedFilters').addEventListener('click', () => {
