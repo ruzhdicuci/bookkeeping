@@ -228,25 +228,23 @@ updateSummary(entries);
 
 
 function applyMobileFilters() {
-    const selectedCategories = Array.from(document.getElementById('categoryFilterMobile')?.selectedOptions).map(opt => opt.value);
-
-  const month = document.getElementById('monthFilter')?.value;
- 
-  const currency = document.getElementById('currencyFilterMobile')?.value;
-  const bank = document.getElementById('bankFilterMobile')?.value;
-  const person = document.getElementById('personFilterMobile')?.value;
-  const type = document.getElementById('typeFilterMobile')?.value;
-  const status = document.getElementById('statusFilterMobile')?.value;
+  const selectedMonths = Array.from(document.getElementById('monthFilter')?.selectedOptions || []).map(opt => opt.value);
+  const selectedCategories = Array.from(document.getElementById('categoryFilterMobile')?.selectedOptions || []).map(opt => opt.value);
+  const selectedCurrencies = Array.from(document.getElementById('currencyFilterMobile')?.selectedOptions || []).map(opt => opt.value);
+  const selectedBanks = Array.from(document.getElementById('bankFilterMobile')?.selectedOptions || []).map(opt => opt.value);
+  const selectedPersons = Array.from(document.getElementById('personFilterMobile')?.selectedOptions || []).map(opt => opt.value);
+  const selectedTypes = Array.from(document.getElementById('typeFilterMobile')?.selectedOptions || []).map(opt => opt.value);
+  const selectedStatuses = Array.from(document.getElementById('statusFilterMobile')?.selectedOptions || []).map(opt => opt.value);
 
   const filtered = mobileEntries.filter(e => {
     return (
-      (month === 'All' || e.date?.startsWith(month)) &&
-      (category === 'All' || e.category === category) &&
-      (currency === 'All' || e.currency === currency) &&
-      (bank === 'All' || e.bank === bank) &&
-      (person === 'All' || e.person === person) &&
-      (type === 'All' || e.type === type) &&
-      (status === 'All' || e.status === status)
+      (selectedMonths.includes('All') || selectedMonths.includes(e.date?.slice(0, 7))) &&
+      (selectedCategories.includes('All') || selectedCategories.includes(e.category)) &&
+      (selectedCurrencies.includes('All') || selectedCurrencies.includes(e.currency)) &&
+      (selectedBanks.includes('All') || selectedBanks.includes(e.bank)) &&
+      (selectedPersons.includes('All') || selectedPersons.includes(e.person)) &&
+      (selectedTypes.includes('All') || selectedTypes.includes(e.type)) &&
+      (selectedStatuses.includes('All') || selectedStatuses.includes(e.status))
     );
   });
 
@@ -255,6 +253,7 @@ function applyMobileFilters() {
   updateAverages(filtered);
   updateBankChanges(filtered);
 }
+
 
 function updateAverages(entries) {
   const months = [...new Set(entries.map(e => e.date?.slice(0, 7)))].filter(Boolean);
