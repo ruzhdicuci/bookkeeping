@@ -118,33 +118,48 @@ async function fetchMobileEntries() {
 
 
 
+// 🌐 Global map to track Choices instances
+window.ChoicesInstances = {};
+
+// ✅ Populate a single <select> with values + Choices.js
 function populateSelect(id, values) {
   const selectEl = document.getElementById(id);
   if (!selectEl) return;
 
-  // Destroy previous instance
+  // Destroy previous Choices instance
   if (window.ChoicesInstances[id]) {
     window.ChoicesInstances[id].destroy();
   }
 
-  // Clear and add options
+  // Clear existing options
   selectEl.innerHTML = '';
-  selectEl.add(new Option('All', 'All')); // not selected by default
 
+  // Dynamically decide if it's multi-select (via HTML 'multiple' attribute)
+  const isMultiple = selectEl.hasAttribute('multiple');
+
+  // Add default 'All' option
+  const allOption = new Option('All', 'All', !isMultiple, !isMultiple); // selected=true if not multi
+  selectEl.add(allOption);
+
+  // Add other options
   Array.from(values).sort().forEach(val => {
     selectEl.add(new Option(val, val));
   });
 
-  // Initialize Choices
-  window.ChoicesInstances[id] = new Choices(selectEl, {
+  // Initialize new Choices.js instance
+  const instance = new Choices(selectEl, {
     removeItemButton: true,
     shouldSort: false,
     placeholder: true,
     placeholderValue: 'Select...',
-    searchPlaceholderValue: 'Search...'
+    searchPlaceholderValue: 'Search...',
   });
-}
 
+  window.ChoicesInstances[id] = instance;
+
+  // 🧠 Attach filtering logic on change
+  selectEl.addEventListener('change', applyMobileFilters);
+}
 
 function populateFilterOptions(entries) {
   const categories = new Set();
@@ -162,7 +177,7 @@ function populateFilterOptions(entries) {
     if (e.person) persons.add(e.person);
     if (e.type) types.add(e.type);
     if (e.status) statuses.add(e.status);
-    if (e.date) months.add(e.date.slice(0, 7));
+    if (e.date) months.add(e.date.slice(0, 7)); // format YYYY-MM
   });
 
   populateSelect('monthFilter', months);
@@ -173,22 +188,6 @@ function populateFilterOptions(entries) {
   populateSelect('typeFilterMobile', types);
   populateSelect('statusFilterMobile', statuses);
 }
-
-[
-  'monthFilter',
-  'categoryFilterMobile',
-  'currencyFilterMobile',
-  'bankFilterMobile',
-  'personFilterMobile',
-  'typeFilterMobile',
-  'statusFilterMobile'
-].forEach(id => {
-  const el = document.getElementById(id);
-  if (el) {
-    el.addEventListener('change', applyMobileFilters);
-  }
-});
-
 
 // ✅ Define renderMobileEntries first
 function renderMobileEntries(entries) {
