@@ -47,9 +47,12 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             <div class="status">Status: ${entry.status}</div>
           </div>
-    <div class="entry-amount">
-    <div class="currency">CHF</div>
-    <div class="amount" style="color: ${amountColor}; font-weight: bold;">
+<div class="amount-line">
+  <span class="currency">CHF</span>
+  <span class="amount ${entry.type === 'income' ? 'income' : 'expense'}">
+    ${parseFloat(entry.amount).toFixed(2)}
+  </span>
+</div>
       ${parseFloat(entry.amount).toFixed(2)}
             <div class="buttons">
               <button onclick="editMobileEntry(${index})">✏️</button>

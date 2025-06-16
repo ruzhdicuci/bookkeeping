@@ -397,3 +397,26 @@ body.dark .status,
 body.dark .currency {
   color: #aaa;
 }
+
+
+.amount-line {
+  font-size: 1rem;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.currency {
+  font-size: 0.75rem;
+  color: grey;
+}
+
+.amount.income {
+  color: rgb(0, 128, 117); /* green */
+  font-weight: bold;
+}
+
+.amount.expense {
+  color: orangered;
+  font-weight: bold;
+}
