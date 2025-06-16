@@ -240,20 +240,26 @@ function updateAverages(entries) {
 }
 
 function updateBankChanges(entries) {
+  const bankChanges = {};
+  entries.forEach(e => {
+    const amount = parseFloat(e.amount) || 0;
+    const bank = e.bank;
+    if (!bankChanges[bank]) bankChanges[bank] = 0;
+    bankChanges[bank] += (e.type === 'Income' ? amount : -amount);
+  });
+
   const list = document.getElementById('bankChangesList');
   list.innerHTML = '';
 
-  const bankChanges = {};
-  entries.forEach(e => {
-    const bank = e.bank;
-    const amount = parseFloat(e.amount) || 0;
-    if (!bankChanges[bank]) bankChanges[bank] = 0;
-    bankChanges[bank] += e.type === 'Income' ? amount : -amount;
-  });
-
   for (const [bank, change] of Object.entries(bankChanges)) {
     const row = document.createElement('div');
-    row.innerHTML = `<span>${bank}:</span> <span style="color:${change >= 0 ? 'green' : 'red'}">${change.toFixed(2)}</span>`;
+    row.className = 'bank-row';
+    row.innerHTML = `
+      <span class="bank-name">${bank}</span>
+      <span class="bank-change ${change > 0 ? 'positive' : change < 0 ? 'negative' : 'neutral'}">
+        ${change.toFixed(2)}
+      </span>
+    `;
     list.appendChild(row);
   }
 }

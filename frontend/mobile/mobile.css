@@ -610,6 +610,8 @@ body.dark .summary-card-container {
   row-gap: 6px;
   column-gap: 12px;
   margin-top: 8px;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 
 .bank-row {
@@ -626,11 +628,11 @@ body.dark .summary-card-container {
 }
 
 .bank-change.positive {
-  color: green;
+  color: rgb(18, 129, 110);
 }
 
 .bank-change.negative {
-  color: red;
+  color: rgb(255, 0, 162);
 }
 
 .bank-change.neutral {
