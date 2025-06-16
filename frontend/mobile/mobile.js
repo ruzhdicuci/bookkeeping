@@ -216,9 +216,45 @@ function applyMobileFilters() {
     );
   });
 
-  renderMobileEntries(filtered);       // ✅ Show filtered list
-updateSummary(filtered);           // ✅ Show filtered totals
+  renderMobileEntries(filtered);
+  updateSummary(filtered);
+  updateAverages(filtered);
+  updateBankChanges(filtered);
 }
+
+function updateAverages(entries) {
+  const months = [...new Set(entries.map(e => e.date?.slice(0, 7)))].filter(Boolean);
+  const income = entries.filter(e => e.type === 'Income').reduce((sum, e) => sum + parseFloat(e.amount), 0);
+  const expense = entries.filter(e => e.type === 'Expense').reduce((sum, e) => sum + parseFloat(e.amount), 0);
+
+  const avgIncome = income / months.length || 0;
+  const avgExpense = expense / months.length || 0;
+  const avgBalance = avgIncome - avgExpense;
+
+  document.getElementById('avgIncome').textContent = avgIncome.toFixed(2);
+  document.getElementById('avgExpenses').textContent = avgExpense.toFixed(2);
+  document.getElementById('avgBalance').textContent = avgBalance.toFixed(2);
+}
+
+function updateBankChanges(entries) {
+  const list = document.getElementById('bankChangesList');
+  list.innerHTML = '';
+
+  const bankChanges = {};
+  entries.forEach(e => {
+    const bank = e.bank;
+    const amount = parseFloat(e.amount) || 0;
+    if (!bankChanges[bank]) bankChanges[bank] = 0;
+    bankChanges[bank] += e.type === 'Income' ? amount : -amount;
+  });
+
+  for (const [bank, change] of Object.entries(bankChanges)) {
+    const row = document.createElement('div');
+    row.innerHTML = `<span>${bank}:</span> <span style="color:${change >= 0 ? 'green' : 'red'}">${change.toFixed(2)}</span>`;
+    list.appendChild(row);
+  }
+}
+
 
 function updateSummary(data = mobileEntries) {
   let income = 0;
