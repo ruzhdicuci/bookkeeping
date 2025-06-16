@@ -238,13 +238,17 @@ function renderMobileEntries(entries) {
 }
 
 
-// ✅ Place this at the top level (outside of any other function)
 function getSelectedValues(id) {
-  const values = window.ChoicesInstances[id]?.getValue(true) || [];
+  const instance = window.ChoicesInstances[id];
+  const values = instance?.getValue(true) || [];
 
-  // If "All" is selected, return an empty array (means allow all)
+  console.log(`🔎 ${id} selected:`, values);
+
+  // If All is selected (alone or with others), remove it
   if (values.includes('All')) {
-    return [];
+    const cleaned = values.filter(v => v !== 'All');
+    console.log(`🧹 ${id} cleaned:`, cleaned);
+    return cleaned; // allow "All + other" combos
   }
 
   return values;
@@ -254,42 +258,19 @@ function getSelectedValues(id) {
 function applyMobileFilters() {
   console.log("📌 applyMobileFilters triggered");
 
-  const selectedMonths = getSelectedValues('monthFilter');
-  const selectedCategories = getSelectedValues('categoryFilterMobile');
-  const selectedCurrencies = getSelectedValues('currencyFilterMobile');
-  const selectedBanks = getSelectedValues('bankFilterMobile');
   const selectedPersons = getSelectedValues('personFilterMobile');
-  const selectedTypes = getSelectedValues('typeFilterMobile');
-  const selectedStatuses = getSelectedValues('statusFilterMobile');
-
-  console.log("🔍 Filter values:", {
-    selectedMonths, selectedCategories, selectedCurrencies,
-    selectedBanks, selectedPersons, selectedTypes, selectedStatuses
-  });
 
   const filtered = mobileEntries.filter(e => {
-    const match =
-      (selectedMonths.length === 0 || selectedMonths.includes(e.date?.slice(0, 7))) &&
-      (selectedCategories.length === 0 || selectedCategories.includes(e.category)) &&
-      (selectedCurrencies.length === 0 || selectedCurrencies.includes(e.currency)) &&
-      (selectedBanks.length === 0 || selectedBanks.includes(e.bank)) &&
-      (selectedPersons.length === 0 || selectedPersons.includes(e.person)) &&
-      (selectedTypes.length === 0 || selectedTypes.includes(e.type)) &&
-      (selectedStatuses.length === 0 || selectedStatuses.includes(e.status));
-
-    if (!match) {
-      console.log('❌ Filtered out:', e);
-    }
-
-    return match;
+    return selectedPersons.length === 0 || selectedPersons.includes(e.person);
   });
 
-  console.log("✅ Entries after filtering:", filtered.length);
+  console.log("👥 Filtered persons:", selectedPersons);
+  console.log("✅ Matched entries:", filtered.length);
+
   renderMobileEntries(filtered);
-  updateSummary(filtered);
-  updateAverages(filtered);
-  updateBankChanges(filtered);
 }
+
+
 
 function updateAverages(entries) {
   const months = [...new Set(entries.map(e => e.date?.slice(0, 7)))].filter(Boolean);
