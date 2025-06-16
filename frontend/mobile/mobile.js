@@ -71,7 +71,7 @@ if (themeBtn) {
 
 
   // ✅ Now fetchMobileEntries AFTER renderMobileEntries
- async function fetchMobileEntries() {
+async function fetchMobileEntries() {
   try {
     const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
       headers: { Authorization: `Bearer ${token}` }
@@ -80,14 +80,16 @@ if (themeBtn) {
     const entries = await res.json();
 
     window.mobileEntries = entries;
-    renderMobileEntries(entries);     // ✅ make sure it's 'entries' not 'filtered'
-    populateMobileCards(entries);
+    renderMobileEntries(entries);      // ✅ Use entries, not filtered
+    updateSummary(entries);
+    updateAverages(entries);
+    updateBankChanges(entries);
+
   } catch (err) {
     console.error("❌ Failed to load mobile entries", err);
     showToast("❌ Error loading data");
   }
 }
-
 
 
 function populateSelect(id, values) {
