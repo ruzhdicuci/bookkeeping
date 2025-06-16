@@ -22,30 +22,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window.ChoicesInstances = {};
 
-  const filterDropdowns = [
-    { id: 'categoryFilterMobile', placeholder: 'Select Categories' },
-    { id: 'typeFilterMobile', placeholder: 'Select Types' },
-    { id: 'currencyFilterMobile', placeholder: 'Select Currencies' },
-    { id: 'bankFilterMobile', placeholder: 'Select Banks' },
-    { id: 'statusFilterMobile', placeholder: 'Select Status' },
-    { id: 'personFilterMobile', placeholder: 'Select Persons' },
-    { id: 'monthFilter', placeholder: 'Select Months' }
-  ];
+// Filter configuration
+const filterDropdowns = [
+  { id: 'monthFilter', placeholder: 'Select Months' },
+  { id: 'categoryFilterMobile', placeholder: 'Select Categories' },
+  { id: 'typeFilterMobile', placeholder: 'Select Types' },
+  { id: 'currencyFilterMobile', placeholder: 'Select Currencies' },
+  { id: 'bankFilterMobile', placeholder: 'Select Banks' },
+  { id: 'statusFilterMobile', placeholder: 'Select Status' },
+  { id: 'personFilterMobile', placeholder: 'Select Persons' }
+];
 
-  filterDropdowns.forEach(({ id, placeholder }) => {
-    const el = document.getElementById(id);
-    if (el) {
-      const instance = new Choices(el, {
-        removeItemButton: true,
-        shouldSort: false,
-        placeholder: true,
-        placeholderValue: placeholder,
-        searchPlaceholderValue: 'Search...'
-      });
-      window.ChoicesInstances[id] = instance;
-      el.addEventListener('change', applyMobileFilters);
+
+// Initialize Choices
+filterDropdowns.forEach(({ id, placeholder }) => {
+  const el = document.getElementById(id);
+  if (el) {
+    // Avoid double init
+    if (window.ChoicesInstances[id]) {
+      window.ChoicesInstances[id].destroy();
     }
-  });
+
+    const instance = new Choices(el, {
+      removeItemButton: true,
+      shouldSort: false,
+      placeholder: true,
+      placeholderValue: placeholder,
+      searchPlaceholderValue: 'Search...'
+    });
+
+    window.ChoicesInstances[id] = instance;
+
+    // Hook to your filter logic
+    el.addEventListener('change', applyMobileFilters);
+  }
+});
 
   // ✅ These toggle buttons must also be inside DOMContentLoaded:
   document.getElementById('toggleAdvancedFilters')?.addEventListener('click', () => {
@@ -102,37 +113,36 @@ async function fetchMobileEntries() {
     showToast("❌ Error loading data");
   }
 }
-// ✅ Call the fetch once DOM is ready
 
 
-// ✅ Initialize Choices instance map
-window.ChoicesInstances = {};
 
 function populateSelect(id, values) {
   const selectEl = document.getElementById(id);
   if (!selectEl) return;
 
-  // Destroy previous Choices instance if it exists
+  // Destroy previous instance
   if (window.ChoicesInstances[id]) {
     window.ChoicesInstances[id].destroy();
   }
 
-  // Clear previous options and add default "All"
+  // Clear and add options
   selectEl.innerHTML = '';
-  selectEl.add(new Option('All', 'All', true, true));
+  selectEl.add(new Option('All', 'All')); // not selected by default
 
   Array.from(values).sort().forEach(val => {
     selectEl.add(new Option(val, val));
   });
 
-  // Initialize new Choices instance
+  // Initialize Choices
   window.ChoicesInstances[id] = new Choices(selectEl, {
     removeItemButton: true,
     shouldSort: false,
     placeholder: true,
-    placeholderValue: 'Select...'
+    placeholderValue: 'Select...',
+    searchPlaceholderValue: 'Search...'
   });
 }
+
 
 function populateFilterOptions(entries) {
   const categories = new Set();
