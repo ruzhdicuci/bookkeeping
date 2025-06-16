@@ -16,16 +16,12 @@ function showToast(message) {
   }, 2000);
 }
 
-
 document.addEventListener('DOMContentLoaded', () => {
-  entryForm = document.getElementById('entry-form'); // ✅ global
-
+  entryForm = document.getElementById('entry-form');
   const mobileEntryList = document.getElementById('mobileEntryList');
 
-  // Store Choices instances globally to manage updates
   window.ChoicesInstances = {};
 
-  // 🔧 Init Choices for all filter dropdowns
   const filterDropdowns = [
     { id: 'categoryFilterMobile', placeholder: 'Select Categories' },
     { id: 'typeFilterMobile', placeholder: 'Select Types' },
@@ -47,56 +43,41 @@ document.addEventListener('DOMContentLoaded', () => {
         searchPlaceholderValue: 'Search...'
       });
       window.ChoicesInstances[id] = instance;
-
-      // Attach filter listener
       el.addEventListener('change', applyMobileFilters);
     }
   });
-});
 
- // ✅ Wrap these inside DOMContentLoaded
-const advBtn = document.getElementById('toggleAdvancedFilters');
-if (advBtn) {
-  advBtn.addEventListener('click', () => {
+  // ✅ These toggle buttons must also be inside DOMContentLoaded:
+  document.getElementById('toggleAdvancedFilters')?.addEventListener('click', () => {
     document.getElementById('advancedFilters')?.classList.toggle('hidden');
   });
-}
 
-const entryBtn = document.getElementById('toggleEntryForm');
-if (entryBtn) {
-  entryBtn.addEventListener('click', () => {
+  document.getElementById('toggleEntryForm')?.addEventListener('click', () => {
     document.getElementById('entry-form')?.classList.toggle('hidden');
   });
-}
 
-const filterBtn = document.getElementById('toggleFilters');
-if (filterBtn) {
-  filterBtn.addEventListener('click', () => {
+  document.getElementById('toggleFilters')?.addEventListener('click', () => {
     document.getElementById('filters')?.classList.toggle('hidden');
   });
-}
 
-const themeBtn = document.getElementById('toggleTheme');
-if (themeBtn) {
-  themeBtn.addEventListener('click', () => {
+  document.getElementById('toggleTheme')?.addEventListener('click', () => {
     document.body.classList.toggle('dark');
   });
-}
 
-  // ✅ Define toggle functions here or outside
+  // ✅ Also define these window toggle helpers here
   window.toggleMobileSummary = function () {
     document.getElementById('mobileSummaryCard').classList.toggle('hidden');
   };
-
   window.toggleMobileAverage = function () {
     document.getElementById('mobileAverageCard').classList.toggle('hidden');
   };
-
   window.toggleMobileBank = function () {
     document.getElementById('mobileBankCard').classList.toggle('hidden');
   };
 
-  
+  // ✅ Finally, fetch entries
+  fetchMobileEntries(); // This MUST stay inside DOMContentLoaded
+});
 
 
 
@@ -121,6 +102,8 @@ async function fetchMobileEntries() {
     showToast("❌ Error loading data");
   }
 }
+// ✅ Call the fetch once DOM is ready
+
 
 // ✅ Initialize Choices instance map
 window.ChoicesInstances = {};
@@ -196,7 +179,7 @@ function populateFilterOptions(entries) {
 
 
 // ✅ Define renderMobileEntries first
- function renderMobileEntries(entries) {
+function renderMobileEntries(entries) {
   window.renderMobileEntries = renderMobileEntries;
   mobileEntries = entries;
   populateFilterOptions(entries);
@@ -239,14 +222,10 @@ function populateFilterOptions(entries) {
     mobileEntryList.appendChild(li);
   });
 
-  updateSummary(entries); // ✅ Corrected
+updateSummary(entries);
 }
-  
 
 
-  // ✅ Call the fetch once DOM is ready
-  fetchMobileEntries();
-});
 
 function applyMobileFilters() {
     const selectedCategories = Array.from(document.getElementById('categoryFilterMobile')?.selectedOptions).map(opt => opt.value);
