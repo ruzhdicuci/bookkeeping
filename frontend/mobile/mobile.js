@@ -65,8 +65,60 @@ if (themeBtn) {
     document.getElementById('mobileBankCard').classList.toggle('hidden');
   };
 
-  // ✅ Define renderMobileEntries first
+  
+
+
+
+
+  // ✅ Now fetchMobileEntries AFTER renderMobileEntries
+ async function fetchMobileEntries() {
+  try {
+    const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
+    const entries = await res.json();
+
+    window.mobileEntries = entries;
+    renderMobileEntries(entries);     // ✅ make sure it's 'entries' not 'filtered'
+    populateMobileCards(entries);
+  } catch (err) {
+    console.error("❌ Failed to load mobile entries", err);
+    showToast("❌ Error loading data");
+  }
+}
+
+
+
+function populateSelect(id, values) {
+  const select = document.getElementById(id);
+  if (!select) return;
+  select.innerHTML = `<option value="All">All</option>`;
+  Array.from(values).sort().forEach(val => {
+    const opt = document.createElement('option');
+    opt.value = val;
+    opt.textContent = val;
+    select.appendChild(opt);
+  });
+}
+
+[
+  'monthFilter',
+  'categoryFilterMobile',
+  'currencyFilterMobile',
+  'bankFilterMobile',
+  'personFilterMobile',
+  'typeFilterMobile',
+  'statusFilterMobile'
+].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) {
+    el.addEventListener('change', applyMobileFilters);
+  }
+});
+// ✅ Define renderMobileEntries first
   function renderMobileEntries(entries) {
+     window.renderMobileEntries = renderMobileEntries;
     mobileEntries = entries;
     populateFilterOptions(entries); // Make sure this function is also defined somewhere
     mobileEntryList.innerHTML = '';
@@ -106,60 +158,10 @@ if (themeBtn) {
         </div>`;
       mobileEntryList.appendChild(li);
     });
-    updateSummary();
+   renderMobileEntries(filtered);
+updateSummary(entries); // ✅ entries is passed into the function
+   
   }
-
-
-
-
-  // ✅ Now fetchMobileEntries AFTER renderMobileEntries
-  async function fetchMobileEntries() {
-    try {
-      const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
-      const entries = await res.json();
-
-      window.mobileEntries = entries;
-      renderMobileEntries(entries);
-      populateMobileCards(entries);
-
-    } catch (err) {
-      console.error("❌ Failed to load mobile entries", err);
-      showToast("❌ Error loading data");
-    }
-  }
-
-
-
-function populateSelect(id, values) {
-  const select = document.getElementById(id);
-  if (!select) return;
-  select.innerHTML = `<option value="All">All</option>`;
-  Array.from(values).sort().forEach(val => {
-    const opt = document.createElement('option');
-    opt.value = val;
-    opt.textContent = val;
-    select.appendChild(opt);
-  });
-}
-
-[
-  'monthFilter',
-  'categoryFilterMobile',
-  'currencyFilterMobile',
-  'bankFilterMobile',
-  'personFilterMobile',
-  'typeFilterMobile',
-  'statusFilterMobile'
-].forEach(id => {
-  const el = document.getElementById(id);
-  if (el) {
-    el.addEventListener('change', applyMobileFilters);
-  }
-});
-
 
 function populateFilterOptions(entries) {
   const categories = new Set();
@@ -214,24 +216,22 @@ function applyMobileFilters() {
     );
   });
 
-  renderMobileEntries(filtered);
+  renderMobileEntries(filtered);       // ✅ Show filtered list
+ updateSummary(entries);         // ✅ Show filtered totals
 }
-  function updateSummary() {
+
+function updateSummary(data = mobileEntries) {
   let income = 0;
   let expenses = 0;
-
-  mobileEntries.forEach(e => {
+  data.forEach(e => {
     const amt = parseFloat(e.amount);
     if (e.type.toLowerCase() === 'income') income += amt;
     else if (e.type.toLowerCase() === 'expense') expenses += amt;
   });
-
-  // ✅ These IDs match your HTML now
-  document.getElementById('summaryIncome').textContent = income.toFixed(2);
-  document.getElementById('summaryExpenses').textContent = expenses.toFixed(2);
-  document.getElementById('summaryBalance').textContent = (income - expenses).toFixed(2);
+  document.getElementById('mobileIncome').textContent = income.toFixed(2);
+  document.getElementById('mobileExpenses').textContent = expenses.toFixed(2);
+  document.getElementById('mobileBalance').textContent = (income - expenses).toFixed(2);
 }
-
   function getFormData() {
     return {
       date: document.getElementById('newDate').value,
