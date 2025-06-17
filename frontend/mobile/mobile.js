@@ -235,14 +235,12 @@ function renderMobileEntries(entries) {
   updateBankChanges(entries);
 }
 
+// ✅ Helper to get selected values from Choices.js
 function getSelectedValues(id) {
   const values = window.ChoicesInstances[id]?.getValue(true) || [];
-
-  // If "All" is selected along with other values, ignore "All"
-  const filtered = values.filter(v => v !== 'All');
-
-  return filtered.length === 0 ? [] : filtered;
+  return values.includes('All') ? null : values;
 }
+
 
 // ✅ Apply filters to entries
 function applyMobileFilters() {
