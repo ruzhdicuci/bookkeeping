@@ -309,28 +309,17 @@ form#entry-form button {
     font-size: 1.1rem;
 }
 
-#advancedFilters select {
-  width: 100%;
-  border-radius: 8px;
-  min-height: 44px;
-  font-size: 16px;
-  padding: 6px 12px;
-  box-shadow: none;
-  border: 1px solid #ccc;
-  margin-bottom: 10px;
-}
-
 
 /* Make All + Select... stay flush and full width */
 .choices__inner {
+ width: 100%;
   display: flex !important;
   align-items: center !important;
   height: 28px !important;
   padding: 6px 8px !important;
-	margin-top: 2px;
-	margin-bottom: 4px;
+
   border-radius: 8px !important;
-  font-size: 1rem !important;
+  font-size: 0.7rem !important;
   gap: 6px !important;
   background-color: white !important;
   box-shadow: none !important;
@@ -338,15 +327,18 @@ form#entry-form button {
   line-height: 1 !important;
   flex-wrap: wrap;
 		margin-left: 10px;
-	margin-right: 2%;
+
+    border: 1px solid #eeeded;
 }
 
 /* Align the outer box of Choices to match inputs */
-.choices {
-  margin: 0 !important;
-	
-}
 
+
+/* Ensure parent .choices doesn't override radius */
+.choices {
+  border-radius: 8px !important;
+  overflow: hidden !important;
+}
 /* Make dropdown search bar consistent */
 .choices__input {
   font-size: 0.7rem !important;
@@ -355,22 +347,31 @@ form#entry-form button {
 }
 
 
-
 #advancedFilters {
-  padding-bottom: 0.5rem;
+
+ margin-bottom: -12px;
+  margin-right: 15px;
+  border-radius: 8px;
 	
 }
 
 /* Ensure multi-line values don’t overflow weirdly */
 .choices__list--multiple .choices__item {
-  margin: 3px 4px;
-		margin-top: 0px;
-  padding: 4px 8px;
-  border-radius: 6px;
   font-size: 0.7rem;
+  border-radius: 8px !important;
 }
 
+#advancedFilters label {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
 
+#advancedFilters select,
+#advancedFilters .choices {
+  margin-bottom: 6px !important; /* reduce space below each */
+}
 
 .login-form {
   margin: 2rem auto;
