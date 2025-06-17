@@ -232,12 +232,12 @@ function renderMobileEntries(entries) {
 function getSelectedValues(id) {
   const values = window.ChoicesInstances[id]?.getValue(true) || [];
 
-  // Treat empty or only 'All' as "skip filtering"
-  if (values.length === 0 || values.includes('All')) {
-    return null; // Means: allow all
+  if (values.length === 0 || (values.length === 1 && values[0] === 'All')) {
+    return null; // allow all
   }
 
-  return values;
+  // Remove "All" if other values are also selected
+  return values.filter(v => v !== 'All');
 }
 
 // ✅ Apply filters to entries
