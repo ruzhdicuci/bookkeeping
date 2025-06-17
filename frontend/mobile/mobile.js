@@ -126,26 +126,21 @@ function populateSelect(id, values) {
   const select = document.getElementById(id);
   if (!select) return;
 
-  // Destroy existing Choices instance
-  if (window.ChoicesInstances?.[id]) {
+  // Destroy any previous instance
+  if (window.ChoicesInstances[id]) {
     window.ChoicesInstances[id].destroy();
   }
 
-  // Clear old options
+  // Clear and add "All" option
   select.innerHTML = '';
-
-  // Add "All" as selected by default
-  const allOption = new Option('All', 'All');
-  allOption.selected = true;
+  const allOption = new Option('All', 'All', true, true); // true, true selects it
   select.add(allOption);
 
-  // Add remaining sorted options
   [...values].sort().forEach(val => {
     const opt = new Option(val, val);
     select.add(opt);
   });
 
-  // Initialize Choices.js
   const instance = new Choices(select, {
     removeItemButton: true,
     shouldSort: false,
@@ -154,13 +149,16 @@ function populateSelect(id, values) {
     searchPlaceholderValue: 'Search...'
   });
 
-  window.ChoicesInstances = window.ChoicesInstances || {};
   window.ChoicesInstances[id] = instance;
 
-  // Remove previous listeners before attaching a fresh one
+  // ✅ Manually select "All"
+  instance.setChoiceByValue('All');
+
+  // Always hook listener freshly
   select.removeEventListener('change', applyMobileFilters);
   select.addEventListener('change', applyMobileFilters);
 }
+
 
 function populateFilterOptions(entries) {
   const categories = new Set();
@@ -192,10 +190,10 @@ function populateFilterOptions(entries) {
 
 // ✅ Define renderMobileEntries first
 function renderMobileEntries(entries) {
-  const mobileEntryList = document.getElementById('mobileEntryList');
-  mobileEntryList.innerHTML = '';
+    console.log('📦 Rendering entries:', entries.length);
 
-  populateFilterOptions(entries); // ✅ only once here
+  mobileEntries = entries;
+  mobileEntryList.innerHTML = '';
 
   entries.forEach((entry, index) => {
     const li = document.createElement('li');
@@ -239,35 +237,70 @@ function renderMobileEntries(entries) {
   updateBankChanges(entries);
 }
 
+function getSelectedValues(id) {
+  const values = window.ChoicesInstances[id]?.getValue(true) || [];
 
+  // Always remove 'All' if other values are selected
+  const filtered = values.filter(v => v !== 'All');
+
+  return filtered.length === 0 ? [] : filtered;
+}
 
 function applyMobileFilters() {
-  const selectedMonths = Array.from(document.getElementById('monthFilter')?.selectedOptions || []).map(opt => opt.value);
-  const selectedCategories = Array.from(document.getElementById('categoryFilterMobile')?.selectedOptions || []).map(opt => opt.value);
-  const selectedCurrencies = Array.from(document.getElementById('currencyFilterMobile')?.selectedOptions || []).map(opt => opt.value);
-  const selectedBanks = Array.from(document.getElementById('bankFilterMobile')?.selectedOptions || []).map(opt => opt.value);
-  const selectedPersons = Array.from(document.getElementById('personFilterMobile')?.selectedOptions || []).map(opt => opt.value);
-  const selectedTypes = Array.from(document.getElementById('typeFilterMobile')?.selectedOptions || []).map(opt => opt.value);
-  const selectedStatuses = Array.from(document.getElementById('statusFilterMobile')?.selectedOptions || []).map(opt => opt.value);
+  console.log("📌 applyMobileFilters triggered");
+
+  const selectedMonths = getSelectedValues('monthFilter');
+  const selectedCategories = getSelectedValues('categoryFilterMobile');
+  const selectedCurrencies = getSelectedValues('currencyFilterMobile');
+  const selectedBanks = getSelectedValues('bankFilterMobile');
+  const selectedPersons = getSelectedValues('personFilterMobile');
+  const selectedTypes = getSelectedValues('typeFilterMobile');
+  const selectedStatuses = getSelectedValues('statusFilterMobile');
+
+  console.log("🧩 Filter values:", {
+    selectedMonths,
+    selectedCategories,
+    selectedCurrencies,
+    selectedBanks,
+    selectedPersons,
+    selectedTypes,
+    selectedStatuses
+  });
 
   const filtered = mobileEntries.filter(e => {
-    return (
-      (selectedMonths.includes('All') || selectedMonths.includes(e.date?.slice(0, 7))) &&
-      (selectedCategories.includes('All') || selectedCategories.includes(e.category)) &&
-      (selectedCurrencies.includes('All') || selectedCurrencies.includes(e.currency)) &&
-      (selectedBanks.includes('All') || selectedBanks.includes(e.bank)) &&
-      (selectedPersons.includes('All') || selectedPersons.includes(e.person)) &&
-      (selectedTypes.includes('All') || selectedTypes.includes(e.type)) &&
-      (selectedStatuses.includes('All') || selectedStatuses.includes(e.status))
-    );
+    const match = 
+      (selectedMonths.length === 0 || selectedMonths.includes(e.date?.slice(0, 7))) &&
+      (selectedCategories.length === 0 || selectedCategories.includes(e.category)) &&
+      (selectedCurrencies.length === 0 || selectedCurrencies.includes(e.currency)) &&
+      (selectedBanks.length === 0 || selectedBanks.includes(e.bank)) &&
+      (selectedPersons.length === 0 || selectedPersons.includes(e.person)) &&
+      (selectedTypes.length === 0 || selectedTypes.includes(e.type)) &&
+      (selectedStatuses.length === 0 || selectedStatuses.includes(e.status));
+
+    if (!match) {
+      console.log("❌ Filtered out:", {
+        person: e.person,
+        category: e.category,
+        type: e.type,
+        currency: e.currency,
+        status: e.status,
+        bank: e.bank,
+        month: e.date?.slice(0, 7),
+        description: e.description
+      });
+    }
+
+    return match;
   });
+
+  console.log(`✅ Filtered entries: ${filtered.length}`);
+  console.log("📦 Rendering entries:", filtered.length);
 
   renderMobileEntries(filtered);
   updateSummary(filtered);
   updateAverages(filtered);
   updateBankChanges(filtered);
 }
-
 
 function updateAverages(entries) {
   const months = [...new Set(entries.map(e => e.date?.slice(0, 7)))].filter(Boolean);
