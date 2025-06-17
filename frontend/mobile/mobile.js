@@ -189,10 +189,32 @@ function populateFilterOptions(entries) {
 
 // ✅ Define renderMobileEntries first
 function renderMobileEntries(entries) {
-    console.log('📦 Rendering entries:', entries.length);
-  const mobileEntryList = document.getElementById('mobileEntryList');
-  mobileEntryList.innerHTML = '';
-  entries.forEach((entry, index) => {
+ console.log('📦 Rendering entries:', entries.length);
+const mobileEntryList = document.getElementById('mobileEntryList');
+mobileEntryList.innerHTML = '';
+
+// ✅ Group by label
+const grouped = {};
+entries.forEach(entry => {
+  const label = getRelativeDateLabel(entry.date);
+  if (!grouped[label]) grouped[label] = [];
+  grouped[label].push(entry);
+});
+
+// ✅ Render sections in order
+const order = ['Today', 'Yesterday', 'This Week', 'Last Week', 'Older'];
+order.forEach(label => {
+  const group = grouped[label];
+  if (!group) return;
+
+  const heading = document.createElement('h4');
+  heading.textContent = label;
+  heading.style.margin = '12px 10px 4px';
+  heading.style.fontSize = '0.9rem';
+  heading.style.color = '#666';
+  mobileEntryList.appendChild(heading);
+
+  group.forEach((entry, index) => {
     const li = document.createElement('li');
     const amountClass = entry.type.toLowerCase() === 'income' ? 'income' : 'expense';
     li.className = 'mobile-entry';
@@ -228,10 +250,11 @@ function renderMobileEntries(entries) {
       </div>`;
     mobileEntryList.appendChild(li);
   });
+});
 
-  updateSummary(entries);
-  updateAverages(entries);
-  updateBankChanges(entries);
+updateSummary(entries);
+updateAverages(entries);
+updateBankChanges(entries);
 }
 
 function getSelectedValues(id) {
@@ -464,3 +487,15 @@ for (const [bank, change] of Object.entries(bankChanges)) {
 } // ✅ <--- THIS was missing
 
 
+function getRelativeDateLabel(dateStr) {
+  const today = new Date();
+  const entryDate = new Date(dateStr);
+  const diffTime = today - entryDate;
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+  if (diffDays === 0) return 'Today';
+  if (diffDays === 1) return 'Yesterday';
+  if (diffDays <= 7) return 'This Week';
+  if (diffDays <= 14) return 'Last Week';
+  return 'Older';
+}
