@@ -411,19 +411,19 @@ entryForm.addEventListener('submit', e => {
   const editId = entryForm.dataset.editIndex;
 
   if (editId) {
-    const index = mobileEntries.findIndex(e => e._id === editId);
+    const index = window.allMobileEntries.findIndex(e => e._id === editId);
     if (index !== -1) {
-      mobileEntries[index] = data;
+      window.allMobileEntries[index] = data;
     }
     delete entryForm.dataset.editIndex;
     showToast("Entry updated");
   } else {
-    mobileEntries.push(data);
+    window.allMobileEntries.push(data);
     showToast("Entry added");
   }
 
   clearForm();
-  renderMobileEntries(mobileEntries);
+  renderMobileEntries(window.allMobileEntries); // show full again or re-apply filter
 });
 }
 
@@ -505,15 +505,22 @@ function getRelativeDateLabel(dateStr) {
   return 'Older';
 }
 
+
+// After fetching
+// After fetching
+window.allMobileEntries = entries;
+window.mobileEntries = entries; // filtered version
+
 window.editMobileEntryById = function (id) {
-  const entry = mobileEntries.find(e => e._id === id);
+  const entry = window.allMobileEntries.find(e => e._id === id); // ✅
+
   if (!entry) {
     console.error("❌ Entry not found for ID:", id);
     return;
   }
 
   Object.entries(entry).forEach(([key, val]) => {
-    const el = document.getElementById(`new${key.charAt(0).toUpperCase() + key.slice(1)}`);
+    const el = document.getElementById(`new${key.charAt(0).toUpperCase()}${key.slice(1)}`);
     if (el) el.value = val;
   });
 
