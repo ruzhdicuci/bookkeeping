@@ -132,6 +132,12 @@ async function fetchMobileEntries() {
   }
 }
 
+// ✅ Helper to get selected values from Choices.js
+function getSelectedValues(id) {
+  const values = window.ChoicesInstances[id]?.getValue(true) || [];
+  return values.includes('All') ? null : values;
+}
+
 
 // ✅ Populate Choices.js with options
 function populateSelect(id, values) {
@@ -164,14 +170,6 @@ function populateFilterOptions(entries) {
   populateSelect('personFilterMobile', getUnique('person'));
   populateSelect('typeFilterMobile', getUnique('type'));
   populateSelect('statusFilterMobile', getUnique('status'));
-}
-
-
-
-// ✅ Helper to get selected values from Choices.js
-function getSelectedValues(id) {
-  const values = window.ChoicesInstances[id]?.getValue(true) || [];
-  return values.includes('All') ? null : values;
 }
 
 // ✅ Apply filters to entries
