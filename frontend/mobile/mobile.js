@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
  
 
 // Filter configuration
+// Filter configuration
 const filterDropdowns = [
   { id: 'monthFilter', placeholder: 'Select Months' },
   { id: 'categoryFilterMobile', placeholder: 'Select Categories' },
@@ -34,30 +35,23 @@ const filterDropdowns = [
   { id: 'personFilterMobile', placeholder: 'Select Persons' }
 ];
 
-
-// Initialize Choices
+// ✅ Use correct variable name here
 filterDropdowns.forEach(({ id, placeholder }) => {
   const el = document.getElementById(id);
-  if (el) {
-    // Avoid double init
-    if (window.ChoicesInstances[id]) {
-      window.ChoicesInstances[id].destroy();
-    }
-
-    const instance = new Choices(el, {
-      removeItemButton: true,
-      shouldSort: false,
-      placeholder: true,
-      placeholderValue: placeholder,
-      searchPlaceholderValue: 'Search...'
-    });
-
-    window.ChoicesInstances[id] = instance;
-
-    // Hook to your filter logic
-    el.addEventListener('change', applyMobileFilters);
-  }
+  if (!el) return;
+  if (window.ChoicesInstances[id]) window.ChoicesInstances[id].destroy();
+  const instance = new Choices(el, {
+    removeItemButton: true,
+    shouldSort: false,
+    placeholder: true,
+    placeholderValue: placeholder,
+    searchPlaceholderValue: 'Search...'
+  });
+  window.ChoicesInstances[id] = instance;
+  el.addEventListener('change', applyMobileFilters);
 });
+
+
 
   // ✅ These toggle buttons must also be inside DOMContentLoaded:
   document.getElementById('toggleAdvancedFilters')?.addEventListener('click', () => {
@@ -235,12 +229,14 @@ function renderMobileEntries(entries) {
   updateBankChanges(entries);
 }
 
-// ✅ Helper to get selected values from Choices.js
 function getSelectedValues(id) {
   const values = window.ChoicesInstances[id]?.getValue(true) || [];
-  return values.includes('All') ? null : values;
-}
 
+  // If "All" is selected along with other values, ignore "All"
+  const filtered = values.filter(v => v !== 'All');
+
+  return filtered.length === 0 ? [] : filtered;
+}
 
 // ✅ Apply filters to entries
 function applyMobileFilters() {
