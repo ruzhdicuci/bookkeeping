@@ -102,10 +102,13 @@ async function fetchMobileEntries() {
     if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
 
     const entries = await res.json();
+
+    // ✅ Declare it here, where `entries` is defined
+    window.allMobileEntries = entries;
     window.mobileEntries = entries;
 
-    populateFilterOptions(entries);        // ✅ first: fill the dropdowns
-    renderMobileEntries(entries);          // ✅ then: render filtered view
+    populateFilterOptions(entries);
+    renderMobileEntries(entries);
     updateSummary(entries);
     updateAverages(entries);
     updateBankChanges(entries);
@@ -508,8 +511,7 @@ function getRelativeDateLabel(dateStr) {
 
 // After fetching
 // After fetching
-window.allMobileEntries = entries;
-window.mobileEntries = entries; // filtered version
+
 
 window.editMobileEntryById = function (id) {
   const entry = window.allMobileEntries.find(e => e._id === id); // ✅
