@@ -240,11 +240,12 @@ function renderMobileEntries(entries) {
 function getSelectedValues(id) {
   const values = window.ChoicesInstances[id]?.getValue(true) || [];
 
-  // If "All" is selected along with other values, ignore "All"
-  const filtered = values.filter(v => v !== 'All');
+  // If All is selected (alone or with others), skip filtering
+  if (values.includes('All')) return null;
 
-  return filtered.length === 0 ? [] : filtered;
+  return values;
 }
+
 function applyMobileFilters() {
   console.log("📌 applyMobileFilters triggered");
 
@@ -256,7 +257,7 @@ function applyMobileFilters() {
   const selectedTypes = getSelectedValues('typeFilterMobile');
   const selectedStatuses = getSelectedValues('statusFilterMobile');
 
-  console.log("🧩 Filter values:", {
+  console.log("🔍 Filter values:", {
     selectedMonths,
     selectedCategories,
     selectedCurrencies,
@@ -267,14 +268,14 @@ function applyMobileFilters() {
   });
 
   const filtered = mobileEntries.filter(e => {
-    const match = 
-      (selectedMonths.length === 0 || selectedMonths.includes(e.date?.slice(0, 7))) &&
-      (selectedCategories.length === 0 || selectedCategories.includes(e.category)) &&
-      (selectedCurrencies.length === 0 || selectedCurrencies.includes(e.currency)) &&
-      (selectedBanks.length === 0 || selectedBanks.includes(e.bank)) &&
-      (selectedPersons.length === 0 || selectedPersons.includes(e.person)) &&
-      (selectedTypes.length === 0 || selectedTypes.includes(e.type)) &&
-      (selectedStatuses.length === 0 || selectedStatuses.includes(e.status));
+    const match =
+      (!selectedMonths || selectedMonths.includes(e.date?.slice(0, 7))) &&
+      (!selectedCategories || selectedCategories.includes(e.category)) &&
+      (!selectedCurrencies || selectedCurrencies.includes(e.currency)) &&
+      (!selectedBanks || selectedBanks.includes(e.bank)) &&
+      (!selectedPersons || selectedPersons.includes(e.person)) &&
+      (!selectedTypes || selectedTypes.includes(e.type)) &&
+      (!selectedStatuses || selectedStatuses.includes(e.status));
 
     if (!match) {
       console.log("❌ Filtered out:", {
@@ -300,6 +301,8 @@ function applyMobileFilters() {
   updateAverages(filtered);
   updateBankChanges(filtered);
 }
+
+
 
 function updateAverages(entries) {
   const months = [...new Set(entries.map(e => e.date?.slice(0, 7)))].filter(Boolean);
