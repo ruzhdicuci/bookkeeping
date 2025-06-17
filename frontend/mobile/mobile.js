@@ -257,19 +257,34 @@ function applyMobileFilters() {
   const selectedTypes = getSelectedValues('typeFilterMobile');
   const selectedStatuses = getSelectedValues('statusFilterMobile');
 
+  console.log("🔍 Filter values:", {
+    selectedMonths,
+    selectedCategories,
+    selectedCurrencies,
+    selectedBanks,
+    selectedPersons,
+    selectedTypes,
+    selectedStatuses
+  });
+
   const filtered = mobileEntries.filter(e => {
-    return (
+    const match =
       (selectedMonths.length === 0 || selectedMonths.includes(e.date?.slice(0, 7))) &&
       (selectedCategories.length === 0 || selectedCategories.includes(e.category)) &&
       (selectedCurrencies.length === 0 || selectedCurrencies.includes(e.currency)) &&
       (selectedBanks.length === 0 || selectedBanks.includes(e.bank)) &&
       (selectedPersons.length === 0 || selectedPersons.includes(e.person)) &&
       (selectedTypes.length === 0 || selectedTypes.includes(e.type)) &&
-      (selectedStatuses.length === 0 || selectedStatuses.includes(e.status))
-    );
+      (selectedStatuses.length === 0 || selectedStatuses.includes(e.status));
+
+    if (!match) {
+      console.log("❌ Filtered out:", e);
+    }
+
+    return match;
   });
 
-  console.log("✅ Filtered entries:", filtered.length);
+  console.log(`✅ Filtered entries: ${filtered.length}`);
   renderMobileEntries(filtered);
   updateSummary(filtered);
   updateAverages(filtered);
