@@ -231,11 +231,10 @@ function renderMobileEntries(entries) {
 
 function getSelectedValues(id) {
   const values = window.ChoicesInstances[id]?.getValue(true) || [];
-  const clean = values.filter(v => v !== 'All');
 
-  return clean.length === 0 ? null : clean;
+  // Remove 'All' from the list completely
+  return values.filter(v => v !== 'All');
 }
-
 // ✅ Apply filters to entries
 function applyMobileFilters() {
   console.log("📌 applyMobileFilters triggered");
@@ -253,24 +252,24 @@ function applyMobileFilters() {
     selectedBanks, selectedPersons, selectedTypes, selectedStatuses
   });
 
- const filtered = mobileEntries.filter(e => {
-  return (
-    (!selectedMonths || selectedMonths.includes(e.date?.slice(0, 7))) &&
-    (!selectedCategories || selectedCategories.includes(e.category)) &&
-    (!selectedCurrencies || selectedCurrencies.includes(e.currency)) &&
-    (!selectedBanks || selectedBanks.includes(e.bank)) &&
-    (!selectedPersons || selectedPersons.includes(e.person)) &&
-    (!selectedTypes || selectedTypes.includes(e.type)) &&
-    (!selectedStatuses || selectedStatuses.includes(e.status))
-  );
-});
+  const filtered = mobileEntries.filter(e => {
+    return (
+      (selectedMonths.length === 0 || selectedMonths.includes(e.date?.slice(0, 7))) &&
+      (selectedCategories.length === 0 || selectedCategories.includes(e.category)) &&
+      (selectedCurrencies.length === 0 || selectedCurrencies.includes(e.currency)) &&
+      (selectedBanks.length === 0 || selectedBanks.includes(e.bank)) &&
+      (selectedPersons.length === 0 || selectedPersons.includes(e.person)) &&
+      (selectedTypes.length === 0 || selectedTypes.includes(e.type)) &&
+      (selectedStatuses.length === 0 || selectedStatuses.includes(e.status))
+    );
+  });
+
   console.log(`✅ Filtered entries: ${filtered.length}`);
   renderMobileEntries(filtered);
   updateSummary(filtered);
   updateAverages(filtered);
   updateBankChanges(filtered);
 }
-
 
 function updateAverages(entries) {
   const months = [...new Set(entries.map(e => e.date?.slice(0, 7)))].filter(Boolean);
