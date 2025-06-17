@@ -34,22 +34,6 @@ const filterDropdowns = [
   { id: 'personFilterMobile', placeholder: 'Select Persons' }
 ];
 
-// ✅ Use correct variable name here
-filterDropdowns.forEach(({ id, placeholder }) => {
-  const el = document.getElementById(id);
-  if (!el) return;
-  if (window.ChoicesInstances[id]) window.ChoicesInstances[id].destroy();
-  const instance = new Choices(el, {
-    removeItemButton: true,
-    shouldSort: false,
-    placeholder: true,
-    placeholderValue: placeholder,
-    searchPlaceholderValue: 'Search...'
-  });
-  window.ChoicesInstances[id] = instance;
-  el.addEventListener('change', applyMobileFilters);
-});
-
 
 // Initialize Choices
 filterDropdowns.forEach(({ id, placeholder }) => {
@@ -111,21 +95,22 @@ filterDropdowns.forEach(({ id, placeholder }) => {
 
 
   // ✅ Now fetchMobileEntries AFTER renderMobileEntries
-// ✅ Load data from API
 async function fetchMobileEntries() {
   try {
     const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
       headers: { Authorization: `Bearer ${token}` }
     });
     if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
+
     const entries = await res.json();
     window.mobileEntries = entries;
 
-    populateFilterOptions(entries);
-    renderMobileEntries(entries);
+    populateFilterOptions(entries);        // ✅ first: fill the dropdowns
+    renderMobileEntries(entries);          // ✅ then: render filtered view
     updateSummary(entries);
     updateAverages(entries);
     updateBankChanges(entries);
+
   } catch (err) {
     console.error("❌ Failed to load mobile entries", err);
     showToast("❌ Error loading data");
@@ -134,14 +119,33 @@ async function fetchMobileEntries() {
 
 
 
-// ✅ Populate Choices.js with options
+
+
+// ✅ Populate a single <select> with values + Choices.js
 function populateSelect(id, values) {
   const select = document.getElementById(id);
   if (!select) return;
-  if (window.ChoicesInstances[id]) window.ChoicesInstances[id].destroy();
+
+  // Destroy existing Choices instance
+  if (window.ChoicesInstances?.[id]) {
+    window.ChoicesInstances[id].destroy();
+  }
+
+  // Clear old options
   select.innerHTML = '';
-  select.add(new Option('All', 'All'));
-  [...values].sort().forEach(val => select.add(new Option(val, val)));
+
+  // Add "All" as selected by default
+  const allOption = new Option('All', 'All');
+  allOption.selected = true;
+  select.add(allOption);
+
+  // Add remaining sorted options
+  [...values].sort().forEach(val => {
+    const opt = new Option(val, val);
+    select.add(opt);
+  });
+
+  // Initialize Choices.js
   const instance = new Choices(select, {
     removeItemButton: true,
     shouldSort: false,
@@ -149,65 +153,50 @@ function populateSelect(id, values) {
     placeholderValue: 'Select...',
     searchPlaceholderValue: 'Search...'
   });
+
+  window.ChoicesInstances = window.ChoicesInstances || {};
   window.ChoicesInstances[id] = instance;
+
+  // Remove previous listeners before attaching a fresh one
   select.removeEventListener('change', applyMobileFilters);
   select.addEventListener('change', applyMobileFilters);
 }
 
-// ✅ Populate filters from entries
 function populateFilterOptions(entries) {
-  const getUnique = (key) => new Set(entries.map(e => e[key]).filter(Boolean));
-  const months = new Set(entries.map(e => e.date?.slice(0, 7)).filter(Boolean));
-  populateSelect('monthFilter', months);
-  populateSelect('categoryFilterMobile', getUnique('category'));
-  populateSelect('currencyFilterMobile', getUnique('currency'));
-  populateSelect('bankFilterMobile', getUnique('bank'));
-  populateSelect('personFilterMobile', getUnique('person'));
-  populateSelect('typeFilterMobile', getUnique('type'));
-  populateSelect('statusFilterMobile', getUnique('status'));
-}
+  const categories = new Set();
+  const currencies = new Set();
+  const banks = new Set();
+  const persons = new Set();
+  const types = new Set();
+  const statuses = new Set();
+  const months = new Set();
 
-
-// ✅ Helper to get selected values from Choices.js
-function getSelectedValues(id) {
-  const values = window.ChoicesInstances[id]?.getValue(true) || [];
-  return values.includes('All') ? null : values;
-}
-
-
-// ✅ Apply filters to entries
-function applyMobileFilters() {
-  const selectedMonths = getSelectedValues('monthFilter');
-  const selectedCategories = getSelectedValues('categoryFilterMobile');
-  const selectedCurrencies = getSelectedValues('currencyFilterMobile');
-  const selectedBanks = getSelectedValues('bankFilterMobile');
-  const selectedPersons = getSelectedValues('personFilterMobile');
-  const selectedTypes = getSelectedValues('typeFilterMobile');
-  const selectedStatuses = getSelectedValues('statusFilterMobile');
-
-  const filtered = mobileEntries.filter(e => {
-    const match =
-      (!selectedMonths || selectedMonths.includes(e.date?.slice(0, 7))) &&
-      (!selectedCategories || selectedCategories.includes(e.category)) &&
-      (!selectedCurrencies || selectedCurrencies.includes(e.currency)) &&
-      (!selectedBanks || selectedBanks.includes(e.bank)) &&
-      (!selectedPersons || selectedPersons.includes(e.person)) &&
-      (!selectedTypes || selectedTypes.includes(e.type)) &&
-      (!selectedStatuses || selectedStatuses.includes(e.status));
-    return match;
+  entries.forEach(e => {
+    if (e.category) categories.add(e.category);
+    if (e.currency) currencies.add(e.currency);
+    if (e.bank) banks.add(e.bank);
+    if (e.person) persons.add(e.person);
+    if (e.type) types.add(e.type);
+    if (e.status) statuses.add(e.status);
+    if (e.date) months.add(e.date.slice(0, 7));
   });
 
-  renderMobileEntries(filtered);
-  updateSummary(filtered);
-  updateAverages(filtered);
-  updateBankChanges(filtered);
+  populateSelect('monthFilter', months);
+  populateSelect('categoryFilterMobile', categories);
+  populateSelect('currencyFilterMobile', currencies);
+  populateSelect('bankFilterMobile', banks);
+  populateSelect('personFilterMobile', persons);
+  populateSelect('typeFilterMobile', types);
+  populateSelect('statusFilterMobile', statuses);
 }
 
-
-// ✅ Render entries
+// ✅ Define renderMobileEntries first
 function renderMobileEntries(entries) {
   const mobileEntryList = document.getElementById('mobileEntryList');
   mobileEntryList.innerHTML = '';
+
+  populateFilterOptions(entries); // ✅ only once here
+
   entries.forEach((entry, index) => {
     const li = document.createElement('li');
     const amountClass = entry.type.toLowerCase() === 'income' ? 'income' : 'expense';
@@ -231,7 +220,9 @@ function renderMobileEntries(entries) {
         <div class="entry-amount">
           <div class="amount-line">
             <span class="currency">CHF</span>
-            <span class="amount ${amountClass}">${parseFloat(entry.amount).toFixed(2)}</span>
+            <span class="amount ${amountClass}">
+              ${parseFloat(entry.amount).toFixed(2)}
+            </span>
           </div>
           <div class="buttons">
             <button onclick="editMobileEntry(${index})">✏️</button>
@@ -242,61 +233,95 @@ function renderMobileEntries(entries) {
       </div>`;
     mobileEntryList.appendChild(li);
   });
+
+  updateSummary(entries);
+  updateAverages(entries);
+  updateBankChanges(entries);
 }
 
-// ✅ Totals
-function updateSummary(data) {
-  let income = 0, expenses = 0;
-  data.forEach(e => {
-    const amt = parseFloat(e.amount);
-    if (e.type.toLowerCase() === 'income') income += amt;
-    if (e.type.toLowerCase() === 'expense') expenses += amt;
+
+
+function applyMobileFilters() {
+  const selectedMonths = Array.from(document.getElementById('monthFilter')?.selectedOptions || []).map(opt => opt.value);
+  const selectedCategories = Array.from(document.getElementById('categoryFilterMobile')?.selectedOptions || []).map(opt => opt.value);
+  const selectedCurrencies = Array.from(document.getElementById('currencyFilterMobile')?.selectedOptions || []).map(opt => opt.value);
+  const selectedBanks = Array.from(document.getElementById('bankFilterMobile')?.selectedOptions || []).map(opt => opt.value);
+  const selectedPersons = Array.from(document.getElementById('personFilterMobile')?.selectedOptions || []).map(opt => opt.value);
+  const selectedTypes = Array.from(document.getElementById('typeFilterMobile')?.selectedOptions || []).map(opt => opt.value);
+  const selectedStatuses = Array.from(document.getElementById('statusFilterMobile')?.selectedOptions || []).map(opt => opt.value);
+
+  const filtered = mobileEntries.filter(e => {
+    return (
+      (selectedMonths.includes('All') || selectedMonths.includes(e.date?.slice(0, 7))) &&
+      (selectedCategories.includes('All') || selectedCategories.includes(e.category)) &&
+      (selectedCurrencies.includes('All') || selectedCurrencies.includes(e.currency)) &&
+      (selectedBanks.includes('All') || selectedBanks.includes(e.bank)) &&
+      (selectedPersons.includes('All') || selectedPersons.includes(e.person)) &&
+      (selectedTypes.includes('All') || selectedTypes.includes(e.type)) &&
+      (selectedStatuses.includes('All') || selectedStatuses.includes(e.status))
+    );
   });
-  document.getElementById('summaryIncome').textContent = income.toFixed(2);
-  document.getElementById('summaryExpenses').textContent = expenses.toFixed(2);
-  document.getElementById('summaryBalance').textContent = (income - expenses).toFixed(2);
+
+  renderMobileEntries(filtered);
+  updateSummary(filtered);
+  updateAverages(filtered);
+  updateBankChanges(filtered);
 }
 
-// ✅ Averages
+
 function updateAverages(entries) {
-  const months = [...new Set(entries.map(e => e.date?.slice(0, 7)).filter(Boolean))];
+  const months = [...new Set(entries.map(e => e.date?.slice(0, 7)))].filter(Boolean);
   const income = entries.filter(e => e.type === 'Income').reduce((sum, e) => sum + parseFloat(e.amount), 0);
   const expense = entries.filter(e => e.type === 'Expense').reduce((sum, e) => sum + parseFloat(e.amount), 0);
+
   const avgIncome = income / months.length || 0;
   const avgExpense = expense / months.length || 0;
   const avgBalance = avgIncome - avgExpense;
+
   document.getElementById('avgIncome').textContent = avgIncome.toFixed(2);
   document.getElementById('avgExpenses').textContent = avgExpense.toFixed(2);
   document.getElementById('avgBalance').textContent = avgBalance.toFixed(2);
 }
 
-// ✅ Bank change table
 function updateBankChanges(entries) {
-  const changes = {};
+  const bankChanges = {};
   entries.forEach(e => {
+    const amount = parseFloat(e.amount) || 0;
     const bank = e.bank;
-    const amt = parseFloat(e.amount) || 0;
-    if (!changes[bank]) changes[bank] = 0;
-    changes[bank] += e.type === 'Income' ? amt : -amt;
+    if (!bankChanges[bank]) bankChanges[bank] = 0;
+    bankChanges[bank] += (e.type === 'Income' ? amount : -amount);
   });
 
   const list = document.getElementById('bankChangesList');
   list.innerHTML = '';
-  for (const [bank, change] of Object.entries(changes)) {
+
+  for (const [bank, change] of Object.entries(bankChanges)) {
     const row = document.createElement('div');
     row.className = 'bank-row';
     row.innerHTML = `
       <span class="bank-name">${bank}</span>
-      <span class="bank-change ${change > 0 ? 'positive' : change < 0 ? 'negative' : 'neutral'}">${change.toFixed(2)}</span>
+      <span class="bank-change ${change > 0 ? 'positive' : change < 0 ? 'negative' : 'neutral'}">
+        ${change.toFixed(2)}
+      </span>
     `;
     list.appendChild(row);
   }
 }
 
 
+function updateSummary(data = mobileEntries) {
+  let income = 0;
+  let expenses = 0;
+  data.forEach(e => {
+    const amt = parseFloat(e.amount);
+    if (e.type.toLowerCase() === 'income') income += amt;
+    else if (e.type.toLowerCase() === 'expense') expenses += amt;
+  });
 
-
-
+  document.getElementById('summaryIncome').textContent = income.toFixed(2);
+  document.getElementById('summaryExpenses').textContent = expenses.toFixed(2);
+  document.getElementById('summaryBalance').textContent = (income - expenses).toFixed(2);
+}
 
 
   function getFormData() {
