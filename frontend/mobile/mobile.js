@@ -120,28 +120,26 @@ async function fetchMobileEntries() {
 
 
 
+// ✅ Populate a single <select> with values + Choices.js
 function populateSelect(id, values) {
   const select = document.getElementById(id);
   if (!select) return;
 
-  // Destroy existing instance cleanly
-  if (window.ChoicesInstances?.[id]) {
+  // Destroy any previous instance
+  if (window.ChoicesInstances[id]) {
     window.ChoicesInstances[id].destroy();
   }
 
-  // Clear existing options
+  // Clear and add "All" option
   select.innerHTML = '';
+  const allOption = new Option('All', 'All', true, true); // true, true selects it
+  select.add(allOption);
 
-  // ✅ Do NOT preselect "All" — just add it as a selectable item
-  const allOption = new Option('All', 'All');
-  select.appendChild(allOption);
-
-  // Add the rest
   [...values].sort().forEach(val => {
-    select.appendChild(new Option(val, val));
+    const opt = new Option(val, val);
+    select.add(opt);
   });
 
-  // ✅ Create instance with placeholder (only works if nothing is selected)
   const instance = new Choices(select, {
     removeItemButton: true,
     shouldSort: false,
@@ -152,13 +150,14 @@ function populateSelect(id, values) {
 
   window.ChoicesInstances[id] = instance;
 
-  // ✅ Reset selection to nothing to show placeholder
-  instance.clearStore();
+  // ✅ Manually select "All"
+  instance.setChoiceByValue('All');
 
-  // Hook up change event
+  // Always hook listener freshly
   select.removeEventListener('change', applyMobileFilters);
   select.addEventListener('change', applyMobileFilters);
 }
+
 
 function populateFilterOptions(entries) {
   const categories = new Set();
