@@ -240,11 +240,10 @@ function renderMobileEntries(entries) {
 function getSelectedValues(id) {
   const values = window.ChoicesInstances[id]?.getValue(true) || [];
 
-  // If only "All" is selected → allow all
-  if (values.length === 1 && values[0] === 'All') return [];
+  // Always remove 'All' if other values are selected
+  const filtered = values.filter(v => v !== 'All');
 
-  // If "All" + others selected → remove 'All'
-  return values.filter(v => v !== 'All');
+  return filtered.length === 0 ? [] : filtered;
 }
 
 function applyMobileFilters() {
