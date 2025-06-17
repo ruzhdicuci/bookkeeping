@@ -231,13 +231,9 @@ function renderMobileEntries(entries) {
 
 function getSelectedValues(id) {
   const values = window.ChoicesInstances[id]?.getValue(true) || [];
+  const clean = values.filter(v => v !== 'All');
 
-  if (values.length === 0 || (values.length === 1 && values[0] === 'All')) {
-    return null; // allow all
-  }
-
-  // Remove "All" if other values are also selected
-  return values.filter(v => v !== 'All');
+  return clean.length === 0 ? null : clean;
 }
 
 // ✅ Apply filters to entries
@@ -257,18 +253,17 @@ function applyMobileFilters() {
     selectedBanks, selectedPersons, selectedTypes, selectedStatuses
   });
 
-  const filtered = mobileEntries.filter(e => {
-    return (
-      (!selectedMonths || selectedMonths.includes(e.date?.slice(0, 7))) &&
-      (!selectedCategories || selectedCategories.includes(e.category)) &&
-      (!selectedCurrencies || selectedCurrencies.includes(e.currency)) &&
-      (!selectedBanks || selectedBanks.includes(e.bank)) &&
-      (!selectedPersons || selectedPersons.includes(e.person)) &&
-      (!selectedTypes || selectedTypes.includes(e.type)) &&
-      (!selectedStatuses || selectedStatuses.includes(e.status))
-    );
-  });
-
+ const filtered = mobileEntries.filter(e => {
+  return (
+    (!selectedMonths || selectedMonths.includes(e.date?.slice(0, 7))) &&
+    (!selectedCategories || selectedCategories.includes(e.category)) &&
+    (!selectedCurrencies || selectedCurrencies.includes(e.currency)) &&
+    (!selectedBanks || selectedBanks.includes(e.bank)) &&
+    (!selectedPersons || selectedPersons.includes(e.person)) &&
+    (!selectedTypes || selectedTypes.includes(e.type)) &&
+    (!selectedStatuses || selectedStatuses.includes(e.status))
+  );
+});
   console.log(`✅ Filtered entries: ${filtered.length}`);
   renderMobileEntries(filtered);
   updateSummary(filtered);
