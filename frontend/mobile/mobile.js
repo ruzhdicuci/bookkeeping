@@ -120,26 +120,28 @@ async function fetchMobileEntries() {
 
 
 
-// ✅ Populate a single <select> with values + Choices.js
 function populateSelect(id, values) {
   const select = document.getElementById(id);
   if (!select) return;
 
-  // Destroy any previous instance
-  if (window.ChoicesInstances[id]) {
+  // Destroy existing instance cleanly
+  if (window.ChoicesInstances?.[id]) {
     window.ChoicesInstances[id].destroy();
   }
 
-  // Clear and add "All" option
+  // Clear existing options
   select.innerHTML = '';
-  const allOption = new Option('All', 'All', true, true); // true, true selects it
-  select.add(allOption);
 
+  // ✅ Do NOT preselect "All" — just add it as a selectable item
+  const allOption = new Option('All', 'All');
+  select.appendChild(allOption);
+
+  // Add the rest
   [...values].sort().forEach(val => {
-    const opt = new Option(val, val);
-    select.add(opt);
+    select.appendChild(new Option(val, val));
   });
 
+  // ✅ Create instance with placeholder (only works if nothing is selected)
   const instance = new Choices(select, {
     removeItemButton: true,
     shouldSort: false,
@@ -150,14 +152,13 @@ function populateSelect(id, values) {
 
   window.ChoicesInstances[id] = instance;
 
-  // ✅ Manually select "All"
-  instance.setChoiceByValue('All');
+  // ✅ Reset selection to nothing to show placeholder
+  instance.clearStore();
 
-  // Always hook listener freshly
+  // Hook up change event
   select.removeEventListener('change', applyMobileFilters);
   select.addEventListener('change', applyMobileFilters);
 }
-
 
 function populateFilterOptions(entries) {
   const categories = new Set();
@@ -235,10 +236,14 @@ function renderMobileEntries(entries) {
 }
 
 function getSelectedValues(id) {
-  const values = window.ChoicesInstances[id]?.getValue(true) || [];
+  const instance = window.ChoicesInstances[id];
+  if (!instance) return [];
 
-  // Remove 'All' from the list completely
-  return values.filter(v => v !== 'All');
+  const values = instance.getValue(true); // returns array of values
+  if (values.includes('All')) {
+    return []; // means allow all
+  }
+  return values;
 }
 // ✅ Apply filters to entries
 function applyMobileFilters() {

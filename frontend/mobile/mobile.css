@@ -337,7 +337,7 @@ form#entry-form button {
 /* Ensure parent .choices doesn't override radius */
 .choices {
   border-radius: 8px !important;
-  overflow: hidden !important;
+
 }
 /* Make dropdown search bar consistent */
 .choices__input {
