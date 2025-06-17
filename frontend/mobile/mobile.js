@@ -25,33 +25,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Filter configuration
 // Filter configuration
-const filterDropdowns = [
-  { id: 'monthFilter', placeholder: 'Select Months' },
-  { id: 'categoryFilterMobile', placeholder: 'Select Categories' },
-  { id: 'typeFilterMobile', placeholder: 'Select Types' },
-  { id: 'currencyFilterMobile', placeholder: 'Select Currencies' },
-  { id: 'bankFilterMobile', placeholder: 'Select Banks' },
+const filters = [
+  { id: 'monthFilter', placeholder: 'Select Month' },
+  { id: 'categoryFilterMobile', placeholder: 'Select Category' },
+  { id: 'typeFilterMobile', placeholder: 'Select Type' },
+  { id: 'currencyFilterMobile', placeholder: 'Select Currency' },
+  { id: 'bankFilterMobile', placeholder: 'Select Bank' },
   { id: 'statusFilterMobile', placeholder: 'Select Status' },
-  { id: 'personFilterMobile', placeholder: 'Select Persons' }
+  { id: 'personFilterMobile', placeholder: 'Select Person' }
 ];
 
-// ✅ Use correct variable name here
-filterDropdowns.forEach(({ id, placeholder }) => {
+filters.forEach(({ id, placeholder }) => {
   const el = document.getElementById(id);
   if (!el) return;
-  if (window.ChoicesInstances[id]) window.ChoicesInstances[id].destroy();
+
+  const existing = window.ChoicesInstances?.[id];
+  if (existing && typeof existing.destroy === 'function') {
+    existing.destroy();
+  }
+
   const instance = new Choices(el, {
     removeItemButton: true,
     shouldSort: false,
     placeholder: true,
     placeholderValue: placeholder,
-    searchPlaceholderValue: 'Search...'
+    searchPlaceholderValue: `Search ${placeholder.toLowerCase()}`
   });
+
   window.ChoicesInstances[id] = instance;
   el.addEventListener('change', applyMobileFilters);
 });
-
-
 
   // ✅ These toggle buttons must also be inside DOMContentLoaded:
   document.getElementById('toggleAdvancedFilters')?.addEventListener('click', () => {
@@ -453,3 +456,5 @@ for (const [bank, change] of Object.entries(bankChanges)) {
 
 
 } // ✅ <--- THIS was missing
+
+
