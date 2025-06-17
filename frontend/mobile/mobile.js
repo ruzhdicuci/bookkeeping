@@ -191,10 +191,8 @@ function populateFilterOptions(entries) {
 // ✅ Define renderMobileEntries first
 function renderMobileEntries(entries) {
     console.log('📦 Rendering entries:', entries.length);
-
-  mobileEntries = entries;
+  const mobileEntryList = document.getElementById('mobileEntryList');
   mobileEntryList.innerHTML = '';
-
   entries.forEach((entry, index) => {
     const li = document.createElement('li');
     const amountClass = entry.type.toLowerCase() === 'income' ? 'income' : 'expense';
@@ -240,10 +238,10 @@ function renderMobileEntries(entries) {
 function getSelectedValues(id) {
   const values = window.ChoicesInstances[id]?.getValue(true) || [];
 
-  // If All is selected (alone or with others), skip filtering
-  if (values.includes('All')) return null;
+  // If "All" is selected along with other values, ignore "All"
+  const filtered = values.filter(v => v !== 'All');
 
-  return values;
+  return filtered.length === 0 ? [] : filtered;
 }
 function applyMobileFilters() {
   console.log("📌 applyMobileFilters triggered");
