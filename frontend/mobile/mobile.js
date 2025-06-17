@@ -240,8 +240,8 @@ function renderMobileEntries(entries) {
 function getSelectedValues(id) {
   const values = window.ChoicesInstances[id]?.getValue(true) || [];
 
-  // If All is selected (alone or with others), skip filtering
-  if (values.includes('All')) return null;
+  // If nothing selected or only "All", skip filtering
+  if (values.length === 0 || values.includes('All')) return null;
 
   return values;
 }
