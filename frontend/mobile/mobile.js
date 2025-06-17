@@ -34,21 +34,21 @@ const filterDropdowns = [
   { id: 'personFilterMobile', placeholder: 'Select Persons' }
 ];
 
-
-  filters.forEach(({ id, placeholder }) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    if (window.ChoicesInstances[id]) window.ChoicesInstances[id].destroy();
-    const instance = new Choices(el, {
-      removeItemButton: true,
-      shouldSort: false,
-      placeholder: true,
-      placeholderValue: placeholder,
-      searchPlaceholderValue: 'Search...'
-    });
-    window.ChoicesInstances[id] = instance;
-    el.addEventListener('change', applyMobileFilters);
+// ✅ Use correct variable name here
+filterDropdowns.forEach(({ id, placeholder }) => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (window.ChoicesInstances[id]) window.ChoicesInstances[id].destroy();
+  const instance = new Choices(el, {
+    removeItemButton: true,
+    shouldSort: false,
+    placeholder: true,
+    placeholderValue: placeholder,
+    searchPlaceholderValue: 'Search...'
   });
+  window.ChoicesInstances[id] = instance;
+  el.addEventListener('change', applyMobileFilters);
+});
 
 
 // Initialize Choices
