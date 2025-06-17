@@ -192,7 +192,7 @@ function populateFilterOptions(entries) {
 function renderMobileEntries(entries) {
     console.log('📦 Rendering entries:', entries.length);
 
-  mobileEntries = entries;
+  const mobileEntryList = document.getElementById('mobileEntryList');
   mobileEntryList.innerHTML = '';
 
   entries.forEach((entry, index) => {
@@ -240,12 +240,11 @@ function renderMobileEntries(entries) {
 function getSelectedValues(id) {
   const values = window.ChoicesInstances[id]?.getValue(true) || [];
 
-  // Always remove 'All' if other values are selected
-  const filtered = values.filter(v => v !== 'All');
+  // If All is selected (alone or with others), skip filtering
+  if (values.includes('All')) return null;
 
-  return filtered.length === 0 ? [] : filtered;
+  return values;
 }
-
 function applyMobileFilters() {
   console.log("📌 applyMobileFilters triggered");
 
