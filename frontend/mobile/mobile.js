@@ -192,7 +192,7 @@ function populateFilterOptions(entries) {
 function renderMobileEntries(entries) {
     console.log('📦 Rendering entries:', entries.length);
 
-  const mobileEntryList = document.getElementById('mobileEntryList');
+  mobileEntries = entries;
   mobileEntryList.innerHTML = '';
 
   entries.forEach((entry, index) => {
