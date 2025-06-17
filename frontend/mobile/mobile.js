@@ -242,7 +242,7 @@ order.forEach(label => {
             </span>
           </div>
           <div class="buttons">
-            <button onclick="editMobileEntry(${index})">✏️</button>
+           <button onclick='editMobileEntryById("${entry._id}")'>✏️</button>
             <button onclick="deleteMobileEntry(${index})">🗑️</button>
             <button onclick="duplicateMobileEntry(${index})">📄</button>
           </div>
@@ -405,21 +405,26 @@ function updateSummary(data = mobileEntries) {
   }
 
  if (entryForm) {
-  entryForm.addEventListener('submit', e => {
-    e.preventDefault();
-    const data = getFormData();
-    const index = entryForm.dataset.editIndex;
-    if (index !== undefined) {
-      mobileEntries[parseInt(index)] = data;
-      delete entryForm.dataset.editIndex;
-      showToast("Entry updated");
-    } else {
-      mobileEntries.push(data);
-      showToast("Entry added");
+entryForm.addEventListener('submit', e => {
+  e.preventDefault();
+  const data = getFormData();
+  const editId = entryForm.dataset.editIndex;
+
+  if (editId) {
+    const index = mobileEntries.findIndex(e => e._id === editId);
+    if (index !== -1) {
+      mobileEntries[index] = data;
     }
-    clearForm();
-    renderMobileEntries(mobileEntries);
-  });
+    delete entryForm.dataset.editIndex;
+    showToast("Entry updated");
+  } else {
+    mobileEntries.push(data);
+    showToast("Entry added");
+  }
+
+  clearForm();
+  renderMobileEntries(mobileEntries);
+});
 }
 
   ['descFilter', 'typeFilter', 'dateFilter'].forEach(id => {
@@ -499,3 +504,19 @@ function getRelativeDateLabel(dateStr) {
   if (diffDays <= 14) return 'Last Week';
   return 'Older';
 }
+
+window.editMobileEntryById = function (id) {
+  const entry = mobileEntries.find(e => e._id === id);
+  if (!entry) {
+    console.error("❌ Entry not found for ID:", id);
+    return;
+  }
+
+  Object.entries(entry).forEach(([key, val]) => {
+    const el = document.getElementById(`new${key.charAt(0).toUpperCase() + key.slice(1)}`);
+    if (el) el.value = val;
+  });
+
+  entryForm.dataset.editIndex = id;
+  showToast("Editing entry...");
+};
