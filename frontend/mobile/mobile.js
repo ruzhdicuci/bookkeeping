@@ -1,35 +1,39 @@
-// ✅ Token & form check
-const token = localStorage.getItem('token');
-let entryForm;
-let mobileEntries = [];
-if (!token) window.location.href = '/bookkeeping/client/login.html';
+// mobile.js
 
-// ✅ Toast helper
+const token = localStorage.getItem('token');
+let entryForm; // declared globally
+  let mobileEntries = [];
+if (!token) {
+  window.location.href = '/bookkeeping/client/login.html';
+}
+
 function showToast(message) {
   const toast = document.getElementById('toast');
   toast.textContent = message;
   toast.style.opacity = '1';
-  setTimeout(() => { toast.style.opacity = '0'; }, 2000);
+  setTimeout(() => {
+    toast.style.opacity = '0';
+  }, 2000);
 }
 
-// ✅ Choices state
-window.ChoicesInstances = {};
-
-// ✅ Run after DOM is ready
+ window.ChoicesInstances = {};
 document.addEventListener('DOMContentLoaded', () => {
   entryForm = document.getElementById('entry-form');
   const mobileEntryList = document.getElementById('mobileEntryList');
 
-  // 🔘 Initialize Choices for dropdowns
-  const filters = [
-    { id: 'monthFilter', placeholder: 'Select Months' },
-    { id: 'categoryFilterMobile', placeholder: 'Select Categories' },
-    { id: 'typeFilterMobile', placeholder: 'Select Types' },
-    { id: 'currencyFilterMobile', placeholder: 'Select Currencies' },
-    { id: 'bankFilterMobile', placeholder: 'Select Banks' },
-    { id: 'statusFilterMobile', placeholder: 'Select Status' },
-    { id: 'personFilterMobile', placeholder: 'Select Persons' }
-  ];
+ 
+
+// Filter configuration
+const filterDropdowns = [
+  { id: 'monthFilter', placeholder: 'Select Months' },
+  { id: 'categoryFilterMobile', placeholder: 'Select Categories' },
+  { id: 'typeFilterMobile', placeholder: 'Select Types' },
+  { id: 'currencyFilterMobile', placeholder: 'Select Currencies' },
+  { id: 'bankFilterMobile', placeholder: 'Select Banks' },
+  { id: 'statusFilterMobile', placeholder: 'Select Status' },
+  { id: 'personFilterMobile', placeholder: 'Select Persons' }
+];
+
 
   filters.forEach(({ id, placeholder }) => {
     const el = document.getElementById(id);
@@ -46,26 +50,67 @@ document.addEventListener('DOMContentLoaded', () => {
     el.addEventListener('change', applyMobileFilters);
   });
 
-  // 🧩 UI toggles
+
+// Initialize Choices
+filterDropdowns.forEach(({ id, placeholder }) => {
+  const el = document.getElementById(id);
+  if (el) {
+    // Avoid double init
+    if (window.ChoicesInstances[id]) {
+      window.ChoicesInstances[id].destroy();
+    }
+
+    const instance = new Choices(el, {
+      removeItemButton: true,
+      shouldSort: false,
+      placeholder: true,
+      placeholderValue: placeholder,
+      searchPlaceholderValue: 'Search...'
+    });
+
+    window.ChoicesInstances[id] = instance;
+
+    // Hook to your filter logic
+    el.addEventListener('change', applyMobileFilters);
+  }
+});
+
+  // ✅ These toggle buttons must also be inside DOMContentLoaded:
   document.getElementById('toggleAdvancedFilters')?.addEventListener('click', () => {
     document.getElementById('advancedFilters')?.classList.toggle('hidden');
   });
+
   document.getElementById('toggleEntryForm')?.addEventListener('click', () => {
     document.getElementById('entry-form')?.classList.toggle('hidden');
   });
+
   document.getElementById('toggleFilters')?.addEventListener('click', () => {
     document.getElementById('filters')?.classList.toggle('hidden');
   });
+
   document.getElementById('toggleTheme')?.addEventListener('click', () => {
     document.body.classList.toggle('dark');
   });
-  window.toggleMobileSummary = () => document.getElementById('mobileSummaryCard')?.classList.toggle('hidden');
-  window.toggleMobileAverage = () => document.getElementById('mobileAverageCard')?.classList.toggle('hidden');
-  window.toggleMobileBank = () => document.getElementById('mobileBankCard')?.classList.toggle('hidden');
 
-  fetchMobileEntries(); // ⬅️ Start the app
+  // ✅ Also define these window toggle helpers here
+  window.toggleMobileSummary = function () {
+    document.getElementById('mobileSummaryCard').classList.toggle('hidden');
+  };
+  window.toggleMobileAverage = function () {
+    document.getElementById('mobileAverageCard').classList.toggle('hidden');
+  };
+  window.toggleMobileBank = function () {
+    document.getElementById('mobileBankCard').classList.toggle('hidden');
+  };
+
+  // ✅ Finally, fetch entries
+  fetchMobileEntries(); // This MUST stay inside DOMContentLoaded
 });
 
+
+
+
+  // ✅ Now fetchMobileEntries AFTER renderMobileEntries
 // ✅ Load data from API
 async function fetchMobileEntries() {
   try {
@@ -92,6 +137,7 @@ function getSelectedValues(id) {
   const values = window.ChoicesInstances[id]?.getValue(true) || [];
   return values.includes('All') ? null : values;
 }
+
 
 // ✅ Populate Choices.js with options
 function populateSelect(id, values) {
@@ -153,6 +199,7 @@ function applyMobileFilters() {
   updateAverages(filtered);
   updateBankChanges(filtered);
 }
+
 
 // ✅ Render entries
 function renderMobileEntries(entries) {
@@ -242,3 +289,137 @@ function updateBankChanges(entries) {
     list.appendChild(row);
   }
 }
+
+
+
+
+
+
+
+  function getFormData() {
+    return {
+      date: document.getElementById('newDate').value,
+      description: document.getElementById('newDescription').value,
+      amount: document.getElementById('newAmount').value,
+      currency: document.getElementById('newCurrency').value,
+      type: document.getElementById('newType').value,
+      person: document.getElementById('newPerson').value,
+      bank: document.getElementById('newBank').value,
+      category: document.getElementById('newCategory').value,
+      status: document.getElementById('newStatus').value
+    };
+  }
+
+  function clearForm() {
+    entryForm.reset();
+  }
+
+  window.editMobileEntry = function(index) {
+    const entry = mobileEntries[index];
+    Object.entries(entry).forEach(([key, val]) => {
+      const el = document.getElementById(`new${key.charAt(0).toUpperCase() + key.slice(1)}`);
+      if (el) el.value = val;
+    });
+    entryForm.dataset.editIndex = index;
+    showToast("Editing entry...");
+  }
+
+ window.deleteMobileEntry = function(index) {
+  const confirmed = confirm("Are you sure you want to delete this entry?");
+  if (!confirmed) return;
+
+  mobileEntries.splice(index, 1);
+  renderMobileEntries(mobileEntries);
+  showToast("Entry deleted");
+};
+
+  window.duplicateMobileEntry = function(index) {
+    const copy = { ...mobileEntries[index] };
+    delete copy._id;
+    copy.description += ' (Copy)';
+    mobileEntries.push(copy);
+    renderMobileEntries(mobileEntries);
+    showToast("✅ Entry duplicated");
+  }
+
+ if (entryForm) {
+  entryForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const data = getFormData();
+    const index = entryForm.dataset.editIndex;
+    if (index !== undefined) {
+      mobileEntries[parseInt(index)] = data;
+      delete entryForm.dataset.editIndex;
+      showToast("Entry updated");
+    } else {
+      mobileEntries.push(data);
+      showToast("Entry added");
+    }
+    clearForm();
+    renderMobileEntries(mobileEntries);
+  });
+}
+
+  ['descFilter', 'typeFilter', 'dateFilter'].forEach(id => {
+    document.getElementById(id)?.addEventListener('input', () => {
+      const value = document.getElementById(id).value.toLowerCase();
+      document.querySelectorAll('#mobileEntryList .mobile-entry').forEach(li => {
+        li.style.display = li.textContent.toLowerCase().includes(value) ? '' : 'none';
+      });
+    });
+  });
+
+
+
+
+
+
+
+// 🔁 You already calculate these in dashboard.js; just reuse values from entries
+function populateMobileCards(entries) {
+  const months = [...new Set(entries.map(e => e.date?.slice(0, 7)))].filter(Boolean);
+  let income = 0, expense = 0;
+  const bankChanges = {};
+
+  entries.forEach(e => {
+    const amount = parseFloat(e.amount) || 0;
+    if (e.type === 'Income') income += amount;
+    if (e.type === 'Expense') expense += amount;
+
+    const bank = e.bank;
+    if (!bankChanges[bank]) bankChanges[bank] = 0;
+    bankChanges[bank] += (e.type === 'Income' ? amount : -amount);
+  });
+
+  const avgIncome = income / months.length;
+  const avgExpense = expense / months.length;
+  const avgBalance = avgIncome - avgExpense;
+
+  // Summary
+  document.getElementById('summaryIncome').textContent = income.toFixed(2);
+  document.getElementById('summaryExpenses').textContent = expense.toFixed(2);
+  document.getElementById('summaryBalance').textContent = (income - expense).toFixed(2);
+
+  // Averages
+  document.getElementById('avgIncome').textContent = avgIncome.toFixed(2);
+  document.getElementById('avgExpenses').textContent = avgExpense.toFixed(2);
+  document.getElementById('avgBalance').textContent = avgBalance.toFixed(2);
+
+  // Bank changes
+const list = document.getElementById('bankChangesList');
+list.innerHTML = '';
+
+for (const [bank, change] of Object.entries(bankChanges)) {
+  const row = document.createElement('div');
+  row.className = 'bank-row';
+  row.innerHTML = `
+    <span class="bank-name">${bank}</span>
+    <span class="bank-change ${change > 0 ? 'positive' : change < 0 ? 'negative' : 'neutral'}">
+      ${change.toFixed(2)}
+    </span>
+  `;
+  list.appendChild(row);
+}
+
+
+} // ✅ <--- THIS was missing
