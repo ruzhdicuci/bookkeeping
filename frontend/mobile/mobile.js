@@ -240,12 +240,11 @@ function renderMobileEntries(entries) {
 function getSelectedValues(id) {
   const values = window.ChoicesInstances[id]?.getValue(true) || [];
 
-  // Always remove 'All' if other values are selected
+  // If "All" is selected along with other values, ignore "All"
   const filtered = values.filter(v => v !== 'All');
 
   return filtered.length === 0 ? [] : filtered;
 }
-
 function applyMobileFilters() {
   console.log("📌 applyMobileFilters triggered");
 
@@ -257,7 +256,7 @@ function applyMobileFilters() {
   const selectedTypes = getSelectedValues('typeFilterMobile');
   const selectedStatuses = getSelectedValues('statusFilterMobile');
 
-  console.log("🔍 Filter values:", {
+  console.log("🧩 Filter values:", {
     selectedMonths,
     selectedCategories,
     selectedCurrencies,
@@ -268,7 +267,7 @@ function applyMobileFilters() {
   });
 
   const filtered = mobileEntries.filter(e => {
-    const match =
+    const match = 
       (selectedMonths.length === 0 || selectedMonths.includes(e.date?.slice(0, 7))) &&
       (selectedCategories.length === 0 || selectedCategories.includes(e.category)) &&
       (selectedCurrencies.length === 0 || selectedCurrencies.includes(e.currency)) &&
@@ -278,13 +277,24 @@ function applyMobileFilters() {
       (selectedStatuses.length === 0 || selectedStatuses.includes(e.status));
 
     if (!match) {
-      console.log("❌ Filtered out:", e);
+      console.log("❌ Filtered out:", {
+        person: e.person,
+        category: e.category,
+        type: e.type,
+        currency: e.currency,
+        status: e.status,
+        bank: e.bank,
+        month: e.date?.slice(0, 7),
+        description: e.description
+      });
     }
 
     return match;
   });
 
   console.log(`✅ Filtered entries: ${filtered.length}`);
+  console.log("📦 Rendering entries:", filtered.length);
+
   renderMobileEntries(filtered);
   updateSummary(filtered);
   updateAverages(filtered);
