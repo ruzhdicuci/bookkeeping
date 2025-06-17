@@ -237,16 +237,16 @@ function renderMobileEntries(entries) {
   updateBankChanges(entries);
 }
 
-
 function getSelectedValues(id) {
   const values = window.ChoicesInstances[id]?.getValue(true) || [];
 
-  // If only "All" is selected → treat as no filtering
+  // If only "All" is selected → allow all
   if (values.length === 1 && values[0] === 'All') return [];
 
-  // If "All" and others selected → ignore "All"
+  // If "All" + others selected → remove 'All'
   return values.filter(v => v !== 'All');
 }
+
 function applyMobileFilters() {
   console.log("📌 applyMobileFilters triggered");
 
@@ -276,7 +276,6 @@ function applyMobileFilters() {
   updateAverages(filtered);
   updateBankChanges(filtered);
 }
-
 
 function updateAverages(entries) {
   const months = [...new Set(entries.map(e => e.date?.slice(0, 7)))].filter(Boolean);
