@@ -243,9 +243,9 @@ function getSelectedValues(id) {
 
   return filtered.length === 0 ? [] : filtered;
 }
-function applyMobileFilters() {
-  console.log("📌 applyMobileFilters triggered");
 
+// ✅ Apply filters to entries
+function applyMobileFilters() {
   const selectedMonths = getSelectedValues('monthFilter');
   const selectedCategories = getSelectedValues('categoryFilterMobile');
   const selectedCurrencies = getSelectedValues('currencyFilterMobile');
@@ -254,50 +254,24 @@ function applyMobileFilters() {
   const selectedTypes = getSelectedValues('typeFilterMobile');
   const selectedStatuses = getSelectedValues('statusFilterMobile');
 
-  console.log("🧩 Filter values:", {
-    selectedMonths,
-    selectedCategories,
-    selectedCurrencies,
-    selectedBanks,
-    selectedPersons,
-    selectedTypes,
-    selectedStatuses
-  });
-
   const filtered = mobileEntries.filter(e => {
-    const match = 
-      (selectedMonths.length === 0 || selectedMonths.includes(e.date?.slice(0, 7))) &&
-      (selectedCategories.length === 0 || selectedCategories.includes(e.category)) &&
-      (selectedCurrencies.length === 0 || selectedCurrencies.includes(e.currency)) &&
-      (selectedBanks.length === 0 || selectedBanks.includes(e.bank)) &&
-      (selectedPersons.length === 0 || selectedPersons.includes(e.person)) &&
-      (selectedTypes.length === 0 || selectedTypes.includes(e.type)) &&
-      (selectedStatuses.length === 0 || selectedStatuses.includes(e.status));
-
-    if (!match) {
-      console.log("❌ Filtered out:", {
-        person: e.person,
-        category: e.category,
-        type: e.type,
-        currency: e.currency,
-        status: e.status,
-        bank: e.bank,
-        month: e.date?.slice(0, 7),
-        description: e.description
-      });
-    }
-
+    const match =
+      (!selectedMonths || selectedMonths.includes(e.date?.slice(0, 7))) &&
+      (!selectedCategories || selectedCategories.includes(e.category)) &&
+      (!selectedCurrencies || selectedCurrencies.includes(e.currency)) &&
+      (!selectedBanks || selectedBanks.includes(e.bank)) &&
+      (!selectedPersons || selectedPersons.includes(e.person)) &&
+      (!selectedTypes || selectedTypes.includes(e.type)) &&
+      (!selectedStatuses || selectedStatuses.includes(e.status));
     return match;
   });
-
-  console.log(`✅ Filtered entries: ${filtered.length}`);
-  console.log("📦 Rendering entries:", filtered.length);
 
   renderMobileEntries(filtered);
   updateSummary(filtered);
   updateAverages(filtered);
   updateBankChanges(filtered);
 }
+
 
 function updateAverages(entries) {
   const months = [...new Set(entries.map(e => e.date?.slice(0, 7)))].filter(Boolean);
