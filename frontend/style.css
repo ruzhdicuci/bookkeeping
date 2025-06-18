@@ -2003,27 +2003,6 @@ font-weight: bold;
   min-width: 100%;
 }
 
-.slider-dots {
-  display: flex;
-  justify-content: center;
-  margin-top: 8px;
-  
-}
-
-.slider-dot {
-  height: 8px;
-  width: 8px;
-  background-color: #bbb;
-  border-radius: 50%;
-  display: inline-block;
-  margin: 0 4px;
-  cursor: pointer;
-  margin-bottom: 10px;
-}
-
-.slider-dot.active {
-  background-color: #333;
-}
 
 .scroll-toggle-wrapper {
   position: fixed;
@@ -2072,4 +2051,35 @@ font-weight: bold;
 body:hover #scrollBtn1 {
   opacity: 1;
   pointer-events: auto;
+}
+
+.credit-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem; /* Smaller font for responsiveness */
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.credit-table th,
+.credit-table td {
+  padding: 0.4rem;
+}
+
+.credit-table input[type="number"] {
+  width: 80px;
+  text-align: center;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 600px) {
+  .credit-table input[type="number"] {
+    width: 100%;
+  }
+
+  .credit-table th,
+  .credit-table td {
+    font-size: 0.75rem;
+    padding: 0.3rem;
+  }
 }

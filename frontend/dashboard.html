@@ -232,59 +232,57 @@ document.addEventListener("DOMContentLoaded", () => {
  
 
 
- <div class="credit-slider-wrapper">
-  <div class="credit-slider" id="creditSlider">
-   
+<div class="credit-section-wrapper">
+  <div id="creditLimitTable" style="margin-top: 0.7rem;">
+    
+    <!-- First row: Limit inputs -->
+    <table class="th4">
+      <thead>
+        <tr>
+          <th>UBS Master</th>
+          <th>Corner Master</th>
+          <th>Post Master</th>
+          <th>Cembra</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="th5"><input type="number" id="creditLimit-ubs" value="3000" /></td>
+          <td class="th5"><input type="number" id="creditLimit-corner" value="9900" /></td>
+          <td class="th5"><input type="number" id="creditLimit-pfm" value="1000" /></td>
+          <td class="th5"><input type="number" id="creditLimit-cembra" value="10000" /></td>
+        </tr>
+      </tbody>
+    </table>
 
-<!-- 💳 Kredit Overview Table -->
-<div id="creditLimitTable" style="margin-top: 0.7rem; overflow-x: auto;">
-  <table class="th4" style="width: 100%; border-collapse: collapse;  text-align: center; font-size: 0.95rem;">
-    <thead class="th4" >
-      <tr>
-        <th class="th4" style="padding: 0.75rem; border: none;">&nbsp;</th>
-        <th class="th4" style="border: none;">UBS Master</th>
-        <th class="th4" style="border: none;">Corner Master</th>
-        <th class="th4" style="border: none;">Post Master</th>
-        <th class="th4" style="border: none;">Cembra</th>
-        <th class="th4" style="border: none;">Total Limit</th>
-        <th class="th4" style="border: none;">Limit Minus</th>
-        <th class="th4" style="border: none;">Mbetja</th>
-        <th class="th4" style="border: none;">Mbetja + Total Plus</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
- <td style="text-align: left; font-size: 18px;">Limit</td>
-<td class="th5"><input type="number" id="creditLimit-ubs" value="3000" /></td>
-<td class="th5"><input type="number" id="creditLimit-corner" value="9900" /></td>
-<td class="th5"><input type="number" id="creditLimit-pfm" value="1000" /></td>
-<td class="th5"><input type="number" id="creditLimit-cembra" value="10000" /></td>
-<td class="th5"><input type="number" readonly id="totalLimit" /></td>
-<td class="th5"><input type="number" readonly id="totalUsed" /></td>
-<td class="th5"><input type="number" readonly id="diffUsed" /></td>
-<td class="th5"><input type="number" readonly id="limitPlusTotal" /></td>
+    <!-- Second row: Calculated outputs -->
+    <table class="th4">
+      <thead>
+        <tr>
+          <th>Total Limit</th>
+          <th>Limit Minus</th>
+          <th>Mbetja</th>
+          <th>Mbetja + Total Plus</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="th5"><input type="number" readonly id="totalLimit" /></td>
+          <td class="th5"><input type="number" readonly id="totalUsed" /></td>
+          <td class="th5"><input type="number" readonly id="diffUsed" /></td>
+          <td class="th5"><input type="number" readonly id="limitPlusTotal" /></td>
+        </tr>
+      </tbody>
+    </table>
 
-      </tr>
-    </tbody>
-  </table>
-  <div style="text-align: left; margin-top: 0.5rem;">
-<div class="credit-controls">
-  <div class="left-buttons">
-    <button class="save1" onclick="saveCreditLimits()">Save</button>
-    <button class="lock1" id="lockBtn">Lock</button>
-    <button class="lock1" id="unlockBtn" style="display:none;">Unlock</button>
+    <!-- Action buttons -->
+    <div style="text-align: left; margin-top: 0.5rem;">
+      <button class="save1" onclick="saveCreditLimits()">Save</button>
+      <button class="lock1" id="lockBtn">Lock</button>
+      <button class="lock1" id="unlockBtn" style="display:none;">Unlock</button>
+    </div>
+
   </div>
-
-  <div class="center-dots">
-    <div class="slider-dots" id="creditSliderDots"></div>
-  </div>
-</div>
-
-
-
-</div>
-
-</div>
 </div>
 
 
