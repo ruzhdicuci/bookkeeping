@@ -146,40 +146,96 @@ console.log("🏦 Bank headers found:", banks);
 
 
 function populateFilters() {
-  if (!entries || !Array.isArray(entries)) return;
+  if (!window.entries || !Array.isArray(window.entries)) return;
 
-  const uniqueMonths = [...new Set(entries.map(e => e.date?.slice(0, 7)))].filter(Boolean).sort();
-  const uniqueCategories = [...new Set(entries.map(e => e.category).filter(Boolean))].sort();
-  const uniqueBanks = [...new Set(entries.map(e => e.bank).filter(Boolean))].sort();
-  const uniquePersons = [...new Set(entries.map(e => e.person).filter(Boolean))].sort();
+  const months = [...new Set(entries.map(e => e.date?.slice(0, 7)))].sort();
+  const banks = [...new Set(entries.map(e => e.bank).filter(Boolean))];
+  const categories = [...new Set(entries.map(e => e.category).filter(Boolean))];
+  const persons = [...new Set(entries.map(e => e.person).filter(Boolean))];
 
-  const monthSelect = document.getElementById('monthFilter');
-  const categorySelect = document.getElementById('categoryFilter');
-  const bankSelect = document.getElementById('bankFilter');
-  const personSelect = document.getElementById('personFilter');
+// ✅ MONTH CHECKBOX FILTER
+const uniqueMonths = [...new Set(entries.map(e => e.date?.slice(0, 7)))].filter(Boolean).sort();
+const monthContainer = document.getElementById('monthOptions');
 
-  if (monthSelect) {
-    monthSelect.innerHTML = '<option value="All">All</option>' +
-      uniqueMonths.map(m => `<option value="${m}">${m}</option>`).join('');
+monthContainer.innerHTML = `
+  <label><input type="checkbox" id="selectAllMonths" checked /> <strong>All</strong></label>
+  <hr style="margin: 4px 0;">
+  ${uniqueMonths.map(m => `
+    <label>
+      <input type="checkbox" class="monthOption" value="${m}" checked />
+      ${m}
+    </label>
+  `).join('')}
+`;
+
+// ✅ Handle Select All
+document.getElementById('selectAllMonths').addEventListener('change', function () {
+  const allChecked = this.checked;
+  document.querySelectorAll('.monthOption').forEach(cb => cb.checked = allChecked);
+  renderEntries();
+  renderBankBalanceForm(); // ✅ update banks too
+});
+
+// ✅ Handle individual changes
+document.querySelectorAll('.monthOption').forEach(cb => {
+  cb.addEventListener('change', () => {
+    const all = document.querySelectorAll('.monthOption');
+    const checked = document.querySelectorAll('.monthOption:checked');
+    document.getElementById('selectAllMonths').checked = all.length === checked.length;
+
+    renderEntries();
+    renderBankBalanceForm(); // ✅ update banks too
+  });
+});
+
+  // ✅ Bank dropdown
+  const bankFilter = document.getElementById('bankFilter');
+  if (bankFilter) {
+    const prevBank = bankFilter.value;
+    bankFilter.innerHTML = `<option value="">All</option>` + banks.map(b => `<option value="${b}">${b}</option>`).join('');
+    bankFilter.value = banks.includes(prevBank) ? prevBank : "";
   }
 
-  if (categorySelect) {
-    categorySelect.innerHTML = '<option value="All">All</option>' +
-      uniqueCategories.map(c => `<option value="${c}">${c}</option>`).join('');
+  // ✅ Category dropdown
+  const categoryFilter = document.getElementById('categoryFilter');
+  if (categoryFilter) {
+    categoryFilter.innerHTML = `<option value="All">All</option>` + categories.map(c => `<option value="${c}">${c}</option>`).join('');
   }
 
-  if (bankSelect) {
-    bankSelect.innerHTML = '<option value="All">All</option>' +
-      uniqueBanks.map(b => `<option value="${b}">${b}</option>`).join('');
-  }
+  // ✅ Person checkboxes
+  const personOptions = document.getElementById('personOptions');
+  if (personOptions) {
+    personOptions.innerHTML = `
+      <div class="personOptionGroup">
+        <label><input type="checkbox" id="selectAllPersons" /> <strong>All</strong></label>
+        ${persons.map(p => `
+          <label>
+            <input type="checkbox" class="personOption" name="personFilter" value="${p}" checked />
+            ${p}
+          </label>
+        `).join('')}
+      </div>
+    `;
 
-  if (personSelect) {
-    personSelect.innerHTML = '<option value="All">All</option>' +
-      uniquePersons.map(p => `<option value="${p}">${p}</option>`).join('');
-  }
+    const selectAllBox = document.getElementById('selectAllPersons');
+    if (selectAllBox) {
+      selectAllBox.addEventListener('change', function () {
+        document.querySelectorAll('.personOption').forEach(cb => cb.checked = this.checked);
+        renderEntries();
+      });
+    }
 
-  console.log("✅ Populated filters (select only)");
+    document.querySelectorAll('.personOption').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const all = document.querySelectorAll('.personOption');
+        const checked = document.querySelectorAll('.personOption:checked');
+        if (selectAllBox) selectAllBox.checked = all.length === checked.length;
+        renderEntries();
+      });
+    });
+  }
 }
+
 function getDateLabel(dateStr) {
   const entryDate = new Date(dateStr);
   const today = new Date();

@@ -99,7 +99,7 @@
  </div>
 </div>
 </div>  
-    <div class="tooltip-wrapper">
+          <div class="tooltip-wrapper">
   <button class="reset-btn" onclick="resetFilters()">
     <span class="reset-icon">↩</span> 
   </button>
@@ -240,16 +240,16 @@
   </div>
 
 
-
+ <div class="sections3">
 
 <div  class="table-container">
 
   
   <div class="th2" id="bankBalanceTableContainer"></div>
-</div>
+</div></div>
  
 
-
+ <div class="sections4">
 <!-- 💳 Kredit Overview Table -->
 <div id="creditLimitTable" style="margin-top: 2rem; overflow-x: auto;">
   <table class="th4" style="width: 100%; border-collapse: collapse;  text-align: center; font-size: 0.95rem;">
@@ -290,7 +290,7 @@
 </div>
 
 
-
+</div>
    
 
         
@@ -311,27 +311,80 @@
 </div>
 
 
-<div id="monthlyAverageCard" style="margin-top: 10px;"></div>
+<div id="monthlyAverageCard" style="margin-top: 10px; margin-bottom: 10px;"></div>
   
+ <div class="filter-grid">
+  
+  <input type="text" id="dateSearch" placeholder="date">
+<input type="text" id="descSearch" placeholder="description">
+     <input type="text" id="amountSearch" step="0.01" placeholder="amount">
+     <input type="text" id="categorySearch" placeholder="category">
+           <input type="text" id="bankSearch" placeholder="bank">
 
-   <div class="filter-grid">
-  <!-- Row 1: text searches -->
-  <input type="text" id="dateSearch" placeholder="Date" />
-  <input type="text" id="descSearch" placeholder="Description" />
-  <input type="text" id="amountSearch" placeholder="Amount" />
-  <input type="text" id="categorySearch" placeholder="Category" />
-  <input type="text" id="bankSearch" placeholder="Bank" />
-  <input type="text" id="personSearch" placeholder="Person" />
 
-  <!-- Row 2: dropdowns -->
-  <select id="monthFilter"><option>All</option></select>
-  <select id="categoryFilter"><option>All</option></select>
-  <select id="typeFilter"><option>All</option></select>
-  <select id="currencyFilter"><option>All</option></select>
-  <select id="bankFilter"><option>All</option></select>
-  <select id="statusFilter"><option>All</option></select>
-  <select id="personFilter"><option>All</option></select>
+       </div>
+
+  <div class="filter-grid">
+
+<select id="categoryFilter">
+  <option value="category">category</option>
+</select>
+
+       
+          <select id="typeFilter">
+            <option value="">type</option>
+            <option>Income</option>
+            <option>Expense</option>
+            <option>Transfer</option>
+          </select>
+     
+     
+          <select id="currencyFilter">
+            <option value="">currency</option>
+            <option value="CHF">CHF</option>
+            <option value="EUR">EUR</option>
+            <option value="USD">USD</option>
+          </select>
+   
+       
+          <select id="bankFilter">
+            <option value="">bank</option>
+          </select>
+     
+
+     
+<select id="statusFilter">
+  <option value="All">status</option>
+  <option value="Paid">Paid</option>
+  <option value="Open">Open</option>
+</select>
+
+
+     
+     <div class="dropdown2">
+  <button id="bt1"  class="dropdown-toggle">months</button>
+  <div class="dropdown-content2" id="monthOptions">
+    <!-- Checkboxes will be inserted here dynamically -->
+  </div>
 </div>
+      <div  class="styled-select"  id="personMultiSelect" onclick="togglePersonDropdown()">
+       <div class="select-display" id="selectedPersonsLabel">
+  Persons <span style="margin-left: 89px;">▾</span>
+</div>
+        <div class="dropdown-options" id="personOptions" style="display: none;">
+          <!-- Checkboxes inserted dynamically here -->
+        </div>
+   </div>    
+ 
+
+   
+   
+     
+  
+   </div>
+
+
+   
 
 
   

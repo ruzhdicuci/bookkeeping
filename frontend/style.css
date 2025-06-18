@@ -1027,42 +1027,36 @@ color: rgb(213, 79, 79);
 }
 
 #bt1  {
-
- border: 1px solid #f4f2f2;
-  border-radius: 4px;
-   color: #333;
-   width: 178px;
-   text-align: left;
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background-color: white;
+  width: 175px;
+  box-sizing: border-box;
 }
-
-
-.styled-select {
-  position: relative;
- height: 17px;
- margin-top: 8px;
-   border: 1px solid #f4f2f2;
-  border-radius: 4px;
-  font-size: 1rem;
-  padding:  8px 12px;
-  background: white;
-  cursor: pointer;
-  display: flex;
-
-  justify-content: space-between;
-
-  color: #333;
-}
-
-.select-display::after {
+.selectedPersonsLabel::after {
   content: '▾';
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  pointer-events: none;
-  color: #333;
+    font-size: 16px;
+  margin-left: 26px;
+}
+
+.dropdown-toggle::after {
+  content: '▾';
+  font-size: 16px;
+  margin-left: 86px;
+}
+.styled-select {
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background-color: white;
+  width: 175px;
+  box-sizing: border-box;
 
 }
+
 
 .select-display {
   flex-grow: 1;
@@ -1422,9 +1416,10 @@ border-radius: 10px;
 }
 .dropdown2 .dropdown-toggle {
   padding: 5px 10px;
- 
+ background-color: white;
   border: 1px solid #ccc;
   cursor: pointer;
+  border-radius: 6px;
 }
 .dropdown-content2 {
   display: none;
@@ -1444,6 +1439,9 @@ padding-top: 15px;
   display: block;
 }
 
+#personMultiSelect:hover .dropdown-options {
+  display: block;
+}
 
 
 .dropdown-content2 label {
@@ -1903,7 +1901,7 @@ font-weight: bold;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   padding: 12px;
   background: #fafafa;
   border-radius: 10px;
