@@ -34,7 +34,7 @@
 
 
 
-
+<div class="filter-grid" style="height: 40px;">
 
   
 
@@ -134,7 +134,7 @@
     <canvas id="pieChart" height="300" width="1200"></canvas>
   </div></div>  
 
-<div class="filter-grid" style="height: 160px;">
+<div class="filter-grid">
  <form id="entryForm" class="entry-form responsive-form">
   <div class="form-grid">
     <input type="text" id="newDate" placeholder="Select Date" class="flatpickr-input">
@@ -190,9 +190,9 @@
 <div class="table-wrapper">
   <div id="bankSlider" style="overflow-x: auto; scroll-behavior: smooth;">
     <div class="th2" id="bankBalanceTableContainer"></div>
-
+  </div>
   <div id="bankSliderDots" class="slider-dots"></div>
-</div>  </div>
+</div>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
@@ -237,7 +237,7 @@ document.addEventListener("DOMContentLoaded", () => {
    
 
 <!-- 💳 Kredit Overview Table -->
-<div id="creditLimitTable" style="margin-top: 2rem; overflow-x: auto;">
+<div id="creditLimitTable" style="margin-top: 0.7rem; overflow-x: auto;">
   <table class="th4" style="width: 100%; border-collapse: collapse;  text-align: center; font-size: 0.95rem;">
     <thead class="th4" >
       <tr>
@@ -281,49 +281,12 @@ document.addEventListener("DOMContentLoaded", () => {
 </div>
 
 
+
+</div>
+
 </div>
 </div>
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const slider = document.getElementById("creditSlider");
-  const dotsContainer = document.getElementById("creditSliderDots");
 
-  if (!slider || !dotsContainer) return;
-
-  const sections = 3; // Define number of scrollable sections
-  const stepSize = slider.clientWidth; // Reliable step
-
-  // Clear existing dots
-  dotsContainer.innerHTML = "";
-
-  for (let i = 0; i < sections; i++) {
-    const dot = document.createElement("div");
-    dot.classList.add("slider-dot");
-    if (i === 0) dot.classList.add("active");
-    dot.dataset.index = i;
-    dotsContainer.appendChild(dot);
-  }
-
-  // Scroll when dot clicked
-  dotsContainer.querySelectorAll(".slider-dot").forEach(dot => {
-    dot.addEventListener("click", () => {
-      const index = parseInt(dot.dataset.index, 10);
-      slider.scrollTo({
-        left: index * stepSize,
-        behavior: 'smooth'
-      });
-    });
-  });
-
-  // Update active dot
-  slider.addEventListener("scroll", () => {
-    const currentIndex = Math.round(slider.scrollLeft / stepSize);
-    dotsContainer.querySelectorAll(".slider-dot").forEach((dot, i) => {
-      dot.classList.toggle("active", i === currentIndex);
-    });
-  });
-});
-</script>
 
         
 
@@ -347,7 +310,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
 
 
-
+<div class="filter-grid2">
   <div class="tabs-wrapper">
  <div class="tabs">
       <div   id="personMultiSelect" onclick="togglePersonDropdown()">
@@ -381,6 +344,7 @@ document.addEventListener("DOMContentLoaded", () => {
 </div>
   </div>
  </div>
+</div>
 
 
 
@@ -396,8 +360,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-
-
+ <div class="filter-grid">
   
   <input type="text" id="dateSearch" placeholder="date">
 <input type="text" id="descSearch" placeholder="description">
@@ -418,7 +381,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-  
+  <div class="filter-grid">
 
 <select id="categoryFilter">
   <option value="category">category</option>
@@ -458,6 +421,16 @@ document.addEventListener("DOMContentLoaded", () => {
     
    </div>    
  
+
+   
+   
+     
+  
+   </div>
+
+
+   
+
 
   
 

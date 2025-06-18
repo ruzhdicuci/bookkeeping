@@ -1619,3 +1619,29 @@ document.addEventListener("DOMContentLoaded", () => {
   fetchEntries(); // or whatever starts your rendering logic
 });
 
+
+document.addEventListener("DOMContentLoaded", () => {
+  const dotsContainer = document.getElementById("creditSliderDots");
+  if (!dotsContainer) return;
+
+  for (let i = 0; i < 3; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'slider-dot';
+    if (i === 0) dot.classList.add('active'); // highlight the first dot
+    dotsContainer.appendChild(dot);
+  }
+});
+
+
+const scrollBtn = document.getElementById('scrollToggleBtn');
+
+window.addEventListener('scroll', () => {
+  const isTop = window.scrollY < 100;
+  scrollBtn.style.opacity = 1;
+  scrollBtn.textContent = isTop ? '⬇' : '⬆';
+});
+
+scrollBtn.addEventListener('click', () => {
+  const isTop = window.scrollY < 100;
+  window.scrollTo({ top: isTop ? document.body.scrollHeight : 0, behavior: 'smooth' });
+});
