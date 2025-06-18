@@ -35,10 +35,7 @@
  <div class="sections" >
 
 <div style="display: flex; align-items: center;  gap: 0.7rem; ">
-    <div class="tabs">
-      <button class="tab-button active" onclick="openTab('dashboardTab', this)">📊 Dashboard</button>
-      <button class="tab-button" onclick="openTab('chartsTab', this)">📈 Charts</button>
-    </div> 
+
   
 
 
@@ -99,17 +96,6 @@
  </div>
 </div>
 </div>  
-          <div class="tooltip-wrapper">
-  <button class="reset-btn" onclick="resetFilters()">
-    <span class="reset-icon">↩</span> 
-  </button>
-  <span class="tooltip-text">Reset all filters to default</span>
-</div>
-<button id="mobile" onclick="window.location.href='/bookkeeping/client/mobile/mobile.html'">📱</button>
-  </div> 
-
-   </div>
-
 
 
 
@@ -248,7 +234,7 @@
   <div class="th2" id="bankBalanceTableContainer"></div>
 </div></div>
  
-
+<div class="filter-grid">
  <div class="sections4">
 <!-- 💳 Kredit Overview Table -->
 <div id="creditLimitTable" style="margin-top: 2rem; overflow-x: auto;">
@@ -291,28 +277,80 @@
 
 
 </div>
-   
+   </div>
 
         
 
-<div class="summary-totals-card">
+<div class="summary-totals-card ">
   <div class="summary-card">
-    Income
+    <div class="label">Income</div>
     <a id="totalIncome" class="income-color">0.00</a>
   </div>
   <div class="summary-card">
-    Expenses
-   <a  id="totalExpense" class="expense-color">0.00</a>
+    <div class="label">Expenses</div>
+    <a id="totalExpense" class="expense-color">0.00</a>
   </div>
   <div class="summary-card">
-    Balance
-    <a  id="totalBalance" class="balance-color">0.00</a>
+    <div class="label">Balance</div>
+    <a id="totalBalance" class="balance-color">0.00</a>
   </div>
 </div>
 
 
-<div id="monthlyAverageCard" style="margin-top: 10px; margin-bottom: 10px;"></div>
+<div id="monthlyAverageCard"></div>
   
+
+
+<div class="filter-grid2">
+  <div class="tabs-wrapper">
+ <div class="tabs">
+      <div   id="personMultiSelect" onclick="togglePersonDropdown()">
+       <button id="bt1"  id="selectedPersonsLabel">
+  👤 <span style="margin-left: 5px;">▾</span>
+       </button>
+        <div class="dropdown-options" id="personOptions" style="display: none;">
+          <!-- Checkboxes inserted dynamically here -->
+        </div>
+ </div> 
+          <div class="tooltip-wrapper">
+  <button class="reset-btn" onclick="resetFilters()">
+    <span class="reset-icon">↩</span> 
+  </button>
+  <span class="tooltip-text">Reset all filters to default</span>
+
+
+
+ <div class="dropdown2">
+  <button id="bt1"  class="dropdown-toggle">📅</button>
+  <div class="dropdown-content2" id="monthOptions">
+    <!-- Checkboxes will be inserted here dynamically -->
+  </div>
+
+     
+     
+      <button class="tab-button active" onclick="openTab('dashboardTab', this)">📊</button>
+      <button class="tab-button" onclick="openTab('chartsTab', this)">📈</button>
+   
+    </div> 
+</div>
+  </div>
+ </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
  <div class="filter-grid">
   
   <input type="text" id="dateSearch" placeholder="date">
@@ -323,6 +361,16 @@
 
 
        </div>
+
+
+
+
+ 
+
+
+
+
+
 
   <div class="filter-grid">
 
@@ -361,19 +409,7 @@
 
 
      
-     <div class="dropdown2">
-  <button id="bt1"  class="dropdown-toggle">months</button>
-  <div class="dropdown-content2" id="monthOptions">
-    <!-- Checkboxes will be inserted here dynamically -->
-  </div>
-</div>
-      <div  class="styled-select"  id="personMultiSelect" onclick="togglePersonDropdown()">
-       <div class="select-display" id="selectedPersonsLabel">
-  Persons <span style="margin-left: 89px;">▾</span>
-</div>
-        <div class="dropdown-options" id="personOptions" style="display: none;">
-          <!-- Checkboxes inserted dynamically here -->
-        </div>
+    
    </div>    
  
 

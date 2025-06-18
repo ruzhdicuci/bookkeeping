@@ -395,14 +395,22 @@ filtered
   const avgIncome = incomeTotal / monthsUsed.length || 0;
   const avgExpense = expenseTotal / monthsUsed.length || 0;
 
-  document.getElementById('monthlyAverageCard').innerHTML = `
-    <div class="average-card-container">
-      <div class="average-card">Avg Income <a class="income-color">${avgIncome.toFixed(2)}</a></div>
-      <div class="average-card">Avg Expenses <a class="expense-color">${avgExpense.toFixed(2)}</a></div>
-      <div class="average-card">Avg Balance <a class="balance-color">${(avgIncome - avgExpense).toFixed(2)}</a></div>
+document.getElementById('monthlyAverageCard').innerHTML = `
+  <div class="average-card-container">
+    <div class="average-card">
+      <div class="label">Avg Income</div>
+      <a class="income-color">${avgIncome.toFixed(2)}</a>
     </div>
-  `;
-
+    <div class="average-card">
+      <div class="label">Avg Expenses</div>
+      <a class="expense-color">${avgExpense.toFixed(2)}</a>
+    </div>
+    <div class="average-card">
+      <div class="label">Avg Balance</div>
+      <a class="balance-color">${(avgIncome - avgExpense).toFixed(2)}</a>
+    </div>
+  </div>
+`;
   document.getElementById('totalIncome').textContent = incomeTotal.toFixed(2);
   document.getElementById('totalExpense').textContent = expenseTotal.toFixed(2);
   document.getElementById('totalBalance').textContent = (incomeTotal - expenseTotal).toFixed(2);
