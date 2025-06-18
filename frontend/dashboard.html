@@ -825,36 +825,23 @@ document.getElementById('categoryFilter')?.addEventListener('change', drawCharts
 </script>
 
 
-   <button id="scrollTopBtn" class="scroll-btn" title="Scroll to top" style="color:rgb(235, 11, 56)">⬆</button>
-<button id="scrollBottomBtn" class="scroll-btn" title="Scroll to bottom" style="color:rgb(22, 173, 118)">⬇</button>
-
+ <div class="scroll-toggle-wrapper">
+  <button id="scrollToggleBtn" class="scroll-toggle-btn" title="Scroll">⬇</button>
+</div>
 <script>
-  const topBtn = document.getElementById('scrollTopBtn');
-  const bottomBtn = document.getElementById('scrollBottomBtn');
+  const scrollBtn = document.getElementById('scrollToggleBtn');
 
-  // Attach click handlers only if buttons exist
-  if (topBtn) {
-    topBtn.onclick = () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-  }
+window.addEventListener('scroll', () => {
+  const isTop = window.scrollY < 100;
+  scrollBtn.style.opacity = 1;
+  scrollBtn.textContent = isTop ? '⬇' : '⬆';
+});
 
-  if (bottomBtn) {
-    bottomBtn.onclick = () => {
-      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-    };
-  }
-
-  // Scroll visibility toggle
-  window.addEventListener('scroll', () => {
-    const show = window.scrollY > 100;
-
-    if (topBtn) topBtn.style.opacity = show ? 1 : 0;
-    if (bottomBtn) bottomBtn.style.opacity = show ? 1 : 0;
-  });
+scrollBtn.addEventListener('click', () => {
+  const isTop = window.scrollY < 100;
+  window.scrollTo({ top: isTop ? document.body.scrollHeight : 0, behavior: 'smooth' });
+});
 </script>
-
-
 <div id="confirmModal" class="modal hidden">
   <div class="modal-content">
     <p>🗑️ Are you sure you want to delete this entry?</p>

@@ -2053,11 +2053,19 @@ font-weight: bold;
   background-color: #333;
 }
 
-.scroll-toggle-btn {
+.scroll-toggle-wrapper {
   position: fixed;
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
+  height: 50px;
+  width: 60px;
+  z-index: 999;
+}
+
+.scroll-toggle-btn {
+  opacity: 0;
+  transition: opacity 0.3s ease;
   background: #f1f1f1;
   border: none;
   border-radius: 50%;
@@ -2065,11 +2073,10 @@ font-weight: bold;
   padding: 10px 14px;
   cursor: pointer;
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  z-index: 999;
+  pointer-events: none; /* Prevent interaction unless visible */
 }
 
-.scroll-toggle-btn:hover {
-  background: #e0e0e0;
+.scroll-toggle-wrapper:hover .scroll-toggle-btn {
+  opacity: 1;
+  pointer-events: auto;
 }

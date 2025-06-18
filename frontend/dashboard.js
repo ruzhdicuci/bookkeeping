@@ -1633,15 +1633,3 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-const scrollBtn = document.getElementById('scrollToggleBtn');
-
-window.addEventListener('scroll', () => {
-  const isTop = window.scrollY < 100;
-  scrollBtn.style.opacity = 1;
-  scrollBtn.textContent = isTop ? '⬇' : '⬆';
-});
-
-scrollBtn.addEventListener('click', () => {
-  const isTop = window.scrollY < 100;
-  window.scrollTo({ top: isTop ? document.body.scrollHeight : 0, behavior: 'smooth' });
-});
