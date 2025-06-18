@@ -1618,3 +1618,4 @@ document.addEventListener('keydown', e => {
 document.addEventListener("DOMContentLoaded", () => {
   fetchEntries(); // or whatever starts your rendering logic
 });
+

@@ -18,7 +18,7 @@ input[type="number"] {
   text-align: center;
   background-color: #ededed;
   color: rgb(20, 102, 156);
-font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+font-family: system-ui, sans-serif;
 }
 
 /* Colors based on value */
@@ -46,7 +46,7 @@ input-with-clear{
   white-space: normal;      /* Allow wrapping */
   word-wrap: break-word;    /* Ensure long words wrap too */
   padding: 8px;             /* Optional: spacing inside */
-font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+font-family: system-ui, sans-serif;
 font-size: 1.1rem;
 border: none;
 
@@ -58,7 +58,7 @@ border: none;
 
 .th5 {
   background-color: white;
-font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+font-family: system-ui, sans-serif;
 font-size: 1.2rem;
  /*  border-top: 5px solid #222222; */
  text-align: center;       /* Center the text horizontally */
@@ -77,7 +77,7 @@ font-size: 1.2rem;
  
 .dark .th4  { 
   background-color: #2c2c2c; 
-font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+font-family: system-ui, sans-serif;
 font-size: 1.2rem;
 
 
@@ -215,7 +215,7 @@ background-color: transparent;
             transition: 0.5s;
             background-size: 200% auto;
                     color: #d32a7c;
-       font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+       font-family: system-ui, sans-serif;
 
            
           }
@@ -414,7 +414,7 @@ color: rgb(132, 161, 255)
 .table-container table {
   width: 100%;
   table-layout: fixed;
- font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+ font-family: system-ui, sans-serif;
 
 
 }
@@ -522,7 +522,7 @@ border-radius: 10px;
 
 }
 .sections4 {
-   background-color: rgb(255, 255, 255);
+  background: #fafafa;
   padding-left: 30px;
   padding-right: 30px;
  margin-top: -23px;
@@ -636,7 +636,7 @@ margin-top: 7px;
   border-radius: 4px;
   box-sizing: border-box;
  
-  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  font-family: system-ui, sans-serif;
 
 
 }
@@ -653,7 +653,7 @@ margin-top: 7px;
 
 
  #entrySubmitBtn {background-color:     #fdf6de;
-font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+font-family: system-ui, sans-serif;
 font-weight: bold;
 
         border: 1px solid transparent;
@@ -690,7 +690,7 @@ text-align: center;
 
 }
 .table-container {
- font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+ font-family: system-ui, sans-serif;
 
 
 }
@@ -698,7 +698,7 @@ text-align: center;
  border: none;
  text-align: center;
  background-color: rgb(245, 245, 248);
-font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+font-family: system-ui, sans-serif;
 font-size: 1.2rem !important;
  color: blue;
 
@@ -718,7 +718,7 @@ font-weight: bolder;
  height: 44px;
 
    
-                    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+                    font-family: system-ui, sans-serif;
 
           }
 
@@ -743,7 +743,7 @@ font-weight: bolder;
  height: 44px;
 
    
-                    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+                    font-family: system-ui, sans-serif;
 
           }
 
@@ -768,7 +768,7 @@ font-size: 1rem;
 margin-left: 10px;
    width: 80px;
  height: 44px;
-          font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+          font-family: system-ui, sans-serif;
 
           }
 
@@ -790,7 +790,7 @@ font-size: 1rem;
 margin-left: -13px;
    width: 80px;
  height: 44px;
-          font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+          font-family: system-ui, sans-serif;
    margin-top: -8px;
           }
 
@@ -873,21 +873,32 @@ margin-left: -2px;
 }
 
 
+#themeToggle {
+  background: transparent;
+    cursor: pointer;
+   border: none;
+    margin-top: 10px;
 
+}
+#themeToggle:hover {
+  background: black;
+
+}
 
 
 .navbar {
   overflow: hidden;
-  background-color: white;
+
 
 }
 
 .navbar a {
   float: left;
-  font-size: 20px;
+  font-size: 14px;
   color: white;
   text-align: center;
-  padding: 14px 16px;
+
+
   text-decoration: none;
 }
 
@@ -900,14 +911,14 @@ margin-left: -2px;
 
   background-color: inherit;
   font-family: inherit;
-  margin: 0;
+   
 }
 .dropdown  {
-   font-size: 18px;
+   font-size: 14px;
   border: none;
   outline: none;
   color: rgb(68, 63, 63);
-  padding: 18px 16px;
+  padding: 12px 10px;
   background-color: inherit;
   font-family: inherit;
   margin: 0;
@@ -1073,7 +1084,7 @@ user-select: none;
   width: 160px;
    color: white !important;
   font-size: 15px;
-  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  font-family: system-ui, sans-serif;
 margin-left: 8px;
 padding-top: 3px;
 background: #444;
@@ -1087,7 +1098,7 @@ padding-bottom: 3px;
   width: 15px;
   height: 15px;
 
-font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+font-family: system-ui, sans-serif;
    color: white !important;
   accent-color: #00aaff; /* optional: blue checkmark */
   cursor: pointer;
@@ -1146,7 +1157,7 @@ box-shadow: 0 4px 6px rgba(100, 99, 99, 0.447);
 color:  #71d0ff !important; /* optional: blue checkmark */
 }
 #h4  {
-font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+font-family: system-ui, sans-serif;
 
 font-size: 1.1rem;
 }
@@ -1306,7 +1317,7 @@ height: 38px;
       padding: 0.5rem 1rem;
       background-color: rgb(252, 252, 153);
       border: none;
-     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+     font-family: system-ui, sans-serif;
 font-size: 1rem;
       cursor: pointer;
       border-radius: 10px;
@@ -1354,7 +1365,7 @@ font-size: 1rem;
       padding: 0.5rem 1rem;
       font-size: 1rem;
       cursor: pointer;
-           font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+           font-family: system-ui, sans-serif;
 border: none;
 background-color: white;
 border: 1px solid rgb(231, 229, 229);
@@ -1414,7 +1425,7 @@ user-select: none;
   width: 160px;
    color: white !important;
   font-size: 15px;
-  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  font-family: system-ui, sans-serif;
 margin-left: 8px;
 padding-top: 3px;
 font-size: 1rem;
@@ -1428,7 +1439,7 @@ padding-bottom: 3px;
   width: 15px;
   height: 15px;
 
-font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+font-family: system-ui, sans-serif;
    color: white !important;
   accent-color: #00aaff; /* optional: blue checkmark */
   cursor: pointer;
@@ -1454,70 +1465,10 @@ color:  #71d0ff !important; /* optional: blue checkmark */
 
 
 
-.income-color {
-  color: #13a07f;
-font-size:  1.7rem;
-     font-weight: bold;
-        margin-left: 10px;
-}
-.expense-color {
-  color: #ff695d;
-   font-size:  1.7rem;
-         font-weight: bold;
-        margin-left: 10px;
-}
-.balance-color {
-  color: #00bfff;
- font-size:  1.7rem;
-         font-weight: bold;
-        margin-left: 10px;
-}
 
 
 
 
-.summary-totals-card {
-  display: flex;
-  gap: 0.6rem;
-  flex-wrap: wrap;
-  justify-content: center;
-
-}
-
-.summary-card {
-  flex: 1 ;
-  background: white;
- border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-  text-align: center;
-  padding: 1rem;
-  font-size: 1rem;
-}
-
-.summary-card span {
-  display: block;
-  font-size: 1.5rem;
-  margin-top: 0.5rem;
-}
-
-.income-color {
-  color: #13a07f;
-      font-size:  1.7rem;
-
-        margin-left: 10px;
-}
-.expense-color {
-  color: #ff695d;
-      font-size:  1.7rem;
-    
-        margin-left: 10px;
-}
-.balance-color {
-  color: #00bfff;
-      font-size:  1.7rem;
-    
-        margin-left: 10px;
-}
 
 #sp1 {
   color: #00bfff;
@@ -1656,7 +1607,7 @@ select:disabled {
 
 .cancel-btn {
 background-color:     #fdf6de;
-font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+font-family: system-ui, sans-serif;
 font-weight: bold;
 
         border: 1px solid transparent;
@@ -1889,35 +1840,47 @@ font-weight: bold;
 
 
 .summary-totals-card {
-  display: flex;
-  overflow-x: auto;
-  gap: 1rem;
-  padding: 10px;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
+ display: flex;
+  flex-wrap: wrap; /* wrap on small screens */
+  justify-content: center;
+  gap: 0.3rem;
   margin-bottom: 10px;
+
 }
 
 .summary-card {
   flex: 0 0 auto;
-  min-width: 110px;
-  background: #fff;
+  background: white;
   border-radius: 10px;
-  padding: 12px 8px;
+  padding: 12px;
   text-align: center;
-  scroll-snap-align: start;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  font-size: 0.9rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  min-width: 100px;
 }
 
-.summary-card a {
-  font-size: 1.2rem;
-  font-weight: bold;
-  margin-top: 5px;
+.summary-card span {
   display: block;
+  font-size: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+.income-color {
+  color: #13a07f;
+      font-size:  1.2rem;
+font-weight: bold;
+    
+}
+.expense-color {
+  color: #ff695d;
+      font-size:  1.2rem;
+    font-weight: bold;
+       
+}
+.balance-color {
+  color: #00bfff;
+      font-size:  1.2rem;
+    font-weight: bold;
+       
 }
 
 
@@ -1926,7 +1889,7 @@ font-weight: bold;
   display: flex;
   flex-wrap: wrap; /* wrap on small screens */
   justify-content: center;
-  gap: 1rem;
+  gap: 0.3rem;
   margin-bottom: 10px;
 }
 
@@ -1940,44 +1903,150 @@ font-weight: bold;
   min-width: 100px;
 }
 
-.average-card .label {
-  font-size: 0.9rem;
+.summary-card .label {
+  font-size: 0.7rem;
   font-weight: 600;
   color: #444;
   margin-bottom: 4px;
 }
 
-.income-color {
-  color: #00a56f;
-  font-weight: bold;
-  font-size: 1.2rem;
+
+.average-card .label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 4px;
+}
+@media (max-width: 480px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
-.expense-color {
-  color: #e74c3c;
-  font-weight: bold;
-  font-size: 1.2rem;
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px; /* uniform spacing between inputs */
+  margin-bottom: 1rem;
+  align-items: center;
+  margin-top: -10px;
+ 
 }
 
-.balance-color {
-  color: #007bff;
-  font-weight: bold;
-  font-size: 1.2rem;
-}
-.income-color {
-  color: #00a56f;
-  font-weight: bold;
-  font-size: 1.1rem;
-}
-
-.expense-color {
-  color: #e74c3c;
-  font-weight: bold;
-  font-size: 1.1rem;
+#entryForm input,
+#entryForm select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  box-sizing: border-box;
 }
 
-.balance-color {
-  color: #007bff;
-  font-weight: bold;
-  font-size: 1.1rem;
+.form-actions {
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+
+
+.credit-slider-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.credit-slider {
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  white-space: nowrap;
+}
+
+.credit-slider table {
+  min-width: 900px;
+  width: max-content;
+}
+.credit-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+/* Left section stays left */
+.left-buttons {
+  
+  gap: 0.5rem;
+}
+
+/* Dots centered */
+.center-dots {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+#creditSlider {
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  display: flex;
+  scroll-behavior: smooth;
+}
+
+.slider-dot {
+  height: 8px;
+  width: 8px;
+  background-color: #999;
+  border-radius: 50%;
+  display: inline-block;
+  margin: 0 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.slider-dot.active {
+  background-color: #333;
+}
+
+
+
+
+
+#bankSlider {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  gap: 1rem;
+}
+
+#bankBalanceTableContainer {
+  display: flex;
+  flex-shrink: 0;
+  scroll-snap-align: start;
+  min-width: 100%;
+}
+
+.slider-dots {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.slider-dot {
+  height: 8px;
+  width: 8px;
+  background-color: #bbb;
+  border-radius: 50%;
+  display: inline-block;
+  margin: 0 4px;
+  cursor: pointer;
+}
+
+.slider-dot.active {
+  background-color: #333;
 }
