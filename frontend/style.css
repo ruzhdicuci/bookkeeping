@@ -992,35 +992,7 @@ color: rgb(213, 79, 79);
 
 
 
-.scroll-btn {
-  position: fixed;
-  right: 20px;
-  width: 40px;
-  height: 40px;
-  font-size: 1.2rem;
-  border: none;
-  border-radius: 50%;
-  background: black;
-  color: #333;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  transition: opacity 0.3s ease;
-  z-index: 999;
-}
 
-#scrollTopBtn {
-  bottom: 80px;
-
-}
-
-#scrollBottomBtn {
-  bottom: 20px;
-
-}
-
-.scroll-btn:hover {
-  background: white;
-}
 
 #bt1  {
   padding: 8px 10px;
@@ -2077,6 +2049,27 @@ font-weight: bold;
 }
 
 .scroll-toggle-wrapper:hover .scroll-toggle-btn {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#scrollBtn1 {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  position: fixed;
+  bottom: 20px;
+  right: 50%;
+  transform: translateX(50%);
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  padding: 0.5rem 1rem;
+  font-size: 1.2rem;
+  z-index: 999;
+}
+
+body:hover #scrollBtn1 {
   opacity: 1;
   pointer-events: auto;
 }
