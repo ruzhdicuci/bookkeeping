@@ -1832,6 +1832,11 @@ font-weight: bold;
 }
 
 
+@media (max-width: 600px) {
+  .filter-grid {
+    grid-template-columns: 1fr;
+  }
+}
 
 
 .summary-totals-card {
