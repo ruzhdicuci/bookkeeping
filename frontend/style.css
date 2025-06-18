@@ -1832,11 +1832,6 @@ font-weight: bold;
 }
 
 
-@media (max-width: 600px) {
-  .filter-grid {
-    grid-template-columns: 1fr;
-  }
-}
 
 
 .summary-totals-card {
@@ -1917,11 +1912,7 @@ font-weight: bold;
   color: #444;
   margin-bottom: 4px;
 }
-@media (max-width: 480px) {
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
-}
+
 
 .form-grid {
   display: grid;
