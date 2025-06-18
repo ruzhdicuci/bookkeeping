@@ -1,3 +1,4 @@
+
 const apiBase = 'https://bookkeeping-i8e0.onrender.com';
 const token = localStorage.getItem('token');
 
@@ -24,8 +25,7 @@ const typeFilter = document.getElementById('typeFilter');
 const dateSearch = document.getElementById('dateSearch');
 const descSearch = document.getElementById('descSearch');
 const amountSearch = document.getElementById('amountSearch');
-
-
+let entries = [];
 
 // Set up event listeners for other filters
 bankFilter.onchange =
@@ -78,6 +78,7 @@ async function loadInitialBankBalances() {
 }
 
 
+
 async function fetchEntries() {
   try {
     const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
@@ -85,20 +86,18 @@ async function fetchEntries() {
     });
     if (!res.ok) throw new Error('Failed to fetch entries');
 
-    window.entries = await res.json();
-    console.log("📦 Entries:", window.entries);
+    const data = await res.json();
+    entries = data; // ✅ Assign after fetch
+    console.log("📦 Entries:", entries);
 
-    renderEntries(); // ✅ This populates the table
-    populateNewEntryDropdowns(); // ✅ Person, Bank, Category lists
-    populateFilters(); // ✅ Category filter dropdown, months, etc.
+    renderEntries(); // ✅ Use only after assignment
+    populateNewEntryDropdowns();
+    populateFilters();
 
   } catch (err) {
     console.error('❌ fetchEntries failed:', err);
   }
 }
-
-
-
 
   function populateNewEntryDropdowns() {
     const persons = [...new Set(window.entries.map(e => e.person))].filter(Boolean);
@@ -237,102 +236,154 @@ document.querySelectorAll('.monthOption').forEach(cb => {
   }
 }
 
+function getDateLabel(dateStr) {
+  const entryDate = new Date(dateStr);
+  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() - 1);
+
+  const isSameDay = (d1, d2) =>
+    d1.getFullYear() === d2.getFullYear() &&
+    d1.getMonth() === d2.getMonth() &&
+    d1.getDate() === d2.getDate();
+
+  if (isSameDay(entryDate, today)) return "Today";
+  if (isSameDay(entryDate, yesterday)) return "Yesterday";
+
+  const diffDays = Math.floor((today - entryDate) / (1000 * 60 * 60 * 24));
+  if (diffDays <= 7) return "This Week";
+
+  return entryDate.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric'
+  });
+}
 
 function renderEntries() {
   const dateSearch = document.getElementById('dateSearch')?.value.trim();
   const descSearch = document.getElementById('descSearch')?.value.trim();
   const amountSearch = document.getElementById('amountSearch')?.value.trim();
-const bankSearch = document.getElementById('bankSearch')?.value.trim();
-const personSearch = document.getElementById('personSearch')?.value.trim();
-const categorySearch = document.getElementById('categorySearch')?.value.trim();
+  const bankSearch = document.getElementById('bankSearch')?.value.trim();
+  const personSearch = document.getElementById('personSearch')?.value.trim();
+  const categorySearch = document.getElementById('categorySearch')?.value.trim();
 
   const selectedMonths = Array.from(document.querySelectorAll('.monthOption:checked')).map(cb => cb.value);
   const selectedPersons = Array.from(document.querySelectorAll('.personOption:checked')).map(cb => cb.value);
-  const categoryFilter = document.getElementById('categoryFilter');
-  const categoryValue = categoryFilter?.value || "All";
+  const categoryValue = document.getElementById('categoryFilter')?.value || "All";
   const statusValue = document.getElementById('statusFilter')?.value || 'All';
 
-  // Multi-search helper
   const matchesMulti = (query, target) =>
     !query || query
       .split(',')
       .map(s => s.trim().toLowerCase())
       .some(val => (target || '').toLowerCase().includes(val));
 
-  // ✅ Filter entries
-const filtered = entries.filter(e => {
-  const entryDay = e.date?.split('-')[2];
+  const filtered = entries.filter(e => {
+    const entryDay = e.date?.split('-')[2];
+    const personMatches =
+      personSearch?.length > 0
+        ? matchesMulti(personSearch, e.person)
+        : selectedPersons.length === 0 || selectedPersons.includes(e.person);
 
-  const personMatches =
-    personSearch?.length > 0
-      ? matchesMulti(personSearch, e.person)
-      : selectedPersons.length === 0 || selectedPersons.includes(e.person);
+    const bankMatches =
+      bankSearch?.length > 0
+        ? matchesMulti(bankSearch, e.bank)
+        : !bankFilter.value || e.bank === bankFilter.value;
 
-  const bankMatches =
-    bankSearch?.length > 0
-      ? matchesMulti(bankSearch, e.bank)
-      : !bankFilter.value || e.bank === bankFilter.value;
+    return (
+      matchesMulti(dateSearch, entryDay) &&
+      (selectedMonths.length === 0 || selectedMonths.includes(e.date?.slice(0, 7))) &&
+      personMatches &&
+      bankMatches &&
+      (!typeFilter.value || e.type === typeFilter.value) &&
+      (!currencyFilter.value || e.currency === currencyFilter.value) &&
+      matchesMulti(descSearch, e.description) &&
+      (categoryValue === "All" || e.category === categoryValue) &&
+      matchesMulti(categorySearch, e.category) &&
+      (statusValue === 'All' || e.status === statusValue) &&
+      matchesMulti(amountSearch, e.amount + '')
+    );
+  });
 
-  return (
-    matchesMulti(dateSearch, entryDay) &&
-    (selectedMonths.length === 0 || selectedMonths.includes(e.date?.slice(0, 7))) &&
-    personMatches &&
-    bankMatches &&
-    (!typeFilter.value || e.type === typeFilter.value) &&
-    (!currencyFilter.value || e.currency === currencyFilter.value) &&
-    matchesMulti(descSearch, e.description) &&
-    (categoryValue === "All" || e.category === categoryValue) &&
-    matchesMulti(categorySearch, e.category) &&
-    (statusValue === 'All' || e.status === statusValue) &&
-    matchesMulti(amountSearch, e.amount + '')
-  );
-});
-
-entryTableBody.innerHTML = '';
-filtered.forEach(e => {
-  const row = document.createElement('tr');
-  const editForm = document.getElementById('entryForm');
-  const isEditing = editForm?.dataset.editId === e._id;
-
-  if (isEditing) row.classList.add('editing-row');
-
-  row.innerHTML = `
-    <td>${e.date}</td>
-    <td>${e.description}</td>
-    <td>${e.amount}</td>
-    <td>${e.currency || ''}</td>
-    <td>${e.type}</td>
-    <td>${e.person}</td>
-    <td>${e.bank}</td>
-    <td>${e.category || ''}</td>
-    <td>
-      ${
-        isEditing
-     ? `<button onclick="cancelEdit()" class="action-btn" style=" background: #fdf6de;   height: 44px; border: none; padding: 6px 12px;  border-radius: 6px;   font-weight: bold;"title="Cancel Edit">❌ Cancel</button>`
-          : `<button class="action-btn" onclick="editEntry('${e._id}')" title="Edit">✏️</button>`
-      }
-      <button class="action-btn" onclick="duplicateEntry('${e._id}')" title="Duplicate">📄</button>
-      <button class="action-btn" onclick="showDeleteModal('${e._id}')" title="Delete">🗑️</button>
-    </td>
-    <td>
-      ${
-        isEditing
-          ? `<button onclick="updateStatus('${e._id}', '${e.status === 'Paid' ? 'Open' : 'Paid'}')"
-               style="background:${e.status === 'Paid' ? '#13a07f' : '#ff695d'}; color:white; border:none; border-radius:5px;">
-               ${e.status}
-             </button>`
-          : `<span style="background:${e.status === 'Paid' ? '#13a07f' : '#ff695d'}; color:white; padding:5px 10px; border-radius:5px;">
-               ${e.status}
-             </span>`
-      }
-    </td>
-  `;
-
-  entryTableBody.appendChild(row);
-});
+  // ✅ Render cards
+ const container = document.getElementById('entryTableBody');
+if (!container) {
+  console.error("❌ Missing #entryTableBody container in DOM");
+  return;
+}
+container.innerHTML = '';
 
 
-  // ✅ Update totals
+
+let lastDateGroup = null;
+
+filtered
+  .sort((a, b) => new Date(b.date) - new Date(a.date))
+  .forEach(e => {
+    const dateGroupLabel = new Date(e.date).toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
+    });
+
+    if (dateGroupLabel !== lastDateGroup) {
+      const label = document.createElement('div');
+      label.className = 'entry-date-label';
+      label.textContent = dateGroupLabel;
+      container.appendChild(label);
+      lastDateGroup = dateGroupLabel;
+    }
+
+    const isEditing = document.getElementById('entryForm')?.dataset.editId === e._id;
+    const amountClass = e.type === 'Income' ? 'income' : 'expense';
+
+    const card = document.createElement('div');
+    card.className = 'entry-card';
+    if (isEditing) card.classList.add('editing-row');
+
+    card.innerHTML = `
+      <div class="entry-date">
+    <div class="date-block">
+      <div class="day">${new Date(e.date).getDate().toString().padStart(2, '0')}</div>
+      <div class="month-year">
+        ${new Date(e.date).toLocaleString('default', { month: 'short' })}<br>
+        ${new Date(e.date).getFullYear()}
+      </div>
+       </div>
+  </div>
+      <div class="entry-main">
+        <div class="description">${e.description}</div>
+        <div class="meta">
+          ${e.category || ''} • ${e.person} • ${e.bank}
+        </div>
+       <div class="status">
+  <span class="status-pill ${e.status === 'Paid' ? 'paid' : 'open'}">
+    ${e.status}
+  </span>
+</div>
+      </div>
+       <div class="entry-amount">
+    <div class="amount-line">
+      <span class="currency small">CHF</span>
+      <span class="amount ${amountClass}">${parseFloat(e.amount).toFixed(2)}</span>
+    </div>
+        <div class="buttons">
+          ${
+            isEditing
+              ? `<button onclick="cancelEdit()" class="action-btn">❌ Cancel</button>`
+              : `<button onclick="editEntry('${e._id}')" class="action-btn">✏️</button>`
+          }
+          <button onclick="duplicateEntry('${e._id}')" class="action-btn">📄</button>
+          <button onclick="showDeleteModal('${e._id}')" class="action-btn">🗑️</button>
+        </div>
+      </div>
+    `;
+
+    container.appendChild(card);
+  });
+
+  // ✅ Totals + Averages
   let incomeTotal = 0, expenseTotal = 0;
   filtered.forEach(e => {
     const amount = parseFloat(e.amount) || 0;
@@ -340,34 +391,22 @@ filtered.forEach(e => {
     else expenseTotal += amount;
   });
 
-  // ✅ Monthly Averages
   const monthsUsed = [...new Set(filtered.map(e => e.date?.slice(0, 7)))].filter(Boolean);
   const avgIncome = incomeTotal / monthsUsed.length || 0;
   const avgExpense = expenseTotal / monthsUsed.length || 0;
 
   document.getElementById('monthlyAverageCard').innerHTML = `
     <div class="average-card-container">
-      <div class="average-card">
-        Avg Income
-        <a class="income-color">${avgIncome.toFixed(2)}</a>
-      </div>
-      <div class="average-card">
-        Avg Expenses
-        <a class="expense-color">${avgExpense.toFixed(2)}</a>
-      </div>
-      <div class="average-card">
-        Avg Balance
-       <a class="balance-color">${(avgIncome - avgExpense).toFixed(2)}</a>
-      </div>
+      <div class="average-card">Avg Income <a class="income-color">${avgIncome.toFixed(2)}</a></div>
+      <div class="average-card">Avg Expenses <a class="expense-color">${avgExpense.toFixed(2)}</a></div>
+      <div class="average-card">Avg Balance <a class="balance-color">${(avgIncome - avgExpense).toFixed(2)}</a></div>
     </div>
   `;
 
   document.getElementById('totalIncome').textContent = incomeTotal.toFixed(2);
   document.getElementById('totalExpense').textContent = expenseTotal.toFixed(2);
   document.getElementById('totalBalance').textContent = (incomeTotal - expenseTotal).toFixed(2);
-} // ✅ final closing brace for renderEntries
-
-
+}
 
 function editEntry(id) {
   const form = document.getElementById('entryForm');
@@ -1565,4 +1604,9 @@ document.addEventListener('keydown', e => {
       cancelEdit();
     }
   }
+});
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  fetchEntries(); // or whatever starts your rendering logic
 });

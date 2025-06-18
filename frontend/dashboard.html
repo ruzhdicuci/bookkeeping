@@ -446,38 +446,6 @@
 
 
    
-   <div class="sections7">
-<table>
-
-
-     <thead>
-  <tr>
-
-        <th id="th3"> Date</th>
-    <th id="th3">Description</th>
-  
-    <th id="th3">Amount</th>
-    <th id="th3">Currency</th>
-    <th id="th3">Type</th>
-    <th id="th3">Person</th>
-    <th id="th3">Bank</th>
-       <th id="th3">Category</th>
-      
-    <th id="th3">Actions</th>
-     <th id="th3">Status</th>
-  </tr>
-  
-
-</thead>
-</div>
-</div>
-
-
-
-
-    <tbody id="entryTableBody"></tbody>
-  </table>
-
 
 
   
@@ -931,7 +899,7 @@ document.getElementById('categoryFilter')?.addEventListener('change', drawCharts
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <!-- ✅ Add these before your dashboard.js -->
-
+<div id="entryTableBody" class="desktop-card-list"></div>
 <script src="dashboard.js"></script>
 
 </body>
