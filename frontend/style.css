@@ -1,5 +1,5 @@
 body {
-font-family: system-ui, sans-serif;
+font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
   margin: 0px auto;
 width: 94rem;
   max-width: 84rem;
@@ -24,7 +24,7 @@ input[type="number"] {
   text-align: center;
   background-color: #ededed;
   color: rgb(20, 102, 156);
-font-family: system-ui, sans-serif;
+font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
 
 /* Colors based on value */
@@ -52,7 +52,7 @@ input-with-clear{
   white-space: normal;      /* Allow wrapping */
   word-wrap: break-word;    /* Ensure long words wrap too */
   padding: 8px;             /* Optional: spacing inside */
-font-family: system-ui, sans-serif;
+font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 font-size: 1.1rem;
 border: none;
 
@@ -64,7 +64,7 @@ border: none;
 
 .th5 {
   background-color: white;
-font-family: system-ui, sans-serif;
+font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 font-size: 1.2rem;
  /*  border-top: 5px solid #222222; */
  text-align: center;       /* Center the text horizontally */
@@ -83,7 +83,7 @@ font-size: 1.2rem;
  
 .dark .th4  { 
   background-color: #2c2c2c; 
-font-family: system-ui, sans-serif;
+font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 font-size: 1.2rem;
 
 
@@ -221,7 +221,7 @@ background-color: transparent;
             transition: 0.5s;
             background-size: 200% auto;
                     color: #d32a7c;
-       font-family: system-ui, sans-serif;
+       font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 
            
           }
@@ -430,7 +430,7 @@ color: rgb(132, 161, 255)
 .table-container table {
   width: 100%;
   table-layout: fixed;
- font-family: system-ui, sans-serif;
+ font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 
 
 }
@@ -652,7 +652,7 @@ margin-top: 7px;
   border-radius: 4px;
   box-sizing: border-box;
  
-  font-family: system-ui, sans-serif;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 
 
 }
@@ -669,7 +669,7 @@ margin-top: 7px;
 
 
  #entrySubmitBtn {background-color:     #fdf6de;
-font-family: system-ui, sans-serif;
+font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 font-weight: bold;
 
         border: 1px solid transparent;
@@ -706,7 +706,7 @@ text-align: center;
 
 }
 .table-container {
- font-family: system-ui, sans-serif;
+ font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 
 
 }
@@ -714,7 +714,7 @@ text-align: center;
  border: none;
  text-align: center;
  background-color: rgb(245, 245, 248);
-font-family: system-ui, sans-serif;
+font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 font-size: 1.2rem !important;
  color: blue;
 
@@ -734,7 +734,7 @@ font-weight: bolder;
  height: 44px;
 
    
-                    font-family: system-ui, sans-serif;
+                    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 
           }
 
@@ -759,7 +759,7 @@ font-weight: bolder;
  height: 44px;
 
    
-                    font-family: system-ui, sans-serif;
+                    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 
           }
 
@@ -784,7 +784,7 @@ font-size: 1rem;
 margin-left: 10px;
    width: 80px;
  height: 44px;
-          font-family: system-ui, sans-serif;
+          font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 
           }
 
@@ -806,7 +806,7 @@ font-size: 1rem;
 margin-left: -13px;
    width: 80px;
  height: 44px;
-          font-family: system-ui, sans-serif;
+          font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
    margin-top: -8px;
           }
 
@@ -1099,7 +1099,7 @@ user-select: none;
   width: 160px;
    color: white !important;
   font-size: 15px;
-  font-family: system-ui, sans-serif;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 margin-left: 8px;
 padding-top: 3px;
 font-size: 1rem;
@@ -1112,7 +1112,7 @@ padding-bottom: 3px;
   width: 15px;
   height: 15px;
 margin-right: 15px;
-font-family: system-ui, sans-serif;
+font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
    color: white !important;
   accent-color: #00aaff; /* optional: blue checkmark */
   cursor: pointer;
@@ -1171,7 +1171,7 @@ box-shadow: 0 4px 6px rgba(100, 99, 99, 0.447);
 color:  #71d0ff !important; /* optional: blue checkmark */
 }
 #h4  {
-font-family: system-ui, sans-serif;
+font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 
 font-size: 1.1rem;
 }
@@ -1227,7 +1227,7 @@ margin-right: 20px;
 
 }
 .right-filters label  {
-font-family: system-ui, sans-serif;
+font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 
 font-weight: normal;
  color: #f372ce;
@@ -1251,7 +1251,7 @@ font-weight: normal;
  
  font-size: 1rem;
     color: #ec5cb3;
-font-family: system-ui, sans-serif;
+font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
 
 .filters {
@@ -1279,7 +1279,7 @@ font-family: system-ui, sans-serif;
   height: 38px;
   padding: 6px 10px;
   color: #333;
- font-family: system-ui, sans-serif;
+ font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
   width: 99%;        /* 🟢 Makes all inputs full width inside their container */
   box-sizing: border-box;
   border-radius: 4px;
@@ -1349,7 +1349,7 @@ font-family: system-ui, sans-serif;
       padding: 0.5rem 1rem;
       background-color: rgb(252, 252, 153);
       border: none;
-     font-family: system-ui, sans-serif;
+     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 font-size: 1rem;
       cursor: pointer;
       border-radius: 10px;
@@ -1397,7 +1397,7 @@ font-size: 1rem;
       padding: 0.5rem 1rem;
       font-size: 1rem;
       cursor: pointer;
-           font-family: system-ui, sans-serif;
+           font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 border: none;
 background-color: white;
 border: 1px solid rgb(231, 229, 229);
@@ -1453,7 +1453,7 @@ user-select: none;
   width: 160px;
    color: white !important;
   font-size: 15px;
-  font-family: system-ui, sans-serif;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 margin-left: 8px;
 padding-top: 3px;
 font-size: 1rem;
@@ -1467,7 +1467,7 @@ padding-bottom: 3px;
   width: 15px;
   height: 15px;
 
-font-family: system-ui, sans-serif;
+font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
    color: white !important;
   accent-color: #00aaff; /* optional: blue checkmark */
   cursor: pointer;
@@ -1697,7 +1697,7 @@ select:disabled {
 
 .cancel-btn {
 background-color:     #fdf6de;
-font-family: system-ui, sans-serif;
+font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 font-weight: bold;
 
         border: 1px solid transparent;
@@ -1896,4 +1896,34 @@ font-weight: bold;
 .status-pill.paid {
   background-color: #9ffee8;
    color: black;
+}
+
+
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 12px;
+  background: #fafafa;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.filter-grid input,
+.filter-grid select {
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background-color: white;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+
+@media (max-width: 600px) {
+  .filter-grid {
+    grid-template-columns: 1fr;
+  }
 }
