@@ -166,12 +166,12 @@
       <option value="Open">Open</option>
       <option value="Paid">Paid</option>
     </select>
-  </div>
-
-  <div class="form-actions">
-    <button id="entrySubmitBtn" class="add-entry-button" onclick="submitEntry()">Add Entry</button>
+ 
+<button id="entrySubmitBtn" class="add-entry-button" onclick="submitEntry()">Add Entry</button>
     <button id="cancelEditBtn" class="cancel-btn hidden" onclick="cancelEdit()">Cancel</button>
-  </div>
+  <div class="form-actions">
+    
+  </div> </div>
 </form>
    
        </div>
@@ -824,33 +824,31 @@ function chartOptions() {
 document.getElementById('categoryFilter')?.addEventListener('change', drawCharts);
 </script>
 
-
- <div class="scroll-toggle-wrapper">
- <div class="scroll-toggle-wrapper">
+<!-- HTML (somewhere in your body) -->
+<div class="scroll-toggle-wrapper">
   <button id="scrollBtn1" class="scroll-toggle-btn" title="Scroll">⬆</button>
 </div>
-</div>
+
+<!-- Place this script AFTER the button or at the end of body -->
 <script>
-const scrollBtn1 = document.getElementById('scrollBtn1');
-document.addEventListener('DOMContentLoaded', () => {
-  const scrollBtn1 = document.getElementById('scrollBtn1');
-  if (!scrollBtn1) return;
+  document.addEventListener("DOMContentLoaded", () => {
+    const scrollBtn1 = document.getElementById('scrollBtn1');
+    if (!scrollBtn1) return; // ✅ Prevent the error
 
-  // Change icon on scroll
-  window.addEventListener('scroll', () => {
-    const isTop = window.scrollY < 100;
-    scrollBtn1.textContent = isTop ? '⬇' : '⬆';
+    window.addEventListener('scroll', () => {
+      const isTop = window.scrollY < 100;
+      scrollBtn1.textContent = isTop ? '⬇' : '⬆';
+    });
+
+    scrollBtn1.addEventListener('click', () => {
+      const isTop = window.scrollY < 100;
+      window.scrollTo({
+        top: isTop ? document.body.scrollHeight : 0,
+        behavior: 'smooth'
+      });
+    });
   });
-
-  // Scroll on click
-  scrollBtn1.addEventListener('click', () => {
-    const isTop = window.scrollY < 100;
-    window.scrollTo({ top: isTop ? document.body.scrollHeight : 0, behavior: 'smooth' });
-  });
-});
-
 </script>
-
 <div id="confirmModal" class="modal hidden">
   <div class="modal-content">
     <p>🗑️ Are you sure you want to delete this entry?</p>
