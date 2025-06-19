@@ -1352,19 +1352,42 @@ const totalPlus = entries.reduce((sum, e) => {
   const amount = parseFloat(e.amount) || 0;
   const status = e.status || 'Open';
   const month = e.date?.slice(0, 7);
+  const bank = e.bank;
 
+  const matchesBank = banks.includes(bank); // <-- ✅ only these banks
   const matchesStatus = statusFilter === 'All' ||
     (statusFilter === 'Paid' && status === 'Paid') ||
     (statusFilter === 'Open' && status === 'Open');
-
   const matchesMonth = selectedMonths.length === 0 || selectedMonths.includes(month);
 
-  return (type === 'income' && matchesStatus && matchesMonth) ? sum + amount : sum;
+  return (type === 'income' && matchesBank && matchesStatus && matchesMonth)
+    ? sum + amount
+    : sum;
 }, 0);
 
 // ✅ now calculate difference AFTER totalUsed is known
+
 const difference = totalLimit - totalUsed;
 const limitPlusTotal = difference + totalPlus;
+
+// ✅ Get Total Plus directly from the totals card
+// Defer totalPlus reading to the next frame to ensure it's in DOM
+requestAnimationFrame(() => {
+  let realTotalPlus = 0;
+
+  const labels = document.querySelectorAll('#bankBalanceTotals .label');
+  labels.forEach(label => {
+    if (label.textContent.includes('Total Plus')) {
+      const valueDiv = label.nextElementSibling;
+      if (valueDiv) {
+        realTotalPlus = parseFloat(valueDiv.textContent.replace('+', '')) || 0;
+      }
+    }
+  });
+
+  const limitPlusTotal = difference + realTotalPlus;
+  document.getElementById('v-limitPlusTotal').textContent = limitPlusTotal.toFixed(2);
+});
 
 // ✅ now you're safe to call update
 updateCreditSummaryCard({
@@ -1386,7 +1409,7 @@ function updateCreditSummaryCard({
   document.getElementById('v-totalLimit').textContent = totalLimit.toFixed(2);
   document.getElementById('v-totalUsed').textContent = totalUsed.toFixed(2);
   document.getElementById('v-diffUsed').textContent = diffUsed.toFixed(2);
- document.getElementById('v-limitPlusTotal').textContent = limitPlusTotal.toFixed(2);
+ document.getElementById('v-limitPlusTotal').textContent = (diffUsed + totalPlus).toFixed(2);
 
   // 🔵 Optional: If you also want to show Total Plus
   const totalPlusEl = document.getElementById('v-totalPlus');
