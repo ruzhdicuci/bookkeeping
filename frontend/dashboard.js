@@ -1310,51 +1310,69 @@ function renderCreditLimitTable() {
   const statusFilter = document.getElementById('statusFilter')?.value || 'All';
 
   entries.forEach(e => {
-    const type = (e.type || '').toLowerCase();
-    const amount = parseFloat(e.amount) || 0;
-    const status = e.status || 'Open';
-    const month = e.date?.slice(0, 7);
-    const bank = e.bank;
+  const type = (e.type || '').toLowerCase();
+  const amount = parseFloat(e.amount) || 0;
+  const status = e.status || 'Open';
+  const month = e.date?.slice(0, 7);
+  const bank = e.bank;
 
-    if (!banks.includes(bank)) return;
+  const matchesStatus = statusFilter === 'All' ||
+    (statusFilter === 'Paid' && status === 'Paid') ||
+    (statusFilter === 'Open' && status === 'Open');
+  const matchesMonth = selectedMonths.length === 0 || selectedMonths.includes(month);
 
-    const matchesStatus = statusFilter === 'All' ||
-      (statusFilter === 'Paid' && status === 'Paid') ||
-      (statusFilter === 'Open' && status === 'Open');
-    const matchesMonth = selectedMonths.length === 0 || selectedMonths.includes(month);
+  if (!banks.includes(bank)) {
+    console.log("❌ Skipped (bank not matched):", bank);
+    return;
+  }
 
-    if (matchesStatus && matchesMonth) {
-      changes[bank] += type === 'income' ? amount : -amount;
-    }
-  });
-
-  let totalUsed = 0, totalLimit = 0;
-  banks.forEach(bank => {
-    const credit = limits[bank];
-    const change = changes[bank];
-    if (change < 0) totalUsed += Math.abs(change);
-    totalLimit += credit;
-  });
-
-  const totalPlus = Object.values(changes).filter(v => v > 0).reduce((a, b) => a + b, 0);
-  const difference = totalLimit - totalUsed;
-const limitPlusTotal = difference + totalPlus;
-
-console.log("🧮 Calculated:", {
-  totalLimit,
-  totalUsed,
-  difference,
-  totalPlus,
-  limitPlusTotal
+  if (matchesStatus && matchesMonth) {
+    changes[bank] += type === 'income' ? amount : -amount;
+    console.log("✅ Included entry:", { type, amount, status, bank, month });
+  } else {
+    console.log("⛔ Filtered out:", { type, amount, status, bank, month });
+  }
 });
 
 
+// ✅ Correct totalPlus by recalculating based on all matching income entries
+// ⬅️ totalUsed and totalLimit are calculated first
+let totalUsed = 0, totalLimit = 0;
+banks.forEach(bank => {
+  const credit = limits[bank];
+  const change = changes[bank];
+  if (change < 0) totalUsed += Math.abs(change);
+  totalLimit += credit;
+});
+
+// ⬅️ now recalculate totalPlus properly
+// ✅ Total Plus only from the banks in limits[] and filtered months/status
+const totalPlus = entries.reduce((sum, e) => {
+  const type = (e.type || '').toLowerCase();
+  const amount = parseFloat(e.amount) || 0;
+  const status = e.status || 'Open';
+  const month = e.date?.slice(0, 7);
+
+  const matchesStatus = statusFilter === 'All' ||
+    (statusFilter === 'Paid' && status === 'Paid') ||
+    (statusFilter === 'Open' && status === 'Open');
+
+  const matchesMonth = selectedMonths.length === 0 || selectedMonths.includes(month);
+
+  return (type === 'income' && matchesStatus && matchesMonth) ? sum + amount : sum;
+}, 0);
+
+// ✅ now calculate difference AFTER totalUsed is known
+const difference = totalLimit - totalUsed;
+const limitPlusTotal = difference + totalPlus;
+
+// ✅ now you're safe to call update
 updateCreditSummaryCard({
   totalLimit,
   totalUsed,
   diffUsed: difference,
-  limitPlusTotal,          // ✅ COMMA here
-  totalPlus                // ✅ Now this line is valid
+  limitPlusTotal,
+  totalPlus
 });
 }
 
@@ -1368,7 +1386,7 @@ function updateCreditSummaryCard({
   document.getElementById('v-totalLimit').textContent = totalLimit.toFixed(2);
   document.getElementById('v-totalUsed').textContent = totalUsed.toFixed(2);
   document.getElementById('v-diffUsed').textContent = diffUsed.toFixed(2);
-  document.getElementById('v-limitPlusTotal').textContent = limitPlusTotal.toFixed(2);
+ document.getElementById('v-limitPlusTotal').textContent = limitPlusTotal.toFixed(2);
 
   // 🔵 Optional: If you also want to show Total Plus
   const totalPlusEl = document.getElementById('v-totalPlus');
