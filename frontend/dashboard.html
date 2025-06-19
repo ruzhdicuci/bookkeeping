@@ -253,51 +253,51 @@ totalsContainer.appendChild(summaryCard);
 }
 </script>
 
-
 <div class="filter-grid" style="margin-top: 15px; margin-bottom: 20px;">
-<div class="credit-section-wrapper">
-  <div id="creditLimitTable" style="margin-top: 0.7rem;">
-    
-    <!-- First row: Limit inputs -->
-    <table>
-      <thead >
-        <tr>
-          <th id="t1">UBS Master</th>
-          <th id="t1">Corner Master</th>
-          <th id="t1">Post Master</th>
-          <th id="t1">Cembra</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td font-family: system-ui, sans-serif;><input type="number" id="creditLimit-ubs" value="3000" /></td>
-          <td font-family: system-ui, sans-serif;><input type="number" id="creditLimit-corner" value="9900" /></td>
-          <td font-family: system-ui, sans-serif;><input type="number" id="creditLimit-pfm" value="1000" /></td>
-          <td font-family: system-ui, sans-serif;><input type="number" id="creditLimit-cembra" value="10000" /></td>
-        </tr>
-      </tbody>
-    </table>
+  <div class="credit-section-wrapper">
 
-    <!-- Second row: Calculated outputs -->
-    <table>
-      <thead>
-        <tr>
-          <th id="t1">Total Limit</th>
-          <th id="t1">Limit Minus</th>
-          <th id="t1">Mbetja</th>
-          <th id="t1">Mbetja + Total Plus</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td ><input type="number" readonly id="totalLimit" /></td>
-          <td ><input type="number" readonly id="totalUsed" /></td>
-          <td ><input type="number" readonly id="diffUsed" /></td>
-          <td ><input type="number" readonly id="limitPlusTotal" /></td>
-        </tr>
-      </tbody>
-    </table>
+    <!-- 💳 First row: Editable Credit Limits -->
+    <div class="credit-card-grid">
+      <div class="credit-card">
+        <div class="label">UBS Master</div>
+        <input type="number" id="creditLimit-ubs" value="3000" />
+      </div>
+      <div class="credit-card">
+        <div class="label">Corner Master</div>
+        <input type="number" id="creditLimit-corner" value="9900" />
+      </div>
+      <div class="credit-card">
+        <div class="label">Post Master</div>
+        <input type="number" id="creditLimit-pfm" value="1000" />
+      </div>
+      <div class="credit-card">
+        <div class="label">Cembra</div>
+        <input type="number" id="creditLimit-cembra" value="10000" />
+      </div>
+    </div>
 
+    <!-- 📊 Second row: Read-only totals -->
+    <div class="credit-card-grid" style="margin-top: 20px;">
+      <div class="credit-card">
+        <div class="label">Total Limit</div>
+        <input type="number" readonly id="totalLimit" />
+      </div>
+      <div class="credit-card">
+        <div class="label">Limit Minus</div>
+        <input type="number" readonly id="totalUsed" />
+      </div>
+      <div class="credit-card">
+        <div class="label">Mbetja</div>
+        <input type="number" readonly id="diffUsed" />
+      </div>
+      <div class="credit-card">
+        <div class="label">Mbetja + Total Plus</div>
+        <input type="number" readonly id="limitPlusTotal" />
+      </div>
+    </div>
+
+  </div>
+</div>
     <!-- Action buttons -->
     <div style="text-align: left; margin-top: 0.5rem;">
       <button class="save1" onclick="saveCreditLimits()">Save</button>

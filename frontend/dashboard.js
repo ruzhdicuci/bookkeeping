@@ -1320,14 +1320,14 @@ console.log("🔍 Parsed bank headers:", [...headerCells].map(th => `[${th.textC
     .filter(([_, value]) => value > 0)
     .reduce((sum, [, value]) => sum + value, 0);
 
-  let totalLimit = 0, totalUsed = 0;
-  banks.forEach(bank => {
-    const credit = limits[bank];
-    const used = Math.abs(changes[bank] || 0);
-    totalLimit += credit;
-    totalUsed += used;
-  });
-
+let totalLimit = 0;
+let totalUsed = 0;
+banks.forEach(bank => {
+  const credit = limits[bank];
+  const change = changes[bank] || 0;
+  if (change < 0) totalUsed += Math.abs(change); // Only count negatives
+  totalLimit += credit;
+});
   const difference = totalLimit - totalUsed;
   const limitPlusTotal = difference + totalPlus;
 
@@ -1592,4 +1592,6 @@ document.addEventListener("DOMContentLoaded", () => {
     dotsContainer.appendChild(dot);
   }
 });
+
+
 
