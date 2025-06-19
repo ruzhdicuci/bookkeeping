@@ -1334,6 +1334,7 @@ banks.forEach(bank => {
   const difference = totalLimit - totalUsed;
   const limitPlusTotal = difference + totalPlus;
 
+  console.log("✅ Credit limit table rendered");
  document.getElementById("totalLimit").value = totalLimit.toFixed(2);
 document.getElementById("totalUsed").value = totalUsed.toFixed(2);
 document.getElementById("diffUsed").value = difference.toFixed(2);
