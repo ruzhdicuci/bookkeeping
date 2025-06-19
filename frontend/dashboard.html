@@ -240,6 +240,7 @@ const summaryCard = document.createElement("div");
 summaryCard.className = "balance-summary-card";
 summaryCard.innerHTML = `
   <div class="label">Total Plus</div>
+  <div class="value" id="v-totalPlus" style="color:#00bfff">+0.00</div>
   <div class="value" style="color:#00bfff">+${totalPlus.toFixed(2)}</div>
   <div class="label">Total Minus</div>
   <div class="value" style="color:orangered">${totalMinus.toFixed(2)}</div>

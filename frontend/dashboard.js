@@ -1348,6 +1348,7 @@ console.log("🧮 Calculated:", {
   limitPlusTotal
 });
 
+
 updateCreditSummaryCard({
   totalLimit,
   totalUsed,
@@ -1371,7 +1372,7 @@ function updateCreditSummaryCard({
 
   // 🔵 Optional: If you also want to show Total Plus
   const totalPlusEl = document.getElementById('v-totalPlus');
-  if (totalPlusEl) totalPlusEl.textContent = totalPlus.toFixed(2);
+if (totalPlusEl) totalPlusEl.textContent = '+' + totalPlus.toFixed(2);
 }
 // ✅ Load credit limits from backend
 async function loadCreditLimits() {
