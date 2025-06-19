@@ -1287,7 +1287,9 @@ function setLockState(locked) {
 }
 
 // ✅ Render credit limit calculations
-  function renderCreditLimitTable() {
+function renderCreditLimitTable() {
+  console.log("🔧 Running renderCreditLimitTable");
+
   const limits = {
     "UBS Master": parseFloat(document.getElementById("creditLimit-ubs")?.value || 0),
     "Corner": parseFloat(document.getElementById("creditLimit-corner")?.value || 0),
@@ -1295,33 +1297,38 @@ function setLockState(locked) {
     "Cembra": parseFloat(document.getElementById("creditLimit-cembra")?.value || 0)
   };
 
+  console.log("📊 Limits:", limits);
 
+  const headerCells = document.querySelectorAll("#bankBalanceTableContainer thead th");
+  const changeCells = document.querySelectorAll("#bankBalanceTableContainer tbody tr:nth-child(2) td");
 
- const headerCells = document.querySelectorAll("#bankBalanceTableContainer thead th");
-const changeCells = document.querySelectorAll("#bankBalanceTableContainer tbody tr:nth-child(2) td");
+  const bankNameAliases = {
+    "Post Master": "Postfinance Master",
+    "Corner Master": "Corner",
+    "UBS Master": "UBS Master",
+    "Cembra": "Cembra"
+  };
 
-const banks = Object.keys(limits);
-const changes = {};
-const allChanges = {};
+  const banks = Object.keys(limits);
+  const changes = {};
+  const allChanges = {};
 
-const bankNameAliases = {
-  "Post Master": "Postfinance Master",
-  "Corner Master": "Corner",
-  "UBS Master": "UBS Master",
-  "Cembra": "Cembra"
-};
-headerCells.forEach((th, i) => {
-  const rawName = th.textContent.trim();
-  const bank = bankNameAliases[rawName] || rawName;
-  const val = parseFloat(changeCells[i]?.textContent) || 0;
+  console.log("🔍 Raw Header Cells:", [...headerCells].map(th => th.textContent.trim()));
 
-banks.forEach(bank => {
-  const credit = limits[bank];
-  const change = changes[bank] || 0;
+  headerCells.forEach((th, i) => {
+    const rawBank = th.textContent.trim();
+    const mappedBank = bankNameAliases[rawBank] || rawBank;
+    const val = parseFloat(changeCells[i]?.textContent || "0");
 
-  if (change < 0) totalUsed += Math.abs(change);
-  totalLimit += credit;
-});
+    console.log(`👉 Header: "${rawBank}" → "${mappedBank}" | Value: ${val}`);
+
+    allChanges[mappedBank] = val;
+    if (banks.includes(mappedBank)) {
+      changes[mappedBank] = val;
+    } else {
+      console.warn(`⚠️ Bank "${mappedBank}" not found in limits list!`);
+    }
+  });
 
   if (!("Cembra" in allChanges)) {
     allChanges["Cembra"] = 0;
@@ -1331,31 +1338,35 @@ banks.forEach(bank => {
     .filter(([_, value]) => value > 0)
     .reduce((sum, [, value]) => sum + value, 0);
 
-let totalUsed = 0;
-let totalLimit = 0;
+  let totalUsed = 0;
+  let totalLimit = 0;
 
-banks.forEach(bank => {
-  const credit = limits[bank];
-  const change = changes[bank] || 0;
+  banks.forEach(bank => {
+    const credit = limits[bank];
+    const change = changes[bank] ?? 0;
 
-  if (change < 0) totalUsed += Math.abs(change); // ✅ Only negative change
-  totalLimit += credit;
-});
+    console.log(`💳 ${bank} → Change: ${change}, Credit: ${credit}`);
+
+    if (change < 0) {
+      totalUsed += Math.abs(change);
+    }
+    totalLimit += credit;
+  });
+
   const difference = totalLimit - totalUsed;
   const limitPlusTotal = difference + totalPlus;
 
-  console.log("✅ Credit limit table rendered");
- document.getElementById("totalLimit").value = totalLimit.toFixed(2);
-document.getElementById("totalUsed").value = totalUsed.toFixed(2);
-document.getElementById("diffUsed").value = difference.toFixed(2);
-document.getElementById("limitPlusTotal").value = limitPlusTotal.toFixed(2);
+  console.log("✅ Final Totals → Limit:", totalLimit, "| Used:", totalUsed, "| Diff:", difference, "| With Plus:", limitPlusTotal);
 
-  applyValueColor(document.getElementById('totalUsed'), totalUsed);
-  applyValueColor(document.getElementById('limitPlusTotal'), limitPlusTotal);
+  document.getElementById("totalLimit").value = totalLimit.toFixed(2);
+  document.getElementById("totalUsed").value = totalUsed.toFixed(2);
+  document.getElementById("diffUsed").value = difference.toFixed(2);
+  document.getElementById("limitPlusTotal").value = limitPlusTotal.toFixed(2);
+
+  applyValueColor(document.getElementById("totalUsed"), totalUsed);
+  applyValueColor(document.getElementById("limitPlusTotal"), limitPlusTotal);
   applyValueColor(document.getElementById("diffUsed"), difference);
-
- 
-} // ← ✅ END of renderCreditLimitTable
+}
 
 // ✅ Load credit limits from backend
 async function loadCreditLimits() {
