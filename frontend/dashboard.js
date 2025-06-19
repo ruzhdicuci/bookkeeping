@@ -1,4 +1,3 @@
-
 const apiBase = 'https://bookkeeping-i8e0.onrender.com';
 const token = localStorage.getItem('token');
 
@@ -1631,5 +1630,4 @@ document.addEventListener("DOMContentLoaded", () => {
     dotsContainer.appendChild(dot);
   }
 });
-
 

@@ -187,12 +187,41 @@
 
 
 
-<div class="table-wrapper">
-  <div id="bankSlider" style="overflow-x: auto; scroll-behavior: smooth;">
-    <div class="th2" id="bankBalanceTableContainer"></div>
-  </div>
-  <div id="bankSliderDots" class="slider-dots"></div>
-</div>
+
+  
+    <!-- Original table rendering (can stay for fallback/testing) -->
+<div class="th2" id="bankBalanceTableContainer"></div>
+
+<!-- New card-based layout -->
+<div id="bankBalanceCards" class="balance-card-grid"></div>
+<script>
+
+function renderBankBalanceCards() {
+  const container = document.getElementById('bankBalanceCards');
+  if (!container) return;
+
+  const changeRow = document.querySelector("#bankBalanceTableContainer tbody tr:nth-child(2)");
+  const headerCells = document.querySelectorAll("#bankBalanceTableContainer thead th");
+  const changeCells = changeRow?.querySelectorAll("td");
+
+  if (!changeRow || !changeCells) return;
+
+  container.innerHTML = '';
+
+  changeCells.forEach((td, i) => {
+    const bank = headerCells[i + 1]?.textContent?.trim(); // skip date column
+    const value = parseFloat(td.textContent) || 0;
+
+    const card = document.createElement('div');
+    card.className = 'balance-card';
+    card.innerHTML = `
+      <div class="bank-name">${bank}</div>
+      <div class="value ${value >= 0 ? 'plus' : 'minus'}">${value.toFixed(2)}</div>
+    `;
+    container.appendChild(card);
+  });
+}
+</script>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
@@ -231,46 +260,46 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
  
 
-
+<div class="filter-grid" style="margin-top: 15px; margin-bottom: 20px;">
 <div class="credit-section-wrapper">
   <div id="creditLimitTable" style="margin-top: 0.7rem;">
     
     <!-- First row: Limit inputs -->
-    <table class="th4">
-      <thead>
+    <table>
+      <thead >
         <tr>
-          <th>UBS Master</th>
-          <th>Corner Master</th>
-          <th>Post Master</th>
-          <th>Cembra</th>
+          <th id="t1">UBS Master</th>
+          <th id="t1">Corner Master</th>
+          <th id="t1">Post Master</th>
+          <th id="t1">Cembra</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td class="th5"><input type="number" id="creditLimit-ubs" value="3000" /></td>
-          <td class="th5"><input type="number" id="creditLimit-corner" value="9900" /></td>
-          <td class="th5"><input type="number" id="creditLimit-pfm" value="1000" /></td>
-          <td class="th5"><input type="number" id="creditLimit-cembra" value="10000" /></td>
+          <td font-family: system-ui, sans-serif;><input type="number" id="creditLimit-ubs" value="3000" /></td>
+          <td font-family: system-ui, sans-serif;><input type="number" id="creditLimit-corner" value="9900" /></td>
+          <td font-family: system-ui, sans-serif;><input type="number" id="creditLimit-pfm" value="1000" /></td>
+          <td font-family: system-ui, sans-serif;><input type="number" id="creditLimit-cembra" value="10000" /></td>
         </tr>
       </tbody>
     </table>
 
     <!-- Second row: Calculated outputs -->
-    <table class="th4">
+    <table>
       <thead>
         <tr>
-          <th>Total Limit</th>
-          <th>Limit Minus</th>
-          <th>Mbetja</th>
-          <th>Mbetja + Total Plus</th>
+          <th id="t1">Total Limit</th>
+          <th id="t1">Limit Minus</th>
+          <th id="t1">Mbetja</th>
+          <th id="t1">Mbetja + Total Plus</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td class="th5"><input type="number" readonly id="totalLimit" /></td>
-          <td class="th5"><input type="number" readonly id="totalUsed" /></td>
-          <td class="th5"><input type="number" readonly id="diffUsed" /></td>
-          <td class="th5"><input type="number" readonly id="limitPlusTotal" /></td>
+          <td ><input type="number" readonly id="totalLimit" /></td>
+          <td ><input type="number" readonly id="totalUsed" /></td>
+          <td ><input type="number" readonly id="diffUsed" /></td>
+          <td ><input type="number" readonly id="limitPlusTotal" /></td>
         </tr>
       </tbody>
     </table>
@@ -285,7 +314,7 @@ document.addEventListener("DOMContentLoaded", () => {
   </div>
 </div>
 
-
+</div>
         
 
 <div class="summary-totals-card ">
@@ -321,7 +350,7 @@ document.addEventListener("DOMContentLoaded", () => {
  </div> 
           <div class="tooltip-wrapper">
   <button class="reset-btn" onclick="resetFilters()">
-    <span class="reset-icon">↩</span> 
+    <span class="reset-icon">▪️</span> 
   </button>
   <span class="tooltip-text">Reset all filters to default</span>
 
