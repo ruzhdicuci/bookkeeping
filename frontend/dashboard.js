@@ -1304,15 +1304,25 @@ const banks = Object.keys(limits);
 const changes = {};
 const allChanges = {};
 
+const bankAliases = {
+  "UBS Master": "UBS Master",
+  "Corner Master": "Corner",
+  "Post Master": "Postfinance Master",
+  "Cembra": "Cembra"
+};
+
 headerCells.forEach((th, i) => {
-  const bank = th.textContent.trim();
+  const rawBank = th.textContent.trim();
+  const mappedBank = bankAliases[rawBank];
   const val = parseFloat(changeCells[i]?.textContent) || 0;
-  allChanges[bank] = val;
-  if (banks.includes(bank)) {
-    changes[bank] = val;
+
+  if (mappedBank) {
+    allChanges[mappedBank] = val;
+    if (banks.includes(mappedBank)) {
+      changes[mappedBank] = val;
+    }
   }
 });
-
   if (!("Cembra" in allChanges)) {
     allChanges["Cembra"] = 0;
   }
