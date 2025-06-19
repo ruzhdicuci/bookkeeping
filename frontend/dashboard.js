@@ -1352,7 +1352,8 @@ updateCreditSummaryCard({
   totalLimit,
   totalUsed,
   diffUsed: difference,
-  limitPlusTotal: limitPlusTotal // make sure this is updated value
+  limitPlusTotal,          // ✅ COMMA here
+  totalPlus                // ✅ Now this line is valid
 });
 }
 
