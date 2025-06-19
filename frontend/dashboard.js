@@ -1352,17 +1352,17 @@ const totalPlus = entries.reduce((sum, e) => {
   const amount = parseFloat(e.amount) || 0;
   const status = e.status || 'Open';
   const month = e.date?.slice(0, 7);
-  const bank = e.bank;
 
-  const matchesBank = banks.includes(bank); // <-- ✅ only these banks
   const matchesStatus = statusFilter === 'All' ||
     (statusFilter === 'Paid' && status === 'Paid') ||
     (statusFilter === 'Open' && status === 'Open');
+
   const matchesMonth = selectedMonths.length === 0 || selectedMonths.includes(month);
 
-  return (type === 'income' && matchesBank && matchesStatus && matchesMonth)
-    ? sum + amount
-    : sum;
+  if (type === 'income' && matchesStatus && matchesMonth) {
+    return sum + amount;
+  }
+  return sum;
 }, 0);
 
 // ✅ now calculate difference AFTER totalUsed is known

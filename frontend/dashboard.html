@@ -187,7 +187,7 @@
 
 
 
-<div class="sections2">
+<div class="filter-grid2" style="margin-top: -5px;">
   
     <!-- Original table rendering (can stay for fallback/testing) -->
 <div class="th2" id="bankBalanceTableContainer"></div>
@@ -253,15 +253,17 @@ summaryCard.innerHTML = `
 totalsContainer.appendChild(summaryCard);
 }
 </script>
+
+<div class="filter-grid">
 <!-- Editable inputs -->
 <div class="credit-section-wrapper" style="margin-top: 1rem;">
 
   <!-- 📝 Input Fields -->
   <div class="credit-limit-inputs" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">
-    <label class="card">UBS Master <input type="number" id="creditLimit-ubs" /></label>
-    <label class="card">Corner Master <input type="number" id="creditLimit-corner" /></label>
-    <label class="card">Post Master <input type="number" id="creditLimit-pfm" /></label>
-    <label class="card">Cembra <input type="number" id="creditLimit-cembra" /></label>
+    <label class="card" style="font-size: 0.75rem;  color: #666; padding-bottom: 10px;">UBS Master <input type="number" style="margin-top: 5px;"  id="creditLimit-ubs" /></label>
+    <label class="card" style="font-size: 0.75rem;  color: #666;">Corner Master <input type="number" style="margin-top: 5px;" id="creditLimit-corner" /></label>
+    <label class="card" style="font-size: 0.75rem;  color: #666;">Post Master <input type="number" style="margin-top: 5px;" id="creditLimit-pfm" /></label>
+    <label class="card" style="font-size: 0.75rem;  color: #666;">Cembra <input type="number" style="margin-top: 5px;" id="creditLimit-cembra" /></label>
   </div>
 
   <!-- 📊 Summary Cards -->
@@ -271,19 +273,20 @@ totalsContainer.appendChild(summaryCard);
     <div class="card"><div>Used</div><strong id="v-totalUsed">0.00</strong></div>
     <div class="card"><div>Left</div><strong id="v-diffUsed">0.00</strong></div>
     <div class="card"><div>Left + Total Plus</div><strong id="v-limitPlusTotal">0.00</strong></div>
-    
-  </div>
-</div>
-  <!-- 🔐 Lock/Unlock & Save -->
+      </div>  
+  
+       <!-- 🔐 Lock/Unlock & Save -->
   <div style="margin-bottom: 0.5rem;">
-    <button id="unlockBtn">🔓 Unlock</button>
-    <button id="lockBtn" style="display:none;">🔒 Lock & Save</button>
-    <button id="saveLimitsBtn" style="display:none;">💾 Save Limits</button>
-  </div>
+    <button id="unlockBtn">Unlock</button>
+    <button id="lockBtn" style="display:none;">Lock & Save</button>
+    <button id="saveLimitsBtn" style="display:none;">Save Limits</button>
 
 </div>
-        
-
+</div>
+</div>
+ 
+  </div>
+<div class="filter-grid">
 <div class="summary-totals-card ">
   <div class="summary-card">
     <div class="label">Income</div>
@@ -301,7 +304,7 @@ totalsContainer.appendChild(summaryCard);
 
 
 <div id="monthlyAverageCard"></div>
-  
+  </div>
 
 
 <div class="filter-grid2">
@@ -871,7 +874,8 @@ document.getElementById('categoryFilter')?.addEventListener('change', drawCharts
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <!-- ✅ Add these before your dashboard.js -->
-<div id="entryTableBody" class="desktop-card-list"></div>
+ <div class="filter-grid">
+<div id="entryTableBody" class="desktop-card-list"></div></div>
 <script src="dashboard.js"></script>
 
 </body>

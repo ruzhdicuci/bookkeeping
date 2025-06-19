@@ -742,45 +742,46 @@ font-weight: bolder;
 
 
 
-       .lock1 {background-color: #fdf6de;
+       #unlockBtn {background-color: #fdf6de;
         border: 1px solid transparent;
          border-radius: 10px;
 font-weight: bold;
   color: rgb(171, 32, 94);
-padding-bottom: 2px;
-font-size: 1rem;
-    margin-top: -9px;
+
+font-size: 0.9rem;
+    margin-top: 10px;
   cursor: pointer;
-margin-left: 10px;
+margin-bottom: -10px;
    width: 80px;
  height: 44px;
           font-family: system-ui, sans-serif;
 
           }
 
-         .lock1:hover {
+         .unlockBtn:hover {
           background-color: black;
             color: #FF512F ;
             text-decoration: none;
           }
 
-        #lockbalance{background-color: #fdf6de;
+        #lockBtn{background-color: #fdf6de;
    border: none ;
 font-weight: bold;
   color: rgb(255, 85, 0);
 padding-bottom: 2px;
-font-size: 1rem;
+
      border: 1px solid transparent;
          border-radius: 10px;
   cursor: pointer;
-margin-left: -13px;
-   width: 80px;
+font-size: 0.9rem;
+    margin-top: 10px;
+   width: 160px;
  height: 44px;
           font-family: system-ui, sans-serif;
-   margin-top: -8px;
+ margin-bottom: 20px;
           }
 
-          #lockbalance:hover {
+          #lockBtn:hover {
           background-color: black;
             color: #FF512F ;
             text-decoration: none;
@@ -1483,18 +1484,29 @@ height: 38px;
 
 
 .filter-grid2 {
-  display: grid;
+  
   grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  gap: 6px;
-
- margin-top: -10px;
- 
-  background: transparent;
-
+    background: #e3e0db;
+   
+  margin-top: 10px;
+  background: #e3e0db;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  margin-left: 20px;
+   margin-top: 10px;
  
 }
 
+.filter-grid3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 6px;
 
+
+ 
+  background: transparent;
+ 
+}
 
 .modal {
   position: fixed;
@@ -1763,12 +1775,14 @@ font-weight: bold;
 .filter-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 12px;
+
   margin-bottom: 10px;
   padding: 12px;
   background: #e3e0db;
   border-radius: 10px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  margin-left: 20px;
+   margin-top: 10px;
 }
 
 .filter-grid input,
@@ -1795,7 +1809,7 @@ font-weight: bold;
   flex-wrap: wrap; /* wrap on small screens */
   justify-content: center;
   gap: 0.3rem;
-  margin-bottom: 10px;
+
 
 }
 
@@ -1878,7 +1892,7 @@ font-weight: bold;
   margin-bottom: 1rem;
   align-items: center;
   margin-top: -15px;
- margin-bottom: -18px;
+ margin-bottom: -25px;
  
 }
 
@@ -2065,7 +2079,7 @@ body:hover #scrollBtn1 {
   font-size: 0.7rem;
     font-weight: normal;
   color: #272626;
-
+ margin-top: 1rem;
 }
 
 .balance-card small {
@@ -2118,16 +2132,28 @@ body:hover #scrollBtn1 {
 }
 
 
-
 .card {
-  background: #f8f8f8;
+  background: #ffffff;
   padding: 10px;
   border-radius: 8px;
   text-align: center;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  margin-top: -10px;
+   font-size: 1.1em;
 }
 .card strong {
   display: block;
-  font-size: 1.2em;
-  color: #333;
+  font-size: 1.1em;
+  color: #534545;
 }
+.card div {
+  font-size: 0.75rem;
+  margin-bottom: 4px;
+  color: #666;
+}
+
+
+
+
+
+
