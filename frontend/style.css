@@ -2073,7 +2073,7 @@ body:hover #scrollBtn1 {
   font-weight: 400 !important; /* not bold */
   color: #555 !important;
   display: block;
-  margin-bottom: 0.6rem !important;
+  margin-bottom: 0.5rem !important;
 }
 .balance-card .change-amount {
   font-size: 1.1rem;
