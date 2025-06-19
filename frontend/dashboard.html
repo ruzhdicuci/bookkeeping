@@ -187,78 +187,72 @@
 
 
 
-
+<div class="sections2">
   
     <!-- Original table rendering (can stay for fallback/testing) -->
 <div class="th2" id="bankBalanceTableContainer"></div>
 
 <!-- New card-based layout -->
 <div id="bankBalanceCards" class="balance-card-grid"></div>
+<div id="bankBalanceTotals"></div>
+
+</div>
 <script>
-
 function renderBankBalanceCards() {
-  const container = document.getElementById('bankBalanceCards');
-  if (!container) return;
+  const table = document.querySelector("#bankBalanceTableContainer table");
+  if (!table) return;
 
-  const changeRow = document.querySelector("#bankBalanceTableContainer tbody tr:nth-child(2)");
-  const headerCells = document.querySelectorAll("#bankBalanceTableContainer thead th");
-  const changeCells = changeRow?.querySelectorAll("td");
+  const headerCells = table.querySelectorAll("thead th");
+  const changeCells = table.querySelectorAll("tbody tr:nth-child(2) td");
 
-  if (!changeRow || !changeCells) return;
+  const cardContainer = document.getElementById("bankBalanceCards");
+  const totalsContainer = document.getElementById("bankBalanceTotals");
+  if (!cardContainer || !totalsContainer) return;
 
-  container.innerHTML = '';
+  cardContainer.innerHTML = "";
+  totalsContainer.innerHTML = "";
 
-  changeCells.forEach((td, i) => {
-    const bank = headerCells[i + 1]?.textContent?.trim(); // skip date column
-    const value = parseFloat(td.textContent) || 0;
+  let totalPlus = 0;
+  let totalMinus = 0;
 
-    const card = document.createElement('div');
-    card.className = 'balance-card';
+  for (let i = 1; i < headerCells.length; i++) {
+    const bank = headerCells[i].textContent.trim();
+    const delta = parseFloat(changeCells[i]?.textContent || "0") || 0;
+
+    const card = document.createElement("div");
+    card.className = "balance-card";
     card.innerHTML = `
-      <div class="bank-name">${bank}</div>
-      <div class="value ${value >= 0 ? 'plus' : 'minus'}">${value.toFixed(2)}</div>
+      <small>${bank}</small>
+      <div class="change-amount" style="color:${delta < 0 ? '#ff695d' : '#13a07f'}">${delta.toFixed(2)}</div>
     `;
-    container.appendChild(card);
-  });
+    cardContainer.appendChild(card);
+
+    // Totals
+    if (delta > 0) totalPlus += delta;
+    else totalMinus += delta;
+  }
+
+  // ✅ Append totals inside card
+ 
+if (!totalsContainer) return;
+
+const summaryCard = document.createElement("div");
+summaryCard.className = "balance-summary-card";
+summaryCard.innerHTML = `
+  <div class="label">Total Plus</div>
+  <div class="value" style="color:#00bfff">+${totalPlus.toFixed(2)}</div>
+  <div class="label">Total Minus</div>
+  <div class="value" style="color:orangered">${totalMinus.toFixed(2)}</div>
+  <div class="label">Difference</div>
+  <div class="value" style="color:${(totalPlus + totalMinus) >= 0 ? '#13a07f' : '#ff695d'}">
+    ${(totalPlus + totalMinus).toFixed(2)}
+  </div>
+`;
+
+totalsContainer.appendChild(summaryCard);
 }
 </script>
 
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const slider = document.getElementById("bankSlider");
-  const dotsContainer = document.getElementById("bankSliderDots");
-
-  if (!slider || !dotsContainer) return;
-
-  const totalScrollWidth = slider.scrollWidth - slider.clientWidth;
-  const sections = Math.ceil(slider.scrollWidth / slider.clientWidth);
-  const stepSize = slider.clientWidth;
-
-  dotsContainer.innerHTML = "";
-  for (let i = 0; i < sections; i++) {
-    const dot = document.createElement("div");
-    dot.classList.add("slider-dot");
-    if (i === 0) dot.classList.add("active");
-    dot.dataset.index = i;
-    dotsContainer.appendChild(dot);
-  }
-
-  dotsContainer.querySelectorAll(".slider-dot").forEach(dot => {
-    dot.addEventListener("click", () => {
-      const index = parseInt(dot.dataset.index, 10);
-      slider.scrollTo({ left: index * stepSize, behavior: 'smooth' });
-    });
-  });
-
-  slider.addEventListener("scroll", () => {
-    const index = Math.round(slider.scrollLeft / stepSize);
-    dotsContainer.querySelectorAll(".slider-dot").forEach((dot, i) => {
-      dot.classList.toggle("active", i === index);
-    });
-  });
-});
-</script>
- 
 
 <div class="filter-grid" style="margin-top: 15px; margin-bottom: 20px;">
 <div class="credit-section-wrapper">

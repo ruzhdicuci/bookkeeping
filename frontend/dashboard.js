@@ -811,134 +811,110 @@ function renderBankBalanceForm() {
     return;
   }
 
-// ✅ Apply status filtering for balance calculations
-const statusFilter = document.getElementById('statusFilter')?.value || 'All';
+  const statusFilter = document.getElementById('statusFilter')?.value || 'All';
+  const changes = {};
+  banks.forEach(bank => changes[bank] = 0);
 
-const changes = {};
-banks.forEach(bank => changes[bank] = 0);
-
-entries.forEach(e => {
-  const bank = e.bank;
-  const type = (e.type || '').trim().toLowerCase();
-  const amount = Math.abs(parseFloat(e.amount)) || 0;
-  const status = e.status || 'Open';
-
-  const include =
-    statusFilter === 'All' ||
-    (statusFilter === 'Paid' && status === 'Paid') ||
-    (statusFilter === 'Open' && status === 'Open');
-
-  const month = e.date?.slice(0, 7);
-  const monthMatch = selectedMonths.length === 0 || selectedMonths.includes(month);
-
-  if (include && monthMatch && bank in changes) {
-    changes[bank] += type === 'income' ? amount : -amount;
-  }
-});
-
-  // Create table HTML
-  let html = '<table><thead><tr><th></th>';
-  banks.forEach(bank => {
-    html += `<th>${bank}</th>`;
+  entries.forEach(e => {
+    const bank = e.bank;
+    const type = (e.type || '').trim().toLowerCase();
+    const amount = Math.abs(parseFloat(e.amount)) || 0;
+    const status = e.status || 'Open';
+    const include = (
+      statusFilter === 'All' ||
+      (statusFilter === 'Paid' && status === 'Paid') ||
+      (statusFilter === 'Open' && status === 'Open')
+    );
+    const month = e.date?.slice(0, 7);
+    const monthMatch = selectedMonths.length === 0 || selectedMonths.includes(month);
+    if (include && monthMatch && bank in changes) {
+      changes[bank] += type === 'income' ? amount : -amount;
+    }
   });
-  html += '</tr></thead><tbody>';
 
-  // Row 1: Initial balances
-  html += '<tr><td><a id="h4">26 Maj 2025</a></td>';
-  banks.forEach(bank => {
-    const val = initialBankBalances[bank] ?? 0;
-    html += `<td><input type="number" step="0.01" data-bank="${bank}" value="${val}" ${window.initialLocked ? 'readonly' : ''} /></td>`;
-  });
-  html += '</tr>';
+  // Clear container
+  container.innerHTML = '';
 
-  // Row 2: Change
-  html += '<tr><td><a id="h4">Change</a></td>';
+  // Card grid
+  const cardGrid = document.createElement('div');
+  cardGrid.className = 'balance-card-grid';
+
+  let totalPlus = 0, totalMinus = 0;
+
   banks.forEach(bank => {
     const delta = changes[bank] ?? 0;
-    const color = delta < 0 ? '#ff695d' : '#13a07f';
-    html += `<td id="center1" style="color:${color}">${delta.toFixed(2)}</td>`;
-  });
-  html += '</tr>';
-  html += '</tbody></table>';
+    if (delta > 0) totalPlus += delta;
+    else totalMinus += delta;
 
-  // ✅ Calculate totals
-  let totalPositive = 0;
-  let totalNegative = 0;
-  Object.values(changes).forEach(val => {
-    if (val > 0) totalPositive += val;
-    else totalNegative += val;
+    const card = document.createElement('div');
+    card.className = 'balance-card';
+    card.innerHTML = `
+      <small>${bank}</small>
+      <div class="change-amount" style="color:${delta < 0 ? '#ff695d' : '#13a07f'}">${delta.toFixed(2)}</div>
+    `;
+    cardGrid.appendChild(card);
   });
 
-  // ✅ Append summary
-const difference = totalPositive + totalNegative;
-const formattedDifference = (difference >= 0 ? '+' : '') + difference.toFixed(2);
-
-html += `
-  <div style="display: flex; align-items: center; gap: 1.5rem; margin-top: 1rem; flex-wrap: wrap;">
-    <button id="saveBankBalances" onclick="saveBankBalances()">Save</button>
-    <button id="lockbalance" onclick="toggleLock()">${window.initialLocked ? 'Unlock' : 'Lock'}</button>
-
-    <div style="display: flex; gap: 1.5rem; align-items: center;">
-      <span>Total Plus:&nbsp; 
-        <span style="color: #00bfff; font-size: 22px;">+${totalPositive.toFixed(2)}</span>
-      </span>
-      <span>Total Minus:&nbsp; 
-        <span style="color: rgb(254, 110, 38); font-size: 22px;">${totalNegative.toFixed(2)}</span>
-      </span>
-      <span>Difference:&nbsp;
-        <span style="color: ${difference >= 0 ? '#13a07f' : '#ff695d'}; font-size: 22px;">
-          ${formattedDifference}
-        </span>
-      </span>
+  // Totals card (inline style version)
+  const summaryCard = document.createElement("div");
+  summaryCard.className = "balance-summary-card";
+summaryCard.innerHTML = `
+  <div>
+    <div class="label">Total Plus</div>
+    <div class="value" style="color:#00bfff">+${totalPlus.toFixed(2)}</div>
+  </div>
+  <div>
+    <div class="label">Total Minus</div>
+    <div class="value" style="color:orangered">${totalMinus.toFixed(2)}</div>
+  </div>
+  <div>
+    <div class="label">Difference</div>
+    <div class="value" style="color:${(totalPlus + totalMinus) >= 0 ? '#13a07f' : '#ff695d'}">
+      ${(totalPlus + totalMinus).toFixed(2)}
     </div>
   </div>
 `;
 
-  container.innerHTML = html;
+  container.appendChild(cardGrid);
+  container.appendChild(summaryCard);
 
-  // ✅ Trigger update for dependent components
   window.dispatchEvent(new Event('bankBalanceUpdated'));
 }
 
-window.initialLocked = true;
+function renderBankBalanceCards() {
+  const table = document.querySelector("#bankBalanceTableContainer table");
+  if (!table) return;
 
-async function saveBankBalances() {
-  const inputs = document.querySelectorAll('[data-bank]');
-  inputs.forEach(input => {
-    const bank = input.dataset.bank;
-    initialBankBalances[bank] = parseFloat(input.value) || 0;
-  });
+  const headerCells = table.querySelectorAll("thead th");
+  const initialCells = table.querySelectorAll("tbody tr:nth-child(1) td");
+  const changeCells = table.querySelectorAll("tbody tr:nth-child(2) td");
 
-  localStorage.setItem('initialBankBalances', JSON.stringify(initialBankBalances)); // Optional
+  // Remove existing cards
+  const cardContainer = document.getElementById("bankBalanceCards");
+  if (!cardContainer) return;
 
-  // ✅ Save to MongoDB backend
-  await fetch('https://bookkeeping-i8e0.onrender.com/api/balances', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(initialBankBalances),
-  });
+  cardContainer.innerHTML = "";
 
-  renderBankBalanceForm();
-  renderEntries();
+  for (let i = 1; i < headerCells.length; i++) {
+    const name = headerCells[i].textContent.trim();
+    const initial = initialCells[i]?.querySelector("input")?.value || "0.00";
+    const change = parseFloat(changeCells[i]?.textContent || "0");
+    const changeColor = change < 0 ? "#ff695d" : "#13a07f";
+
+    const card = document.createElement("div");
+    card.className = "bank-card";
+    card.innerHTML = `
+      <div class="bank-name">${name}</div>
+      <div class="bank-initial">Initial: ${parseFloat(initial).toFixed(2)}</div>
+      <div class="bank-change" style="color: ${changeColor};">
+        Change: ${change.toFixed(2)}
+      </div>
+    `;
+
+    cardContainer.appendChild(card);
+  }
 }
 
-
-
-
-
-
-
-// Resize alignment for consistency
-setTimeout(() => {
-  const mainTable = document.querySelector('table');
-  const bankTable = document.querySelector('#bankBalanceTableContainer table');
-  if (mainTable && bankTable) {
-    bankTable.style.width = `${mainTable.offsetWidth}px`;
-  }
-}, 0);
 
 
 
@@ -1189,20 +1165,6 @@ function calculateCurrentBankBalance(bankName) {
            : sum;
     }, 0);
 }
-
-
-
-
-function toggleLock() {
-  window.initialLocked = !window.initialLocked;
-  renderBankBalanceForm();
-}
-
-
-
-
-
-
 
 
 
