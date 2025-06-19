@@ -1286,7 +1286,7 @@ function setLockState(locked) {
   unlockBtn.style.display = locked ? 'inline-block' : 'none';
 }
 
-// ✅ Render credit limit calculationsunction renderCreditLimitTable() {
+// ✅ Render credit limit calculations
   function renderCreditLimitTable() {
   const limits = {
     "UBS Master": parseFloat(document.getElementById("creditLimit-ubs")?.value || 0),
