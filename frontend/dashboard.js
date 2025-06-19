@@ -1269,6 +1269,11 @@ document.getElementById('statusFilter')?.addEventListener('change', () => {
 });
 });
 
+  ['creditLimit-ubs', 'creditLimit-corner', 'creditLimit-pfm', 'creditLimit-cembra'].forEach(id => {
+    const input = document.getElementById(id);
+    if (input) input.addEventListener('input', renderCreditLimitTable);
+  });
+
 // ✅ Lockable inputs
 const limitInputs = {
   ubs: document.getElementById('creditLimit-ubs'),
@@ -1281,15 +1286,15 @@ const lockBtn = document.getElementById('lockBtn');
 const unlockBtn = document.getElementById('unlockBtn');
 
 function setLockState(locked) {
-  Object.values(limitInputs).forEach(input => input.disabled = locked);
-  lockBtn.style.display = locked ? 'none' : 'inline-block';
-  unlockBtn.style.display = locked ? 'inline-block' : 'none';
+  Object.values(limitInputs).forEach(input => {
+    if (input) input.disabled = locked;
+  });
+
+  if (lockBtn) lockBtn.style.display = locked ? 'none' : 'inline-block';
+  if (unlockBtn) unlockBtn.style.display = locked ? 'inline-block' : 'none';
 }
 
-// ✅ Render credit limit calculations
 function renderCreditLimitTable() {
-  console.log("🔧 Running renderCreditLimitTable");
-
   const limits = {
     "UBS Master": parseFloat(document.getElementById("creditLimit-ubs")?.value || 0),
     "Corner": parseFloat(document.getElementById("creditLimit-corner")?.value || 0),
@@ -1297,77 +1302,76 @@ function renderCreditLimitTable() {
     "Cembra": parseFloat(document.getElementById("creditLimit-cembra")?.value || 0)
   };
 
-  console.log("📊 Limits:", limits);
-
-  const headerCells = document.querySelectorAll("#bankBalanceTableContainer thead th");
-  const changeCells = document.querySelectorAll("#bankBalanceTableContainer tbody tr:nth-child(2) td");
-
-  const bankNameAliases = {
-    "Post Master": "Postfinance Master",
-    "Corner Master": "Corner",
-    "UBS Master": "UBS Master",
-    "Cembra": "Cembra"
-  };
-
   const banks = Object.keys(limits);
   const changes = {};
-  const allChanges = {};
+  banks.forEach(bank => changes[bank] = 0);
 
-  console.log("🔍 Raw Header Cells:", [...headerCells].map(th => th.textContent.trim()));
+  const selectedMonths = Array.from(document.querySelectorAll('#monthOptions input[type="checkbox"]:checked')).map(cb => cb.value);
+  const statusFilter = document.getElementById('statusFilter')?.value || 'All';
 
-  headerCells.forEach((th, i) => {
-    const rawBank = th.textContent.trim();
-    const mappedBank = bankNameAliases[rawBank] || rawBank;
-    const val = parseFloat(changeCells[i]?.textContent || "0");
+  entries.forEach(e => {
+    const type = (e.type || '').toLowerCase();
+    const amount = parseFloat(e.amount) || 0;
+    const status = e.status || 'Open';
+    const month = e.date?.slice(0, 7);
+    const bank = e.bank;
 
-    console.log(`👉 Header: "${rawBank}" → "${mappedBank}" | Value: ${val}`);
+    if (!banks.includes(bank)) return;
 
-    allChanges[mappedBank] = val;
-    if (banks.includes(mappedBank)) {
-      changes[mappedBank] = val;
-    } else {
-      console.warn(`⚠️ Bank "${mappedBank}" not found in limits list!`);
+    const matchesStatus = statusFilter === 'All' ||
+      (statusFilter === 'Paid' && status === 'Paid') ||
+      (statusFilter === 'Open' && status === 'Open');
+    const matchesMonth = selectedMonths.length === 0 || selectedMonths.includes(month);
+
+    if (matchesStatus && matchesMonth) {
+      changes[bank] += type === 'income' ? amount : -amount;
     }
   });
 
-  if (!("Cembra" in allChanges)) {
-    allChanges["Cembra"] = 0;
-  }
-
-  const totalPlus = Object.entries(allChanges)
-    .filter(([_, value]) => value > 0)
-    .reduce((sum, [, value]) => sum + value, 0);
-
-  let totalUsed = 0;
-  let totalLimit = 0;
-
+  let totalUsed = 0, totalLimit = 0;
   banks.forEach(bank => {
     const credit = limits[bank];
-    const change = changes[bank] ?? 0;
-
-    console.log(`💳 ${bank} → Change: ${change}, Credit: ${credit}`);
-
-    if (change < 0) {
-      totalUsed += Math.abs(change);
-    }
+    const change = changes[bank];
+    if (change < 0) totalUsed += Math.abs(change);
     totalLimit += credit;
   });
 
+  const totalPlus = Object.values(changes).filter(v => v > 0).reduce((a, b) => a + b, 0);
   const difference = totalLimit - totalUsed;
-  const limitPlusTotal = difference + totalPlus;
+const limitPlusTotal = difference + totalPlus;
 
-  console.log("✅ Final Totals → Limit:", totalLimit, "| Used:", totalUsed, "| Diff:", difference, "| With Plus:", limitPlusTotal);
+console.log("🧮 Calculated:", {
+  totalLimit,
+  totalUsed,
+  difference,
+  totalPlus,
+  limitPlusTotal
+});
 
-  document.getElementById("totalLimit").value = totalLimit.toFixed(2);
-  document.getElementById("totalUsed").value = totalUsed.toFixed(2);
-  document.getElementById("diffUsed").value = difference.toFixed(2);
-  document.getElementById("limitPlusTotal").value = limitPlusTotal.toFixed(2);
-
-  applyValueColor(document.getElementById("totalUsed"), totalUsed);
-  applyValueColor(document.getElementById("limitPlusTotal"), limitPlusTotal);
-  applyValueColor(document.getElementById("diffUsed"), difference);
+updateCreditSummaryCard({
+  totalLimit,
+  totalUsed,
+  diffUsed: difference,
+  limitPlusTotal: limitPlusTotal // make sure this is updated value
+});
 }
 
+function updateCreditSummaryCard({
+  totalLimit = 0,
+  totalUsed = 0,
+  diffUsed = 0,
+  limitPlusTotal = 0,
+  totalPlus = 0 // ← add this
+}) {
+  document.getElementById('v-totalLimit').textContent = totalLimit.toFixed(2);
+  document.getElementById('v-totalUsed').textContent = totalUsed.toFixed(2);
+  document.getElementById('v-diffUsed').textContent = diffUsed.toFixed(2);
+  document.getElementById('v-limitPlusTotal').textContent = limitPlusTotal.toFixed(2);
+
+  // 🔵 Optional: If you also want to show Total Plus
+  const totalPlusEl = document.getElementById('v-totalPlus');
+  if (totalPlusEl) totalPlusEl.textContent = totalPlus.toFixed(2);
+}
 // ✅ Load credit limits from backend
 async function loadCreditLimits() {
   try {
@@ -1459,6 +1463,9 @@ function clearSearch(id) {
 
   renderEntries();
 }
+
+
+
 
 function resetFilters() {
   // Temporarily suppress toast messages
