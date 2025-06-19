@@ -1295,22 +1295,23 @@ function setLockState(locked) {
     "Cembra": parseFloat(document.getElementById("creditLimit-cembra")?.value || 0)
   };
 
-  const banks = Object.keys(limits);
-  const changes = {};
-  const allChanges = {};
 
-  const headerCells = document.querySelectorAll("#bankBalanceTableContainer thead th");
-  const changeCells = document.querySelectorAll("#bankBalanceTableContainer tbody tr:nth-child(2) td");
-console.log("🔍 Parsed bank headers:", [...headerCells].map(th => `[${th.textContent.trim()}]`));
 
-  headerCells.forEach((th, i) => {
-    const bank = th.textContent.trim();
-    const val = parseFloat(changeCells[i]?.textContent) || 0;
-    allChanges[bank] = val;
-    if (banks.includes(bank)) {
-      changes[bank] = val;
-    }
-  });
+ const headerCells = document.querySelectorAll("#bankBalanceTableContainer thead th");
+const changeCells = document.querySelectorAll("#bankBalanceTableContainer tbody tr:nth-child(2) td");
+
+const banks = Object.keys(limits);
+const changes = {};
+const allChanges = {};
+
+headerCells.forEach((th, i) => {
+  const bank = th.textContent.trim();
+  const val = parseFloat(changeCells[i]?.textContent) || 0;
+  allChanges[bank] = val;
+  if (banks.includes(bank)) {
+    changes[bank] = val;
+  }
+});
 
   if (!("Cembra" in allChanges)) {
     allChanges["Cembra"] = 0;
@@ -1320,12 +1321,14 @@ console.log("🔍 Parsed bank headers:", [...headerCells].map(th => `[${th.textC
     .filter(([_, value]) => value > 0)
     .reduce((sum, [, value]) => sum + value, 0);
 
-let totalLimit = 0;
 let totalUsed = 0;
+let totalLimit = 0;
+
 banks.forEach(bank => {
   const credit = limits[bank];
   const change = changes[bank] || 0;
-  if (change < 0) totalUsed += Math.abs(change); // Only count negatives
+
+  if (change < 0) totalUsed += Math.abs(change); // ✅ Only negative change
   totalLimit += credit;
 });
   const difference = totalLimit - totalUsed;
