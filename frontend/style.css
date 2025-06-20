@@ -2067,7 +2067,7 @@ body:hover #scrollBtn1 {
 .balance-card {
   background: white;
   flex: 0 0 auto;
-  width: 100px; /* fixed width for uniformity */
+  width: 110px; /* fixed width for uniformity */
   padding: 12px;
   border-radius: 10px;
   text-align: center;
@@ -2100,7 +2100,7 @@ body:hover #scrollBtn1 {
 }
 
 .balance-summary-card {
-  padding: 16px;
+
   border-radius: 12px;
 
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
