@@ -860,19 +860,21 @@ function renderBankBalanceForm() {
   const summaryCard = document.createElement("div");
   summaryCard.className = "balance-summary-card";
 summaryCard.innerHTML = `
-   <div class="summary-box" style="background:#e6f4f1;">
-    <div class="label">Total Plus</div>
-    <div class="value" id="v-totalPlus" style="color:#00bfff">+${totalPlus.toFixed(2)}</div>
-     </div>
- <div class="summary-box" style="background:#fff0ec;">
-    <div class="label">Total Minus</div>
-    <div class="value" id="v-totalMinus" style="color:orangered">${totalMinus.toFixed(2)}</div>
-    </div>
- <div class="summary-box" style="background:#f0f5ff;">
-    <div class="label">Difference</div>
-    <div class="value" style="color:${(totalPlus + totalMinus) >= 0 ? '#13a07f' : '#ff695d'}">
-      ${(totalPlus + totalMinus).toFixed(2)}
-  </div>
+  <div class="summary-row">
+    <span class="summary-box" style="background:#f0f8ff;">
+      <div class="label">Total Plus</div>
+      <div class="value" id="v-totalPlus" style="color:#00bfff">+${totalPlus.toFixed(2)}</div>
+    </span>
+    <span class="summary-box" style="background:#ffecec;">
+      <div class="label">Total Minus</div>
+      <div class="value" id="v-totalMinus" style="color:orangered">${totalMinus.toFixed(2)}</div>
+    </span>
+    <span class="summary-box" style="background:#e5f7f0;">
+      <div class="label">Difference</div>
+      <div class="value" style="color:${(totalPlus + totalMinus) >= 0 ? '#13a07f' : '#ff695d'}">
+        ${(totalPlus + totalMinus).toFixed(2)}
+      </div>
+    </span>
   </div>
 `;
 
