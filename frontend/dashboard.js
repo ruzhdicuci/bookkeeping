@@ -1316,7 +1316,7 @@ function renderCreditLimitTable() {
     if (delta < 0) totalMinus += Math.abs(delta);
   });
 
-  // ✅ Read totalPlus directly from #bankBalanceTotals .value (second value element is Total Plus)
+  // ✅ Read totalPlus directly from #bankBalanceTotals
   let totalPlus = 0;
   const totalPlusSummaryEl = document.querySelector('#bankBalanceTotals .value:nth-of-type(2)');
   if (totalPlusSummaryEl) {
@@ -1341,7 +1341,6 @@ function renderCreditLimitTable() {
   console.log("🟢 TOTAL PLUS:", totalPlus.toFixed(2));
   console.log("🧮 LEFT (Limit - Used):", left.toFixed(2));
   console.log("➕ LEFT + TOTAL PLUS:", limitPlusTotal.toFixed(2));
-}
 
   // ✅ Update summary bar
   updateCreditSummaryCard({
@@ -1352,8 +1351,6 @@ function renderCreditLimitTable() {
     totalPlus
   });
 }
-
-
 function updateCreditSummaryCard({
   totalLimit = 0,
   totalUsed = 0,
