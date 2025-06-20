@@ -1356,14 +1356,21 @@ function renderCreditLimitTable() {
   const headerCells = document.querySelectorAll("#bankBalanceTableContainer thead th");
   const changeCells = document.querySelectorAll("#bankBalanceTableContainer tbody tr:nth-child(2) td");
 
-  let totalMinus = 0;
-  let totalPlus = 0;
+let totalMinus = 0;
 
-  headerCells.forEach((th, i) => {
-    const delta = parseFloat(changeCells[i]?.textContent) || 0;
-    if (delta < 0) totalMinus += Math.abs(delta);
-    if (delta > 0) totalPlus += delta;
-  });
+// ✅ Only calculate totalMinus from balance table
+headerCells.forEach((th, i) => {
+  const delta = parseFloat(changeCells[i]?.textContent) || 0;
+  if (delta < 0) totalMinus += Math.abs(delta);
+});
+
+// ✅ Read totalPlus from summary card
+let totalPlus = 0;
+const totalPlusEl = document.querySelector('#bankBalanceTotals .value:nth-of-type(2)');
+if (totalPlusEl) {
+  totalPlus = parseFloat(totalPlusEl.textContent.replace('+', '')) || 0;
+  console.log("✅ Corrected TOTAL PLUS from summary card:", totalPlus);
+}
 
   const left = totalLimit - totalMinus;
   const limitPlusTotal = left + totalPlus;
