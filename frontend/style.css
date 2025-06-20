@@ -1602,7 +1602,7 @@ font-weight: bold;
 
 .entry-main .description {
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 0.8rem;
   white-space: normal;       /* Allow text wrapping */
   overflow: visible;         /* Show full content */
   text-overflow: unset;      /* Remove ... ellipsis */
