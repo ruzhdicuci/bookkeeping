@@ -110,70 +110,10 @@ h3 {
 
 
 
-.controls, .filters {
-  margin-bottom: 2px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  
-}
-
-.controls button {
-  padding: 8px 12px;
-  font-size: 1rem;
-  background-color: white;
-  border-radius: 10px;
-}
-
-.filters label {
-  flex: 1 1 50px;
-  display: flex;
-  flex-direction: column; /* 👈 This stacks children vertically */
-  gap: 4px;               /* Optional: space between label and field */
-  color: rgb(243, 114, 206);
-}
 
 #center1 {
  text-align: center;
  font-size: 1.2rem;
-}
-
-.filter-group {
-  flex: 1 1 50px;
-  display: flex;
-  flex-direction: column;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-  background-color: white;
-  table-layout: auto;  
-
-}
-td {
-  border: 1px solid #f4f2f2;
-  padding: 8px;
-text-align: left;
-
-}
-
-th {
-  border: 1px solid #f4f2f2;
-  padding: 8px;
-  margin-left: 8px;
-text-align: left;
-
-  background: white;
-
-}
-
-
-#th3 {
-  background: rgb(245, 245, 243);
-
-
 }
 
 
@@ -1589,7 +1529,6 @@ font-weight: bold;
   font-size: 0.94rem;
   font-weight: 500;
   color: #444;
-  margin-bottom: 4px;
   margin-left: 6px;
   margin-top: 10px;
   margin-bottom: 6px;
@@ -1601,26 +1540,31 @@ font-weight: bold;
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-  gap: 10px;
-  padding: 12px;
+ 
+  padding: 8px 10px;
   border-radius: 12px;
   background: white;
   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
   margin-bottom: 10px;
   width: 100%;
   box-sizing: border-box;
-  
+   
+    font-size: 14px;
 }
+
 
 .entry-date {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-width: 60px;
   font-size: 0.9rem;
-  padding-right: 8px;
+  text-align: left;
+  margin-right: 3px;
+   flex: 0 0 20px; /* Smaller fixed width */
 }
+
+
 
 .date-block {
   text-align: center;
@@ -1637,6 +1581,9 @@ font-weight: bold;
   color: #555;
 }
 
+
+
+
 .currency.small {
   font-size: 0.7rem;
   color: #888;
@@ -1649,27 +1596,67 @@ font-weight: bold;
   display: flex;
   flex-direction: column;
   justify-content: center;
+   margin-right: -8px; /* Tighten space before CHF/Buttons */
+    overflow: hidden;
 }
 
 .entry-main .description {
   font-weight: 600;
   font-size: 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px; /* or width: 200px; adjust as needed */
+  display: inline-block;
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-size: 1.1em;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: max-content;
+  max-width: 200px;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 6px 10px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%; /* position above */
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  font-size: 0.85em;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
 }
 
 .entry-main .meta {
-  font-size: 0.85rem;
+  font-size: 0.7rem;
   color: #666;
 }
 
 .entry-main .status {
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   margin-top: 2px;
   color: #444;
 }
 
 .entry-amount {
   text-align: right;
-  min-width: 120px;
+  min-width: 80px;
 }
 
 .entry-amount .amount {
@@ -1695,7 +1682,7 @@ font-weight: bold;
 .action-btn {
   border: none;
   background: none;
-  font-size: 1.1rem;
+  font-size: 0.7rem;
   cursor: pointer;
 }
 
