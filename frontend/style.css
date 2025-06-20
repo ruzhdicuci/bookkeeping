@@ -1808,7 +1808,7 @@ font-weight: bold;
   padding: 12px;
   text-align: center;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-  width: 110px;
+  width: 100;
   margin-bottom:10px;
 }
 
@@ -1856,7 +1856,7 @@ font-weight: bold;
   padding: 12px;
   text-align: center;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
- width: 110px;
+ width: 100;
   
 }
 
@@ -2067,7 +2067,7 @@ body:hover #scrollBtn1 {
 .balance-card {
   background: white;
   flex: 0 0 auto;
-  width: 110px; /* fixed width for uniformity */
+  width: 100; /* fixed width for uniformity */
   padding: 12px;
   border-radius: 10px;
   text-align: center;
