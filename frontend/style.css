@@ -2108,7 +2108,6 @@ body:hover #scrollBtn1 {
   justify-content: center; /* Center the totals card horizontally */
 }
 
-/* Card container for totals */
 .balance-summary-card {
   margin-top: 1rem;
   padding: 16px;
@@ -2116,32 +2115,43 @@ body:hover #scrollBtn1 {
   background: #ffffff;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
   text-align: center;
-  max-width: 700px;
+  max-width: 600px;
   margin-inline: auto;
- margin-bottom: -1.2rem;
+  margin-bottom: -1.2rem;
+
   display: flex;
-  justify-content: space-around;
-  gap: 1rem;
+  justify-content: center;
+  gap: 1.5rem;
   flex-wrap: wrap;
 }
-/* Label above each total */
-.balance-summary-card .label {
-  display: block;
-  margin-bottom: 0.3rem;
-  font-size: 0.7rem;
-  color: #444;            /* Add a readable color */
+
+.balance-summary-card .item {
+  flex: 1 1 100px;
+  min-width: 100px;
+  text-align: center;
 }
 
-/* Value amount */
+.balance-summary-card .label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+  color: #555;
+}
+
 .balance-summary-card .value {
   font-size: 1.2rem;
   font-weight: bold;
 }
 
+.balance-summary-card .description {
+  font-size: 0.65rem;
+  color: #777;
+  margin-top: 0.25rem;
+}
 
 .credit-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
   gap: 10px;
   justify-content: center;
   margin-top: 1rem;

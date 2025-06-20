@@ -1645,3 +1645,5 @@ function addSwipeListeners(targetElement, onSwipeLeft, onSwipeRight) {
     }
   }
 }
+
+
