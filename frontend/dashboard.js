@@ -1356,33 +1356,27 @@ function renderCreditLimitTable() {
   });
 
   // ✅ Recalculate totalPlus based on grouped banks
-  let totalPlus = 0;
-  entries.forEach(e => {
-    const bankKey = getBankKey(e.bank);
-    const type = (e.type || '').toLowerCase();
-    const amount = parseFloat(e.amount) || 0;
-    const status = e.status || 'Open';
-    const month = e.date?.slice(0, 7);
+// ✅ Get Total Plus from #bankBalanceTotals
+let totalPlus = 0;
+const totalPlusLabels = document.querySelectorAll('#bankBalanceTotals .label');
 
-    const matchesStatus =
-      statusFilter === 'All' ||
-      (statusFilter === 'Paid' && status === 'Paid') ||
-      (statusFilter === 'Open' && status === 'Open');
-    const matchesMonth = selectedMonths.length === 0 || selectedMonths.includes(month);
-
-    if (type === 'income' && matchesStatus && matchesMonth && bankKey && banks.includes(bankKey)) {
-      totalPlus += amount;
+totalPlusLabels.forEach(label => {
+  if (label.textContent.includes('Total Plus')) {
+    const sibling = label.nextElementSibling;
+    if (sibling) {
+      totalPlus = parseFloat(sibling.textContent.replace('+', '').trim()) || 0;
     }
-  });
+  }
+});
 
-  const diffUsed = totalLimit - totalUsed;
-  const limitPlusTotal = diffUsed + totalPlus;
+const diffUsed = totalLimit - totalUsed;
+const limitPlusTotal = diffUsed + totalPlus;
 
-  // ✅ Update UI
-  document.getElementById('v-totalLimit').textContent = totalLimit.toFixed(2);
-  document.getElementById('v-totalUsed').textContent = totalUsed.toFixed(2);
-  document.getElementById('v-diffUsed').textContent = diffUsed.toFixed(2);
-  document.getElementById('v-limitPlusTotal').textContent = limitPlusTotal.toFixed(2);
+// ✅ Update UI
+document.getElementById('v-totalLimit').textContent = totalLimit.toFixed(2);
+document.getElementById('v-totalUsed').textContent = totalUsed.toFixed(2);
+document.getElementById('v-diffUsed').textContent = diffUsed.toFixed(2);
+document.getElementById('v-limitPlusTotal').textContent = limitPlusTotal.toFixed(2);
 
   const totalPlusEl = document.getElementById('v-totalPlus');
   if (totalPlusEl) totalPlusEl.textContent = '+' + totalPlus.toFixed(2);
