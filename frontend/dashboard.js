@@ -1452,13 +1452,17 @@ function resetFilters() {
   // Temporarily suppress toast messages
   window.suppressToast = true;
 
-  // Clear search inputs
-  document.getElementById('dateSearch').value = '';
-  document.getElementById('descSearch').value = '';
-  document.getElementById('amountSearch').value = '';
-  document.getElementById('categorySearch').value = '';
-  document.getElementById('bankSearch').value = '';
-  document.getElementById('personSearch').value = '';
+// Clear search inputs
+document.getElementById('dateSearch').value = '';
+document.getElementById('descSearch').value = '';
+document.getElementById('amountSearch').value = '';
+document.getElementById('categorySearch').value = '';
+
+const bankSearch = document.getElementById('bankSearch');
+if (bankSearch) bankSearch.value = '';
+
+const personSearch = document.getElementById('personSearch');
+if (personSearch) personSearch.value = '';
 
   // Re-enable and reset dropdown filters
   ['categoryFilter', 'typeFilter', 'currencyFilter', 'statusFilter', 'bankFilter'].forEach(id => {
@@ -1619,3 +1623,7 @@ function showToast(message = "Done!", color = "#13a07f") {
     toast.style.display = "none";
   }, 3000);
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  showToast("✅ This is a test");
+});

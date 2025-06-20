@@ -750,7 +750,7 @@ font-weight: bold;
 font-size: 0.8rem;
   
   cursor: pointer;
-
+margin-top: 20px;
    width: 60px;
  height: 44px;
           font-family: system-ui, sans-serif;
@@ -777,7 +777,7 @@ font-size: 0.8rem;
    width: 100px;
  height: 44px;
           font-family: system-ui, sans-serif;
- margin-bottom: 20px;
+
           }
 
           #lockBtn:hover {
