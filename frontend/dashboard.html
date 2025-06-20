@@ -847,43 +847,36 @@ function chartOptions() {
 document.getElementById('categoryFilter')?.addEventListener('change', drawCharts);
 </script>
 
-
 <div class="scroll-toggle-wrapper">
-  <button id="scrollBtn1" class="scroll-toggle-btn" title="Scroll">⬆</button>
+  <button class="scroll-toggle-btn" id="scrollUpBtn" title="Scroll to Top">⬆</button>
+  <button class="scroll-toggle-btn" id="scrollDownBtn" title="Scroll to Bottom">⬇</button>
 </div>
-
 
 <script>
   document.addEventListener("DOMContentLoaded", () => {
-    const scrollBtn1 = document.getElementById('scrollBtn1');
-    if (!scrollBtn1) return;
+    const upBtn = document.getElementById('scrollUpBtn');
+    const downBtn = document.getElementById('scrollDownBtn');
 
-    let hideTimeout;
-
-    function showScrollButton() {
-      scrollBtn1.style.display = 'block';
-      clearTimeout(hideTimeout);
-      hideTimeout = setTimeout(() => {
-        scrollBtn1.style.display = 'none';
-      }, 3000); // hide after 3 seconds
+    if (upBtn) {
+      upBtn.addEventListener('click', () => {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      });
     }
 
-    window.addEventListener('scroll', () => {
-      const isTop = window.scrollY < 100;
-      scrollBtn1.textContent = isTop ? '⬇' : '⬆';
-      showScrollButton();
-    });
-
-    scrollBtn1.addEventListener('click', () => {
-      const isTop = window.scrollY < 100;
-      window.scrollTo({
-        top: isTop ? document.body.scrollHeight : 0,
-        behavior: 'smooth'
+    if (downBtn) {
+      downBtn.addEventListener('click', () => {
+        window.scrollTo({
+          top: document.body.scrollHeight,
+          behavior: 'smooth'
+        });
       });
-      showScrollButton();
-    });
+    }
   });
 </script>
+
 <div id="confirmModal" class="modal hidden">
   <div class="modal-content">
     <p>🗑️ Are you sure you want to delete this entry?</p>
