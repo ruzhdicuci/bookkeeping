@@ -836,20 +836,48 @@ function chartOptions() {
 document.getElementById('categoryFilter')?.addEventListener('change', drawCharts);
 </script>
 
-<!-- HTML (somewhere in your body) -->
+<!-- HTML: Button stays fixed -->
 <div class="scroll-toggle-wrapper">
   <button id="scrollBtn1" class="scroll-toggle-btn" title="Scroll">⬆</button>
 </div>
 
-<!-- Place this script AFTER the button or at the end of body -->
+<style>
+  .scroll-toggle-wrapper {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+  }
+  .scroll-toggle-btn {
+    padding: 10px;
+    font-size: 18px;
+    border-radius: 50%;
+    background-color: #13a07f;
+    color: white;
+    border: none;
+    display: none;
+  }
+</style>
+
 <script>
   document.addEventListener("DOMContentLoaded", () => {
     const scrollBtn1 = document.getElementById('scrollBtn1');
-    if (!scrollBtn1) return; // ✅ Prevent the error
+    if (!scrollBtn1) return;
+
+    let hideTimeout;
+
+    function showScrollButton() {
+      scrollBtn1.style.display = 'block';
+      clearTimeout(hideTimeout);
+      hideTimeout = setTimeout(() => {
+        scrollBtn1.style.display = 'none';
+      }, 3000); // hide after 3 seconds
+    }
 
     window.addEventListener('scroll', () => {
       const isTop = window.scrollY < 100;
       scrollBtn1.textContent = isTop ? '⬇' : '⬆';
+      showScrollButton();
     });
 
     scrollBtn1.addEventListener('click', () => {
@@ -858,6 +886,7 @@ document.getElementById('categoryFilter')?.addEventListener('change', drawCharts
         top: isTop ? document.body.scrollHeight : 0,
         behavior: 'smooth'
       });
+      showScrollButton();
     });
   });
 </script>
