@@ -1658,24 +1658,4 @@ function addSwipeListeners(targetElement, onSwipeLeft, onSwipeRight) {
 }
 
 
-document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll(".entry-main .description").forEach(el => {
-    if (el.offsetWidth < el.scrollWidth) {
-      el.setAttribute("title", el.textContent.trim());
-    } else {
-      el.removeAttribute("title");
-    }
-  });
-});
 
-function applyEllipsisTooltips() {
-  const descriptions = document.querySelectorAll('.entry-main .description');
-  descriptions.forEach(el => {
-    // Check if text is overflowing
-    if (el.scrollWidth > el.clientWidth) {
-      el.setAttribute('title', el.textContent.trim());
-    } else {
-      el.removeAttribute('title'); // Clean up if no longer overflowing
-    }
-  });
-}
