@@ -860,19 +860,13 @@ function renderBankBalanceForm() {
   const summaryCard = document.createElement("div");
   summaryCard.className = "balance-summary-card";
 summaryCard.innerHTML = `
-  <div>
-    <div class="label">Total Plus</div>
-    <div class="value" style="color:#00bfff">+${totalPlus.toFixed(2)}</div>
-  </div>
-  <div>
-    <div class="label">Total Minus</div>
-    <div class="value" style="color:orangered">${totalMinus.toFixed(2)}</div>
-  </div>
-  <div>
-    <div class="label">Difference</div>
-    <div class="value" style="color:${(totalPlus + totalMinus) >= 0 ? '#13a07f' : '#ff695d'}">
-      ${(totalPlus + totalMinus).toFixed(2)}
-    </div>
+  <div class="label">Total Plus</div>
+  <div class="value" id="v-totalPlus" style="color:#00bfff">+${totalPlus.toFixed(2)}</div>
+  <div class="label">Total Minus</div>
+  <div class="value" id="v-totalMinus" style="color:orangered">${totalMinus.toFixed(2)}</div>
+  <div class="label">Difference</div>
+  <div class="value" style="color:${(totalPlus + totalMinus) >= 0 ? '#13a07f' : '#ff695d'}">
+    ${(totalPlus + totalMinus).toFixed(2)}
   </div>
 `;
 
@@ -1295,8 +1289,8 @@ function setLockState(locked) {
   if (unlockBtn) unlockBtn.style.display = locked ? 'inline-block' : 'none';
 }
 
-
 function renderCreditLimitTable() {
+  // ✅ Read limits from input fields
   const limits = {
     "UBS Master": parseFloat(document.getElementById("creditLimit-ubs")?.value || 0),
     "Corner": parseFloat(document.getElementById("creditLimit-corner")?.value || 0),
@@ -1306,22 +1300,12 @@ function renderCreditLimitTable() {
 
   const totalLimit = Object.values(limits).reduce((a, b) => a + b, 0);
 
-  // ✅ Read from the rendered bank balance table
-  const headerCells = document.querySelectorAll("#bankBalanceTableContainer thead th");
-  const changeCells = document.querySelectorAll("#bankBalanceTableContainer tbody tr:nth-child(2) td");
+  // ✅ Get Total Plus and Minus from rendered summary card
+  const totalPlusEl = document.getElementById('v-totalPlus');
+  const totalMinusEl = document.getElementById('v-totalMinus');
 
-  let totalMinus = 0;
-  headerCells.forEach((th, i) => {
-    const delta = parseFloat(changeCells[i]?.textContent) || 0;
-    if (delta < 0) totalMinus += Math.abs(delta);
-  });
-
-  // ✅ Read totalPlus directly from #bankBalanceTotals
-  let totalPlus = 0;
-  const totalPlusSummaryEl = document.querySelector('#bankBalanceTotals .value:nth-of-type(2)');
-  if (totalPlusSummaryEl) {
-    totalPlus = parseFloat(totalPlusSummaryEl.textContent.replace('+', '')) || 0;
-  }
+  const totalPlus = totalPlusEl ? parseFloat(totalPlusEl.textContent.replace('+', '')) || 0 : 0;
+  const totalMinus = totalMinusEl ? Math.abs(parseFloat(totalMinusEl.textContent)) || 0 : 0;
 
   const left = totalLimit - totalMinus;
   const limitPlusTotal = left + totalPlus;
@@ -1331,9 +1315,7 @@ function renderCreditLimitTable() {
   document.getElementById('v-totalUsed').textContent = totalMinus.toFixed(2);
   document.getElementById('v-diffUsed').textContent = left.toFixed(2);
   document.getElementById('v-limitPlusTotal').textContent = limitPlusTotal.toFixed(2);
-
-  const totalPlusDisplayEl = document.getElementById('v-totalPlus');
-  if (totalPlusDisplayEl) totalPlusDisplayEl.textContent = '+' + totalPlus.toFixed(2);
+  if (totalPlusEl) totalPlusEl.textContent = '+' + totalPlus.toFixed(2);
 
   // ✅ Logging
   console.log("📊 TOTAL LIMIT:", totalLimit.toFixed(2));
@@ -1342,7 +1324,7 @@ function renderCreditLimitTable() {
   console.log("🧮 LEFT (Limit - Used):", left.toFixed(2));
   console.log("➕ LEFT + TOTAL PLUS:", limitPlusTotal.toFixed(2));
 
-  // ✅ Update summary bar
+  // ✅ Update summary card
   updateCreditSummaryCard({
     totalLimit,
     totalUsed: totalMinus,
