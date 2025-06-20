@@ -1294,7 +1294,7 @@ function setLockState(locked) {
   if (unlockBtn) unlockBtn.style.display = locked ? 'inline-block' : 'none';
 }
 
-// ✅ Render Credit Limit Table with updated logic
+
 function renderCreditLimitTable() {
   // ✅ Bank group mapping
   const bankGroups = {
@@ -1338,6 +1338,7 @@ function renderCreditLimitTable() {
       statusFilter === 'All' ||
       (statusFilter === 'Paid' && status === 'Paid') ||
       (statusFilter === 'Open' && status === 'Open');
+
     const matchesMonth = selectedMonths.length === 0 || selectedMonths.includes(month);
 
     if (!bankKey || !banks.includes(bankKey)) return;
@@ -1347,49 +1348,44 @@ function renderCreditLimitTable() {
     }
   });
 
-  // ✅ Calculate total used and limit
+  // ✅ Total limit from inputs
   const totalLimit = Object.values(limits).reduce((a, b) => a + b, 0);
-  let totalUsed = 0;
-  banks.forEach(bank => {
-    const delta = changes[bank] || 0;
-    if (delta < 0) totalUsed += Math.abs(delta);
+
+  // ✅ Get Total Plus and Minus from balance table
+  const headerCells = document.querySelectorAll("#bankBalanceTableContainer thead th");
+  const changeCells = document.querySelectorAll("#bankBalanceTableContainer tbody tr:nth-child(2) td");
+
+  let totalMinus = 0;
+  let totalPlus = 0;
+
+  headerCells.forEach((th, i) => {
+    const delta = parseFloat(changeCells[i]?.textContent) || 0;
+    if (delta < 0) totalMinus += Math.abs(delta);
+    if (delta > 0) totalPlus += delta;
   });
 
-  // ✅ Recalculate totalPlus based on grouped banks
-// ✅ Get Total Plus from #bankBalanceTotals
-let totalPlus = 0;
-const totalPlusLabels = document.querySelectorAll('#bankBalanceTotals .label');
+  const left = totalLimit - totalMinus;
+  const limitPlusTotal = left + totalPlus;
 
-totalPlusLabels.forEach(label => {
-  if (label.textContent.includes('Total Plus')) {
-    const sibling = label.nextElementSibling;
-    if (sibling) {
-      totalPlus = parseFloat(sibling.textContent.replace('+', '').trim()) || 0;
-    }
-  }
-});
-
-const diffUsed = totalLimit - totalUsed;
-const limitPlusTotal = diffUsed + totalPlus;
-
-// ✅ Update UI
-document.getElementById('v-totalLimit').textContent = totalLimit.toFixed(2);
-document.getElementById('v-totalUsed').textContent = totalUsed.toFixed(2);
-document.getElementById('v-diffUsed').textContent = diffUsed.toFixed(2);
-document.getElementById('v-limitPlusTotal').textContent = limitPlusTotal.toFixed(2);
-
+  // ✅ Update UI
+  document.getElementById('v-totalLimit').textContent = totalLimit.toFixed(2);
+  document.getElementById('v-totalUsed').textContent = totalMinus.toFixed(2);      // Used = totalMinus
+  document.getElementById('v-diffUsed').textContent = left.toFixed(2);             // Left
+  document.getElementById('v-limitPlusTotal').textContent = limitPlusTotal.toFixed(2); // Left + Total Plus
   const totalPlusEl = document.getElementById('v-totalPlus');
   if (totalPlusEl) totalPlusEl.textContent = '+' + totalPlus.toFixed(2);
 
-  // ✅ Optionally update summary bar too
+  // ✅ Update summary bar
   updateCreditSummaryCard({
     totalLimit,
-    totalUsed,
-    diffUsed,
+    totalUsed: totalMinus,
+    diffUsed: left,
     limitPlusTotal,
     totalPlus
   });
 }
+
+
 function updateCreditSummaryCard({
   totalLimit = 0,
   totalUsed = 0,
