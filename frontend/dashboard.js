@@ -1,6 +1,6 @@
 const apiBase = 'https://bookkeeping-i8e0.onrender.com';
 const token = localStorage.getItem('token');
-
+const backend = 'https://bookkeeping-i8e0.onrender.com';
 
 if (!token) {
   console.error('❌ No token found. Please log in.');
