@@ -1607,4 +1607,15 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
+function showToast(message = "Done!", color = "#13a07f") {
+  const toast = document.getElementById("toast");
+  if (!toast) return;
 
+  toast.textContent = message;
+  toast.style.backgroundColor = color;
+  toast.style.display = "block";
+
+  setTimeout(() => {
+    toast.style.display = "none";
+  }, 3000);
+}
