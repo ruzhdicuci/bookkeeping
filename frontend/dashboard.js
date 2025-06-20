@@ -860,15 +860,24 @@ function renderBankBalanceForm() {
   const summaryCard = document.createElement("div");
   summaryCard.className = "balance-summary-card";
 summaryCard.innerHTML = `
-  <div class="label">Total Plus</div>
-  <div class="value" id="v-totalPlus" style="color:#00bfff">+${totalPlus.toFixed(2)}</div>
-  <div class="label">Total Minus</div>
-  <div class="value" id="v-totalMinus" style="color:orangered">${totalMinus.toFixed(2)}</div>
-  <div class="label">Difference</div>
-  <div class="value" style="color:${(totalPlus + totalMinus) >= 0 ? '#13a07f' : '#ff695d'}">
-    ${(totalPlus + totalMinus).toFixed(2)}
+  <div class="item">
+    <div class="label">Total Plus</div>
+    <div class="value" id="v-totalPlus" style="color:#00bfff">+${totalPlus.toFixed(2)}</div>
+     </div>
+  <div class="item">
+    <div class="label">Total Minus</div>
+    <div class="value" id="v-totalMinus" style="color:orangered">${totalMinus.toFixed(2)}</div>
+    </div>
+  <div class="item">
+    <div class="label">Difference</div>
+    <div class="value" style="color:${(totalPlus + totalMinus) >= 0 ? '#13a07f' : '#ff695d'}">
+      ${(totalPlus + totalMinus).toFixed(2)}
+  
   </div>
 `;
+
+
+ 
 
   container.appendChild(cardGrid);
   container.appendChild(summaryCard);

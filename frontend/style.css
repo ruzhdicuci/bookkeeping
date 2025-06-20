@@ -2107,7 +2107,6 @@ body:hover #scrollBtn1 {
   display: flex;
   justify-content: center; /* Center the totals card horizontally */
 }
-
 .balance-summary-card {
   margin-top: 1rem;
   padding: 16px;
@@ -2121,19 +2120,19 @@ body:hover #scrollBtn1 {
 
   display: flex;
   justify-content: center;
-  gap: 1.5rem;
+  gap: 1rem;
   flex-wrap: wrap;
 }
 
 .balance-summary-card .item {
-  flex: 1 1 100px;
+  flex: 1 1 120px;
   min-width: 100px;
   text-align: center;
 }
 
 .balance-summary-card .label {
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: 0.7rem;
+  
   margin-bottom: 0.3rem;
   color: #555;
 }
@@ -2143,11 +2142,6 @@ body:hover #scrollBtn1 {
   font-weight: bold;
 }
 
-.balance-summary-card .description {
-  font-size: 0.65rem;
-  color: #777;
-  margin-top: 0.25rem;
-}
 
 .credit-grid {
   display: grid;
@@ -2187,6 +2181,23 @@ body:hover #scrollBtn1 {
 }
 
 
+
+
+  .scroll-toggle-wrapper {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+  }
+  .scroll-toggle-btn {
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 50%;
+    background-color: #13a07f;
+    color: white;
+    border: none;
+    display: none;
+  }
 
 
 
