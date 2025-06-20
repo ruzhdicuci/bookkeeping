@@ -462,18 +462,6 @@ border: 1px solid #373535;
 
 
 
-.summary-totals {
-  display: flex;
-  gap: 1.5rem;
-  flex-wrap: wrap;
-  margin-bottom: 1rem;
-  font-size: 1.3rem;
-}
-
-.summary-totals p {
-  margin: 0;
-  white-space: nowrap;
-}
 
 
 .controls-wrapper {
@@ -2143,6 +2131,9 @@ body:hover #scrollBtn1 {
 }
 
 
+
+
+
 .credit-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
@@ -2201,3 +2192,33 @@ body:hover #scrollBtn1 {
 
 
 
+#v-totalPlus {
+  margin-top: 0.5rem;
+  padding: 16px;
+  border-radius: 12px;
+  background: #aee6f9;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  width: 100px;
+  margin-inline: auto;
+ font-weight: ;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+
+
+    }
+
+
+    .summary-totals {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+}
+
+.summary-totals p {
+  margin: 0;
+  white-space: nowrap;
+}
