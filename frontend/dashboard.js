@@ -1366,9 +1366,9 @@ headerCells.forEach((th, i) => {
 
 // ✅ Read totalPlus from summary card
 let totalPlus = 0;
-const totalPlusEl = document.querySelector('#bankBalanceTotals .value:nth-of-type(2)');
-if (totalPlusEl) {
-  totalPlus = parseFloat(totalPlusEl.textContent.replace('+', '')) || 0;
+const totalPlusSummaryEl = document.querySelector('#bankBalanceTotals .value:nth-of-type(2)');
+if (totalPlusSummaryEl) {
+  totalPlus = parseFloat(totalPlusSummaryEl.textContent.replace('+', '')) || 0;
   console.log("✅ Corrected TOTAL PLUS from summary card:", totalPlus);
 }
 
