@@ -520,6 +520,7 @@ renderBankBalanceForm();                // ✅ re-render balance inputs
       alert('Failed to save entry.');
     }
   });
+
     let monthlyChartInstance = null;
     let personChartInstance = null;
     let comparisonChartInstance = null;
@@ -532,8 +533,10 @@ renderBankBalanceForm();                // ✅ re-render balance inputs
       document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
       document.getElementById(tabId).classList.add('active');
       if (btn) btn.classList.add('active');
-      if (tabId === 'chartsTab') drawCharts();
-    }
+   if (tabId === 'chartsTab') {
+  // Delay slightly to ensure person checkboxes are in DOM
+  setTimeout(drawCharts, 50);
+}
 
 function drawCharts() {
   Chart.register(ChartDataLabels); // Required once at top of your chart setup
@@ -542,8 +545,12 @@ function drawCharts() {
 
   const monthlyIncome = {}, monthlyExpense = {}, personIncome = {}, personExpense = {}, expenseByCategory = {};
 // 🔍 For filtering the entry table:
-const selectedPersons = Array.from(document.querySelectorAll('.personChartFilter:checked')).map(cb => cb.value);
+let selectedPersons = Array.from(document.querySelectorAll('.personChartFilter:checked')).map(cb => cb.value);
 
+// If nothing selected yet (e.g. first load), use all available persons
+if (!selectedPersons.length) {
+  selectedPersons = [...new Set((window.entries || []).map(e => e.person))];
+}
   entries.forEach(e => {
     if (categoryFilter !== 'All' && (e.category || 'Uncategorized') !== categoryFilter) return;
     if (selectedPersons.length && !selectedPersons.includes(e.person)) return;

@@ -2020,7 +2020,7 @@ font-weight: bold;
   bottom: 20px;
   right: 50%;
   transform: translateX(50%);
-  background: white;
+  background: rgb(0, 0, 0);
   border: 1px solid #ccc;
   border-radius: 20px;
   padding: 0.5rem 1rem;
