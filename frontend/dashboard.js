@@ -1375,6 +1375,11 @@ function renderCreditLimitTable() {
   document.getElementById('v-limitPlusTotal').textContent = limitPlusTotal.toFixed(2); // Left + Total Plus
   const totalPlusEl = document.getElementById('v-totalPlus');
   if (totalPlusEl) totalPlusEl.textContent = '+' + totalPlus.toFixed(2);
+  console.log("📊 TOTAL LIMIT:", totalLimit.toFixed(2));
+console.log("🔻 TOTAL MINUS (Used):", totalMinus.toFixed(2));
+console.log("🟢 TOTAL PLUS:", totalPlus.toFixed(2));
+console.log("🧮 LEFT (Limit - Used):", left.toFixed(2));
+console.log("➕ LEFT + TOTAL PLUS:", limitPlusTotal.toFixed(2));
 
   // ✅ Update summary bar
   updateCreditSummaryCard({
