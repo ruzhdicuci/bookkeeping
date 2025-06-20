@@ -1,9 +1,7 @@
 body {
+margin: 2px;
 
-  margin: 0;
-  padding: 0;
   font-family: system-ui, sans-serif;
-
   background: #f4f2ee;
 }
 
@@ -588,7 +586,8 @@ padding-bottom: 10px;
 
 #entryTableBody {
 font-size: 1.1rem;
-  
+  width: 100%;
+  margin-left: -10px;
 }
 
 .entry-form {
@@ -749,9 +748,9 @@ font-weight: bold;
   color: rgb(171, 32, 94);
 
 font-size: 0.9rem;
-    margin-top: 10px;
+  
   cursor: pointer;
-margin-bottom: -10px;
+
    width: 80px;
  height: 44px;
           font-family: system-ui, sans-serif;
@@ -1492,7 +1491,7 @@ height: 38px;
   background: #e3e0db;
   border-radius: 10px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-  margin-left: 20px;
+
    margin-top: 10px;
  
 }
@@ -1750,6 +1749,7 @@ font-weight: bold;
 .desktop-card-list {
   padding: 10px;
   max-width: 100%;
+
 }
 
 .status-pill {
@@ -1774,14 +1774,15 @@ font-weight: bold;
 
 .filter-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
 
   margin-bottom: 10px;
   padding: 12px;
+  
   background: #e3e0db;
   border-radius: 10px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-  margin-left: 20px;
+
    margin-top: 10px;
 }
 
@@ -1819,9 +1820,10 @@ font-weight: bold;
   padding: 12px;
   text-align: center;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-  min-width: 100px;
+  min-width: 90px;
   margin-bottom:10px;
 }
+
 
 .summary-card span {
   display: block;
@@ -1855,7 +1857,8 @@ font-weight: bold;
   flex-wrap: wrap; /* wrap on small screens */
   justify-content: center;
   gap: 0.3rem;
-  margin-bottom: 10px;
+
+
 }
 
 .average-card {
@@ -1865,7 +1868,8 @@ font-weight: bold;
   padding: 12px;
   text-align: center;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-  min-width: 100px;
+  min-width: 90px;
+  
 }
 
 .summary-card .label {
@@ -1892,7 +1896,7 @@ font-weight: bold;
   margin-bottom: 1rem;
   align-items: center;
   margin-top: -15px;
- margin-bottom: -25px;
+ margin-bottom: -15px;
  
 }
 
@@ -1904,6 +1908,7 @@ font-weight: bold;
   border: 1px solid #ccc;
   font-size: 1rem;
   box-sizing: border-box;
+ 
 }
 
 .form-actions {
@@ -2134,26 +2139,42 @@ body:hover #scrollBtn1 {
 }
 
 
+.credit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+  justify-content: center;
+  margin-top: 1rem;
+  margin-top: -2px;
+}
+
 .card {
   background: #ffffff;
   padding: 10px;
   border-radius: 8px;
   text-align: center;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  margin-top: -10px;
-   font-size: 1.1em;
 }
+
+.card div {
+  font-size: 0.75rem;
+  color: #666;
+  margin-bottom: 4px;
+}
+
 .card strong {
   display: block;
   font-size: 1.1em;
   color: #534545;
 }
-.card div {
-  font-size: 0.75rem;
-  margin-bottom: 4px;
-  color: #666;
-}
 
+.card input {
+  width: 100%;
+  padding: 4px;
+  font-size: 1em;
+  text-align: center;
+  margin-left: 3px;
+}
 
 
 

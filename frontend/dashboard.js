@@ -395,16 +395,16 @@ filtered
   const avgExpense = expenseTotal / monthsUsed.length || 0;
 
 document.getElementById('monthlyAverageCard').innerHTML = `
-  <div class="average-card-container">
-    <div class="average-card">
+  <div class="average-card-container"  ">
+    <div class="average-card" >
       <div class="label">Avg Income</div>
       <a class="income-color">${avgIncome.toFixed(2)}</a>
     </div>
-    <div class="average-card">
+    <div class="average-card" >
       <div class="label">Avg Expenses</div>
       <a class="expense-color">${avgExpense.toFixed(2)}</a>
     </div>
-    <div class="average-card">
+    <div class="average-card" >
       <div class="label">Avg Balance</div>
       <a class="balance-color">${(avgIncome - avgExpense).toFixed(2)}</a>
     </div>
@@ -1294,6 +1294,7 @@ function setLockState(locked) {
   if (unlockBtn) unlockBtn.style.display = locked ? 'inline-block' : 'none';
 }
 
+// ✅ Render Credit Limit Table with updated logic
 function renderCreditLimitTable() {
   const limits = {
     "UBS Master": parseFloat(document.getElementById("creditLimit-ubs")?.value || 0),
@@ -1303,100 +1304,57 @@ function renderCreditLimitTable() {
   };
 
   const banks = Object.keys(limits);
+
+  const table = document.querySelector("#bankBalanceTableContainer table");
+  if (!table) return;
+
+  const headerCells = table.querySelectorAll("thead th");
+  const changeCells = table.querySelectorAll("tbody tr:nth-child(2) td");
+
   const changes = {};
-  banks.forEach(bank => changes[bank] = 0);
+  const allChanges = {};
 
-  const selectedMonths = Array.from(document.querySelectorAll('#monthOptions input[type="checkbox"]:checked')).map(cb => cb.value);
-  const statusFilter = document.getElementById('statusFilter')?.value || 'All';
-
-  entries.forEach(e => {
-  const type = (e.type || '').toLowerCase();
-  const amount = parseFloat(e.amount) || 0;
-  const status = e.status || 'Open';
-  const month = e.date?.slice(0, 7);
-  const bank = e.bank;
-
-  const matchesStatus = statusFilter === 'All' ||
-    (statusFilter === 'Paid' && status === 'Paid') ||
-    (statusFilter === 'Open' && status === 'Open');
-  const matchesMonth = selectedMonths.length === 0 || selectedMonths.includes(month);
-
-  if (!banks.includes(bank)) {
-    console.log("❌ Skipped (bank not matched):", bank);
-    return;
-  }
-
-  if (matchesStatus && matchesMonth) {
-    changes[bank] += type === 'income' ? amount : -amount;
-    console.log("✅ Included entry:", { type, amount, status, bank, month });
-  } else {
-    console.log("⛔ Filtered out:", { type, amount, status, bank, month });
-  }
-});
-
-
-// ✅ Correct totalPlus by recalculating based on all matching income entries
-// ⬅️ totalUsed and totalLimit are calculated first
-let totalUsed = 0, totalLimit = 0;
-banks.forEach(bank => {
-  const credit = limits[bank];
-  const change = changes[bank];
-  if (change < 0) totalUsed += Math.abs(change);
-  totalLimit += credit;
-});
-
-// ⬅️ now recalculate totalPlus properly
-// ✅ Total Plus only from the banks in limits[] and filtered months/status
-const totalPlus = entries.reduce((sum, e) => {
-  const type = (e.type || '').toLowerCase();
-  const amount = parseFloat(e.amount) || 0;
-  const status = e.status || 'Open';
-  const month = e.date?.slice(0, 7);
-
-  const matchesStatus = statusFilter === 'All' ||
-    (statusFilter === 'Paid' && status === 'Paid') ||
-    (statusFilter === 'Open' && status === 'Open');
-
-  const matchesMonth = selectedMonths.length === 0 || selectedMonths.includes(month);
-
-  if (type === 'income' && matchesStatus && matchesMonth) {
-    return sum + amount;
-  }
-  return sum;
-}, 0);
-
-// ✅ now calculate difference AFTER totalUsed is known
-
-const difference = totalLimit - totalUsed;
-const limitPlusTotal = difference + totalPlus;
-
-// ✅ Get Total Plus directly from the totals card
-// Defer totalPlus reading to the next frame to ensure it's in DOM
-requestAnimationFrame(() => {
-  let realTotalPlus = 0;
-
-  const labels = document.querySelectorAll('#bankBalanceTotals .label');
-  labels.forEach(label => {
-    if (label.textContent.includes('Total Plus')) {
-      const valueDiv = label.nextElementSibling;
-      if (valueDiv) {
-        realTotalPlus = parseFloat(valueDiv.textContent.replace('+', '')) || 0;
-      }
+  headerCells.forEach((th, i) => {
+    const bank = th.textContent.trim();
+    const delta = parseFloat(changeCells[i]?.textContent || "0") || 0;
+    allChanges[bank] = delta;
+    if (banks.includes(bank)) {
+      changes[bank] = delta;
     }
   });
 
-  const limitPlusTotal = difference + realTotalPlus;
-  document.getElementById('v-limitPlusTotal').textContent = limitPlusTotal.toFixed(2);
-});
+  // ✅ Used = only negative from limited banks
+  let totalUsed = 0;
+  banks.forEach(bank => {
+    const delta = changes[bank] || 0;
+    if (delta < 0) totalUsed += Math.abs(delta);
+  });
 
-// ✅ now you're safe to call update
-updateCreditSummaryCard({
-  totalLimit,
-  totalUsed,
-  diffUsed: difference,
-  limitPlusTotal,
-  totalPlus
-});
+  // ✅ Total Limit = sum of limits
+  const totalLimit = Object.values(limits).reduce((a, b) => a + b, 0);
+
+  // ✅ Total Plus = all positive values (even from non-limited banks)
+  const totalPlus = Object.values(allChanges).reduce((sum, val) => val > 0 ? sum + val : sum, 0);
+
+  const diffUsed = totalLimit - totalUsed;
+  const limitPlusTotal = diffUsed + totalPlus;
+
+  // ✅ Update UI
+  document.getElementById("v-totalLimit").textContent = totalLimit.toFixed(2);
+  document.getElementById("v-totalUsed").textContent = totalUsed.toFixed(2);
+  document.getElementById("v-diffUsed").textContent = diffUsed.toFixed(2);
+  document.getElementById("v-limitPlusTotal").textContent = limitPlusTotal.toFixed(2);
+  const totalPlusEl = document.getElementById("v-totalPlus");
+  if (totalPlusEl) totalPlusEl.textContent = '+' + totalPlus.toFixed(2);
+
+  // ✅ Optionally call this too
+  updateCreditSummaryCard({
+    totalLimit,
+    totalUsed,
+    diffUsed,
+    limitPlusTotal,
+    totalPlus
+  });
 }
 
 function updateCreditSummaryCard({
@@ -1404,17 +1362,21 @@ function updateCreditSummaryCard({
   totalUsed = 0,
   diffUsed = 0,
   limitPlusTotal = 0,
-  totalPlus = 0 // ← add this
+  totalPlus = 0
 }) {
-  document.getElementById('v-totalLimit').textContent = totalLimit.toFixed(2);
-  document.getElementById('v-totalUsed').textContent = totalUsed.toFixed(2);
-  document.getElementById('v-diffUsed').textContent = diffUsed.toFixed(2);
- document.getElementById('v-limitPlusTotal').textContent = (diffUsed + totalPlus).toFixed(2);
+  const setText = (id, value) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
+  };
 
-  // 🔵 Optional: If you also want to show Total Plus
-  const totalPlusEl = document.getElementById('v-totalPlus');
-if (totalPlusEl) totalPlusEl.textContent = '+' + totalPlus.toFixed(2);
+  setText('v-totalLimit', totalLimit.toFixed(2));
+  setText('v-totalUsed', totalUsed.toFixed(2));
+  setText('v-diffUsed', diffUsed.toFixed(2));
+  setText('v-limitPlusTotal', limitPlusTotal.toFixed(2));
+  setText('v-totalPlus', '+' + totalPlus.toFixed(2));
 }
+
+
 // ✅ Load credit limits from backend
 async function loadCreditLimits() {
   try {
