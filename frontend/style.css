@@ -750,7 +750,7 @@ font-weight: bold;
 font-size: 0.8rem;
   
   cursor: pointer;
-margin-top: 20px;
+
    width: 60px;
  height: 44px;
           font-family: system-ui, sans-serif;
@@ -773,7 +773,7 @@ padding-bottom: 2px;
          border-radius: 10px;
   cursor: pointer;
 font-size: 0.8rem;
-    margin-top: 20px;
+   
    width: 100px;
  height: 44px;
           font-family: system-ui, sans-serif;
