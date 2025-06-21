@@ -327,13 +327,6 @@ border: 1px solid #373535;
 
 
 
-#bankBalanceTableContainer  {
- 
- 
-  padding-top: 10px;
-    
-}
-
 
 
 
@@ -1348,9 +1341,11 @@ height: 38px;
   background: #e3e0db;
   border-radius: 10px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
 
-
- 
+#bankBalanceTableContainer {
+    margin-top: 15px;
+margin-bottom: -10px;
 }
 
 .filter-grid3 {
@@ -1914,13 +1909,10 @@ width: 100px; /* Match credit limit cards */
 
 
 .balance-card-grid {
-
- display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  gap: 0.3rem;
-  justify-content: center;
-  margin-right: 10px;
-  margin-left: 10px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.5rem;
+  padding: 0.5rem; 
  
 }
 
@@ -1955,9 +1947,10 @@ width: 100px; /* Match credit limit cards */
 
 
 #bankBalanceTotals {
-  display: flex;
-  justify-content: center;
-
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+  align-items: stretch;
 }
 
 .balance-summary-card {
@@ -2095,5 +2088,6 @@ margin-right: 10px;
   font-size: 12px;
   margin-left: 4px;
   cursor: pointer;
-  color: #555;rgb(235, 231, 231)
+  color: #555;
 }
+

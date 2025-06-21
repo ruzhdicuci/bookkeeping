@@ -272,6 +272,48 @@ app.post('/api/limits', auth, async (req, res) => {
 });
 
 
+// middleware to verify if the user is admin
+function isAdmin(req, res, next) {
+  if (req.user && req.user.role === 'admin') {
+    return next();
+  } else {
+    return res.status(403).json({ error: 'Only admins can register new users.' });
+  }
+}
 
+// protected registration route
+app.post('/register', isAdmin, async (req, res) => {
+  const { email, password } = req.body;
 
+  // check if user exists
+  const existing = await User.findOne({ email });
+  if (existing) return res.status(400).json({ error: 'User already exists' });
 
+  const hashed = await bcrypt.hash(password, 10);
+  const user = new User({ email, password: hashed, role: 'user' }); // default role is 'user'
+  await user.save();
+
+  res.json({ message: 'User registered by admin' });
+});
+
+// after verifying JWT or session
+app.use((req, res, next) => {
+  // Example using JWT
+  const token = req.headers.authorization?.split(" ")[1];
+  if (token) {
+    const decoded = jwt.verify(token, 'SECRET_KEY');
+    req.user = decoded;
+  }
+  next();
+});
+
+const UserSchema = new mongoose.Schema({
+  email: String,
+  password: String,
+  role: { type: String, default: 'user' } // 'user' or 'admin'
+});
+// Only for admin
+app.get('/users', isAdmin, async (req, res) => {
+  const users = await User.find();
+  res.json(users);
+});

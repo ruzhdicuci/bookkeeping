@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Century">
+
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
@@ -191,11 +191,12 @@
   
     <!-- Original table rendering (can stay for fallback/testing) -->
 <div id="bankBalanceTableContainer" ></div>
-
 <!-- New card-based layout -->
 <div id="bankBalanceCards" class="balance-card-grid"></div>
+
 </div>
-<div class="filter-grid">
+
+<div class="filter-grid2">
 <div id="bankBalanceTotals"></div>
 
 </div>
@@ -862,7 +863,13 @@ function chartOptions() {
 document.getElementById('categoryFilter')?.addEventListener('change', drawCharts);
 </script>
 
-
+<!-- Show only if isAdmin -->
+<div id="registerForm" style="display: none;">
+  <h2>Register</h2>
+  <input type="email" id="newUserEmail" placeholder="New user email" />
+  <input type="password" id="newUserPassword" placeholder="Password" />
+  <button onclick="registerUser()">Register</button>
+</div>
 <div id="confirmModal" class="modal hidden">
   <div class="modal-content">
     <p>🗑️ Are you sure you want to delete this entry?</p>

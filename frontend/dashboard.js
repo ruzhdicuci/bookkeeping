@@ -1666,3 +1666,9 @@ function clearField(id) {
   }
   renderEntries(); // update the view
 }
+
+
+// Example condition after login
+if (loggedInUser && loggedInUser.role === 'admin') {
+  document.getElementById('registerForm').style.display = 'block';
+}
