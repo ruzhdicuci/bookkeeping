@@ -883,8 +883,17 @@ document.getElementById('categoryFilter')?.addEventListener('change', drawCharts
 <div id="entryTableBody" class="desktop-card-list"></div></div>
 <script src="dashboard.js"></script>
 
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById('scrollUpBtn')?.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
 
-
+    document.getElementById('scrollDownBtn')?.addEventListener('click', () => {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    });
+  });
+</script>
 
 
 

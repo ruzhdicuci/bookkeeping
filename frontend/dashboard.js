@@ -1679,27 +1679,3 @@ document.addEventListener('click', function (e) {
 });
 
 
-
-// scroll button
-  document.addEventListener("DOMContentLoaded", () => {
-    const upBtn = document.getElementById('scrollUpBtn');
-    const downBtn = document.getElementById('scrollDownBtn');
-
-    if (upBtn) {
-      upBtn.addEventListener('click', () => {
-        window.scrollTo({
-          top: 0,
-          behavior: 'smooth'
-        });
-      });
-    }
-
-    if (downBtn) {
-      downBtn.addEventListener('click', () => {
-        window.scrollTo({
-          top: document.body.scrollHeight,
-          behavior: 'smooth'
-        });
-      });
-    }
-  });

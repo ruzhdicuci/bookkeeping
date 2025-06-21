@@ -1874,6 +1874,29 @@ width: 100px; /* Match credit limit cards */
 
 
 
+/* width */
+::-webkit-scrollbar {
+  overflow: hidden;
+   width: 0px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    overflow: hidden;
+ width: 0px;
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+overflow: hidden;
+  width: 0px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: black; 
+  width: 0px;
+}
 
 
 
@@ -1886,9 +1909,10 @@ width: 100px; /* Match credit limit cards */
   flex-direction: column;
   gap: 5px;
   z-index: 9999;
+  
 }
 
-.scroll-toggle-btn {
+#scrollUpBtn {
   padding: 10px;
   font-size: 18px;
   background: #333;
