@@ -139,7 +139,7 @@
   <div class="form-grid">
     <input type="text" id="newDate" placeholder="Select Date" class="flatpickr-input">
     <input type="text" id="newDescription" placeholder="Description" required />
-    <input type="number" step="0.01" id="newAmount" placeholder="Amount" required />
+    <input type="number" step="0.01" id="newAmount" style="text-align: left;" placeholder="Amount" required />
 
     <select id="newCurrency" required>
       <option value="CHF">CHF</option>
@@ -187,13 +187,15 @@
 
 
 
-<div class="filter-grid2" style="margin-top: -15px;">
+<div class="filter-grid2">
   
     <!-- Original table rendering (can stay for fallback/testing) -->
-<div class="th2" id="bankBalanceTableContainer"></div>
+<div id="bankBalanceTableContainer" ></div>
 
 <!-- New card-based layout -->
 <div id="bankBalanceCards" class="balance-card-grid"></div>
+</div>
+<div class="filter-grid">
 <div id="bankBalanceTotals"></div>
 
 </div>
@@ -238,7 +240,7 @@ if (!totalsContainer) return;
 
 const summaryCard = document.createElement("div");
 summaryCard.className = "balance-summary-card";
-summaryCard.innerHTML = `
+Differe = `
   <div class="label">Total Plus</div>
   <div class="value" id="v-totalPlus" style="color:#00bfff">+${totalPlus.toFixed(2)}</div>
   <div class="label">Total Minus</div>
@@ -315,9 +317,10 @@ totalsContainer.appendChild(summaryCard);
     <a id="totalBalance" class="balance-color">0.00</a>
   </div>
 
-
+ </div>
 </div>
-<div id="monthlyAverageCard" ></div>
+<div class="filter-grid" >
+<div id="monthlyAverageCard"></div>
   </div>
 
  </div>
@@ -372,14 +375,26 @@ totalsContainer.appendChild(summaryCard);
 
 
  <div class="filter-grid">
-  
+<div class="filter-field">
   <input type="text" id="dateSearch" placeholder="date">
-<input type="text" id="descSearch" placeholder="description">
-     <input type="text" id="amountSearch" step="0.01" placeholder="amount">
-     <input type="text" id="categorySearch" placeholder="category">
-           <input type="text" id="bankSearch" placeholder="bank">
-
-
+  <button class="clear-pill" onclick="clearField('dateSearch')">clear</button>
+</div>
+<div class="filter-field">
+  <input type="text" id="descSearch" placeholder="description">
+  <button class="clear-pill" onclick="clearField('descSearch')">clear</button>
+</div>
+<div class="filter-field">
+  <input type="text" id="amountSearch" step="0.01" placeholder="amount">
+  <button class="clear-pill" onclick="clearField('amountSearch')">clear</button>
+</div>
+<div class="filter-field">
+  <input type="text" id="categorySearch" placeholder="category">
+  <button class="clear-pill" onclick="clearField('categorySearch')">clear</button>
+</div>
+<div class="filter-field">
+  <input type="text" id="bankSearch" placeholder="bank">
+  <button class="clear-pill" onclick="clearField('bankSearch')">clear</button>
+</div>
        </div>
 
 
@@ -847,6 +862,19 @@ function chartOptions() {
 document.getElementById('categoryFilter')?.addEventListener('change', drawCharts);
 </script>
 
+
+<div id="confirmModal" class="modal hidden">
+  <div class="modal-content">
+    <p>🗑️ Are you sure you want to delete this entry?</p>
+    <div class="modal-actions">
+      <button id="cancelDelete" class="btn cancel">Cancel</button>
+      <button id="confirmDelete" class="btn confirm">Delete</button>
+    </div>
+  </div>
+</div>
+<div id="toast" style="display:none; position: fixed; bottom: 20px; right: 20px; background: #13a07f; color: white; padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); font-size: 16px; z-index: 1000;"></div>
+
+
 <div class="scroll-toggle-wrapper">
   <button class="scroll-toggle-btn" id="scrollUpBtn" title="Scroll to Top">⬆</button>
   <button class="scroll-toggle-btn" id="scrollDownBtn" title="Scroll to Bottom">⬇</button>
@@ -876,23 +904,10 @@ document.getElementById('categoryFilter')?.addEventListener('change', drawCharts
     }
   });
 </script>
-
-<div id="confirmModal" class="modal hidden">
-  <div class="modal-content">
-    <p>🗑️ Are you sure you want to delete this entry?</p>
-    <div class="modal-actions">
-      <button id="cancelDelete" class="btn cancel">Cancel</button>
-      <button id="confirmDelete" class="btn confirm">Delete</button>
-    </div>
-  </div>
-</div>
-<div id="toast" style="display:none; position: fixed; bottom: 20px; right: 20px; background: #13a07f; color: white; padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); font-size: 16px; z-index: 1000;"></div>
-
-
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <!-- ✅ Add these before your dashboard.js -->
- <div class="filter-grid" >
+ <div class="filter-grid"  >
 <div id="entryTableBody" class="desktop-card-list"></div></div>
 <script src="dashboard.js"></script>
 
