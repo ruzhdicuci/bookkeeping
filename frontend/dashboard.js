@@ -199,7 +199,7 @@ document.querySelectorAll('.monthOption').forEach(cb => {
   // ✅ Category dropdown
   const categoryFilter = document.getElementById('categoryFilter');
   if (categoryFilter) {
-    categoryFilter.innerHTML = `<option value="All">All</option>` + categories.map(c => `<option value="${c}">${c}</option>`).join('');
+    categoryFilter.innerHTML = `<option value="All">category</option>` + categories.map(c => `<option value="${c}">${c}</option>`).join('');
   }
 
   // ✅ Person checkboxes
@@ -1677,3 +1677,29 @@ document.addEventListener('click', function (e) {
     menu.style.display = 'none';
   }
 });
+
+
+
+// scroll button
+  document.addEventListener("DOMContentLoaded", () => {
+    const upBtn = document.getElementById('scrollUpBtn');
+    const downBtn = document.getElementById('scrollDownBtn');
+
+    if (upBtn) {
+      upBtn.addEventListener('click', () => {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      });
+    }
+
+    if (downBtn) {
+      downBtn.addEventListener('click', () => {
+        window.scrollTo({
+          top: document.body.scrollHeight,
+          behavior: 'smooth'
+        });
+      });
+    }
+  });
