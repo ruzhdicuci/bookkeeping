@@ -272,48 +272,46 @@ app.post('/api/limits', auth, async (req, res) => {
 });
 
 
-// middleware to verify if the user is admin
+
+// add users onlhy as admin
+// Example middleware to check if the user is an admin
 function isAdmin(req, res, next) {
   if (req.user && req.user.role === 'admin') {
-    return next();
+    return next(); // proceed if admin
   } else {
-    return res.status(403).json({ error: 'Only admins can register new users.' });
+    return res.status(403).json({ error: 'Only admins can register users.' });
   }
 }
 
-// protected registration route
+// Secure the /register route
 app.post('/register', isAdmin, async (req, res) => {
   const { email, password } = req.body;
 
-  // check if user exists
-  const existing = await User.findOne({ email });
-  if (existing) return res.status(400).json({ error: 'User already exists' });
+  const existingUser = await User.findOne({ email });
+  if (existingUser) {
+    return res.status(400).json({ error: 'User already exists' });
+  }
 
-  const hashed = await bcrypt.hash(password, 10);
-  const user = new User({ email, password: hashed, role: 'user' }); // default role is 'user'
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const user = new User({ email, password: hashedPassword, role: 'user' });
   await user.save();
 
-  res.json({ message: 'User registered by admin' });
+  res.json({ message: 'User registered successfully' });
 });
 
-// after verifying JWT or session
+const jwt = require('jsonwebtoken');
+
+// Example middleware to decode token
 app.use((req, res, next) => {
-  // Example using JWT
-  const token = req.headers.authorization?.split(" ")[1];
-  if (token) {
-    const decoded = jwt.verify(token, 'SECRET_KEY');
-    req.user = decoded;
+  const authHeader = req.headers.authorization;
+  if (authHeader) {
+    const token = authHeader.split(' ')[1];
+    try {
+      const decoded = jwt.verify(token, 'SECRET_KEY');
+      req.user = decoded;
+    } catch (err) {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
   }
   next();
-});
-
-const UserSchema = new mongoose.Schema({
-  email: String,
-  password: String,
-  role: { type: String, default: 'user' } // 'user' or 'admin'
-});
-// Only for admin
-app.get('/users', isAdmin, async (req, res) => {
-  const users = await User.find();
-  res.json(users);
 });

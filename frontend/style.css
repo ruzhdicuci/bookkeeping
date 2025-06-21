@@ -1336,8 +1336,8 @@ height: 38px;
   
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     background: #e3e0db;
-   
-  margin-top: 10px;
+ padding-bottom: 10px;
+ 
   background: #e3e0db;
   border-radius: 10px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.05);
@@ -1350,13 +1350,11 @@ margin-bottom: -10px;
 
 .filter-grid3 {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 6px;
+    background: #e3e0db;
+  padding: 12px;
 
-
- 
-  background: transparent;
- 
 }
 
 .modal {
@@ -1675,7 +1673,7 @@ font-weight: bold;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
 
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   padding: 12px;
   
   background: #e3e0db;
@@ -1910,10 +1908,10 @@ width: 100px; /* Match credit limit cards */
 
 .balance-card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 0.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 0.3rem;
   padding: 0.5rem; 
- 
+
 }
 
 .balance-card {
@@ -2090,4 +2088,6 @@ margin-right: 10px;
   cursor: pointer;
   color: #555;
 }
+
+
 
