@@ -726,7 +726,7 @@ margin-left: -2px;
    border: none;
  height:42px;
 margin-top: 4px;
-    width: 120px;
+    width: 100px;
     margin-left: 3px;
     font-size: 0.7;
 
@@ -850,11 +850,11 @@ color: rgb(213, 79, 79);
   padding: 8px 10px;
  border:1px solid white;
   border-radius: 8px;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   background-color: white;
   cursor: pointer;
   box-sizing: border-box;
-  width: 124px;
+  width: 100px;
 }
 
 #bt1:hover  {
@@ -867,7 +867,7 @@ color: rgb(213, 79, 79);
 .dropdown-toggle::after {
   content: '▾';
   font-size: 16px;
-  margin-left: 5px;
+  margin-left: 1px;
 }
 .styled-select {
   padding: 8px 10px;
@@ -1199,6 +1199,7 @@ border-radius: 10px;
 .dropdown2 {
   position: relative;
   display: inline-block;
+ 
 }
 .dropdown2 .dropdown-toggle {
   padding: 5px 10px;
@@ -1306,7 +1307,7 @@ color:  #71d0ff !important; /* optional: blue checkmark */
   border: 1px solid #f5dae1;
   border-radius: 8px;
 height: 42px;
-  width: 102px;
+  width: 90px;
   margin-left: -2px;
   font-weight: 600;
   font-size: 16px;
