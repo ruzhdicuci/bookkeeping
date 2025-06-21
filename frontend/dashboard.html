@@ -881,26 +881,37 @@ document.getElementById('categoryFilter')?.addEventListener('change', drawCharts
 <!-- ✅ Add these before your dashboard.js -->
  <div class="filter-grid"  >
 <div id="entryTableBody" class="desktop-card-list"></div></div>
-<script src="dashboard.js"></script>
+
 
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById('scrollUpBtn')?.addEventListener('click', () => {
+document.addEventListener("DOMContentLoaded", () => {
+  const upBtn = document.getElementById('scrollUpBtn');
+  const downBtn = document.getElementById('scrollDownBtn');
+
+  if (upBtn) {
+    upBtn.addEventListener('click', () => {
+      console.log("⬆ Scroll Up button clicked");
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
+  }
 
-    document.getElementById('scrollDownBtn')?.addEventListener('click', () => {
+  if (downBtn) {
+    downBtn.addEventListener('click', () => {
+      console.log("⬇ Scroll Down button clicked");
       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     });
-  });
+  }
+});
+
+
 </script>
-
-
-
 <div class="scroll-toggle-wrapper">
   <button class="scroll-toggle-btn" id="scrollUpBtn" title="Scroll to Top">⬆</button>
   <button class="scroll-toggle-btn" id="scrollDownBtn" title="Scroll to Bottom">⬇</button>
 </div>
+
+<script src="dashboard.js"></script>
+
 </body>
 </html>
 
