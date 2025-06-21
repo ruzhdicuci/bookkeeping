@@ -1658,6 +1658,19 @@ function clearField(id) {
 
 
 
+function toggleDropdown(id) {
+  const dropdown = document.getElementById(id);
+  dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+}
 
+// Close dropdown when clicking outside
+document.addEventListener('click', function (e) {
+  const toggle = document.getElementById('bt1');
+  const menu = document.getElementById('monthOptions');
+
+  if (!toggle.contains(e.target) && !menu.contains(e.target)) {
+    menu.style.display = 'none';
+  }
+});
 
 
