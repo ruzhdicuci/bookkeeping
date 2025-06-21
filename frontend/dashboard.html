@@ -18,7 +18,7 @@
    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
 <!-- Optional: Flatpickr dark theme support -->
 
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <title>Bookkeeping</title>
 
  
@@ -34,7 +34,7 @@
 
 
 
-<div class="filter-grid" style="height: 40px;">
+
 
   
 
@@ -42,15 +42,10 @@
 <div class="navbar">
   
   <div class="dropdown">
-     <button class="tab-button active" onclick="openTab('dashboardTab', this)">📊</button>
-      <button class="tab-button" onclick="openTab('chartsTab', this)">📈</button>
+    
     <button class="dropbtn">Settings
       <i class="fa fa-caret-down"></i>
     </button>
-
-     <button id="themeToggle" onclick="toggleTheme()" >
-  🌙
-   </button>
     <div class="dropdown-content">
      
       <a href="#" id="full"  onclick="openFullscreen();">Full Screen</a>
@@ -100,7 +95,17 @@
 </div>
 </div>  
 
+<div class="tabs-wrapper">
+ <div class="tabs">
+ <button class="tab-button active" onclick="openTab('dashboardTab', this)">📊  Dashboard</button>
+      <button class="tab-button" onclick="openTab('chartsTab', this)">📈  My Charts</button>
+   
 
+     <button id="themeToggle" onclick="toggleTheme()" > 
+   <i class="fa-solid fa-moon"></i>My Theme
+</button>
+</div>
+</div>
 
 
  <!-- Charts Tab -->
@@ -875,6 +880,15 @@ document.getElementById('categoryFilter')?.addEventListener('change', drawCharts
 <div id="toast" style="display:none; position: fixed; bottom: 20px; right: 20px; background: #13a07f; color: white; padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); font-size: 16px; z-index: 1000;"></div>
 
 
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<!-- ✅ Add these before your dashboard.js -->
+ <div class="filter-grid"  >
+<div id="entryTableBody" class="desktop-card-list"></div></div>
+<script src="dashboard.js"></script>
+
+
+
 <div class="scroll-toggle-wrapper">
   <button class="scroll-toggle-btn" id="scrollUpBtn" title="Scroll to Top">⬆</button>
   <button class="scroll-toggle-btn" id="scrollDownBtn" title="Scroll to Bottom">⬇</button>
@@ -904,14 +918,7 @@ document.getElementById('categoryFilter')?.addEventListener('change', drawCharts
     }
   });
 </script>
-<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<!-- ✅ Add these before your dashboard.js -->
- <div class="filter-grid"  >
-<div id="entryTableBody" class="desktop-card-list"></div></div>
-<script src="dashboard.js"></script>
-
-
-</div>
 </body>
 </html>
+
+

@@ -532,15 +532,6 @@ async function saveEdit(row) {
   }
 }
 
-function showToast(message) {
-    const toast = document.getElementById('toast');
-    toast.textContent = message;
-    toast.style.opacity = '1';
-
-    setTimeout(() => {
-      toast.style.opacity = '0';
-    }, 2000);
-  }
 
 
 
@@ -1630,9 +1621,7 @@ function showToast(message = "Done!", color = "#13a07f") {
   }, 3000);
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  showToast("✅ This is a test");
-});
+
 
 function addSwipeListeners(targetElement, onSwipeLeft, onSwipeRight) {
   let touchStartX = 0;
