@@ -842,12 +842,19 @@ color: rgb(213, 79, 79);
 
 #bt1  {
   padding: 8px 10px;
-  border: 1px solid #ddd;
+ border:1px solid white;
   border-radius: 8px;
   font-size: 0.9rem;
   background-color: white;
-  
+  cursor: pointer;
   box-sizing: border-box;
+  width: 124px;
+}
+
+#bt1:hover  {
+ 
+  background-color: rgb(211, 208, 208);
+ 
 }
 
 
@@ -900,7 +907,7 @@ background: #444;
   display: flex;
 user-select: none;
   justify-content: flex-start;
-  width: 160px;
+  width: 120px;
    color: white !important;
   font-size: 15px;
   font-family: system-ui, sans-serif;
@@ -1091,14 +1098,15 @@ height: 38px;
   border: 1px solid #ddd;
   border-radius: 8px;
   z-index: 999;
-  width: 200px;
+ 
 }
 
 
 .tabs-wrapper {
   display: flex;
   justify-content: center;
-  margin: 10px 0;
+ 
+gap: 0;
 
 
 }
@@ -1106,8 +1114,9 @@ height: 38px;
 .tabs {
   display: flex;
   align-items: center;
-  gap: 8px;
+   margin-bottom:-3px; 
   flex-wrap: wrap;
+ gap: 0;
 }
 
 
@@ -1210,20 +1219,26 @@ padding-top: 15px;
  
   box-shadow: 0 4px 6px rgba(165, 163, 163, 0.931);
 }
-.dropdown2:hover .dropdown-content2 {
+.dropdown-content2 {
   display: block;
 }
 
 #personMultiSelect:hover .dropdown-options {
   display: block;
 }
+.dropdown-content2 {
+  display: none;
+}
 
+.dropdown-content2.show {
+  display: block;
+}
 
 .dropdown-content2 label {
   display: block;
 user-select: none;
   justify-content: flex-start;
-  width: 160px;
+  width: 110px;
    color: white !important;
   font-size: 15px;
   font-family: system-ui, sans-serif;
@@ -1284,12 +1299,13 @@ color:  #71d0ff !important; /* optional: blue checkmark */
 
 
 .reset-btn {
-  background:  #faaabc;
+  background:  #f5dae1;
   color: white;
-  border: none;
+  border: 1px solid #f5dae1;
   border-radius: 8px;
-height: 38px;
-  width: 40px;
+height: 42px;
+  width: 102px;
+  margin-left: -2px;
   font-weight: 600;
   font-size: 16px;
   cursor: pointer;
@@ -2060,34 +2076,36 @@ margin-right: 10px;
 
 
 
-
-.clear-pill:hover {
-  background: orangered;
-  color: white;
-}
-.filter-field {
-  display: inline-flex;
-  align-items: center;
-  margin-right: 10px;
-}
-.filter-field {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 5px;
+.input-wrapper {
+  position: relative;
+  width: 100%;
 }
 
+.input-wrapper input {
+  width: 100%;
+  padding-right: 60px; /* room for pill button */
+  height: 36px;
+  box-sizing: border-box;
+  border-radius: 8px;
+}
 
 .clear-pill {
-  background: #ffffff;
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #e4e4e4;
   border: none;
-  border-radius: 50px;
-  padding: 3px 12px;
+  color: #333;
   font-size: 12px;
-  margin-left: 4px;
+  padding: 3px 10px;
+  border-radius: 999px;
   cursor: pointer;
-  color: #555;
+  transition: background 0.2s;
 }
 
+.clear-pill:hover {
+  background-color: #ccc;
+}
 
 
