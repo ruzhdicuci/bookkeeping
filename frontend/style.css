@@ -2069,18 +2069,10 @@ margin-right: 10px;
 
 
 
-.clear-pill {
-  background: #f4f1f1;
-  border: none;
-  border-radius: 50px;
-  padding: 3px 12px;
-  font-size: 12px;
-  margin-left: 4px;
-  cursor: pointer;
-  color: #555;
-}
+
 .clear-pill:hover {
-  background: #bbbbbb;
+  background: orangered;
+  color: white;
 }
 .filter-field {
   display: inline-flex;
@@ -2094,11 +2086,14 @@ margin-right: 10px;
   margin-bottom: 5px;
 }
 
+
 .clear-pill {
-  padding: 2px 8px;
-  font-size: 0.8em;
+  background: #ffffff;
   border: none;
-  border-radius: 12px;
-  background: #ccc;
+  border-radius: 50px;
+  padding: 3px 12px;
+  font-size: 12px;
+  margin-left: 4px;
   cursor: pointer;
+  color: #555;rgb(235, 231, 231)
 }
