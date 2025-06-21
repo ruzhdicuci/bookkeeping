@@ -284,22 +284,18 @@ function isAdmin(req, res, next) {
 }
 
 // Secure the /register route
-app.post('/register', isAdmin, async (req, res) => {
+// Add to server.js — only accessible to admins
+app.post('/admin/create-user', isAdmin, async (req, res) => {
   const { email, password } = req.body;
+  if (!email || !password) return res.status(400).json({ error: 'Missing email or password' });
 
   const existingUser = await User.findOne({ email });
-  if (existingUser) {
-    return res.status(400).json({ error: 'User already exists' });
-  }
+  if (existingUser) return res.status(400).json({ error: 'User already exists' });
 
   const hashedPassword = await bcrypt.hash(password, 10);
-  const user = new User({ email, password: hashedPassword, role: 'user' });
-  await user.save();
-
-  res.json({ message: 'User registered successfully' });
+  await User.create({ email, password: hashedPassword, role: 'user' });
+  res.json({ message: 'User created by admin' });
 });
-
-const jwt = require('jsonwebtoken');
 
 // Example middleware to decode token
 app.use((req, res, next) => {

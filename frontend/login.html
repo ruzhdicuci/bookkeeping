@@ -111,7 +111,7 @@ overflow: hidden;
 </div>
 
 <div class="box">
-  <h2>🆕 Register</h2>
+  <h2 id="hidden">🆕 Register</h2>
   <form id="registerForm" autocomplete="off">
     <label for="registerEmail">Email</label>
     <input
@@ -140,7 +140,15 @@ overflow: hidden;
   #registerForm {
     display: none !important;
   }
+    #hidden {
+    display: none !important;
+  }
 </style>
+<script>
+  if (localStorage.getItem('role') !== 'admin') {
+    location.href = '/login.html';
+  }
+</script>
 
   <script src="login.js"></script>
 </body>
