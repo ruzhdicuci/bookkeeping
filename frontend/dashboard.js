@@ -1685,3 +1685,80 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
+
+// Toggle visibility of person dropdown
+document.querySelector('.dropdown-toggle').addEventListener('click', function () {
+  const dropdown = document.getElementById('personDropdown');
+  dropdown.classList.toggle('show');
+});
+
+
+
+// Add entries
+document.getElementById('entryForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+
+  const inputDate = document.getElementById('newDate')._flatpickr?.selectedDates[0];
+  function formatDateToLocalISO(date) {
+    const offsetDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+    return offsetDate.toISOString().split('T')[0];
+  }
+  const isoDate = inputDate ? formatDateToLocalISO(inputDate) : '';
+
+  console.log('📥 Submitting entry...');
+  const entry = {
+    date: isoDate,
+    description: document.getElementById('newDescription').value,
+    category: document.getElementById('newCategory').value,
+    amount: parseFloat(document.getElementById('newAmount').value),
+    currency: document.getElementById('newCurrency').value,
+    type: document.getElementById('newType').value,
+    person: document.getElementById('newPerson').value,
+    bank: document.getElementById('newBank').value,
+    status: document.getElementById('newStatus')?.value || 'Paid' // ✅ Add this line
+  };
+// ✅ Log the entry before sending
+console.log("🧾 Entry being submitted:", entry);
+    try {
+      const form = document.getElementById('entryForm');
+      const editId = form.dataset.editId;
+
+      const method = editId ? 'PUT' : 'POST';
+      const url = editId
+        ? `https://bookkeeping-i8e0.onrender.com/api/entries/${editId}`
+        : 'https://bookkeeping-i8e0.onrender.com/api/entries';
+
+ console.log('🧾 Entry being submitted:', entry);
+
+      const res = await fetch(url, {
+        method,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(entry)
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        alert('❌ Error saving entry: ' + (err.message || res.statusText));
+        return;
+      }
+
+      document.getElementById('entryForm').reset();
+await fetchEntries();                    // reload data from server
+if (editId) delete form.dataset.editId;
+
+populateNewEntryDropdowns();            // refresh datalists
+populateFilters();                      // refresh filters (e.g. categories)
+renderEntries();                        // re-render entry table
+renderBankBalanceForm();                // ✅ re-render balance inputs
+
+
+    } catch (error) {
+      console.error('❌ Error saving entry:', error);
+      alert('Failed to save entry.');
+    }
+  });
