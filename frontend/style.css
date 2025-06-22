@@ -2137,8 +2137,14 @@ margin-right: 10px;
 }
 
 
+
+
 #personDropdown {
   display: none;
+  padding: 10px;
+  background: #f9f9f9;
+  border: 1px solid #ccc;
+  z-index: 20;
 }
 #personDropdown.show {
   display: block;
