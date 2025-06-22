@@ -2157,3 +2157,10 @@ margin-right: 10px;
   background-color: yellow !important;
   transition: background-color 1s ease;
 }
+
+
+
+.entry-date-label.special-label {
+  color: #3bb3e2;
+  font-weight: bold;
+}

@@ -242,22 +242,46 @@ document.querySelectorAll('.monthOption').forEach(cb => {
 function getDateLabel(dateStr) {
   const entryDate = new Date(dateStr);
   const today = new Date();
-  const yesterday = new Date();
-
-  // Normalize all dates to midnight (remove time)
-  today.setHours(0, 0, 0, 0);
+  const yesterday = new Date(today);
   yesterday.setDate(today.getDate() - 1);
-  yesterday.setHours(0, 0, 0, 0);
-  entryDate.setHours(0, 0, 0, 0);
 
   const isSameDay = (d1, d2) =>
-    d1.getTime() === d2.getTime();
+    d1.getFullYear() === d2.getFullYear() &&
+    d1.getMonth() === d2.getMonth() &&
+    d1.getDate() === d2.getDate();
+
+  const isSameWeek = (d1, d2) => {
+    const day1 = new Date(d1);
+    const day2 = new Date(d2);
+    day1.setHours(0, 0, 0, 0);
+    day2.setHours(0, 0, 0, 0);
+    const dayOfWeek1 = day1.getDay(); // 0 (Sun) to 6 (Sat)
+    const diff = day1.getDate() - dayOfWeek1;
+    const weekStart = new Date(day1.setDate(diff));
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekEnd.getDate() + 6);
+
+    return d2 >= weekStart && d2 <= weekEnd;
+  };
+
+  const isLastWeek = (d1, d2) => {
+    const day1 = new Date(d1);
+    const dayOfWeek = day1.getDay();
+    const lastWeekEnd = new Date(day1.setDate(day1.getDate() - dayOfWeek - 1));
+    const lastWeekStart = new Date(lastWeekEnd);
+    lastWeekStart.setDate(lastWeekEnd.getDate() - 6);
+    return d2 >= lastWeekStart && d2 <= lastWeekEnd;
+  };
+
+  const isSameMonth = (d1, d2) =>
+    d1.getFullYear() === d2.getFullYear() &&
+    d1.getMonth() === d2.getMonth();
 
   if (isSameDay(entryDate, today)) return "Today";
   if (isSameDay(entryDate, yesterday)) return "Yesterday";
-
-  const diffDays = Math.floor((today - entryDate) / (1000 * 60 * 60 * 24));
-  if (diffDays <= 7) return "This Week";
+  if (isSameWeek(today, entryDate)) return "This Week";
+  if (isLastWeek(today, entryDate)) return "Last Week";
+  if (isSameMonth(today, entryDate)) return "This Month";
 
   return entryDate.toLocaleDateString('en-GB', {
     day: '2-digit',
@@ -265,7 +289,6 @@ function getDateLabel(dateStr) {
     year: 'numeric'
   });
 }
-
 function renderEntries() {
   const dateSearch = document.getElementById('dateSearch')?.value.trim();
   const descSearch = document.getElementById('descSearch')?.value.trim();
@@ -321,21 +344,23 @@ function renderEntries() {
   let lastDateGroup = null;
 
   filtered
-    .sort((a, b) => new Date(b.date) - new Date(a.date))
-    .forEach(e => {
-      const dateGroupLabel = new Date(e.date).toLocaleDateString('en-GB', {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric'
-      });
+  .sort((a, b) => new Date(a.date) - new Date(b.date)) // sort oldest to newest
+  .reverse() // render newest first
+  .forEach(e => {
+    const dateGroupLabel = getDateLabel(e.date);
 
-      if (dateGroupLabel !== lastDateGroup) {
-        const label = document.createElement('div');
-        label.className = 'entry-date-label';
-        label.textContent = dateGroupLabel;
-        container.appendChild(label);
-        lastDateGroup = dateGroupLabel;
-      }
+if (dateGroupLabel !== lastDateGroup) {
+  const label = document.createElement('div');
+  label.className = 'entry-date-label';
+  label.textContent = dateGroupLabel;
+
+  if (['Today', 'Yesterday', 'This Week', 'Last Week', 'This Month'].includes(dateGroupLabel)) {
+    label.classList.add('special-label'); // Optional highlight
+  }
+
+  container.appendChild(label);
+  lastDateGroup = dateGroupLabel;
+}
 
       const isEditing = document.getElementById('entryForm')?.dataset.editId === e._id;
       const amountClass = e.type === 'Income' ? 'income' : 'expense';
