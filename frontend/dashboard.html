@@ -810,6 +810,18 @@ document.getElementById('categoryFilter')?.addEventListener('change', drawCharts
 
 
 <div class="scroll-toggle-wrapper">
+  <div style="display: flex; justify-content: flex-end; align-items: center; margin: 10px;">
+  <label for="dateRangeFilter" style="margin-right: 5px;">📅 Filter:</label>
+  <select id="dateRangeFilter" onchange="renderEntries()">
+    <option value="All">All</option>
+    <option value="Today">Today</option>
+    <option value="Yesterday">Yesterday</option>
+    <option value="This Week">This Week</option>
+    <option value="Last Week">Last Week</option>
+    <option value="2 Weeks Ago">2 Weeks Ago</option>
+    <option value="3 Weeks Ago">3 Weeks Ago</option>
+  </select>
+</div>
   <button class="scroll-toggle-btn" id="scrollUpBtn" title="Scroll to Top">⬆</button>
   <button class="scroll-toggle-btn" id="scrollDownBtn" title="Scroll to Bottom">⬇</button>
 </div>

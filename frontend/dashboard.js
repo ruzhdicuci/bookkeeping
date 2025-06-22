@@ -239,56 +239,61 @@ document.querySelectorAll('.monthOption').forEach(cb => {
   }
 }
 
+
 function getDateLabel(dateStr) {
   const entryDate = new Date(dateStr);
   const today = new Date();
-  const yesterday = new Date(today);
+  const yesterday = new Date();
+
+  // Zero out time (midnight for accurate comparisons)
+  today.setHours(0, 0, 0, 0);
   yesterday.setDate(today.getDate() - 1);
+  yesterday.setHours(0, 0, 0, 0);
+  entryDate.setHours(0, 0, 0, 0);
+
+  const diffDays = Math.floor((today - entryDate) / (1000 * 60 * 60 * 24));
+  const sameYear = today.getFullYear() === entryDate.getFullYear();
 
   const isSameDay = (d1, d2) =>
     d1.getFullYear() === d2.getFullYear() &&
     d1.getMonth() === d2.getMonth() &&
     d1.getDate() === d2.getDate();
 
-  const isSameWeek = (d1, d2) => {
-    const day1 = new Date(d1);
-    const day2 = new Date(d2);
-    day1.setHours(0, 0, 0, 0);
-    day2.setHours(0, 0, 0, 0);
-    const dayOfWeek1 = day1.getDay(); // 0 (Sun) to 6 (Sat)
-    const diff = day1.getDate() - dayOfWeek1;
-    const weekStart = new Date(day1.setDate(diff));
-    const weekEnd = new Date(weekStart);
-    weekEnd.setDate(weekEnd.getDate() + 6);
-
-    return d2 >= weekStart && d2 <= weekEnd;
-  };
-
-  const isLastWeek = (d1, d2) => {
-    const day1 = new Date(d1);
-    const dayOfWeek = day1.getDay();
-    const lastWeekEnd = new Date(day1.setDate(day1.getDate() - dayOfWeek - 1));
-    const lastWeekStart = new Date(lastWeekEnd);
-    lastWeekStart.setDate(lastWeekEnd.getDate() - 6);
-    return d2 >= lastWeekStart && d2 <= lastWeekEnd;
-  };
-
-  const isSameMonth = (d1, d2) =>
-    d1.getFullYear() === d2.getFullYear() &&
-    d1.getMonth() === d2.getMonth();
-
   if (isSameDay(entryDate, today)) return "Today";
   if (isSameDay(entryDate, yesterday)) return "Yesterday";
-  if (isSameWeek(today, entryDate)) return "This Week";
-  if (isLastWeek(today, entryDate)) return "Last Week";
-  if (isSameMonth(today, entryDate)) return "This Month";
+  if (diffDays < 7 && entryDate.getDay() <= today.getDay()) return "This Week";
 
+  // New group: Last Week (within 14 days but not this week)
+  if (diffDays < 14) return "Last Week";
+
+  // New group: This Month
+  if (
+    today.getMonth() === entryDate.getMonth() &&
+    today.getFullYear() === entryDate.getFullYear()
+  ) {
+    return "This Month";
+  }
+
+  // Default to full date
   return entryDate.toLocaleDateString('en-GB', {
     day: '2-digit',
     month: 'long',
-    year: 'numeric'
+    year: 'numeric',
   });
 }
+
+function getLabelRank(label) {
+  const ranks = {
+    "Today": 1,
+    "Yesterday": 2,
+    "This Week": 3,
+    "Last Week": 4,
+    "This Month": 5,
+  };
+  return ranks[label] || 9999; // fallback for full dates
+}
+
+
 function renderEntries() {
   const dateSearch = document.getElementById('dateSearch')?.value.trim();
   const descSearch = document.getElementById('descSearch')?.value.trim();
@@ -343,25 +348,52 @@ function renderEntries() {
   container.innerHTML = '';
   let lastDateGroup = null;
 
-  filtered
-  .sort((a, b) => new Date(a.date) - new Date(b.date)) // sort oldest to newest
-  .reverse() // render newest first
-  .forEach(e => {
-    const dateGroupLabel = getDateLabel(e.date);
+  // Group entries by label
+const groupedEntries = {};
+filtered.forEach(e => {
+  const label = getDateLabel(e.date);
+  if (!groupedEntries[label]) groupedEntries[label] = [];
+  groupedEntries[label].push(e);
+});
 
-if (dateGroupLabel !== lastDateGroup) {
-  const label = document.createElement('div');
-  label.className = 'entry-date-label';
-  label.textContent = dateGroupLabel;
+// Sort groups by rank
+const sortedLabels = Object.keys(groupedEntries).sort((a, b) => getLabelRank(a) - getLabelRank(b));
 
-  if (['Today', 'Yesterday', 'This Week', 'Last Week', 'This Month'].includes(dateGroupLabel)) {
-    label.classList.add('special-label'); // Optional highlight
+sortedLabels.forEach(label => {
+  const labelEl = document.createElement('div');
+  labelEl.className = 'entry-date-label';
+  if (['Today', 'Yesterday', 'This Week', 'Last Week', 'This Month'].includes(label)) {
+    labelEl.classList.add('special-label');
   }
 
-  container.appendChild(label);
-  lastDateGroup = dateGroupLabel;
-}
+const rangeFilter = document.getElementById('dateRangeFilter')?.value || 'All';
+const now = new Date();
 
+const isInRange = (dateStr, label) => {
+  const d = new Date(dateStr);
+  const daysDiff = Math.floor((now - d) / (1000 * 60 * 60 * 24));
+
+  switch (label) {
+    case 'Today': return daysDiff === 0;
+    case 'Yesterday': return daysDiff === 1;
+    case 'This Week': return daysDiff <= 6;
+    case 'Last Week': return daysDiff >= 7 && daysDiff <= 13;
+    case '2 Weeks Ago': return daysDiff >= 14 && daysDiff <= 20;
+    case '3 Weeks Ago': return daysDiff >= 21 && daysDiff <= 27;
+    default: return true;
+  }
+};
+
+filtered = filtered.filter(e => isInRange(e.date, rangeFilter));
+
+
+
+  labelEl.textContent = label;
+  container.appendChild(labelEl);
+
+  groupedEntries[label]
+    .sort((a, b) => new Date(b.date) - new Date(a.date))
+    .forEach(e => {
       const isEditing = document.getElementById('entryForm')?.dataset.editId === e._id;
       const amountClass = e.type === 'Income' ? 'income' : 'expense';
 
@@ -413,6 +445,8 @@ if (dateGroupLabel !== lastDateGroup) {
 
       container.appendChild(card);
     });
+});
+
 
   // ✅ Auto-scroll to highlighted row after render
   setTimeout(() => {
@@ -459,6 +493,10 @@ if (dateGroupLabel !== lastDateGroup) {
   document.getElementById('totalExpense').textContent = expenseTotal.toFixed(2);
   document.getElementById('totalBalance').textContent = (incomeTotal - expenseTotal).toFixed(2);
 }
+
+
+
+
 function editEntry(id) {
   const form = document.getElementById('entryForm');
   if (form) {
