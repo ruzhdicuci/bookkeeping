@@ -1657,20 +1657,28 @@ function clearField(id) {
 }
 
 
-
+// Toggle dropdown visibility
 function toggleDropdown(id) {
   const dropdown = document.getElementById(id);
-  dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+  dropdown.classList.toggle('show');
 }
 
-// Close dropdown when clicking outside
-document.addEventListener('click', function (e) {
-  const toggle = document.getElementById('bt1');
-  const menu = document.getElementById('monthOptions');
 
-  if (!toggle.contains(e.target) && !menu.contains(e.target)) {
-    menu.style.display = 'none';
+document.addEventListener("DOMContentLoaded", () => {
+  const upBtn = document.getElementById('scrollUpBtn');
+  const downBtn = document.getElementById('scrollDownBtn');
+
+  if (upBtn) {
+    upBtn.addEventListener('click', () => {
+      console.log("⬆ Scroll Up button clicked");
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
+  if (downBtn) {
+    downBtn.addEventListener('click', () => {
+      console.log("⬇ Scroll Down button clicked");
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    });
   }
 });
-
-

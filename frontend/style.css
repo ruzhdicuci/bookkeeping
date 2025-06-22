@@ -873,7 +873,7 @@ color: rgb(213, 79, 79);
 .dropdown-toggle::after {
   content: '▾';
   font-size: 16px;
-  margin-left: 1px;
+  margin-left: 2px;
 }
 .styled-select {
   padding: 8px 10px;
@@ -1202,47 +1202,40 @@ border-radius: 10px;
 }
 
 
-
 .dropdown2 {
   position: relative;
   display: inline-block;
- 
 }
-.dropdown2 .dropdown-toggle {
+
+.dropdown-toggle {
   padding: 5px 10px;
- background-color: white;
+  background-color: white;
   border: 1px solid #ccc;
   cursor: pointer;
   border-radius: 6px;
 }
+
 .dropdown-content2 {
   display: none;
   position: absolute;
-   background: #444;
+  background: #444;
+  color: white;
+  padding: 10px;
   border: 1px solid #ccc;
-padding-bottom: 10px;
-  overflow-y: auto;
-padding-top: 15px;
-  overflow-y: auto;
+  border-radius: 10px;
   z-index: 1000;
-    border-radius: 10px;
- 
-  box-shadow: 0 4px 6px rgba(165, 163, 163, 0.931);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+  min-width: 160px;
 }
-.dropdown-content2 {
+
+.dropdown-content2.show {
   display: block;
 }
 
 #personMultiSelect:hover .dropdown-options {
   display: block;
 }
-.dropdown-content2 {
-  display: none;
-}
 
-.dropdown-content2.show {
-  display: block;
-}
 
 .dropdown-content2 label {
   display: block;
@@ -1315,7 +1308,7 @@ color:  #71d0ff !important; /* optional: blue checkmark */
   border-radius: 8px;
 height: 40px;
   width: 110px;
-  margin-left: -2px;
+  margin-left: 2px;
   font-weight: 600;
   font-size: 14px;
   cursor: pointer;

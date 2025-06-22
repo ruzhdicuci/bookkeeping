@@ -346,11 +346,11 @@ totalsContainer.appendChild(summaryCard);
  </div> 
        
  <div class="dropdown2">
-  <button id="bt1"  class="dropdown-toggle" onclick="toggleDropdown('monthOptions')">📅 &nbsp;  month </button>
+  <button id="bt1"  class="dropdown-toggle" onclick="toggleDropdown('monthOptions')">📅  &nbsp; month </button>
   <div class="dropdown-content2" id="monthOptions">
     <!-- Checkboxes will be inserted here dynamically -->
   </div>
-
+</div>
      <div class="tooltip-wrapper">
   <button class="reset-btn" onclick="resetFilters()">
     <span class="reset-icon" style="color: black; font-size: 0.7rem;">clear all filters</span> 
@@ -876,40 +876,18 @@ document.getElementById('categoryFilter')?.addEventListener('change', drawCharts
 <div id="toast" style="display:none; position: fixed; bottom: 20px; right: 20px; background: #13a07f; color: white; padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); font-size: 16px; z-index: 1000;"></div>
 
 
-<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
 <!-- ✅ Add these before your dashboard.js -->
  <div class="filter-grid"  >
 <div id="entryTableBody" class="desktop-card-list"></div></div>
 
 
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const upBtn = document.getElementById('scrollUpBtn');
-  const downBtn = document.getElementById('scrollDownBtn');
-
-  if (upBtn) {
-    upBtn.addEventListener('click', () => {
-      console.log("⬆ Scroll Up button clicked");
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-  }
-
-  if (downBtn) {
-    downBtn.addEventListener('click', () => {
-      console.log("⬇ Scroll Down button clicked");
-      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-    });
-  }
-});
-
-
-</script>
 <div class="scroll-toggle-wrapper">
   <button class="scroll-toggle-btn" id="scrollUpBtn" title="Scroll to Top">⬆</button>
   <button class="scroll-toggle-btn" id="scrollDownBtn" title="Scroll to Bottom">⬇</button>
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="dashboard.js"></script>
 
 </body>
