@@ -472,6 +472,9 @@ totalsContainer.appendChild(summaryCard);
 // Add entries
 document.getElementById('entryForm').addEventListener('submit', async (e) => {
   e.preventDefault();
+document.querySelector('.dropdown-toggle').addEventListener('click', function () {
+  document.getElementById('personDropdown').classList.toggle('show');
+});
 
   const inputDate = document.getElementById('newDate')._flatpickr?.selectedDates[0];
   function formatDateToLocalISO(date) {

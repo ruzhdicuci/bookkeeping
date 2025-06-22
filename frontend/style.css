@@ -2137,3 +2137,9 @@ margin-right: 10px;
 }
 
 
+#personDropdown {
+  display: none;
+}
+#personDropdown.show {
+  display: block;
+}
