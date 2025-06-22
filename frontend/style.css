@@ -2151,3 +2151,9 @@ margin-right: 10px;
 #personDropdown.show {
   display: block;
 }
+
+
+.highlighted {
+  background-color: yellow !important;
+  transition: background-color 1s ease;
+}

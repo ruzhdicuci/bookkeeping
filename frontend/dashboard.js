@@ -262,7 +262,6 @@ function getDateLabel(dateStr) {
     year: 'numeric'
   });
 }
-
 function renderEntries() {
   const dateSearch = document.getElementById('dateSearch')?.value.trim();
   const descSearch = document.getElementById('descSearch')?.value.trim();
@@ -309,83 +308,96 @@ function renderEntries() {
     );
   });
 
-  // ✅ Render cards
- const container = document.getElementById('entryTableBody');
-if (!container) {
-  console.error("❌ Missing #entryTableBody container in DOM");
-  return;
-}
-container.innerHTML = '';
+  const container = document.getElementById('entryTableBody');
+  if (!container) {
+    console.error("❌ Missing #entryTableBody container in DOM");
+    return;
+  }
+  container.innerHTML = '';
+  let lastDateGroup = null;
 
+  filtered
+    .sort((a, b) => new Date(b.date) - new Date(a.date))
+    .forEach(e => {
+      const dateGroupLabel = new Date(e.date).toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric'
+      });
 
+      if (dateGroupLabel !== lastDateGroup) {
+        const label = document.createElement('div');
+        label.className = 'entry-date-label';
+        label.textContent = dateGroupLabel;
+        container.appendChild(label);
+        lastDateGroup = dateGroupLabel;
+      }
 
-let lastDateGroup = null;
+      const isEditing = document.getElementById('entryForm')?.dataset.editId === e._id;
+      const amountClass = e.type === 'Income' ? 'income' : 'expense';
 
-filtered
-  .sort((a, b) => new Date(b.date) - new Date(a.date))
-  .forEach(e => {
-    const dateGroupLabel = new Date(e.date).toLocaleDateString('en-GB', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric'
+      const card = document.createElement('div');
+      card.className = 'entry-card';
+      card.dataset.id = e._id;
+
+      if (isEditing) card.classList.add('editing-row');
+      if (e._id === window.highlightedEntryId) {
+        card.classList.add('highlighted');
+        card.id = 'highlighted-entry';
+      }
+
+      card.innerHTML = `
+        <div class="entry-date">
+          <div class="date-block">
+            <div class="day">${new Date(e.date).getDate().toString().padStart(2, '0')}</div>
+            <div class="month-year">
+              ${new Date(e.date).toLocaleString('default', { month: 'short' })}<br>
+              ${new Date(e.date).getFullYear()}
+            </div>
+          </div>
+        </div>
+        <div class="entry-main">
+          <div class="description">${e.description}</div>
+          <div class="meta">
+            ${e.category || ''} • ${e.person} • ${e.bank}
+          </div>
+          <div class="status">
+            <span class="status-pill ${e.status === 'Paid' ? 'paid' : 'open'}">${e.status}</span>
+          </div>
+        </div>
+        <div class="entry-amount">
+          <div class="amount-line">
+            <span class="currency small">CHF</span>
+            <span class="amount ${amountClass}">${parseFloat(e.amount).toFixed(2)}</span>
+          </div>
+          <div class="buttons">
+            ${
+              isEditing
+                ? `<button onclick="cancelEdit()" class="action-btn">❌ Cancel</button>`
+                : `<button onclick="editEntry('${e._id}')" class="action-btn">✏️</button>`
+            }
+            <button onclick="duplicateEntry('${e._id}')" class="action-btn">📄</button>
+            <button onclick="showDeleteModal('${e._id}')" class="action-btn">🗑️</button>
+          </div>
+        </div>
+      `;
+
+      container.appendChild(card);
     });
 
-    if (dateGroupLabel !== lastDateGroup) {
-      const label = document.createElement('div');
-      label.className = 'entry-date-label';
-      label.textContent = dateGroupLabel;
-      container.appendChild(label);
-      lastDateGroup = dateGroupLabel;
+  // ✅ Auto-scroll to highlighted row after render
+  setTimeout(() => {
+    const el = document.getElementById('highlighted-entry');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(() => {
+        el.classList.remove('highlighted');
+        el.removeAttribute('id');
+        delete window.highlightedEntryId;
+      }, 2000);
     }
-
-    const isEditing = document.getElementById('entryForm')?.dataset.editId === e._id;
-    const amountClass = e.type === 'Income' ? 'income' : 'expense';
-
-    const card = document.createElement('div');
-    card.className = 'entry-card';
-    if (isEditing) card.classList.add('editing-row');
-
-    card.innerHTML = `
-      <div class="entry-date">
-    <div class="date-block">
-      <div class="day">${new Date(e.date).getDate().toString().padStart(2, '0')}</div>
-      <div class="month-year">
-        ${new Date(e.date).toLocaleString('default', { month: 'short' })}<br>
-        ${new Date(e.date).getFullYear()}
-      </div>
-       </div>
-  </div>
-      <div class="entry-main">
-        <div class="description">${e.description}</div>
-        <div class="meta">
-          ${e.category || ''} • ${e.person} • ${e.bank}
-        </div>
-       <div class="status">
-  <span class="status-pill ${e.status === 'Paid' ? 'paid' : 'open'}">
-    ${e.status}
-  </span>
-</div>
-      </div>
-       <div class="entry-amount">
-    <div class="amount-line">
-      <span class="currency small">CHF</span>
-      <span class="amount ${amountClass}">${parseFloat(e.amount).toFixed(2)}</span>
-    </div>
-        <div class="buttons">
-          ${
-            isEditing
-              ? `<button onclick="cancelEdit()" class="action-btn">❌ Cancel</button>`
-              : `<button onclick="editEntry('${e._id}')" class="action-btn">✏️</button>`
-          }
-          <button onclick="duplicateEntry('${e._id}')" class="action-btn">📄</button>
-          <button onclick="showDeleteModal('${e._id}')" class="action-btn">🗑️</button>
-        </div>
-      </div>
-    `;
-
-    container.appendChild(card);
-  });
-
+  }, 100);
+}
   // ✅ Totals + Averages
   let incomeTotal = 0, expenseTotal = 0;
   filtered.forEach(e => {
@@ -536,8 +548,6 @@ async function saveEdit(row) {
 }
 
 
-
-
 async function duplicateEntry(id) {
   const entry = entries.find(e => e._id === id);
   if (!entry) return alert("Entry not found");
@@ -556,33 +566,19 @@ async function duplicateEntry(id) {
   });
 
   if (res.ok) {
+    const newEntry = await res.json(); // ⬅️ get the newly created entry with _id
+    window.highlightedEntryId = newEntry._id;
+
     await fetchEntries();
     renderEntries();
     populateNewEntryDropdowns();
     populateFilters();
     renderBankBalanceForm();
     showToast("✅ Entry duplicated");
-
-    // ✅ Scroll to the duplicated entry by description
-    const targetDescription = copy.description;
-
-    setTimeout(() => {
-      const rows = document.querySelectorAll('#entryTableBody tr');
-      for (const row of rows) {
-        const descCell = row.querySelector('td:nth-child(2)');
-        if (descCell && descCell.textContent?.trim().includes('(Copy)')) {
-          row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          row.classList.add('highlight-row');
-          setTimeout(() => row.classList.remove('highlight-row'), 2000);
-          break;
-        }
-      }
-    }, 300); // ✅ longer delay to ensure DOM is fully rendered
   } else {
     alert("❌ Failed to duplicate entry");
   }
-} // ✅ this is the closing bracket for the entire function
-
+}
 
 
 
@@ -1598,17 +1594,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-document.addEventListener("DOMContentLoaded", () => {
-  const dotsContainer = document.getElementById("creditSliderDots");
-  if (!dotsContainer) return;
-
-  for (let i = 0; i < 3; i++) {
-    const dot = document.createElement('div');
-    dot.className = 'slider-dot';
-    if (i === 0) dot.classList.add('active'); // highlight the first dot
-    dotsContainer.appendChild(dot);
-  }
-});
 
 
 function showToast(message = "Done!", color = "#13a07f") {
