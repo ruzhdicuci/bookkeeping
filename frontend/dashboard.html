@@ -116,10 +116,10 @@
         <option value="bar">Bar</option>
         <option value="line">Line</option>
       </select>
-<div class="dropdown2">
+    <div class="dropdown2">
   <button class="dropdown-toggle">👤 Person</button>
   <div class="dropdown-content2" id="personDropdown">
-    <!-- Dynamically inserted checkboxes go here -->
+        <!-- Dynamically inserted checkboxes go here -->
   </div>
 </div>
 
@@ -747,9 +747,16 @@ function drawCharts() {
 
 function populatePersonFilter(persons) {
   const container = document.getElementById('personDropdown');
-  if (!container) return;
+  console.log("👥 container:", container);
+  if (!container) {
+    console.warn("⚠️ personDropdown container not found!");
+    return;
+  }
 
-  container.innerHTML = `
+  console.log("👥 persons to render:", persons);
+
+  // Build HTML content
+  const html = `
     <label>
       <input type="checkbox" id="selectAllPersons" checked />
       <strong>Select All</strong>
@@ -758,13 +765,16 @@ function populatePersonFilter(persons) {
     ${persons.map(p => `
       <label>
         <input type="checkbox" class="personChartFilter" value="${p}" checked />
-        
         ${p}
       </label>
     `).join('')}
   `;
 
-  // Prevent closing dropdown when clicking checkboxes
+  container.innerHTML = html;
+
+  console.log("✅ Injected HTML into personDropdown:", container.innerHTML);
+
+  // Stop dropdown from closing when clicking inside
   container.addEventListener('click', (e) => {
     e.stopPropagation();
   });
@@ -772,20 +782,26 @@ function populatePersonFilter(persons) {
   const selectAll = document.getElementById('selectAllPersons');
   const checkboxes = container.querySelectorAll('.personChartFilter');
 
-  selectAll.addEventListener('change', () => {
-    checkboxes.forEach(cb => cb.checked = selectAll.checked);
-    drawCharts();
-  });
+  console.log("🧪 selectAll checkbox:", selectAll);
+  console.log("🧪 personChartFilter checkboxes:", checkboxes);
 
+  // Setup Select All
+  if (selectAll) {
+    selectAll.addEventListener('change', () => {
+      checkboxes.forEach(cb => cb.checked = selectAll.checked);
+      drawCharts();
+    });
+  }
+
+  // Setup individual checkboxes
   checkboxes.forEach(cb => {
     cb.addEventListener('change', () => {
       const allChecked = Array.from(checkboxes).every(cb => cb.checked);
-      selectAll.checked = allChecked;
+      if (selectAll) selectAll.checked = allChecked;
       drawCharts();
     });
   });
 }
-
 
 
     function populateCategoryFilter(entries) {

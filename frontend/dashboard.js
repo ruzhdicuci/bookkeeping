@@ -92,12 +92,12 @@ async function fetchEntries() {
     renderEntries();              // ✅ uses global entries
     populateNewEntryDropdowns(); // ✅ also uses global entries
     populateFilters();
+    drawCharts();                 // ✅ charts need entries!
 
   } catch (err) {
     console.error('❌ fetchEntries failed:', err);
   }
 }
-
 
 
 function populateNewEntryDropdowns() {
