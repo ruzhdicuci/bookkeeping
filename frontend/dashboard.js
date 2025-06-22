@@ -243,12 +243,15 @@ function getDateLabel(dateStr) {
   const entryDate = new Date(dateStr);
   const today = new Date();
   const yesterday = new Date();
+
+  // Normalize all dates to midnight (remove time)
+  today.setHours(0, 0, 0, 0);
   yesterday.setDate(today.getDate() - 1);
+  yesterday.setHours(0, 0, 0, 0);
+  entryDate.setHours(0, 0, 0, 0);
 
   const isSameDay = (d1, d2) =>
-    d1.getFullYear() === d2.getFullYear() &&
-    d1.getMonth() === d2.getMonth() &&
-    d1.getDate() === d2.getDate();
+    d1.getTime() === d2.getTime();
 
   if (isSameDay(entryDate, today)) return "Today";
   if (isSameDay(entryDate, yesterday)) return "Yesterday";
@@ -262,6 +265,7 @@ function getDateLabel(dateStr) {
     year: 'numeric'
   });
 }
+
 function renderEntries() {
   const dateSearch = document.getElementById('dateSearch')?.value.trim();
   const descSearch = document.getElementById('descSearch')?.value.trim();
@@ -397,8 +401,8 @@ function renderEntries() {
       }, 2000);
     }
   }, 100);
-}
-  // ✅ Totals + Averages
+
+  // ✅ Totals + Averages (moved inside the function)
   let incomeTotal = 0, expenseTotal = 0;
   filtered.forEach(e => {
     const amount = parseFloat(e.amount) || 0;
@@ -410,27 +414,26 @@ function renderEntries() {
   const avgIncome = incomeTotal / monthsUsed.length || 0;
   const avgExpense = expenseTotal / monthsUsed.length || 0;
 
-document.getElementById('monthlyAverageCard').innerHTML = `
-  <div class="average-card-container"  ">
-    <div class="average-card" >
-      <div class="label">Avg Income</div>
-      <a class="income-color">${avgIncome.toFixed(2)}</a>
+  document.getElementById('monthlyAverageCard').innerHTML = `
+    <div class="average-card-container">
+      <div class="average-card">
+        <div class="label">Avg Income</div>
+        <a class="income-color">${avgIncome.toFixed(2)}</a>
+      </div>
+      <div class="average-card">
+        <div class="label">Avg Expenses</div>
+        <a class="expense-color">${avgExpense.toFixed(2)}</a>
+      </div>
+      <div class="average-card">
+        <div class="label">Avg Balance</div>
+        <a class="balance-color">${(avgIncome - avgExpense).toFixed(2)}</a>
+      </div>
     </div>
-    <div class="average-card" >
-      <div class="label">Avg Expenses</div>
-      <a class="expense-color">${avgExpense.toFixed(2)}</a>
-    </div>
-    <div class="average-card" >
-      <div class="label">Avg Balance</div>
-      <a class="balance-color">${(avgIncome - avgExpense).toFixed(2)}</a>
-    </div>
-  </div>
-`;
+  `;
   document.getElementById('totalIncome').textContent = incomeTotal.toFixed(2);
   document.getElementById('totalExpense').textContent = expenseTotal.toFixed(2);
   document.getElementById('totalBalance').textContent = (incomeTotal - expenseTotal).toFixed(2);
 }
-
 function editEntry(id) {
   const form = document.getElementById('entryForm');
   if (form) {

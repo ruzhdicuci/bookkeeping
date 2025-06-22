@@ -1439,7 +1439,7 @@ select:disabled {
 }
 
 .cancel-btn {
-background-color:     #fdf6de;
+background-color:     red;
 font-family: system-ui, sans-serif;
 font-weight: bold;
 
@@ -1447,11 +1447,11 @@ font-weight: bold;
          border-radius: 10px;
            cursor: pointer;
   white-space: nowrap;
-   height: 44px;
+   height: 40px;
   padding: 0.5rem 1rem;
   font-size: 1rem;
-            color: red;            
-     margin-top: -9px;
+            color: #fdf6de;             
+   
 }
 
 .cancel-btn:hover {
