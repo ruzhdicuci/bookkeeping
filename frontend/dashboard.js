@@ -8,8 +8,11 @@ if (!token) {
   // window.location.href = '/login.html';
 }
 
-
-
+let entries = [];
+document.addEventListener('DOMContentLoaded', () => {
+  fetchEntries();
+  loadInitialBankBalances();
+});
 
 const entryTableBody = document.getElementById('entryTableBody');
 
@@ -25,7 +28,7 @@ const typeFilter = document.getElementById('typeFilter');
 const dateSearch = document.getElementById('dateSearch');
 const descSearch = document.getElementById('descSearch');
 const amountSearch = document.getElementById('amountSearch');
-let entries = [];
+
 
 // Set up event listeners for other filters
 bankFilter.onchange =
