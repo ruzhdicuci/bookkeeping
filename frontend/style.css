@@ -364,8 +364,14 @@ border-radius: 10px;
 .sections2 {
   background: #e3e0db;
 border-radius: 10px;
-padding-top: 2px;
+
+   
+  padding: 12px;
   
+
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+
+   margin-top: 10px;
 
 }
 
@@ -1310,7 +1316,7 @@ color:  #71d0ff !important; /* optional: blue checkmark */
   border-radius: 8px;
 height: 40px;
   width: 110px;
-  margin-left: 2px;
+  margin-left: 4px;
   font-weight: 600;
   font-size: 14px;
   cursor: pointer;
@@ -2085,6 +2091,11 @@ margin-right: 10px;
     border: none;
     display: none;
   }
+.entry-header select {
+  background: white;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
 
 
 

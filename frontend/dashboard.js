@@ -95,6 +95,7 @@ async function fetchEntries() {
     renderEntries();              // ✅ uses global entries
     populateNewEntryDropdowns(); // ✅ also uses global entries
     populateFilters();
+
     drawCharts();                 // ✅ charts need entries!
 
   } catch (err) {
@@ -195,7 +196,7 @@ document.querySelectorAll('.monthOption').forEach(cb => {
   const bankFilter = document.getElementById('bankFilter');
   if (bankFilter) {
     const prevBank = bankFilter.value;
-    bankFilter.innerHTML = `<option value="">All</option>` + banks.map(b => `<option value="${b}">${b}</option>`).join('');
+    bankFilter.innerHTML = `<option value="">bank</option>` + banks.map(b => `<option value="${b}">${b}</option>`).join('');
     bankFilter.value = banks.includes(prevBank) ? prevBank : "";
   }
 
@@ -244,15 +245,12 @@ function getDateLabel(dateStr) {
   const entryDate = new Date(dateStr);
   const today = new Date();
   const yesterday = new Date();
-
-  // Zero out time (midnight for accurate comparisons)
-  today.setHours(0, 0, 0, 0);
   yesterday.setDate(today.getDate() - 1);
-  yesterday.setHours(0, 0, 0, 0);
-  entryDate.setHours(0, 0, 0, 0);
 
-  const diffDays = Math.floor((today - entryDate) / (1000 * 60 * 60 * 24));
-  const sameYear = today.getFullYear() === entryDate.getFullYear();
+  // Clear time components for accurate date-only comparison
+  entryDate.setHours(0, 0, 0, 0);
+  today.setHours(0, 0, 0, 0);
+  yesterday.setHours(0, 0, 0, 0);
 
   const isSameDay = (d1, d2) =>
     d1.getFullYear() === d2.getFullYear() &&
@@ -261,27 +259,19 @@ function getDateLabel(dateStr) {
 
   if (isSameDay(entryDate, today)) return "Today";
   if (isSameDay(entryDate, yesterday)) return "Yesterday";
-  if (diffDays < 7 && entryDate.getDay() <= today.getDay()) return "This Week";
 
-  // New group: Last Week (within 14 days but not this week)
-  if (diffDays < 14) return "Last Week";
+  const diffDays = Math.floor((today - entryDate) / (1000 * 60 * 60 * 24));
+  if (diffDays <= 7) return "This Week";
+  if (diffDays <= 14) return "Last Week";
+  if (diffDays <= 21) return "2 Weeks Ago";
+  if (diffDays <= 28) return "3 Weeks Ago";
 
-  // New group: This Month
-  if (
-    today.getMonth() === entryDate.getMonth() &&
-    today.getFullYear() === entryDate.getFullYear()
-  ) {
-    return "This Month";
-  }
-
-  // Default to full date
   return entryDate.toLocaleDateString('en-GB', {
     day: '2-digit',
     month: 'long',
-    year: 'numeric',
+    year: 'numeric'
   });
 }
-
 function getLabelRank(label) {
   const ranks = {
     "Today": 1,
@@ -313,7 +303,7 @@ function renderEntries() {
       .map(s => s.trim().toLowerCase())
       .some(val => (target || '').toLowerCase().includes(val));
 
-  const filtered = entries.filter(e => {
+ let filtered = entries.filter(e => {
     const entryDay = e.date?.split('-')[2];
     const personMatches =
       personSearch?.length > 0
@@ -339,6 +329,28 @@ function renderEntries() {
       matchesMulti(amountSearch, e.amount + '')
     );
   });
+
+  const selectedTime = document.getElementById('timeSort')?.value;
+if (selectedTime) {
+  const now = new Date();
+  filtered = filtered.filter(e => {
+    const entryDate = new Date(e.date);
+    const daysDiff = Math.floor((now - entryDate) / (1000 * 60 * 60 * 24));
+
+    switch (selectedTime) {
+      case 'Today': return daysDiff === 0;
+      case 'Yesterday': return daysDiff === 1;
+      case 'This Week': return daysDiff <= 6;
+      case 'Last Week': return daysDiff >= 7 && daysDiff <= 13;
+      case '2 Weeks Ago': return daysDiff >= 14 && daysDiff <= 20;
+      case '3 Weeks Ago': return daysDiff >= 21 && daysDiff <= 27;
+      default: return true;
+    }
+  });
+}
+
+
+
 
   const container = document.getElementById('entryTableBody');
   if (!container) {
@@ -366,28 +378,10 @@ sortedLabels.forEach(label => {
     labelEl.classList.add('special-label');
   }
 
-const rangeFilter = document.getElementById('dateRangeFilter')?.value || 'All';
-const now = new Date();
-
-const isInRange = (dateStr, label) => {
-  const d = new Date(dateStr);
-  const daysDiff = Math.floor((now - d) / (1000 * 60 * 60 * 24));
-
-  switch (label) {
-    case 'Today': return daysDiff === 0;
-    case 'Yesterday': return daysDiff === 1;
-    case 'This Week': return daysDiff <= 6;
-    case 'Last Week': return daysDiff >= 7 && daysDiff <= 13;
-    case '2 Weeks Ago': return daysDiff >= 14 && daysDiff <= 20;
-    case '3 Weeks Ago': return daysDiff >= 21 && daysDiff <= 27;
-    default: return true;
-  }
-};
-
-filtered = filtered.filter(e => isInRange(e.date, rangeFilter));
 
 
 
+  
   labelEl.textContent = label;
   container.appendChild(labelEl);
 
