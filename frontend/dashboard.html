@@ -116,11 +116,10 @@
         <option value="bar">Bar</option>
         <option value="line">Line</option>
       </select>
-
-    <div class="dropdown2">
+<div class="dropdown2">
   <button class="dropdown-toggle">👤 Person</button>
   <div class="dropdown-content2" id="personDropdown">
-        <!-- Dynamically inserted checkboxes go here -->
+    <!-- Dynamically inserted checkboxes go here -->
   </div>
 </div>
 
@@ -744,6 +743,8 @@ function drawCharts() {
 
   populatePersonFilter(persons);
 } // ←✅ THIS is the real end of drawCharts()
+
+
 function populatePersonFilter(persons) {
   const container = document.getElementById('personDropdown');
   if (!container) return;
@@ -852,6 +853,10 @@ document.getElementById('categoryFilter')?.addEventListener('change', drawCharts
       setTimeout(drawCharts, 50);
     }
   }
+  document.querySelector('.dropdown-toggle')?.addEventListener('click', () => {
+  const dropdown = document.getElementById('personDropdown');
+  dropdown?.classList.toggle('show');
+});
 </script>
 <div id="confirmModal" class="modal hidden">
   <div class="modal-content">
