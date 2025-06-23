@@ -143,7 +143,7 @@ async function fetchEntries() {
 
 
 // For chart tab
-populatePersonFilter(persons, 'personDropdown2');
+populatePersonFilter(persons, 'personDropdown2'); // dashboard only
 
     // ✅ Delay chart drawing until checkboxes exist
     setTimeout(() => {

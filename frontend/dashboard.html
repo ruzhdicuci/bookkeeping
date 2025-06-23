@@ -805,7 +805,7 @@ function openTab(tabId, btn) {
   if (tabId === 'chartsTab') {
     setTimeout(() => {
       const persons = [...new Set((window.entries || []).map(e => e.person).filter(Boolean))];
-      populatePersonFilter(persons, 'personDropdown'); // ✅ now it's safe
+      populatePersonFilter(persons, 'personDropdown'); // ✅ this one here
       drawCharts();
     }, 50);
   }
