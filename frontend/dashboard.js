@@ -81,6 +81,7 @@ async function loadInitialBankBalances() {
   }
 }
 
+
 function populatePersonFilter(persons, containerId = 'personDropdown') {
   const container = document.getElementById(containerId);
   if (!container) {
@@ -102,24 +103,26 @@ function populatePersonFilter(persons, containerId = 'personDropdown') {
     `).join('')}
   `;
 
-  setTimeout(() => {
-    const selectAll = document.getElementById(`${containerId}_selectAll`);
-    const checkboxes = container.querySelectorAll(`.${containerId}_personFilter`);
+  // Prevent closing dropdown if this is a floating menu
+  container.addEventListener('click', e => e.stopPropagation());
 
-    selectAll?.addEventListener('change', () => {
-      checkboxes.forEach(cb => cb.checked = selectAll.checked);
-      drawCharts(); // or whatever chart you want
-    });
+  const selectAll = document.getElementById(`${containerId}_selectAll`);
+  const checkboxes = container.querySelectorAll(`.${containerId}_personFilter`);
 
-    checkboxes.forEach(cb => {
-      cb.addEventListener('change', () => {
-        const allChecked = Array.from(checkboxes).every(cb => cb.checked);
-        selectAll.checked = allChecked;
-        drawCharts(); // or other handler
-      });
+  selectAll?.addEventListener('change', () => {
+    checkboxes.forEach(cb => cb.checked = selectAll.checked);
+    drawCharts(); // or pass a callback
+  });
+
+  checkboxes.forEach(cb => {
+    cb.addEventListener('change', () => {
+      const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+      selectAll.checked = allChecked;
+      drawCharts(); // or pass a callback
     });
-  }, 0);
+  });
 }
+
 async function fetchEntries() {
   try {
     const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
@@ -137,8 +140,7 @@ async function fetchEntries() {
     const persons = [...new Set(entries.map(e => e.person).filter(Boolean))];
     console.log("🧑‍🤝‍🧑 Found persons:", persons);
    
-// For dashboard
-populatePersonFilter(persons, 'personDropdown');
+
 
 // For chart tab
 populatePersonFilter(persons, 'personDropdown2');
@@ -1780,12 +1782,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-
-// Toggle visibility of person dropdown
-document.querySelector('.dropdown-toggle').addEventListener('click', function () {
-  const dropdown = document.getElementById('personDropdown');
-  dropdown.classList.toggle('show');
-});
 
 
 

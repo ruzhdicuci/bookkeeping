@@ -117,7 +117,8 @@
         <option value="line">Line</option>
       </select>
 <div class="dropdown2">
-  <button class="dropdown-toggle">👤 Person</button>
+  <button class="dropdown-toggle" data-target="personDropdown">👤 Charts ▾</button>
+
   <div class="dropdown-content2" id="personDropdown2">
     <!-- Dynamically inserted checkboxes go here -->
   </div>
@@ -793,31 +794,22 @@ document.getElementById('categoryFilter')?.addEventListener('change', drawCharts
 </script>
 
 <script>
-  function openTab(tabId, btn) {
-    document.querySelectorAll('.tab-content').forEach(div => div.classList.remove('active'));
-    document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+function openTab(tabId, btn) {
+  document.querySelectorAll('.tab-content').forEach(div => div.classList.remove('active'));
+  document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
 
-    const targetTab = document.getElementById(tabId);
-    if (targetTab) targetTab.classList.add('active');
+  const targetTab = document.getElementById(tabId);
+  if (targetTab) targetTab.classList.add('active');
+  if (btn) btn.classList.add('active');
 
-    if (btn) btn.classList.add('active');
-
-    if (tabId === 'chartsTab') {
-      setTimeout(drawCharts, 50);
-    }
+  if (tabId === 'chartsTab') {
+    setTimeout(() => {
+      const persons = [...new Set((window.entries || []).map(e => e.person).filter(Boolean))];
+      populatePersonFilter(persons, 'personDropdown'); // ✅ now it's safe
+      drawCharts();
+    }, 50);
   }
-
-document.querySelector('.dropdown-toggle')?.addEventListener('click', () => {
-  console.log("👤 Person dropdown clicked");
-  const dropdown = document.getElementById('personDropdown');
-  if (!dropdown) {
-    console.warn("❌ personDropdown container not found!");
-    return;
-  }
-  dropdown.classList.toggle('show');
-});
-
-
+}
 </script>
 <div id="confirmModal" class="modal hidden">
   <div class="modal-content">
