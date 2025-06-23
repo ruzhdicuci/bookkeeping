@@ -498,30 +498,46 @@ function drawCharts() {
   const monthlyIncome = {}, monthlyExpense = {}, personIncome = {}, personExpense = {}, expenseByCategory = {};
 
   // Get selected persons from checkboxes
+// Get selected persons from checkboxes
 let selectedPersons = Array.from(document.querySelectorAll('.personChartFilter:checked')).map(cb => cb.value);
 if (!selectedPersons.length) {
   selectedPersons = [...new Set(entries.map(e => e.person))];
 }
 
-  // Filter and categorize data
-  entries.forEach(e => {
-    if (categoryFilter !== 'All' && (e.category || 'Uncategorized') !== categoryFilter) return;
-    if (!selectedPersons.includes(e.person)) return;
+// Filter and categorize data
+entries.forEach(e => {
+  const person = (e.person || 'Unknown').trim();
 
-    const month = e.date?.slice(0, 7);
-    const person = e.person || 'Unknown';
-    const value = parseFloat(e.amount) || 0;
-    const key = e.category || 'Other';
+  if (categoryFilter !== 'All' && (e.category || 'Uncategorized') !== categoryFilter) {
+    console.log("🚫 Skipped by category:", e.category);
+    return;
+  }
 
-    if (e.type === 'Income') {
-      monthlyIncome[month] = (monthlyIncome[month] || 0) + value;
-      personIncome[person] = (personIncome[person] || 0) + value;
-    } else if (e.type === 'Expense') {
-      monthlyExpense[month] = (monthlyExpense[month] || 0) + value;
-      personExpense[person] = (personExpense[person] || 0) + value;
-      expenseByCategory[key] = (expenseByCategory[key] || 0) + value;
-    }
+  if (!selectedPersons.includes(person)) {
+    console.log("🚫 Skipped by person:", person);
+    return;
+  }
+
+  console.log("✅ Included:", {
+    person,
+    category: e.category,
+    amount: e.amount,
+    type: e.type
   });
+
+  const month = e.date?.slice(0, 7);
+  const value = parseFloat(e.amount) || 0;
+  const key = e.category || 'Other';
+
+  if (e.type === 'Income') {
+    monthlyIncome[month] = (monthlyIncome[month] || 0) + value;
+    personIncome[person] = (personIncome[person] || 0) + value;
+  } else if (e.type === 'Expense') {
+    monthlyExpense[month] = (monthlyExpense[month] || 0) + value;
+    personExpense[person] = (personExpense[person] || 0) + value;
+    expenseByCategory[key] = (expenseByCategory[key] || 0) + value;
+  }
+});
 
   const incomeTotal = Object.values(monthlyIncome).reduce((a, b) => a + b, 0);
   const expenseTotal = Object.values(monthlyExpense).reduce((a, b) => a + b, 0);
@@ -795,6 +811,29 @@ document.querySelector('.dropdown-toggle')?.addEventListener('click', () => {
   <button class="scroll-toggle-btn" id="scrollUpBtn" title="Scroll to Top">⬆</button>
   <button class="scroll-toggle-btn" id="scrollDownBtn" title="Scroll to Bottom">⬇</button>
 </div>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+  const toggleBtn = document.querySelector('.dropdown-toggle');
+  const dropdown = document.getElementById('personDropdown');
+
+  if (toggleBtn && dropdown) {
+    toggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation(); // don't bubble to body
+      dropdown.classList.toggle('show');
+      console.log("✅ Person dropdown clicked");
+    });
+
+    // Close dropdown on outside click
+    document.addEventListener('click', (e) => {
+      if (!dropdown.contains(e.target) && !toggleBtn.contains(e.target)) {
+        dropdown.classList.remove('show');
+      }
+    });
+  }
+});
+</script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
