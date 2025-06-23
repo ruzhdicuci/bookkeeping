@@ -497,11 +497,13 @@ function drawCharts() {
 
   const monthlyIncome = {}, monthlyExpense = {}, personIncome = {}, personExpense = {}, expenseByCategory = {};
 
+  // Get selected persons from checkboxes
   let selectedPersons = Array.from(document.querySelectorAll('.personChartFilter:checked')).map(cb => cb.value);
   if (!selectedPersons.length) {
     selectedPersons = [...new Set(entries.map(e => e.person))];
   }
 
+  // Filter and categorize data
   entries.forEach(e => {
     if (categoryFilter !== 'All' && (e.category || 'Uncategorized') !== categoryFilter) return;
     if (!selectedPersons.includes(e.person)) return;
@@ -535,8 +537,9 @@ function drawCharts() {
   const expensePersonVals = persons.map(p => personExpense[p] || 0);
   const pieValues = categories.map(k => expenseByCategory[k]);
 
-  const type = document.getElementById('chartType').value;
+  const type = document.getElementById('chartType')?.value;
 
+  // Chart contexts
   const ctx1 = document.getElementById('monthlyChart')?.getContext('2d');
   const ctx2 = document.getElementById('personChart')?.getContext('2d');
   const ctx3 = document.getElementById('comparisonChart')?.getContext('2d');
@@ -544,6 +547,7 @@ function drawCharts() {
   const ctx5 = document.getElementById('summaryChart')?.getContext('2d');
   const avgCtx = document.getElementById('averageChart')?.getContext('2d');
 
+  // Destroy old instances to avoid duplicates
   averageChartInstance?.destroy();
   monthlyChartInstance?.destroy();
   personChartInstance?.destroy();
