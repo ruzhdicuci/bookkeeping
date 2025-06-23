@@ -531,6 +531,8 @@ function drawCharts() {
     }
   });
 
+  // ⚠️ Now call your chart drawing logic (chart1, chart2, etc.)
+
 
   const incomeTotal = Object.values(monthlyIncome).reduce((a, b) => a + b, 0);
   const expenseTotal = Object.values(monthlyExpense).reduce((a, b) => a + b, 0);
@@ -761,12 +763,12 @@ function openTab(tabId, btn) {
 
   if (btn) btn.classList.add('active');
 
-  if (tabId === 'chartsTab') {
-    // Delay chart drawing slightly to ensure layout and filters are ready
-    setTimeout(() => {
-      drawCharts();
-    }, 50);
-  }
+if (tabId === 'chartsTab') {
+  setTimeout(() => {
+    populateFilters();  // ← ✅ Add this
+    drawCharts();
+  }, 50);
+}
 }
 </script>
 <div id="confirmModal" class="modal hidden">

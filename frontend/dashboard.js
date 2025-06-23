@@ -112,7 +112,7 @@ async function loadInitialBankBalances() {
 function populatePersonDropdownForCharts(persons) {
   const select = document.getElementById('filterPerson');
   if (!select) {
-    console.warn("⚠️ #filterPerson not found");
+    console.warn("⚠️ #filterPerson not found. Chart dropdown won't be updated yet.");
     return;
   }
 
@@ -140,9 +140,7 @@ async function fetchEntries() {
     populatePersonFilterForDashboard(persons);   // ✅ Dashboard checkbox filters
     populatePersonDropdownForCharts(persons);    // ✅ Charts <select> dropdown
 
-    setTimeout(() => {
-      drawCharts();
-    }, 50);
+
   } catch (err) {
     console.error('❌ fetchEntries failed:', err);
   }
@@ -200,6 +198,7 @@ function populateFilters() {
   const banks = [...new Set(entries.map(e => e.bank).filter(Boolean))];
   const categories = [...new Set(entries.map(e => e.category).filter(Boolean))];
   const persons = [...new Set(entries.map(e => e.person).filter(Boolean))];
+  populatePersonDropdownForCharts(persons); // ✅ update chart dropdown
 
   // ✅ Month checkbox filter
   const monthContainer = document.getElementById('monthOptions');
