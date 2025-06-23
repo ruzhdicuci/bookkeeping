@@ -1,4 +1,5 @@
 let entries = [];
+let persons = []; // <-- Add this
 const apiBase = 'https://bookkeeping-i8e0.onrender.com';
 const token = localStorage.getItem('token');
 const backend = 'https://bookkeeping-i8e0.onrender.com';
@@ -137,15 +138,20 @@ async function fetchEntries() {
     populateNewEntryDropdowns();
     populateFilters();
 
-    persons = [...new Set(entries.map(e => e.person).filter(Boolean))];
+    persons = [...new Set(entries.map(e => e.person).filter(Boolean))]; // now sets global
     console.log("🧑‍🤝‍🧑 Found persons:", persons);
 
-    // ❌ REMOVE: populatePersonFilter(persons, 'personDropdown2');
+    // ✅ Only dashboard filter populated now:
+    populatePersonFilter(persons, 'personDropdown');
 
+    setTimeout(() => {
+      drawCharts(); // first draw (can be re-drawn in openTab too)
+    }, 50);
   } catch (err) {
     console.error('❌ fetchEntries failed:', err);
   }
 }
+
 function populateNewEntryDropdowns() {
   const persons = [...new Set(entries.map(e => e.person))].filter(Boolean);
   const banks = [...new Set(entries.map(e => e.bank))].filter(Boolean);

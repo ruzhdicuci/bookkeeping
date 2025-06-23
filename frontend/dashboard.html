@@ -117,10 +117,9 @@
         <option value="line">Line</option>
       </select>
 <div class="dropdown2">
-  <button class="dropdown-toggle" data-target="personDropdown">👤 Charts ▾</button>
-
-  <div class="dropdown-content2" id="personDropdown"> <!-- ✅ fixed -->
-    <!-- Dynamically inserted checkboxes go here -->
+  <button class="dropdown-toggle" data-target="personDropdown2">👤 Charts ▾</button>
+  <div class="dropdown-content2" id="personDropdown2">
+    <!-- Filter checkboxes inserted here -->
   </div>
 </div>
 
@@ -803,14 +802,21 @@ function openTab(tabId, btn) {
   if (btn) btn.classList.add('active');
 
   if (tabId === 'chartsTab') {
-    // Wait a moment to ensure DOM is rendered
     setTimeout(() => {
-      // 🧑‍🤝‍🧑 Populate person filter for chart tab
-      if (persons && persons.length > 0) {
-        populatePersonFilter(persons, 'personDropdown2');
+      const container = document.getElementById('personDropdown2');
+      if (!container) {
+        console.warn("⚠️ Container #personDropdown2 not found");
+        return;
       }
+
+      // Only populate once
+      if (!container.dataset.populated) {
+        populatePersonFilter(persons, 'personDropdown2');
+        container.dataset.populated = 'true';
+      }
+
       drawCharts();
-    }, 50);
+    }, 100); // delay ensures DOM is ready
   }
 }
 </script>
