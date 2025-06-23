@@ -140,14 +140,12 @@ async function fetchEntries() {
     populateNewEntryDropdowns();
     populateFilters();
 
-    // ❌ REMOVE this line (you already draw on tab switch)
-    // setTimeout(() => drawCharts(), 50);
+    renderBankBalanceForm(); // ✅ Add here (NOT fetchEntries again!)
 
   } catch (err) {
     console.error('❌ fetchEntries failed:', err);
   }
 }
-
 function populateNewEntryDropdowns() {
   const persons = [...new Set(entries.map(e => e.person))].filter(Boolean);
   const banks = [...new Set(entries.map(e => e.bank))].filter(Boolean);
@@ -196,20 +194,22 @@ console.log("🏦 Bank headers found:", banks);
 function populateFilters() {
   if (!window.entries || !Array.isArray(window.entries)) return;
 
-  const entries = window.entries;
-  const months = [...new Set(entries.map(e => e.date?.slice(0, 7)))].filter(Boolean).sort();
+  const entries = window.entries; // ✅ move this up first
   const banks = [...new Set(entries.map(e => e.bank).filter(Boolean))];
+  console.log("✅ Unique banks detected:", banks);
+  const months = [...new Set(entries.map(e => e.date?.slice(0, 7)))].filter(Boolean).sort();
   const categories = [...new Set(entries.map(e => e.category).filter(Boolean))];
   const persons = [...new Set(entries.map(e => e.person).filter(Boolean))];
 
-  window.persons = persons; // ✅ global for charts
-  populatePersonDropdownForCharts(window.persons); // ✅ update <select> for charts
+  window.persons = persons;
+  populatePersonDropdownForCharts(window.persons);
 
   const filterPerson = document.getElementById('filterPerson');
   if (filterPerson && !filterPerson.dataset.listenerAttached) {
     filterPerson.addEventListener('change', drawCharts);
-    filterPerson.dataset.listenerAttached = "true"; // prevent duplicate
+    filterPerson.dataset.listenerAttached = "true";
   }
+
 
   // ✅ Month checkboxes
   const monthContainer = document.getElementById('monthOptions');
@@ -905,6 +905,10 @@ async function fetchBalancesFromBackend() {
 
 function renderBankBalanceForm() {
   const container = document.getElementById('bankBalanceTableContainer');
+  if (!container) {
+  console.error("❌ Missing #bankBalanceTableContainer element");
+  return;
+}
   const banks = [...new Set(entries.map(e => e.bank).filter(Boolean))];
   const selectedMonths = Array.from(document.querySelectorAll('#monthOptions input[type="checkbox"]:checked')).map(cb => cb.value);
 
