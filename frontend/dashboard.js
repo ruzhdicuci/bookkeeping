@@ -118,8 +118,6 @@ function populatePersonDropdownForCharts(persons) {
 
   select.innerHTML = `<option value="All">All</option>` +
     persons.map(p => `<option value="${p}">${p}</option>`).join('');
-
-  select.addEventListener('change', drawCharts); // Redraw on change
 }
 
 async function fetchEntries() {
@@ -224,6 +222,8 @@ document.getElementById('selectAllMonths').addEventListener('change', function (
   document.querySelectorAll('.monthOption').forEach(cb => cb.checked = allChecked);
   renderEntries();
   renderBankBalanceForm(); // ✅ update banks too
+  // ✅ Add this to update chart person filter dropdown
+populatePersonDropdownForCharts(persons);
 });
 
 // ✅ Handle individual changes
