@@ -116,11 +116,12 @@ function populatePersonDropdownForCharts(persons) {
     return;
   }
 
-
   select.innerHTML = `<option value="All">All</option>` +
     persons.map(p => `<option value="${p}">${p}</option>`).join('');
-}
 
+  // ✅ Add this line to re-render charts when dropdown changes
+  select.addEventListener('change', drawCharts);
+}
 async function fetchEntries() {
   try {
     const res = await fetch(`${apiBase}/api/entries`, {
