@@ -492,7 +492,7 @@ let averageChartInstance = null;
 
 function drawCharts() {
   Chart.register(ChartDataLabels);
-
+const persons = window.persons || [];
   const categoryFilter = document.getElementById('categoryFilter')?.value || 'All';
   const selectedPerson = document.getElementById('filterPerson')?.value || 'All';
   const entries = window.entries || [];
@@ -539,7 +539,7 @@ function drawCharts() {
   const difference = incomeTotal - expenseTotal;
 
   const months = [...new Set([...Object.keys(monthlyIncome), ...Object.keys(monthlyExpense)])].sort();
-  const persons = [...new Set([...Object.keys(personIncome), ...Object.keys(personExpense)])];
+ 
   const categories = Object.keys(expenseByCategory);
 
   const incomeMonthVals = months.map(m => monthlyIncome[m] || 0);

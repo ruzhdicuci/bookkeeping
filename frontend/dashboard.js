@@ -115,6 +115,7 @@ function populatePersonDropdownForCharts(persons) {
     console.warn("⚠️ #filterPerson not found. Chart dropdown won't be updated yet.");
     return;
   }
+const persons = window.persons || []; // ✅ Use global
 
   select.innerHTML = `<option value="All">All</option>` +
     persons.map(p => `<option value="${p}">${p}</option>`).join('');
@@ -127,19 +128,19 @@ async function fetchEntries() {
     });
     if (!res.ok) throw new Error('Failed to fetch entries');
 
-    entries = await res.json();
-    console.log("📦 Entries:", entries);
+    window.entries = await res.json(); // ✅ Store globally
+    console.log("📦 Entries:", window.entries);
+
+    // ✅ Set global persons list
+    window.persons = [...new Set(window.entries.map(e => e.person).filter(Boolean))];
+    console.log("🧑‍🤝‍🧑 Found persons:", window.persons);
 
     renderEntries();
     populateNewEntryDropdowns();
     populateFilters();
 
-    const persons = [...new Set(entries.map(e => e.person).filter(Boolean))];
-    console.log("👤 Loaded persons:", persons);
-
-    populatePersonFilterForDashboard(persons);   // ✅ Dashboard checkbox filters
-    populatePersonDropdownForCharts(persons);    // ✅ Charts <select> dropdown
-
+    // ❌ REMOVE this line (you already draw on tab switch)
+    // setTimeout(() => drawCharts(), 50);
 
   } catch (err) {
     console.error('❌ fetchEntries failed:', err);
@@ -197,7 +198,7 @@ function populateFilters() {
   const months = [...new Set(entries.map(e => e.date?.slice(0, 7)))].filter(Boolean).sort();
   const banks = [...new Set(entries.map(e => e.bank).filter(Boolean))];
   const categories = [...new Set(entries.map(e => e.category).filter(Boolean))];
-  const persons = [...new Set(entries.map(e => e.person).filter(Boolean))];
+const persons = window.persons || [];
   populatePersonDropdownForCharts(persons); // ✅ update chart dropdown
 
   // ✅ Month checkbox filter
