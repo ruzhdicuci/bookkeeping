@@ -125,36 +125,27 @@ function populatePersonFilter(persons, containerId = 'personDropdown') {
 
 async function fetchEntries() {
   try {
-    const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
+    const res = await fetch(`${apiBase}/api/entries`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     if (!res.ok) throw new Error('Failed to fetch entries');
 
-    entries = await res.json(); // ✅ uses global
+    entries = await res.json();
     console.log("📦 Entries:", entries);
 
-    renderEntries();              // ✅ uses global entries
-    populateNewEntryDropdowns(); // ✅ also uses global entries
+    renderEntries();
+    populateNewEntryDropdowns();
     populateFilters();
 
-    const persons = [...new Set(entries.map(e => e.person).filter(Boolean))];
+    persons = [...new Set(entries.map(e => e.person).filter(Boolean))];
     console.log("🧑‍🤝‍🧑 Found persons:", persons);
-   
 
-
-// For chart tab
-populatePersonFilter(persons, 'personDropdown2'); // dashboard only
-
-    // ✅ Delay chart drawing until checkboxes exist
-    setTimeout(() => {
-      drawCharts();
-    }, 50);
+    // ❌ REMOVE: populatePersonFilter(persons, 'personDropdown2');
 
   } catch (err) {
     console.error('❌ fetchEntries failed:', err);
   }
 }
-
 function populateNewEntryDropdowns() {
   const persons = [...new Set(entries.map(e => e.person))].filter(Boolean);
   const banks = [...new Set(entries.map(e => e.bank))].filter(Boolean);

@@ -119,7 +119,7 @@
 <div class="dropdown2">
   <button class="dropdown-toggle" data-target="personDropdown">👤 Charts ▾</button>
 
-  <div class="dropdown-content2" id="personDropdown2">
+  <div class="dropdown-content2" id="personDropdown"> <!-- ✅ fixed -->
     <!-- Dynamically inserted checkboxes go here -->
   </div>
 </div>
@@ -803,9 +803,12 @@ function openTab(tabId, btn) {
   if (btn) btn.classList.add('active');
 
   if (tabId === 'chartsTab') {
+    // Wait a moment to ensure DOM is rendered
     setTimeout(() => {
-      const persons = [...new Set((window.entries || []).map(e => e.person).filter(Boolean))];
-      populatePersonFilter(persons, 'personDropdown'); // ✅ this one here
+      // 🧑‍🤝‍🧑 Populate person filter for chart tab
+      if (persons && persons.length > 0) {
+        populatePersonFilter(persons, 'personDropdown2');
+      }
       drawCharts();
     }, 50);
   }
