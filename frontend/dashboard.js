@@ -11,9 +11,66 @@ if (!token) {
 }
 
 
-document.addEventListener('DOMContentLoaded', () => {
-  fetchEntries();
-  loadInitialBankBalances();
+
+document.addEventListener('DOMContentLoaded', async () => {
+  // ✅ Date Picker
+  const dateInput = document.getElementById('newDate');
+  if (dateInput) {
+    const fp = flatpickr(dateInput, {
+      dateFormat: "Y-m-d",
+      defaultDate: new Date()
+    });
+
+    if (!dateInput.value) {
+      fp.setDate(new Date());
+    }
+  }
+
+  // ✅ Initial loading
+  await fetchEntries();
+  await loadInitialBankBalances();
+  await loadCreditLimits();
+
+  populateNewEntryDropdowns();
+  populateFilters();
+  renderEntries();
+  renderBankBalanceForm();
+
+  // ✅ Status filter
+  document.getElementById('statusFilter')?.addEventListener('change', () => {
+    renderEntries();
+    renderBankBalanceForm();
+  });
+
+  // ✅ Person search
+  document.getElementById('personSearch')?.addEventListener('input', () => {
+    const value = document.getElementById('personSearch').value.trim();
+    const checkboxes = document.querySelectorAll('.personOption');
+    const selectAllBox = document.getElementById('selectAllPersons');
+    const disabled = value.length > 0;
+
+    checkboxes.forEach(cb => cb.disabled = disabled);
+    if (selectAllBox) selectAllBox.disabled = disabled;
+
+    if (!disabled) showToast("Person filters re-enabled");
+    renderEntries();
+  });
+
+  // ✅ Bank search
+  document.getElementById('bankSearch')?.addEventListener('input', () => {
+    const value = document.getElementById('bankSearch').value.trim();
+    const bankDropdown = document.getElementById('bankFilter');
+
+    if (bankDropdown) {
+      bankDropdown.disabled = value.length > 0;
+      if (!value) {
+        bankDropdown.selectedIndex = 0;
+        showToast("Bank filter re-enabled");
+      }
+    }
+
+    renderEntries();
+  });
 });
 
 const entryTableBody = document.getElementById('entryTableBody');
@@ -1609,35 +1666,6 @@ inputsToClear.forEach(id => {
 }
 
 
-document.addEventListener('DOMContentLoaded', () => {
-  // ✅ personSearch logic
-  document.getElementById('personSearch')?.addEventListener('input', () => {
-    const value = document.getElementById('personSearch').value.trim();
-    const checkboxes = document.querySelectorAll('.personOption');
-    const selectAllBox = document.getElementById('selectAllPersons');
-    const disabled = value.length > 0;
-
-    checkboxes.forEach(cb => cb.disabled = disabled);
-    if (selectAllBox) selectAllBox.disabled = disabled;
-
-    if (!disabled) showToast("Person filters re-enabled");
-    renderEntries();
-  });
-
-  document.getElementById('bankSearch')?.addEventListener('input', () => {
-    const value = document.getElementById('bankSearch').value.trim();
-    const bankDropdown = document.getElementById('bankFilter');
-
-    if (bankDropdown) {
-      bankDropdown.disabled = value.length > 0;
-      if (!value) {
-        bankDropdown.selectedIndex = 0;
-        showToast("Bank filter re-enabled");
-      }
-    }
-
-    renderEntries();
-  });
 
   
 
@@ -1664,7 +1692,7 @@ window.showDeleteModal = function(id) {
       document.getElementById('confirmModal').classList.add('hidden');
     }
   });
-  }); // ✅ Close the second DOMContentLoaded
+
 
 
 function cancelEdit() {
