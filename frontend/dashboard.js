@@ -11,38 +11,24 @@ if (!token) {
 }
 
 
-
 document.addEventListener('DOMContentLoaded', async () => {
-  // ✅ Date Picker
+  // 1. Fetch entries and balances
+  await fetchEntries();
+  await loadInitialBankBalances();
+
+  // 2. Initialize flatpickr
   const dateInput = document.getElementById('newDate');
   if (dateInput) {
     const fp = flatpickr(dateInput, {
       dateFormat: "Y-m-d",
       defaultDate: new Date()
     });
-
     if (!dateInput.value) {
       fp.setDate(new Date());
     }
   }
 
-  // ✅ Initial loading
-  await fetchEntries();
-  await loadInitialBankBalances();
-  await loadCreditLimits();
-
-  populateNewEntryDropdowns();
-  populateFilters();
-  renderEntries();
-  renderBankBalanceForm();
-
-  // ✅ Status filter
-  document.getElementById('statusFilter')?.addEventListener('change', () => {
-    renderEntries();
-    renderBankBalanceForm();
-  });
-
-  // ✅ Person search
+  // 3. Person search input logic
   document.getElementById('personSearch')?.addEventListener('input', () => {
     const value = document.getElementById('personSearch').value.trim();
     const checkboxes = document.querySelectorAll('.personOption');
@@ -56,7 +42,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderEntries();
   });
 
-  // ✅ Bank search
+  // 4. Bank search input logic
   document.getElementById('bankSearch')?.addEventListener('input', () => {
     const value = document.getElementById('bankSearch').value.trim();
     const bankDropdown = document.getElementById('bankFilter');
@@ -71,8 +57,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     renderEntries();
   });
-});
 
+  // ✅ Any other DOM-ready setup (scroll buttons, dropdowns, etc.) can go here
+});
 const entryTableBody = document.getElementById('entryTableBody');
 
 const catgorySelect = document.getElementById('categorySelect');
@@ -1401,19 +1388,6 @@ function calculateCurrentBankBalance(bankName) {
 
 
   
-document.addEventListener('DOMContentLoaded', () => {
-  const dateInput = document.getElementById('newDate');
-  if (!dateInput) return;
-
-  const fp = flatpickr(dateInput, {
-    dateFormat: "Y-m-d",
-    defaultDate: new Date()
-  });
-
-  if (!dateInput.value) {
-    fp.setDate(new Date());
-  }
-});
 
 
 
@@ -1666,6 +1640,7 @@ inputsToClear.forEach(id => {
 }
 
 
+;
 
   
 
