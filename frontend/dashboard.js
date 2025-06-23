@@ -96,9 +96,16 @@ async function fetchEntries() {
     populateNewEntryDropdowns(); // ✅ also uses global entries
     populateFilters();
 
-    drawCharts();                 // ✅ charts need entries!
+   const persons = [...new Set(entries.map(e => e.person).filter(Boolean))];
+console.log("🧑‍🤝‍🧑 Found persons:", persons);
+populatePersonFilter(persons);
 
-  } catch (err) {
+drawCharts(); // <-- AFTER populating person filter
+
+  } 
+  
+  
+  catch (err) {
     console.error('❌ fetchEntries failed:', err);
   }
 }

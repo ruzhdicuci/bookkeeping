@@ -498,10 +498,10 @@ function drawCharts() {
   const monthlyIncome = {}, monthlyExpense = {}, personIncome = {}, personExpense = {}, expenseByCategory = {};
 
   // Get selected persons from checkboxes
-  let selectedPersons = Array.from(document.querySelectorAll('.personChartFilter:checked')).map(cb => cb.value);
-  if (!selectedPersons.length) {
-    selectedPersons = [...new Set(entries.map(e => e.person))];
-  }
+let selectedPersons = Array.from(document.querySelectorAll('.personChartFilter:checked')).map(cb => cb.value);
+if (!selectedPersons.length) {
+  selectedPersons = [...new Set(entries.map(e => e.person))];
+}
 
   // Filter and categorize data
   entries.forEach(e => {
@@ -686,50 +686,9 @@ function drawCharts() {
     });
   }
 
-  populateFilters(persons);
+  populatePersonFilter(persons);
 } // ←✅ THIS is the real end of drawCharts()
 
-
-function populateFilters(persons) {
-  const container = document.getElementById('personDropdown');
-  if (!container) return;
-
-  container.innerHTML = `
-    <label>
-      <input type="checkbox" id="selectAllPersons" checked />
-      <strong>Select All</strong>
-    </label>
-    <hr style="margin: 6px 0;">
-    ${persons.map(p => `
-      <label>
-        <input type="checkbox" class="personChartFilter" value="${p}" checked />
-        
-        ${p}
-      </label>
-    `).join('')}
-  `;
-
-  // Prevent closing dropdown when clicking checkboxes
-  container.addEventListener('click', (e) => {
-    e.stopPropagation();
-  });
-
-  const selectAll = document.getElementById('selectAllPersons');
-  const checkboxes = container.querySelectorAll('.personChartFilter');
-
-  selectAll.addEventListener('change', () => {
-    checkboxes.forEach(cb => cb.checked = selectAll.checked);
-    drawCharts();
-  });
-
-  checkboxes.forEach(cb => {
-    cb.addEventListener('change', () => {
-      const allChecked = Array.from(checkboxes).every(cb => cb.checked);
-      selectAll.checked = allChecked;
-      drawCharts();
-    });
-  });
-}
 
 
 
@@ -798,10 +757,18 @@ document.getElementById('categoryFilter')?.addEventListener('change', drawCharts
       setTimeout(drawCharts, 50);
     }
   }
-  document.querySelector('.dropdown-toggle')?.addEventListener('click', () => {
+
+document.querySelector('.dropdown-toggle')?.addEventListener('click', () => {
+  console.log("👤 Person dropdown clicked");
   const dropdown = document.getElementById('personDropdown');
-  dropdown?.classList.toggle('show');
+  if (!dropdown) {
+    console.warn("❌ personDropdown container not found!");
+    return;
+  }
+  dropdown.classList.toggle('show');
 });
+
+
 </script>
 <div id="confirmModal" class="modal hidden">
   <div class="modal-content">
@@ -830,6 +797,48 @@ document.getElementById('categoryFilter')?.addEventListener('change', drawCharts
 </div>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+function populatePersonFilter(persons) {
+  const container = document.getElementById('personDropdown');
+  if (!container) return;
+
+  container.innerHTML = `
+    <label>
+      <input type="checkbox" id="selectAllPersons" checked />
+      <strong>Select All</strong>
+    </label>
+    <hr style="margin: 6px 0;">
+    ${persons.map(p => `
+      <label>
+        <input type="checkbox" class="personChartFilter" value="${p}" checked />
+        
+        ${p}
+      </label>
+    `).join('')}
+  `;
+
+  // Prevent closing dropdown when clicking checkboxes
+  container.addEventListener('click', (e) => {
+    e.stopPropagation();
+  });
+
+  const selectAll = document.getElementById('selectAllPersons');
+  const checkboxes = container.querySelectorAll('.personChartFilter');
+
+  selectAll.addEventListener('change', () => {
+    checkboxes.forEach(cb => cb.checked = selectAll.checked);
+    drawCharts();
+  });
+
+  checkboxes.forEach(cb => {
+    cb.addEventListener('change', () => {
+      const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+      selectAll.checked = allChecked;
+      drawCharts();
+    });
+  });
+}
+</script>
 <script src="dashboard.js"></script>
 
 </body>
