@@ -83,45 +83,43 @@ async function loadInitialBankBalances() {
 }
 
 
-function populatePersonFilter(persons, containerId = 'personDropdown') {
-  const container = document.getElementById(containerId);
-  if (!container) {
-    console.warn(`⚠️ Container #${containerId} not found`);
+ function populatePersonFilterForDashboard(persons) {
+    const container = document.getElementById('personOptions');
+    if (!container) {
+      console.warn("⚠️ #personOptions container not found");
+      return;
+    }
+
+    container.innerHTML = `
+      <label><input type="checkbox" value="All" onchange="toggleAllPersons(this)" checked> <strong>All</strong></label>
+      <hr style="margin: 6px 0;">
+      ${persons.map(p => `
+        <label>
+          <input type="checkbox" class="personFilter" value="${p}" checked onchange="renderEntries()" />
+          ${p}
+        </label>
+      `).join('')}
+    `;
+  }
+
+  function toggleAllPersons(masterCheckbox) {
+    const checkboxes = document.querySelectorAll('#personOptions .personFilter');
+    checkboxes.forEach(cb => cb.checked = masterCheckbox.checked);
+    renderEntries(); // Re-render dashboard entries
+  }
+
+
+function populatePersonDropdownForCharts(persons) {
+  const select = document.getElementById('filterPerson');
+  if (!select) {
+    console.warn("⚠️ #filterPerson not found");
     return;
   }
 
-  container.innerHTML = `
-    <label>
-      <input type="checkbox" id="${containerId}_selectAll" checked />
-      <strong>Select All</strong>
-    </label>
-    <hr style="margin: 6px 0;">
-    ${persons.map(p => `
-      <label>
-        <input type="checkbox" class="${containerId}_personFilter" value="${p}" checked />
-        ${p}
-      </label>
-    `).join('')}
-  `;
+  select.innerHTML = `<option value="All">All</option>` +
+    persons.map(p => `<option value="${p}">${p}</option>`).join('');
 
-  // Prevent closing dropdown if this is a floating menu
-  container.addEventListener('click', e => e.stopPropagation());
-
-  const selectAll = document.getElementById(`${containerId}_selectAll`);
-  const checkboxes = container.querySelectorAll(`.${containerId}_personFilter`);
-
-  selectAll?.addEventListener('change', () => {
-    checkboxes.forEach(cb => cb.checked = selectAll.checked);
-    drawCharts(); // or pass a callback
-  });
-
-  checkboxes.forEach(cb => {
-    cb.addEventListener('change', () => {
-      const allChecked = Array.from(checkboxes).every(cb => cb.checked);
-      selectAll.checked = allChecked;
-      drawCharts(); // or pass a callback
-    });
-  });
+  select.addEventListener('change', drawCharts); // Redraw on change
 }
 
 async function fetchEntries() {
@@ -138,14 +136,14 @@ async function fetchEntries() {
     populateNewEntryDropdowns();
     populateFilters();
 
-    persons = [...new Set(entries.map(e => e.person).filter(Boolean))]; // now sets global
-    console.log("🧑‍🤝‍🧑 Found persons:", persons);
+    const persons = [...new Set(entries.map(e => e.person).filter(Boolean))];
+    console.log("👤 Loaded persons:", persons);
 
-    // ✅ Only dashboard filter populated now:
-    populatePersonFilter(persons, 'personDropdown');
+    populatePersonFilterForDashboard(persons);   // ✅ Dashboard checkbox filters
+    populatePersonDropdownForCharts(persons);    // ✅ Charts <select> dropdown
 
     setTimeout(() => {
-      drawCharts(); // first draw (can be re-drawn in openTab too)
+      drawCharts();
     }, 50);
   } catch (err) {
     console.error('❌ fetchEntries failed:', err);

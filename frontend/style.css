@@ -855,6 +855,9 @@ color: rgb(213, 79, 79);
   display: block;
 }
 
+.dropdown-content2.show {
+  display: block;
+}
 
 
 

@@ -116,12 +116,12 @@
         <option value="bar">Bar</option>
         <option value="line">Line</option>
       </select>
-<div class="dropdown2">
-  <button class="dropdown-toggle" data-target="personDropdown2">👤 Charts ▾</button>
-  <div class="dropdown-content2" id="personDropdown2">
-    <!-- Filter checkboxes inserted here -->
-  </div>
-</div>
+<label for="filterPerson">Person:</label>
+<select id="filterPerson">
+  <option value="All">All</option>
+</select>
+
+
 
 
 
@@ -129,7 +129,7 @@
       <button onclick="downloadChart('personChart')">⬇️ Person</button>
       <button onclick="downloadChart('comparisonChart')">⬇️ Comparison</button>
       <button onclick="downloadChart('pieChart')">⬇️ Pie</button>
-    </div>
+  
 
     <canvas id="monthlyChart" height="300" width="1200" ></canvas>
    
@@ -494,33 +494,32 @@ function drawCharts() {
   Chart.register(ChartDataLabels);
 
   const categoryFilter = document.getElementById('categoryFilter')?.value || 'All';
-const entries = window.entries || [];
-console.log("📦 Entries after filtering:", entries.length, entries);
+  const selectedPerson = document.getElementById('filterPerson')?.value || 'All';
+  const entries = window.entries || [];
+
+  console.log("📦 Entries before filtering:", entries.length, entries);
+  console.log("🪪 Current categoryFilter:", categoryFilter);
+  console.log("👥 Selected person:", selectedPerson);
+
   const monthlyIncome = {}, monthlyExpense = {}, personIncome = {}, personExpense = {}, expenseByCategory = {};
 
-  // ✅ CORRECT ORDER — first get selectedPersons, then log them
- let selectedPersons = Array.from(document.querySelectorAll('.personChartFilter:checked')).map(cb => cb.value);
-console.log("👥 Selected persons:", selectedPersons);
-
-if (!selectedPersons.length) {
-  selectedPersons = [...new Set(entries.map(e => e.person).filter(Boolean))];
-  console.log("⚠️ No person selected, fallback to all:", selectedPersons);
-}
-
-  // ✅ Now logs
-  console.log("🪪 Current categoryFilter:", categoryFilter);
-  console.log("👥 Selected persons:", selectedPersons);
-  console.log("📦 Total entries before filter:", entries.length);
-
-  // ✅ Now start entries.forEach
-  entries.forEach(e => {
+  const filteredEntries = entries.filter(e => {
     const person = (e.person || 'Unknown').trim();
-    if (categoryFilter !== 'All' && (e.category || 'Uncategorized') !== categoryFilter) return;
-    if (!selectedPersons.includes(person)) return;
+    const category = (e.category || 'Uncategorized').trim();
 
+    const personMatch = (selectedPerson === 'All') || (person === selectedPerson);
+    const categoryMatch = (categoryFilter === 'All') || (category === categoryFilter);
+
+    return personMatch && categoryMatch;
+  });
+
+  console.log("📦 Entries after filtering:", filteredEntries.length, filteredEntries);
+
+  filteredEntries.forEach(e => {
+    const person = (e.person || 'Unknown').trim();
+    const category = e.category || 'Other';
     const month = e.date?.slice(0, 7);
     const value = parseFloat(e.amount) || 0;
-    const key = e.category || 'Other';
 
     if (e.type === 'Income') {
       monthlyIncome[month] = (monthlyIncome[month] || 0) + value;
@@ -528,9 +527,10 @@ if (!selectedPersons.length) {
     } else if (e.type === 'Expense') {
       monthlyExpense[month] = (monthlyExpense[month] || 0) + value;
       personExpense[person] = (personExpense[person] || 0) + value;
-      expenseByCategory[key] = (expenseByCategory[key] || 0) + value;
+      expenseByCategory[category] = (expenseByCategory[category] || 0) + value;
     }
   });
+
 
   const incomeTotal = Object.values(monthlyIncome).reduce((a, b) => a + b, 0);
   const expenseTotal = Object.values(monthlyExpense).reduce((a, b) => a + b, 0);
@@ -695,50 +695,9 @@ if (!selectedPersons.length) {
     });
   }
 
-  populatePersonFilter(persons);
+populatePersonDropdownForCharts(persons);
 } // ←✅ THIS is the real end of drawCharts()
 
-
-function populatePersonFilter(persons) {
-  const container = document.getElementById('personDropdown');
-  if (!container) return;
-
-  container.innerHTML = `
-    <label>
-      <input type="checkbox" id="selectAllPersons" checked />
-      <strong>Select All</strong>
-    </label>
-    <hr style="margin: 6px 0;">
-    ${persons.map(p => `
-      <label>
-        <input type="checkbox" class="personChartFilter" value="${p}" checked />
-        
-        ${p}
-      </label>
-    `).join('')}
-  `;
-
-  // Prevent closing dropdown when clicking checkboxes
-  container.addEventListener('click', (e) => {
-    e.stopPropagation();
-  });
-
-  const selectAll = document.getElementById('selectAllPersons');
-  const checkboxes = container.querySelectorAll('.personChartFilter');
-
-  selectAll.addEventListener('change', () => {
-    checkboxes.forEach(cb => cb.checked = selectAll.checked);
-    drawCharts();
-  });
-
-  checkboxes.forEach(cb => {
-    cb.addEventListener('change', () => {
-      const allChecked = Array.from(checkboxes).every(cb => cb.checked);
-      selectAll.checked = allChecked;
-      drawCharts();
-    });
-  });
-}
 
 
     function populateCategoryFilter(entries) {
@@ -799,24 +758,14 @@ function openTab(tabId, btn) {
 
   const targetTab = document.getElementById(tabId);
   if (targetTab) targetTab.classList.add('active');
+
   if (btn) btn.classList.add('active');
 
   if (tabId === 'chartsTab') {
+    // Delay chart drawing slightly to ensure layout and filters are ready
     setTimeout(() => {
-      const container = document.getElementById('personDropdown2');
-      if (!container) {
-        console.warn("⚠️ Container #personDropdown2 not found");
-        return;
-      }
-
-      // Only populate once
-      if (!container.dataset.populated) {
-        populatePersonFilter(persons, 'personDropdown2');
-        container.dataset.populated = 'true';
-      }
-
       drawCharts();
-    }, 100); // delay ensures DOM is ready
+    }, 50);
   }
 }
 </script>
@@ -846,6 +795,8 @@ function openTab(tabId, btn) {
   <button class="scroll-toggle-btn" id="scrollDownBtn" title="Scroll to Bottom">⬇</button>
 </div>
 
+
+ 
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
