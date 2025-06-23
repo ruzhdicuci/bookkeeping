@@ -115,7 +115,7 @@ function populatePersonDropdownForCharts(persons) {
     console.warn("⚠️ #filterPerson not found. Chart dropdown won't be updated yet.");
     return;
   }
-const persons = window.persons || []; // ✅ Use global
+
 
   select.innerHTML = `<option value="All">All</option>` +
     persons.map(p => `<option value="${p}">${p}</option>`).join('');
