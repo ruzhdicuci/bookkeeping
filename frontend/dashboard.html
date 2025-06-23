@@ -797,48 +797,7 @@ document.querySelector('.dropdown-toggle')?.addEventListener('click', () => {
 </div>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script>
-function populatePersonFilter(persons) {
-  const container = document.getElementById('personDropdown');
-  if (!container) return;
 
-  container.innerHTML = `
-    <label>
-      <input type="checkbox" id="selectAllPersons" checked />
-      <strong>Select All</strong>
-    </label>
-    <hr style="margin: 6px 0;">
-    ${persons.map(p => `
-      <label>
-        <input type="checkbox" class="personChartFilter" value="${p}" checked />
-        
-        ${p}
-      </label>
-    `).join('')}
-  `;
-
-  // Prevent closing dropdown when clicking checkboxes
-  container.addEventListener('click', (e) => {
-    e.stopPropagation();
-  });
-
-  const selectAll = document.getElementById('selectAllPersons');
-  const checkboxes = container.querySelectorAll('.personChartFilter');
-
-  selectAll.addEventListener('change', () => {
-    checkboxes.forEach(cb => cb.checked = selectAll.checked);
-    drawCharts();
-  });
-
-  checkboxes.forEach(cb => {
-    cb.addEventListener('change', () => {
-      const allChecked = Array.from(checkboxes).every(cb => cb.checked);
-      selectAll.checked = allChecked;
-      drawCharts();
-    });
-  });
-}
-</script>
 <script src="dashboard.js"></script>
 
 </body>

@@ -82,6 +82,53 @@ async function loadInitialBankBalances() {
 
 
 
+function populatePersonFilter(persons) {
+  const container = document.getElementById('personDropdown');
+  if (!container) {
+    console.warn("⚠️ personDropdown not found in DOM");
+    return;
+  }
+
+  container.innerHTML = `
+    <label>
+      <input type="checkbox" id="selectAllPersons" checked />
+      <strong>Select All</strong>
+    </label>
+    <hr style="margin: 6px 0;">
+    ${persons.map(p => `
+      <label>
+        <input type="checkbox" class="personChartFilter" value="${p}" checked />
+        ${p}
+      </label>
+    `).join('')}
+  `;
+
+  // Prevent closing dropdown when clicking inside
+  container.addEventListener('click', e => e.stopPropagation());
+
+  const selectAll = document.getElementById('selectAllPersons');
+  const checkboxes = container.querySelectorAll('.personChartFilter');
+
+  if (selectAll) {
+    selectAll.addEventListener('change', () => {
+      checkboxes.forEach(cb => cb.checked = selectAll.checked);
+      drawCharts();
+    });
+  }
+
+  checkboxes.forEach(cb => {
+    cb.addEventListener('change', () => {
+      const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+      if (selectAll) selectAll.checked = allChecked;
+      drawCharts();
+    });
+  });
+}
+
+
+
+
+
 async function fetchEntries() {
   try {
     const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
