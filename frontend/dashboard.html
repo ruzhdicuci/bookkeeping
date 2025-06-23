@@ -375,7 +375,10 @@ totalsContainer.appendChild(summaryCard);
   <div class="filter-grid">
 
 <select id="categoryFilter">
-  <option value="category">category</option>
+  <option value="All">All</option>
+  <option value="Auto">Auto</option>
+  <option value="Haus">Haus</option>
+  ...
 </select>
 
        
@@ -492,52 +495,42 @@ function drawCharts() {
 
   const categoryFilter = document.getElementById('categoryFilter')?.value || 'All';
   const rawEntries = window.entries || [];
-  window.entries = rawEntries.filter(e => typeof e === 'object');
+  console.log("🐛 rawEntries before filtering:", rawEntries.length, rawEntries);
+  window.entries = rawEntries.filter(e => e && typeof e === 'object' && e.person);
   const entries = window.entries;
-
+console.log("📦 Entries after filtering:", entries.length, entries);
   const monthlyIncome = {}, monthlyExpense = {}, personIncome = {}, personExpense = {}, expenseByCategory = {};
 
-  // Get selected persons from checkboxes
-// Get selected persons from checkboxes
-let selectedPersons = Array.from(document.querySelectorAll('.personChartFilter:checked')).map(cb => cb.value);
-if (!selectedPersons.length) {
-  selectedPersons = [...new Set(entries.map(e => e.person))];
-}
-
-// Filter and categorize data
-entries.forEach(e => {
-  const person = (e.person || 'Unknown').trim();
-
-  if (categoryFilter !== 'All' && (e.category || 'Uncategorized') !== categoryFilter) {
-    console.log("🚫 Skipped by category:", e.category);
-    return;
+  // ✅ CORRECT ORDER — first get selectedPersons, then log them
+  let selectedPersons = Array.from(document.querySelectorAll('.personChartFilter:checked')).map(cb => cb.value);
+  if (!selectedPersons.length) {
+    selectedPersons = [...new Set(entries.map(e => e.person))];
   }
 
-  if (!selectedPersons.includes(person)) {
-    console.log("🚫 Skipped by person:", person);
-    return;
-  }
+  // ✅ Now logs
+  console.log("🪪 Current categoryFilter:", categoryFilter);
+  console.log("👥 Selected persons:", selectedPersons);
+  console.log("📦 Total entries before filter:", entries.length);
 
-  console.log("✅ Included:", {
-    person,
-    category: e.category,
-    amount: e.amount,
-    type: e.type
+  // ✅ Now start entries.forEach
+  entries.forEach(e => {
+    const person = (e.person || 'Unknown').trim();
+    if (categoryFilter !== 'All' && (e.category || 'Uncategorized') !== categoryFilter) return;
+    if (!selectedPersons.includes(person)) return;
+
+    const month = e.date?.slice(0, 7);
+    const value = parseFloat(e.amount) || 0;
+    const key = e.category || 'Other';
+
+    if (e.type === 'Income') {
+      monthlyIncome[month] = (monthlyIncome[month] || 0) + value;
+      personIncome[person] = (personIncome[person] || 0) + value;
+    } else if (e.type === 'Expense') {
+      monthlyExpense[month] = (monthlyExpense[month] || 0) + value;
+      personExpense[person] = (personExpense[person] || 0) + value;
+      expenseByCategory[key] = (expenseByCategory[key] || 0) + value;
+    }
   });
-
-  const month = e.date?.slice(0, 7);
-  const value = parseFloat(e.amount) || 0;
-  const key = e.category || 'Other';
-
-  if (e.type === 'Income') {
-    monthlyIncome[month] = (monthlyIncome[month] || 0) + value;
-    personIncome[person] = (personIncome[person] || 0) + value;
-  } else if (e.type === 'Expense') {
-    monthlyExpense[month] = (monthlyExpense[month] || 0) + value;
-    personExpense[person] = (personExpense[person] || 0) + value;
-    expenseByCategory[key] = (expenseByCategory[key] || 0) + value;
-  }
-});
 
   const incomeTotal = Object.values(monthlyIncome).reduce((a, b) => a + b, 0);
   const expenseTotal = Object.values(monthlyExpense).reduce((a, b) => a + b, 0);

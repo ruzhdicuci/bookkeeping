@@ -1,3 +1,4 @@
+let entries = [];
 const apiBase = 'https://bookkeeping-i8e0.onrender.com';
 const token = localStorage.getItem('token');
 const backend = 'https://bookkeeping-i8e0.onrender.com';
@@ -8,7 +9,7 @@ if (!token) {
   // window.location.href = '/login.html';
 }
 
-let entries = [];
+
 document.addEventListener('DOMContentLoaded', () => {
   fetchEntries();
   loadInitialBankBalances();
@@ -136,27 +137,24 @@ async function fetchEntries() {
     });
     if (!res.ok) throw new Error('Failed to fetch entries');
 
-    entries = await res.json(); // ✅ uses global
-    console.log("📦 Entries:", entries);
+    const data = await res.json();
+    entries = data.filter(e => typeof e === 'object' && e !== null); // ✅ Clean here only!
+    console.log("📦 Cleaned entries:", entries.length, entries);
 
-    renderEntries();              // ✅ uses global entries
-    populateNewEntryDropdowns(); // ✅ also uses global entries
+    renderEntries();              
+    populateNewEntryDropdowns(); 
     populateFilters();
 
-   const persons = [...new Set(entries.map(e => e.person).filter(Boolean))];
-console.log("🧑‍🤝‍🧑 Found persons:", persons);
-populatePersonFilter(persons);
+    const persons = [...new Set(entries.map(e => e.person).filter(Boolean))];
+    console.log("🧑‍🤝‍🧑 Found persons:", persons);
+    populatePersonFilter(persons);
 
-drawCharts(); // <-- AFTER populating person filter
+    drawCharts(); // ✅ Safe to call now
 
-  } 
-  
-  
-  catch (err) {
+  } catch (err) {
     console.error('❌ fetchEntries failed:', err);
   }
 }
-
 
 function populateNewEntryDropdowns() {
   const persons = [...new Set(entries.map(e => e.person))].filter(Boolean);
