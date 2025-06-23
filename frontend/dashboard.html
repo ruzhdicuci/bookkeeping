@@ -116,9 +116,9 @@
         <option value="bar">Bar</option>
         <option value="line">Line</option>
       </select>
-<div class="dropdown">
+<div class="dropdown2">
   <button class="dropdown-toggle">👤 Person</button>
-  <div class="dropdown-content" id="personDropdown">
+  <div class="dropdown-content2" id="personDropdown2">
     <!-- Dynamically inserted checkboxes go here -->
   </div>
 </div>
@@ -494,18 +494,18 @@ function drawCharts() {
   Chart.register(ChartDataLabels);
 
   const categoryFilter = document.getElementById('categoryFilter')?.value || 'All';
-  const rawEntries = window.entries || [];
-  console.log("🐛 rawEntries before filtering:", rawEntries.length, rawEntries);
-  window.entries = rawEntries.filter(e => e && typeof e === 'object' && e.person);
-  const entries = window.entries;
+const entries = window.entries || [];
 console.log("📦 Entries after filtering:", entries.length, entries);
   const monthlyIncome = {}, monthlyExpense = {}, personIncome = {}, personExpense = {}, expenseByCategory = {};
 
   // ✅ CORRECT ORDER — first get selectedPersons, then log them
-  let selectedPersons = Array.from(document.querySelectorAll('.personChartFilter:checked')).map(cb => cb.value);
-  if (!selectedPersons.length) {
-    selectedPersons = [...new Set(entries.map(e => e.person))];
-  }
+ let selectedPersons = Array.from(document.querySelectorAll('.personChartFilter:checked')).map(cb => cb.value);
+console.log("👥 Selected persons:", selectedPersons);
+
+if (!selectedPersons.length) {
+  selectedPersons = [...new Set(entries.map(e => e.person).filter(Boolean))];
+  console.log("⚠️ No person selected, fallback to all:", selectedPersons);
+}
 
   // ✅ Now logs
   console.log("🪪 Current categoryFilter:", categoryFilter);
@@ -699,6 +699,46 @@ console.log("📦 Entries after filtering:", entries.length, entries);
 } // ←✅ THIS is the real end of drawCharts()
 
 
+function populatePersonFilter(persons) {
+  const container = document.getElementById('personDropdown');
+  if (!container) return;
+
+  container.innerHTML = `
+    <label>
+      <input type="checkbox" id="selectAllPersons" checked />
+      <strong>Select All</strong>
+    </label>
+    <hr style="margin: 6px 0;">
+    ${persons.map(p => `
+      <label>
+        <input type="checkbox" class="personChartFilter" value="${p}" checked />
+        
+        ${p}
+      </label>
+    `).join('')}
+  `;
+
+  // Prevent closing dropdown when clicking checkboxes
+  container.addEventListener('click', (e) => {
+    e.stopPropagation();
+  });
+
+  const selectAll = document.getElementById('selectAllPersons');
+  const checkboxes = container.querySelectorAll('.personChartFilter');
+
+  selectAll.addEventListener('change', () => {
+    checkboxes.forEach(cb => cb.checked = selectAll.checked);
+    drawCharts();
+  });
+
+  checkboxes.forEach(cb => {
+    cb.addEventListener('change', () => {
+      const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+      selectAll.checked = allChecked;
+      drawCharts();
+    });
+  });
+}
 
 
     function populateCategoryFilter(entries) {

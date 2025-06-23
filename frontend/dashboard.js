@@ -81,55 +81,45 @@ async function loadInitialBankBalances() {
   }
 }
 
-
-
-function populatePersonFilter(persons) {
-  const container = document.getElementById('personDropdown');
+function populatePersonFilter(persons, containerId = 'personDropdown') {
+  const container = document.getElementById(containerId);
   if (!container) {
-    console.warn("⚠️ personDropdown not found in DOM");
+    console.warn(`⚠️ Container #${containerId} not found`);
     return;
   }
 
   container.innerHTML = `
     <label>
-      <input type="checkbox" id="selectAllPersons" checked />
+      <input type="checkbox" id="${containerId}_selectAll" checked />
       <strong>Select All</strong>
     </label>
     <hr style="margin: 6px 0;">
     ${persons.map(p => `
       <label>
-        <input type="checkbox" class="personChartFilter" value="${p}" checked />
+        <input type="checkbox" class="${containerId}_personFilter" value="${p}" checked />
         ${p}
       </label>
     `).join('')}
   `;
 
-  // Prevent closing dropdown when clicking inside
-  container.addEventListener('click', e => e.stopPropagation());
+  setTimeout(() => {
+    const selectAll = document.getElementById(`${containerId}_selectAll`);
+    const checkboxes = container.querySelectorAll(`.${containerId}_personFilter`);
 
-  const selectAll = document.getElementById('selectAllPersons');
-  const checkboxes = container.querySelectorAll('.personChartFilter');
-
-  if (selectAll) {
-    selectAll.addEventListener('change', () => {
+    selectAll?.addEventListener('change', () => {
       checkboxes.forEach(cb => cb.checked = selectAll.checked);
-      drawCharts();
+      drawCharts(); // or whatever chart you want
     });
-  }
 
-  checkboxes.forEach(cb => {
-    cb.addEventListener('change', () => {
-      const allChecked = Array.from(checkboxes).every(cb => cb.checked);
-      if (selectAll) selectAll.checked = allChecked;
-      drawCharts();
+    checkboxes.forEach(cb => {
+      cb.addEventListener('change', () => {
+        const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+        selectAll.checked = allChecked;
+        drawCharts(); // or other handler
+      });
     });
-  });
+  }, 0);
 }
-
-
-
-
-
 async function fetchEntries() {
   try {
     const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
@@ -137,19 +127,26 @@ async function fetchEntries() {
     });
     if (!res.ok) throw new Error('Failed to fetch entries');
 
-    const data = await res.json();
-    entries = data.filter(e => typeof e === 'object' && e !== null); // ✅ Clean here only!
-    console.log("📦 Cleaned entries:", entries.length, entries);
+    entries = await res.json(); // ✅ uses global
+    console.log("📦 Entries:", entries);
 
-    renderEntries();              
-    populateNewEntryDropdowns(); 
+    renderEntries();              // ✅ uses global entries
+    populateNewEntryDropdowns(); // ✅ also uses global entries
     populateFilters();
 
     const persons = [...new Set(entries.map(e => e.person).filter(Boolean))];
     console.log("🧑‍🤝‍🧑 Found persons:", persons);
-    populatePersonFilter(persons);
+   
+// For dashboard
+populatePersonFilter(persons, 'personDropdown');
 
-    drawCharts(); // ✅ Safe to call now
+// For chart tab
+populatePersonFilter(persons, 'personDropdown2');
+
+    // ✅ Delay chart drawing until checkboxes exist
+    setTimeout(() => {
+      drawCharts();
+    }, 50);
 
   } catch (err) {
     console.error('❌ fetchEntries failed:', err);
@@ -1859,3 +1856,5 @@ renderBankBalanceForm();                // ✅ re-render balance inputs
       alert('Failed to save entry.');
     }
   });
+
+  
