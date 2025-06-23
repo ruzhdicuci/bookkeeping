@@ -196,13 +196,22 @@ console.log("🏦 Bank headers found:", banks);
 function populateFilters() {
   if (!window.entries || !Array.isArray(window.entries)) return;
 
+  const entries = window.entries;
   const months = [...new Set(entries.map(e => e.date?.slice(0, 7)))].filter(Boolean).sort();
   const banks = [...new Set(entries.map(e => e.bank).filter(Boolean))];
   const categories = [...new Set(entries.map(e => e.category).filter(Boolean))];
-const persons = window.persons || [];
-  populatePersonDropdownForCharts(persons); // ✅ update chart dropdown
+  const persons = [...new Set(entries.map(e => e.person).filter(Boolean))];
 
-  // ✅ Month checkbox filter
+  window.persons = persons; // ✅ global for charts
+  populatePersonDropdownForCharts(window.persons); // ✅ update <select> for charts
+
+  const filterPerson = document.getElementById('filterPerson');
+  if (filterPerson && !filterPerson.dataset.listenerAttached) {
+    filterPerson.addEventListener('change', drawCharts);
+    filterPerson.dataset.listenerAttached = "true"; // prevent duplicate
+  }
+
+  // ✅ Month checkboxes
   const monthContainer = document.getElementById('monthOptions');
   if (monthContainer) {
     monthContainer.innerHTML = `
@@ -249,7 +258,7 @@ const persons = window.persons || [];
     categoryFilterEl.innerHTML = `<option value="All">category</option>` + categories.map(c => `<option value="${c}">${c}</option>`).join('');
   }
 
-  // ✅ Person checkbox group
+  // ✅ Person checkboxes
   const personOptions = document.getElementById('personOptions');
   if (personOptions) {
     personOptions.innerHTML = `
@@ -265,23 +274,22 @@ const persons = window.persons || [];
     `;
 
     const selectAllBox = document.getElementById('selectAllPersons');
-    selectAllBox.addEventListener('change', function () {
-      document.querySelectorAll('.personOption').forEach(cb => cb.checked = this.checked);
-      renderEntries();
-    });
+    if (selectAllBox) {
+      selectAllBox.addEventListener('change', function () {
+        document.querySelectorAll('.personOption').forEach(cb => cb.checked = this.checked);
+        renderEntries();
+      });
+    }
 
     document.querySelectorAll('.personOption').forEach(cb => {
       cb.addEventListener('change', () => {
         const all = document.querySelectorAll('.personOption');
         const checked = document.querySelectorAll('.personOption:checked');
-        selectAllBox.checked = all.length === checked.length;
+        if (selectAllBox) selectAllBox.checked = all.length === checked.length;
         renderEntries();
       });
     });
   }
-
-  // ✅ Populate chart person dropdown (used in Chart tab)
-  populatePersonDropdownForCharts(persons);
 }
 
 function getDateLabel(dateStr) {
