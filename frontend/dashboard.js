@@ -948,18 +948,22 @@ async function fetchBalancesFromBackend() {
 
 
 function renderBankBalanceForm() {
+  console.log("📊 renderBankBalanceForm called");
+
   const container = document.getElementById('bankBalanceTableContainer');
-  if (!container) {
-  console.error("❌ Missing #bankBalanceTableContainer element");
-  return;
-}
   const banks = [...new Set(entries.map(e => e.bank).filter(Boolean))];
   const selectedMonths = Array.from(document.querySelectorAll('#monthOptions input[type="checkbox"]:checked')).map(cb => cb.value);
 
+  console.log("📦 Entries count:", entries.length);
+  console.log("🏦 Banks found:", banks);
+  console.log("📆 Selected months:", selectedMonths);
+
   if (!banks.length) {
+    console.warn("⚠️ No banks found in entries.");
     container.innerHTML = `<p>No bank data available yet.</p>`;
     return;
   }
+
 
   const statusFilter = document.getElementById('statusFilter')?.value || 'All';
   const changes = {};
@@ -1201,6 +1205,8 @@ async function saveBankBalancesToBackend() {
     },
     body: JSON.stringify(initialBankBalances)
   });
+    renderBankBalanceForm();
+  renderEntries();
 }
 
 // Load from backend
@@ -1393,7 +1399,6 @@ function calculateCurrentBankBalance(bankName) {
 
 
 // ✅ Initialization
-// ✅ Initialization
 window.addEventListener('DOMContentLoaded', async () => {
   await fetchEntries();
   await loadInitialBankBalances();
@@ -1403,18 +1408,20 @@ window.addEventListener('DOMContentLoaded', async () => {
   populateFilters();
   renderEntries();
   renderBankBalanceForm();
+  renderCreditLimitTable(); // ✅ Show limits table
 
-  // ✅ Add this line for status filter
-document.getElementById('statusFilter')?.addEventListener('change', () => {
-  renderEntries();             // update the visible entries
-  renderBankBalanceForm();     // update the bank balance based on filtered entries
-});
-});
+  // ✅ Status filter listener (INSIDE this block!)
+  document.getElementById('statusFilter')?.addEventListener('change', () => {
+    renderEntries();
+    renderBankBalanceForm();
+  });
 
+  // ✅ Input event listeners for credit limit fields
   ['creditLimit-ubs', 'creditLimit-corner', 'creditLimit-pfm', 'creditLimit-cembra'].forEach(id => {
     const input = document.getElementById(id);
     if (input) input.addEventListener('input', renderCreditLimitTable);
   });
+});
 
 // ✅ Lockable inputs
 const limitInputs = {
