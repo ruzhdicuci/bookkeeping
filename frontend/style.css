@@ -647,23 +647,6 @@ font-size: 0.8rem;
 
 
 
-#bt3{
- 
-  color: black;
- height:60px;
- width: 160px;
-margin-left: -2px;
-  font-size: 18px;
-  border: none;
-  background-color: #f9f9f9;
- 
-}
-#bt3:hover{
-  background: rgb(235, 233, 233);
-  color: red;
-  
-}
-
 
 
 
@@ -1124,15 +1107,7 @@ font-size: 0.7rem;
     .tab-content.active {
       display: block;
     }
-    canvas {
-      display: block;
-   
-      margin: 2rem auto;
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 1rem;
-    }
+ 
     .chart-controls {
       text-align: center;
       margin-top: 1rem;
@@ -2222,4 +2197,107 @@ body.dark .entry-card .entry-label {
 /* Optional: amount coloring */
 body.dark .entry-card .amount {
   color: #ff6666;
+}
+
+
+.dropdown3 .dropdown-menu {
+  display: none;
+  position: absolute;
+  background: white;
+  border: 1px solid #ccc;
+  min-width: 80px;
+  z-index: 1000;
+  padding: 0.3rem;
+  border-radius: 6px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+}
+
+
+.dropdown-menu button {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 6px 10px;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+  
+}
+
+.dropdown-menu button:hover {
+  background-color: #f5f5f5;
+}
+
+/* Show on click */
+.dropdown3.show .dropdown-menu {
+  display: block;
+}
+
+
+
+.dropdown-toggle3 {
+  padding: 8px 14px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  cursor: pointer;
+ 
+}
+.chart-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.3rem; /* smaller space between buttons */
+  margin: 0.2rem 0;
+  flex-wrap: wrap;
+
+}
+.chart-controls select,
+.chart-controls .dropdown-toggle,
+.chart-controls .dropdown-toggle3 {
+  padding: 6px 10px;
+  font-size: 14px;
+}
+
+
+.chart-resize-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 0.1rem;
+   margin: 0.5rem 0;
+  font-size: 0.7rem;
+}
+
+
+.btn {
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.btn:hover {
+  background-color: #e0e0e0;
+}
+
+
+
+
+
+
+    .chart-canvas {
+  width: 1200px;
+  height: 300px;
+  max-width: 100%;
+  transition: all 0.3s ease;
+  display: block;
+   
+      margin: 0.5rem auto;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 1rem;
 }

@@ -80,11 +80,11 @@
      
      
 
-                <button id="bt3"> <label for="importCSV" class="custom-file-label">📥 Import CSV</label></button>
+                <a> <label for="importCSV" class="custom-file-label">📥 Import CSV</label></a>
                 <input type="file" id="importCSV" accept=".csv" style="display: none;" />
  <input type="file" id="restoreFile" style="display:none" onchange="restoreBackup(event)" />
 
-  <a  onclick="exportCombinedCSV()">📤 Export CSV</a>
+  <a onclick="exportVisibleEntriesWithSummary()">📤 Export CSV</a>
 
 <a onclick="window.print()">🖨️ Print</a>
 <a onclick="window.print()">🧾 Export PDF</a>
@@ -112,33 +112,40 @@
   <div id="chartsTab" class="tab-content">
    
     <div class="chart-controls">
-      <label for="chartType">Chart Type:</label>
-      <select id="chartType">
-        <option value="bar">Bar</option>
-        <option value="line">Line</option>
-      </select>
-<label for="filterPerson">Person:</label>
-<select id="filterPerson">
-  <option value="All">All</option>
-</select>
 
 
 
+ <select id="chartType">
+    <option value="bar">Bar</option>
+    <option value="line">Line</option>
+  </select>
+
+  <select id="filterPerson">
+    <option value="All">All</option>
+  </select>
 
 
-      <button onclick="downloadChart('monthlyChart')">⬇️ Monthly</button>
+
+<div class="dropdown3">
+  <button class="dropdown-toggle3" id="chartDropdownToggle">
+    Charts <span style="margin-left: 3px;">▾</span>
+  </button>
+  <div class="dropdown-menu" id="chartDropdownMenu">
+   <button onclick="downloadChart('monthlyChart')">⬇️ Monthly</button>
       <button onclick="downloadChart('personChart')">⬇️ Person</button>
       <button onclick="downloadChart('comparisonChart')">⬇️ Comparison</button>
       <button onclick="downloadChart('pieChart')">⬇️ Pie</button>
+  </div>
+</div>
+</div>
   
 
-    <canvas id="monthlyChart" height="300" width="1200" ></canvas>
-   
-  <canvas id="summaryChart" height="300" width="1200"></canvas>
-  <canvas id="averageChart" height="300" width="1200"></canvas>
-    <canvas id="personChart" height="300" width="1200"></canvas>
-    <canvas id="comparisonChart" height="300" width="1200"></canvas>
-    <canvas id="pieChart" height="300" width="1200"></canvas>
+<canvas id="monthlyChart" class="chart-canvas"></canvas>
+<canvas id="summaryChart" class="chart-canvas"></canvas>
+<canvas id="averageChart" class="chart-canvas"></canvas>
+<canvas id="personChart" class="chart-canvas"></canvas>
+<canvas id="comparisonChart" class="chart-canvas"></canvas>
+<canvas id="pieChart" class="chart-canvas"></canvas>
   </div></div>  
 
 <div class="filter-grid">
@@ -484,7 +491,7 @@ totalsContainer.appendChild(summaryCard);
 
 
 
-  
+  let chartSizeFactor = 1; // default
 let monthlyChartInstance = null;
 let personChartInstance = null;
 let comparisonChartInstance = null;

@@ -858,69 +858,93 @@ document.getElementById('importCSV').addEventListener('change', async (e) => {
 });
 
 
+//export csv start
+function exportVisibleEntriesWithSummary() {
+  const entries = typeof getFilteredEntries === 'function' ? getFilteredEntries() : (window.entries || []);
+  const initialBankBalances = window.initialBankBalances || {};
 
-function exportCombinedCSV() {
+  console.log("📦 Export entries:", entries.length);
+  console.log("🏦 Export balances:", Object.keys(initialBankBalances));
+
+  if (!entries.length || !Object.keys(initialBankBalances).length) {
+    alert("No data available to export.");
+    return;
+  }
+
+  // === Entries Section ===
   const entryHeaders = ['date', 'description', 'amount', 'currency', 'type', 'person', 'bank'];
   const entryRows = entries.map(e => [
     e.date, e.description, e.amount, e.currency, e.type, e.person, e.bank
   ]);
 
-  const banks = Object.keys(initialBankBalances);
-  const bankHeaders = ['Bank', ...banks];
-
-  const initialRow = ['Initial'];
-  const changeRow = ['Change'];
-
-  // Initial balances
+  // === Bank Balance Summary ===
+  const bankBalanceSection = ['Bank Balances', 'Bank,Initial,Balance'];
   banks.forEach(bank => {
-    initialRow.push(initialBankBalances[bank] ?? 0);
+    const initial = initialBankBalances[bank] || 0;
+    const total = entries
+      .filter(e => e.bank === bank)
+      .reduce((sum, e) => {
+        const amt = parseFloat(e.amount) || 0;
+        return e.type?.toLowerCase() === 'income' ? sum + amt : sum - amt;
+      }, initial);
+    bankBalanceSection.push(`${bank},${initial.toFixed(2)},${total.toFixed(2)}`);
   });
 
-  // Calculate net balance changes per bank
-const changes = {};
-banks.forEach(bank => (changes[bank] = 0));
+  // === Credit Limits Section (if available)
+  const limits = {
+    'UBS Master': document.getElementById('creditLimit-ubs')?.value,
+    'Corner Master': document.getElementById('creditLimit-corner')?.value,
+    'Post Master': document.getElementById('creditLimit-pfm')?.value,
+    'Cembra': document.getElementById('creditLimit-cembra')?.value
+  };
 
-entries.forEach(e => {
-  const bank = e.bank;
-  const type = (e.type || '').trim().toLowerCase();
-  const amount = Math.abs(parseFloat(e.amount)) || 0;
-
-  if (changes[bank] != null) {
-    changes[bank] += (type === 'income') ? amount : -amount;
+  const creditSection = ['Credit Limits', 'Bank,Limit'];
+  for (const [bank, limit] of Object.entries(limits)) {
+    if (limit) creditSection.push(`${bank},${parseFloat(limit).toFixed(2)}`);
   }
-});
 
-banks.forEach(bank => {
-  changeRow.push(changes[bank].toFixed(2));
-});
+  // === Final CSV Structure ===
+  const csvParts = [];
+  csvParts.push('Filtered Entries');
+  csvParts.push(entryHeaders.join(','));
+  csvParts.push(...entryRows.map(r => r.join(',')));
+  csvParts.push('', ...bankBalanceSection, '', ...creditSection);
 
-  // Build CSV
-  const csvSections = [];
-  csvSections.push('Entries');
-  csvSections.push(entryHeaders.join(','));
-  csvSections.push(...entryRows.map(r => r.join(',')));
-  csvSections.push('', 'Bank Balances');
-  csvSections.push(bankHeaders.join(','));
-  csvSections.push(initialRow.join(','));
-  csvSections.push(changeRow.join(','));
-
-  // Generate timestamped filename
-  const now = new Date();
-  const timestamp = now.toISOString().replace(/[:.]/g, '-'); // e.g. "2025-06-08T11-45-30-123Z"
-  const filename = `bookkeeping_combined_${timestamp}.csv`;
-
-  const csvContent = csvSections.join('\n');
+  const csvContent = csvParts.join('\n');
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+
+  const now = new Date().toISOString().replace(/[:T]/g, '-').split('.')[0];
+  const filename = `bookkeeping_filtered_${now}.csv`;
+
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
-  link.setAttribute('href', url);
-  link.setAttribute('download', filename);
+  link.href = url;
+  link.download = filename;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
 }
 
+//export csv end
+//export csv filteed start
+function getFilteredEntries() {
+  const all = window.entries || [];
 
+  const selectedMonths = Array.from(document.querySelectorAll('.monthOption:checked')).map(cb => cb.value);
+  const selectedPersons = Array.from(document.querySelectorAll('.personOption:checked')).map(cb => cb.value);
+  const personSearch = document.getElementById('personSearch')?.value.trim().toLowerCase();
+  const descSearch = document.getElementById('descSearch')?.value.trim().toLowerCase();
+
+  return all.filter(e => {
+    const month = e.date?.slice(0, 7);
+    const matchesMonth = selectedMonths.includes(month);
+    const matchesPerson = selectedPersons.includes(e.person);
+    const matchesSearch = !personSearch || (e.person?.toLowerCase().includes(personSearch)) || (e.description?.toLowerCase().includes(personSearch)) || (descSearch && e.description?.toLowerCase().includes(descSearch));
+    return matchesMonth && matchesPerson && matchesSearch;
+  });
+}
+
+//export csv filteed end
 
 async function deleteAllEntries() {
   if (!confirm("Are you sure you want to delete all entries?")) return;
@@ -1099,21 +1123,18 @@ function backupData() {
   };
 
   const now = new Date();
-  const timestamp = now.toISOString().replace(/[:T]/g, '-').split('.')[0]; // e.g., 2025-05-22-15-32-10
+  const timestamp = now.toISOString().replace(/[:T]/g, '-').split('.')[0];
   const filename = `bookkeeping_backup_${timestamp}.json`;
 
   const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
-  link.setAttribute('href', url);
-  link.setAttribute('download', filename);
+  link.href = url;
+  link.download = filename;
   link.click();
 }
 
-
-
-// Restore from JSON backup file (with safe ID handling)
-function restoreBackup(e) {
+async function restoreBackup(e) {
   const file = e.target.files[0];
   if (!file) return;
 
@@ -1123,9 +1144,9 @@ function restoreBackup(e) {
 
     if (Array.isArray(data.entries)) {
       for (const entry of data.entries) {
-        if (entry._id) delete entry._id; // 🧼 Remove _id to avoid MongoDB duplicate error
+        if (entry._id) delete entry._id;
 
-        await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
+        await fetch(`${apiBase}/api/entries`, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${token}`,
@@ -1136,27 +1157,28 @@ function restoreBackup(e) {
       }
     }
 
-if (data.initialBankBalances) {
-  localStorage.setItem('initialBankBalances', JSON.stringify(data.initialBankBalances));
+    if (data.initialBankBalances) {
+      localStorage.setItem('initialBankBalances', JSON.stringify(data.initialBankBalances));
 
-  await fetch(`${backend}/api/balances`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(data.initialBankBalances)
-  });
-}
+      await fetch(`${apiBase}/api/balances`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data.initialBankBalances)
+      });
+    }
 
     alert('✅ Backup restored!');
-    fetchEntries();
+
+    // ✅ wait before re-rendering
+    await fetchEntries();
+    renderBankBalanceForm();
   };
 
   reader.readAsText(file);
 }
-renderBankBalanceForm(); // 🧮 Re-render updated balances
-
 
 
 
@@ -1881,3 +1903,25 @@ renderBankBalanceForm();                // ✅ re-render balance inputs
   });
 
   
+
+  // group of download chart buttons
+  document.addEventListener('DOMContentLoaded', () => {
+    const toggleBtn = document.getElementById('chartDropdownToggle');
+    const dropdown = document.querySelector('.dropdown3');
+
+    if (toggleBtn && dropdown) {
+      toggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // prevent body click from closing it immediately
+        dropdown.classList.toggle('show');
+      });
+
+      // Optional: close on outside click
+      document.addEventListener('click', (e) => {
+        if (!dropdown.contains(e.target)) {
+          dropdown.classList.remove('show');
+        }
+      });
+    }
+  });
+
+
