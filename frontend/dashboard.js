@@ -1960,14 +1960,11 @@ function cleanBalances() {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(cleaned)
-  })
-    .then(res => {
-      if (!res.ok) throw new Error("Failed to save cleaned balances");
-      window.initialBankBalances = cleaned; // ✅ Update memory too
-      alert("✅ Cleaned balances saved.");
-    })
-    .catch(err => {
-      console.error("❌ Failed to clean balances", err);
-      alert("Failed to save cleaned balances.");
-    });
+  }).then(() => {
+    window.initialBankBalances = cleaned; // Update local
+    alert("✅ Cleaned balances saved.");
+  }).catch(err => {
+    console.error("❌ Failed to save cleaned balances", err);
+    alert("❌ Failed to save cleaned balances.");
+  });
 }
