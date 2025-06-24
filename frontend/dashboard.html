@@ -101,8 +101,8 @@
     
    
 
-     <button id="themeToggle" onclick="toggleTheme()" > 
-   <i class="fa-solid fa-moon"></i>Theme
+   <button id="themeToggle" onclick="toggleTheme()"> 
+    <i id="themeIcon" class="fa-solid fa-moon"></i>
 </button>
 </div>
 </div>
@@ -303,11 +303,12 @@ totalsContainer.appendChild(summaryCard);
   </div>
 
   <!-- Button Card -->
-  <div>
-    <button id="unlockBtn">Unlock</button>
-    <button id="lockBtn" style="display: none;">Lock & Save</button>
-    <button id="saveLimitsBtn" style="display: none;">Save Limits</button>
-  </div>
+ <!-- Button Card -->
+<div class="button-card">
+  <button id="unlockBtn">Unlock</button>
+  <button id="lockBtn" style="display: none;">Lock & Save</button>
+  <button id="saveLimitsBtn" style="display: none;">Save Limits</button>
+</div>
 </div>
  
   </div>
@@ -353,7 +354,7 @@ totalsContainer.appendChild(summaryCard);
 </div>
      <div class="tooltip-wrapper">
   <button class="reset-btn" onclick="resetFilters()">
-    <span class="reset-icon" style="color: black; font-size: 0.7rem;">clear all filters</span> 
+    <span class="reset-icon" style="color: black; font-size: 0.8rem;color: rgb(255, 0, 149);">clear all filters</span> 
   </button>
   <span class="tooltip-text">Reset all filters to default</span>
      
@@ -504,15 +505,20 @@ const persons = window.persons || [];
 
   const monthlyIncome = {}, monthlyExpense = {}, personIncome = {}, personExpense = {}, expenseByCategory = {};
 
-  const filteredEntries = entries.filter(e => {
-    const person = (e.person || 'Unknown').trim();
-    const category = (e.category || 'Uncategorized').trim();
+ const excludedPersons = ['Transfer', 'Balance']; // <-- Add any you want to exclude
 
-    const personMatch = (selectedPerson === 'All') || (person === selectedPerson);
-    const categoryMatch = (categoryFilter === 'All') || (category === categoryFilter);
+const filteredEntries = entries.filter(e => {
+  const person = (e.person || 'Unknown').trim();
+  const category = (e.category || 'Uncategorized').trim();
 
-    return personMatch && categoryMatch;
-  });
+  const personMatch = (selectedPerson === 'All') || (person === selectedPerson);
+  const categoryMatch = (categoryFilter === 'All') || (category === categoryFilter);
+
+  // ✅ Exclude unwanted persons
+  const notExcluded = !excludedPersons.includes(person);
+
+  return personMatch && categoryMatch && notExcluded;
+});
 
   console.log("📦 Entries after filtering:", filteredEntries.length, filteredEntries);
 
@@ -772,18 +778,6 @@ if (tabId === 'chartsTab') {
 }
 }
 </script>
-<div id="confirmModal" class="modal hidden">
-  <div class="modal-content">
-    <p>🗑️ Are you sure you want to delete this entry?</p>
-    <div class="modal-actions">
-      <button id="cancelDelete" class="btn cancel">Cancel</button>
-      <button id="confirmDelete" class="btn confirm">Delete</button>
-    </div>
-  </div>
-</div>
-<div id="toast" style="display:none; position: fixed; bottom: 20px; right: 20px; background: #13a07f; color: white; padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); font-size: 16px; z-index: 1000;"></div>
-
-
 
 <div class="scroll-toggle-wrapper">
   
@@ -816,6 +810,22 @@ if (tabId === 'chartsTab') {
 });
 </script>
 
+
+<div id="confirmModal" class="modal hidden">
+  <div class="modal-content">
+    <p>🗑️ Are you sure you want to delete this entry?</p>
+    <div class="modal-actions">
+      <button id="cancelDelete" class="btn cancel">Cancel</button>
+      <button id="confirmDelete" class="btn confirm">Delete</button>
+    </div>
+  </div>
+</div>
+<div id="toast" style="display:none; position: fixed; bottom: 20px; right: 20px; background: #13a07f; color: white; padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); font-size: 16px; z-index: 1000;"></div>
+
+
+
+
+
 <div class="filter-grid">
  <!-- Entry table -->
 
@@ -826,7 +836,6 @@ if (tabId === 'chartsTab') {
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 <script src="dashboard.js"></script>
-
 </body>
 </html>
 

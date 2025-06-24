@@ -156,16 +156,22 @@ async function loadInitialBankBalances() {
 function populatePersonDropdownForCharts(persons) {
   const select = document.getElementById('filterPerson');
   if (!select) {
-    console.warn("⚠️ #filterPerson not found. Chart dropdown won't be updated yet.");
+    console.warn("⚠️ #filterPerson not found.");
     return;
   }
 
-  select.innerHTML = `<option value="All">All</option>` +
-    persons.map(p => `<option value="${p}">${p}</option>`).join('');
+  const excluded = ['Transfer', 'Balance'];
+  const filteredPersons = persons.filter(p => !excluded.includes(p));
 
-  // ✅ Add this line to re-render charts when dropdown changes
-  select.addEventListener('change', drawCharts);
+  select.innerHTML = `<option value="All">All</option>` +
+    filteredPersons.map(p => `<option value="${p}">${p}</option>`).join('');
+
+  if (!select.dataset.listenerAttached) {
+    select.addEventListener('change', drawCharts);
+    select.dataset.listenerAttached = "true";
+  }
 }
+
 async function fetchEntries() {
   try {
     const res = await fetch(`${apiBase}/api/entries`, {
@@ -190,6 +196,7 @@ async function fetchEntries() {
     console.error('❌ fetchEntries failed:', err);
   }
 }
+
 function populateNewEntryDropdowns() {
   const persons = [...new Set(entries.map(e => e.person))].filter(Boolean);
   const banks = [...new Set(entries.map(e => e.bank))].filter(Boolean);
@@ -238,13 +245,51 @@ console.log("🏦 Bank headers found:", banks);
 function populateFilters() {
   if (!window.entries || !Array.isArray(window.entries)) return;
 
-  const entries = window.entries; // ✅ move this up first
+  const entries = window.entries;
   const banks = [...new Set(entries.map(e => e.bank).filter(Boolean))];
-  console.log("✅ Unique banks detected:", banks);
   const months = [...new Set(entries.map(e => e.date?.slice(0, 7)))].filter(Boolean).sort();
   const categories = [...new Set(entries.map(e => e.category).filter(Boolean))];
   const persons = [...new Set(entries.map(e => e.person).filter(Boolean))];
+  const excludedByDefault = ['Balance', 'Transfer'];
 
+  // ✅ Person checkbox group
+  const personOptions = document.getElementById('personOptions');
+  if (personOptions) {
+    personOptions.innerHTML = `
+      <div class="personOptionGroup">
+        <label><input type="checkbox" id="selectAllPersons" /> <strong>All</strong></label>
+        ${persons.map(p => `
+          <label>
+            <input type="checkbox" class="personOption" name="personFilter" value="${p}" ${excludedByDefault.includes(p) ? '' : 'checked'} />
+            ${p}
+          </label>
+        `).join('')}
+      </div>
+    `;
+
+    const selectAllBox = document.getElementById('selectAllPersons');
+    if (selectAllBox) {
+      selectAllBox.addEventListener('change', function () {
+        document.querySelectorAll('.personOption').forEach(cb => cb.checked = this.checked);
+        renderEntries();
+      });
+
+      document.querySelectorAll('.personOption').forEach(cb => {
+        cb.addEventListener('change', () => {
+          const all = document.querySelectorAll('.personOption');
+          const checked = document.querySelectorAll('.personOption:checked');
+          selectAllBox.checked = all.length === checked.length;
+          renderEntries();
+        });
+      });
+
+      // Set initial 'All' box status
+      const initiallyChecked = document.querySelectorAll('.personOption:checked').length;
+      selectAllBox.checked = initiallyChecked === (persons.length - excludedByDefault.length);
+    }
+  }
+
+  // ✅ Save persons for chart dropdown
   window.persons = persons;
   populatePersonDropdownForCharts(window.persons);
 
@@ -253,7 +298,6 @@ function populateFilters() {
     filterPerson.addEventListener('change', drawCharts);
     filterPerson.dataset.listenerAttached = "true";
   }
-
 
   // ✅ Month checkboxes
   const monthContainer = document.getElementById('monthOptions');
@@ -301,40 +345,8 @@ function populateFilters() {
   if (categoryFilterEl) {
     categoryFilterEl.innerHTML = `<option value="All">category</option>` + categories.map(c => `<option value="${c}">${c}</option>`).join('');
   }
-
-  // ✅ Person checkboxes
-  const personOptions = document.getElementById('personOptions');
-  if (personOptions) {
-    personOptions.innerHTML = `
-      <div class="personOptionGroup">
-        <label><input type="checkbox" id="selectAllPersons" checked /> <strong>All</strong></label>
-        ${persons.map(p => `
-          <label>
-            <input type="checkbox" class="personOption" name="personFilter" value="${p}" checked />
-            ${p}
-          </label>
-        `).join('')}
-      </div>
-    `;
-
-    const selectAllBox = document.getElementById('selectAllPersons');
-    if (selectAllBox) {
-      selectAllBox.addEventListener('change', function () {
-        document.querySelectorAll('.personOption').forEach(cb => cb.checked = this.checked);
-        renderEntries();
-      });
-    }
-
-    document.querySelectorAll('.personOption').forEach(cb => {
-      cb.addEventListener('change', () => {
-        const all = document.querySelectorAll('.personOption');
-        const checked = document.querySelectorAll('.personOption:checked');
-        if (selectAllBox) selectAllBox.checked = all.length === checked.length;
-        renderEntries();
-      });
-    });
-  }
 }
+
 
 function getDateLabel(dateStr) {
   const entryDate = new Date(dateStr);
@@ -380,6 +392,7 @@ function getLabelRank(label) {
 
 
 function renderEntries() {
+  const entries = window.entries || [];
   const dateSearch = document.getElementById('dateSearch')?.value.trim();
   const descSearch = document.getElementById('descSearch')?.value.trim();
   const amountSearch = document.getElementById('amountSearch')?.value.trim();
@@ -758,14 +771,15 @@ async function deleteEntry(id) {
 
 function toggleTheme() {
   const body = document.body;
-  const icon = document.getElementById('themeToggle');
+  const icon = document.getElementById('themeIcon');
 
   const isDark = body.classList.toggle('dark');
+
   if (icon) {
-    icon.textContent = isDark ? '☀️' : '🌙';
+    icon.classList.remove('fa-moon', 'fa-sun');
+    icon.classList.add(isDark ? 'fa-sun' : 'fa-moon');
   }
 }
-
 
 function logout() {
   localStorage.removeItem('token');
@@ -949,7 +963,7 @@ async function fetchBalancesFromBackend() {
 
 function renderBankBalanceForm() {
   console.log("📊 renderBankBalanceForm called");
-
+const entries = window.entries || [];
   const container = document.getElementById('bankBalanceTableContainer');
   const banks = [...new Set(entries.map(e => e.bank).filter(Boolean))];
   const selectedMonths = Array.from(document.querySelectorAll('#monthOptions input[type="checkbox"]:checked')).map(cb => cb.value);
@@ -1407,7 +1421,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   populateNewEntryDropdowns();
   populateFilters();
   renderEntries();
-  renderBankBalanceForm();
+
   renderCreditLimitTable(); // ✅ Show limits table
 
   // ✅ Status filter listener (INSIDE this block!)
@@ -1623,10 +1637,11 @@ inputsToClear.forEach(id => {
   });
 
   // Re-enable and re-check all person checkboxes
-  document.querySelectorAll('.personOption').forEach(cb => {
-    cb.disabled = false;
-    cb.checked = true;
-  });
+const excludedByDefault = ['Balance', 'Transfer'];
+document.querySelectorAll('.personOption').forEach(cb => {
+  cb.disabled = false;
+  cb.checked = !excludedByDefault.includes(cb.value); // uncheck Balance/Transfer
+});
   const selectAllPersons = document.getElementById('selectAllPersons');
   if (selectAllPersons) {
     selectAllPersons.disabled = false;
@@ -1646,8 +1661,6 @@ inputsToClear.forEach(id => {
   setTimeout(() => window.suppressToast = false, 100);
 }
 
-
-;
 
   
 

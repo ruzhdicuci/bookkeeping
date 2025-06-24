@@ -66,25 +66,8 @@ border: none;
  
     }
  
-.dark .th4  { 
-  background-color: #2c2c2c; 
-font-family: system-ui, sans-serif;
-font-size: 1.2rem;
 
 
-text-align: center;       /* Center the text horizontally */
-  vertical-align: middle;   /* Center the text vertically */
-    padding: 8px;  
- 
-    }
-
-
-.dark .th4 table thead:first-child  {
-  background-color:#222;
-  
-  border-left: 1px solid #222;
-    border-top: 1px solid#222;
-}
 
 #creditLimitTable  table th {
    background: #e3e0db;
@@ -609,7 +592,11 @@ font-weight: bolder;
             text-decoration: none;
           }
          
-
+.button-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end; /* Push buttons to bottom */
+}
 
 
        #unlockBtn {background-color: #fdf6de;
@@ -729,14 +716,16 @@ margin-left: -2px;
 
 }
 
-
+body.dark .fa-sun {
+  color: black;
+}
 #themeToggle {
   background: rgb(192, 250, 255);
     cursor: pointer;
    border: none;
  height:40px;
 margin-top: 4px;
-    width: 90px;
+  width:40px;
     margin-left: 3px;
     font-size: 0.7;
 
@@ -1286,13 +1275,6 @@ color:  #71d0ff !important; /* optional: blue checkmark */
 }
 
 
-.dark .average-card {
-  background-color: #222222; 
-  
-}
-.dark .summary-card {
- background-color: #222222; 
-}
 
 
 
@@ -1315,15 +1297,15 @@ color:  #71d0ff !important; /* optional: blue checkmark */
 
 
 .reset-btn {
-  background:  #f5dae1;
-  color: white;
-  border: 1px solid #f5dae1;
+  background:  #fdf6de;
+
+ border:none;
   border-radius: 8px;
 height: 40px;
   width: 110px;
   margin-left: 4px;
-  font-weight: 600;
-  font-size: 14px;
+
+
   cursor: pointer;
 
 }
@@ -2182,3 +2164,68 @@ margin-right: 10px;
 }
 
 
+body.dark {
+  background-color: #111;
+  color: #eee;
+}
+
+body.dark input,
+body.dark select,
+body.dark textarea {
+  background-color: #2c2c2c; 
+  color: #eee;
+  border: 1px solid  #1e1d1d;
+}
+
+
+
+
+/* Optional hover effect */
+.dark #bt1:hover {
+  color: #000000;
+}
+
+
+
+body.dark .filter-grid {
+  background-color: #222;
+}
+
+
+body.dark .filter-grid2  {
+  background-color: #222;
+}
+
+
+
+body.dark .card {
+  background-color: #2c2c2c; 
+  color: #f4f1f1;
+}
+
+body.dark .card strong {
+  color: #8af;
+}
+
+body.dark #entryForm select,
+body.dark #entryForm input {
+  background-color: #2c2c2c; 
+  color: #eee;
+  border: 1px solid  #1e1d1d;
+}
+
+.dark .average-card {
+  background-color: #2c2c2c; 
+  
+}
+.dark .summary-card {
+ background-color: #2c2c2c; 
+}
+
+
+.dark .input-wrapper select,
+.dark .input-wrapper input {
+  background-color: #2c2c2c; 
+  color: #eee;
+  border: 1px solid  #111111;
+}
