@@ -2301,3 +2301,9 @@ body.dark .entry-card .amount {
       border-radius: 8px;
       padding: 1rem;
 }
+
+
+.dark .status-pill.open {
+  background-color: #e44343;
+  color: white;
+}

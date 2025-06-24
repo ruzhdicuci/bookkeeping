@@ -117,12 +117,13 @@ async function loadInitialBankBalances() {
 
     if (!res.ok) throw new Error('Failed to load balances');
 
-    initialBankBalances = await res.json();
-    localStorage.setItem('initialBankBalances', JSON.stringify(initialBankBalances));
+    // ✅ Store globally
+    window.initialBankBalances = await res.json();
+    localStorage.setItem('initialBankBalances', JSON.stringify(window.initialBankBalances));
   } catch (err) {
     console.warn('⚠️ Could not load balances from backend. Using localStorage fallback.');
     const local = localStorage.getItem('initialBankBalances');
-    if (local) initialBankBalances = JSON.parse(local);
+    if (local) window.initialBankBalances = JSON.parse(local);
   }
 }
 
@@ -859,9 +860,17 @@ document.getElementById('importCSV').addEventListener('change', async (e) => {
 
 
 //export csv start
-function exportVisibleEntriesWithSummary() {
+// export csv start
+async function exportVisibleEntriesWithSummary() {
   const entries = typeof getFilteredEntries === 'function' ? getFilteredEntries() : (window.entries || []);
-  const initialBankBalances = window.initialBankBalances || {};
+  let initialBankBalances = window.initialBankBalances || {};
+
+  // ✅ Fallback: if balances not loaded, load them
+  if (!Object.keys(initialBankBalances).length && typeof loadInitialBankBalances === 'function') {
+    console.warn("🔄 Loading missing balances...");
+    await loadInitialBankBalances();
+    initialBankBalances = window.initialBankBalances || {};
+  }
 
   console.log("📦 Export entries:", entries.length);
   console.log("🏦 Export balances:", Object.keys(initialBankBalances));
@@ -870,7 +879,6 @@ function exportVisibleEntriesWithSummary() {
     alert("No data available to export.");
     return;
   }
-
   // === Entries Section ===
   const entryHeaders = ['date', 'description', 'amount', 'currency', 'type', 'person', 'bank'];
   const entryRows = entries.map(e => [
@@ -878,6 +886,7 @@ function exportVisibleEntriesWithSummary() {
   ]);
 
   // === Bank Balance Summary ===
+  const banks = Object.keys(initialBankBalances); // ✅ FIX
   const bankBalanceSection = ['Bank Balances', 'Bank,Initial,Balance'];
   banks.forEach(bank => {
     const initial = initialBankBalances[bank] || 0;
@@ -931,7 +940,13 @@ function getFilteredEntries() {
   const all = window.entries || [];
 
   const selectedMonths = Array.from(document.querySelectorAll('.monthOption:checked')).map(cb => cb.value);
-  const selectedPersons = Array.from(document.querySelectorAll('.personOption:checked')).map(cb => cb.value);
+  let selectedPersons = Array.from(document.querySelectorAll('.personOption:checked')).map(cb => cb.value);
+
+  // 🔄 fallback: if no checkboxes are present, use all persons
+  if (selectedPersons.length === 0 && window.persons?.length) {
+    selectedPersons = [...window.persons];
+  }
+
   const personSearch = document.getElementById('personSearch')?.value.trim().toLowerCase();
   const descSearch = document.getElementById('descSearch')?.value.trim().toLowerCase();
 
@@ -939,11 +954,15 @@ function getFilteredEntries() {
     const month = e.date?.slice(0, 7);
     const matchesMonth = selectedMonths.includes(month);
     const matchesPerson = selectedPersons.includes(e.person);
-    const matchesSearch = !personSearch || (e.person?.toLowerCase().includes(personSearch)) || (e.description?.toLowerCase().includes(personSearch)) || (descSearch && e.description?.toLowerCase().includes(descSearch));
+    const matchesSearch =
+      !personSearch ||
+      (e.person?.toLowerCase().includes(personSearch)) ||
+      (e.description?.toLowerCase().includes(personSearch)) ||
+      (descSearch && e.description?.toLowerCase().includes(descSearch));
+
     return matchesMonth && matchesPerson && matchesSearch;
   });
 }
-
 //export csv filteed end
 
 async function deleteAllEntries() {
