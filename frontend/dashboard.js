@@ -117,16 +117,14 @@ async function loadInitialBankBalances() {
 
     if (!res.ok) throw new Error('Failed to load balances');
 
-    // ✅ Store globally
-    window.initialBankBalances = await res.json();
-    localStorage.setItem('initialBankBalances', JSON.stringify(window.initialBankBalances));
+    initialBankBalances = await res.json();
+    localStorage.setItem('initialBankBalances', JSON.stringify(initialBankBalances));
   } catch (err) {
     console.warn('⚠️ Could not load balances from backend. Using localStorage fallback.');
     const local = localStorage.getItem('initialBankBalances');
-    if (local) window.initialBankBalances = JSON.parse(local);
+    if (local) initialBankBalances = JSON.parse(local);
   }
 }
-
 
  function populatePersonFilterForDashboard(persons) {
     const container = document.getElementById('personOptions');
@@ -790,141 +788,94 @@ function logout() {
 
 
 
-
-// Safely import only the entries section from a combined CSV
-
-document.getElementById('importCSV').addEventListener('change', async (e) => {
-  const file = e.target.files[0];
+//import csv
+function importEntriesFromCSV(event) {
+  const file = event.target.files[0];
   if (!file) return;
 
-  const text = await file.text();
-  const lines = text.trim().split('\n');
+  const reader = new FileReader();
+  reader.onload = async function (e) {
+    const csvText = e.target.result;
+    const lines = csvText.trim().split('\n');
 
-  const entriesStart = lines.findIndex(l => l.trim() === 'Entries');
-  const bankStart = lines.findIndex(l => l.trim() === 'Bank Balances');
+    const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+    const expectedHeaders = ['date', 'description', 'amount', 'currency', 'type', 'person', 'bank', 'category'];
 
-  // ✅ 1. Parse and import entries
-  const entryHeaders = lines[entriesStart + 1].split(',');
-  for (let i = entriesStart + 2; i < lines.length; i++) {
-    const line = lines[i].trim();
-    if (!line || line === 'Bank Balances') break;
+    // ✅ Validate headers
+    if (headers.join() !== expectedHeaders.join()) {
+      alert("❌ CSV headers do not match expected format.");
+      return;
+    }
 
-    const row = line.split(',');
-    if (row.length < 7) continue;
+    const newEntries = lines.slice(1).map(line => {
+      const values = line.split(',').map(v => v.replace(/^"|"$/g, '').trim()); // strip quotes + trim
 
-    const entry = {
-      date: row[0],
-      description: row[1],
-      amount: parseFloat(row[2]),
-      currency: row[3],
-      type: row[4],
-      person: row[5],
-      bank: row[6]
-    };
-
-    await fetch(`${backend}/api/entries`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(entry)
-    });
-  }
-
-  // ✅ 2. Parse and import initial balances
-  if (bankStart !== -1 && lines.length > bankStart + 2) {
-    const bankHeaders = lines[bankStart + 1].split(',').slice(1); // remove 'Bank'
-    const initialValues = lines[bankStart + 2].split(',').slice(1); // remove 'Initial'
-
-    const balances = {};
-    bankHeaders.forEach((bank, i) => {
-      balances[bank.trim()] = parseFloat(initialValues[i]) || 0;
+      return {
+        date: values[0],
+        description: values[1],
+        amount: parseFloat(values[2]) || 0,
+        currency: values[3] || '',
+        type: values[4] || '',
+        person: values[5] || '',
+        bank: values[6] || '',
+        category: values[7] || ''
+      };
     });
 
-    await fetch(`${backend}/api/balances`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(balances)
-    });
-  }
+    // ✅ Send entries to backend
+    for (const entry of newEntries) {
+      await fetch(`${apiBase}/api/entries`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(entry)
+      });
+    }
 
-  alert('✅ CSV Imported!');
-  await fetchEntries();
-  await loadInitialBankBalances();
-  renderBankBalanceForm();
-});
-
-
-//export csv start
-// export csv start
-async function exportVisibleEntriesWithSummary() {
-  const entries = typeof getFilteredEntries === 'function' ? getFilteredEntries() : (window.entries || []);
-  let initialBankBalances = window.initialBankBalances || {};
-
-  // ✅ Fallback: if balances not loaded, load them
-  if (!Object.keys(initialBankBalances).length && typeof loadInitialBankBalances === 'function') {
-    console.warn("🔄 Loading missing balances...");
-    await loadInitialBankBalances();
-    initialBankBalances = window.initialBankBalances || {};
-  }
-
-  console.log("📦 Export entries:", entries.length);
-  console.log("🏦 Export balances:", Object.keys(initialBankBalances));
-
-  if (!entries.length || !Object.keys(initialBankBalances).length) {
-    alert("No data available to export.");
-    return;
-  }
-  // === Entries Section ===
-  const entryHeaders = ['date', 'description', 'amount', 'currency', 'type', 'person', 'bank'];
-  const entryRows = entries.map(e => [
-    e.date, e.description, e.amount, e.currency, e.type, e.person, e.bank
-  ]);
-
-  // === Bank Balance Summary ===
-  const banks = Object.keys(initialBankBalances); // ✅ FIX
-  const bankBalanceSection = ['Bank Balances', 'Bank,Initial,Balance'];
-  banks.forEach(bank => {
-    const initial = initialBankBalances[bank] || 0;
-    const total = entries
-      .filter(e => e.bank === bank)
-      .reduce((sum, e) => {
-        const amt = parseFloat(e.amount) || 0;
-        return e.type?.toLowerCase() === 'income' ? sum + amt : sum - amt;
-      }, initial);
-    bankBalanceSection.push(`${bank},${initial.toFixed(2)},${total.toFixed(2)}`);
-  });
-
-  // === Credit Limits Section (if available)
-  const limits = {
-    'UBS Master': document.getElementById('creditLimit-ubs')?.value,
-    'Corner Master': document.getElementById('creditLimit-corner')?.value,
-    'Post Master': document.getElementById('creditLimit-pfm')?.value,
-    'Cembra': document.getElementById('creditLimit-cembra')?.value
+    alert(`✅ Imported ${newEntries.length} entries.`);
+    fetchEntries(); // 🔄 reload entries after import
   };
 
-  const creditSection = ['Credit Limits', 'Bank,Limit'];
-  for (const [bank, limit] of Object.entries(limits)) {
-    if (limit) creditSection.push(`${bank},${parseFloat(limit).toFixed(2)}`);
+  reader.readAsText(file);
+}
+
+
+//export csv
+function exportVisibleCardEntriesAsCSV() {
+  const headers = ['date', 'description', 'amount', 'currency', 'type', 'person', 'bank', 'category'];
+
+  const entries = window.entries || [];
+  const visibleCards = document.querySelectorAll('.entry-card');
+
+  const rows = Array.from(visibleCards).map(card => {
+    const id = card.dataset.id;
+    const entry = entries.find(e => e._id === id);
+
+    return [
+      entry?.date || '',
+      entry?.description || '',
+      entry?.amount || '',
+      entry?.currency || '',
+      entry?.type || '',
+      entry?.person || '',
+      entry?.bank || '',
+      entry?.category || ''
+    ];
+  });
+
+  if (!rows.length) {
+    alert("No visible entries to export.");
+    return;
   }
 
-  // === Final CSV Structure ===
-  const csvParts = [];
-  csvParts.push('Filtered Entries');
-  csvParts.push(entryHeaders.join(','));
-  csvParts.push(...entryRows.map(r => r.join(',')));
-  csvParts.push('', ...bankBalanceSection, '', ...creditSection);
-
-  const csvContent = csvParts.join('\n');
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const csv = [headers.join(','), ...rows.map(r => r.map(v => `"${v}"`).join(','))].join('\n');
 
   const now = new Date().toISOString().replace(/[:T]/g, '-').split('.')[0];
-  const filename = `bookkeeping_filtered_${now}.csv`;
+  const filename = `visible_entries_${now}.csv`;
 
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
@@ -934,36 +885,6 @@ async function exportVisibleEntriesWithSummary() {
   document.body.removeChild(link);
 }
 
-//export csv end
-//export csv filteed start
-function getFilteredEntries() {
-  const all = window.entries || [];
-
-  const selectedMonths = Array.from(document.querySelectorAll('.monthOption:checked')).map(cb => cb.value);
-  let selectedPersons = Array.from(document.querySelectorAll('.personOption:checked')).map(cb => cb.value);
-
-  // 🔄 fallback: if no checkboxes are present, use all persons
-  if (selectedPersons.length === 0 && window.persons?.length) {
-    selectedPersons = [...window.persons];
-  }
-
-  const personSearch = document.getElementById('personSearch')?.value.trim().toLowerCase();
-  const descSearch = document.getElementById('descSearch')?.value.trim().toLowerCase();
-
-  return all.filter(e => {
-    const month = e.date?.slice(0, 7);
-    const matchesMonth = selectedMonths.includes(month);
-    const matchesPerson = selectedPersons.includes(e.person);
-    const matchesSearch =
-      !personSearch ||
-      (e.person?.toLowerCase().includes(personSearch)) ||
-      (e.description?.toLowerCase().includes(personSearch)) ||
-      (descSearch && e.description?.toLowerCase().includes(descSearch));
-
-    return matchesMonth && matchesPerson && matchesSearch;
-  });
-}
-//export csv filteed end
 
 async function deleteAllEntries() {
   if (!confirm("Are you sure you want to delete all entries?")) return;
@@ -1943,28 +1864,3 @@ renderBankBalanceForm();                // ✅ re-render balance inputs
     }
   });
   
-
-function cleanBalances() {
-  const raw = window.initialBankBalances || {};
-
-  const cleaned = Object.fromEntries(
-    Object.entries(raw).filter(([key]) =>
-      !['Initial Balance', 'UBS Euro'].includes(key)
-    )
-  );
-
-  fetch('https://bookkeeping-i8e0.onrender.com/api/balances', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(cleaned)
-  }).then(() => {
-    window.initialBankBalances = cleaned; // Update local
-    alert("✅ Cleaned balances saved.");
-  }).catch(err => {
-    console.error("❌ Failed to save cleaned balances", err);
-    alert("❌ Failed to save cleaned balances.");
-  });
-}

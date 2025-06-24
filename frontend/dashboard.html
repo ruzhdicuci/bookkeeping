@@ -78,13 +78,13 @@
     </button>
     <div class="dropdown-content">
      
-     <button onclick="cleanBalances()">🧹 Clean Balances</button>
+  
 
                 <a> <label for="importCSV" class="custom-file-label">📥 Import CSV</label></a>
                 <input type="file" id="importCSV" accept=".csv" style="display: none;" />
  <input type="file" id="restoreFile" style="display:none" onchange="restoreBackup(event)" />
 
-  <a onclick="exportVisibleEntriesWithSummary()">📤 Export CSV</a>
+  <a onclick="exportVisibleCardEntriesAsCSV()">📤 Export CSV</a>
 
 <a onclick="window.print()">🖨️ Print</a>
 <a onclick="window.print()">🧾 Export PDF</a>
