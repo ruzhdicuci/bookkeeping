@@ -242,12 +242,14 @@ function populateFilters() {
   if (!window.entries || !Array.isArray(window.entries)) return;
 
   const entries = window.entries;
-  const excludedByDefault = ['Balance', 'Transfer'];
 
-  const banks = [...new Set(entries.map(e => e.bank?.trim()).filter(Boolean))].sort();
-  const months = [...new Set(entries.map(e => e.date?.slice(0, 7))).filter(Boolean)].sort();
-  const categories = [...new Set(entries.map(e => e.category?.trim()).filter(Boolean))].sort();
-  const persons = [...new Set(entries.map(e => e.person?.trim()).filter(Boolean))].sort();
+  // ✅ Cleaned, trimmed, sorted
+  const banks = [...new Set(entries.map(e => e.bank?.trim()))].filter(Boolean).sort();
+  const persons = [...new Set(entries.map(e => e.person?.trim()))].filter(Boolean).sort();
+  const categories = [...new Set(entries.map(e => e.category?.trim()))].filter(Boolean).sort();
+  const months = [...new Set(entries.map(e => e.date?.slice(0, 7)))].filter(Boolean).sort();
+
+  const excludedByDefault = ['Balance', 'Transfer'];
 
   // ✅ Person checkbox group
   const personOptions = document.getElementById('personOptions');
@@ -265,7 +267,7 @@ function populateFilters() {
     `;
 
     const selectAllBox = document.getElementById('selectAllPersons');
-    if (selectAllBox && !selectAllBox.dataset.listenerAttached) {
+    if (selectAllBox) {
       selectAllBox.addEventListener('change', function () {
         document.querySelectorAll('.personOption').forEach(cb => cb.checked = this.checked);
         renderEntries();
@@ -280,11 +282,8 @@ function populateFilters() {
         });
       });
 
-      // Set initial 'All' box status
       const initiallyChecked = document.querySelectorAll('.personOption:checked').length;
       selectAllBox.checked = initiallyChecked === (persons.length - excludedByDefault.length);
-
-      selectAllBox.dataset.listenerAttached = "true";
     }
   }
 
@@ -345,6 +344,7 @@ function populateFilters() {
     categoryFilterEl.innerHTML = `<option value="All">category</option>` + categories.map(c => `<option value="${c}">${c}</option>`).join('');
   }
 }
+
 
 function getDateLabel(dateStr) {
   const entryDate = new Date(dateStr);
