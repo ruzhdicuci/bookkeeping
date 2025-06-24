@@ -1942,5 +1942,22 @@ renderBankBalanceForm();                // ✅ re-render balance inputs
       });
     }
   });
+  
 
+  const cleaned = Object.fromEntries(
+  Object.entries(window.initialBankBalances).filter(([key]) =>
+    !['Initial Balance', 'UBS Euro'].includes(key)
+  )
+);
+
+fetch('https://bookkeeping-i8e0.onrender.com/api/balances', {
+  method: 'POST',
+  headers: {
+    Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(cleaned)
+}).then(() => {
+  alert("✅ Cleaned balances saved.");
+});
 
