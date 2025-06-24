@@ -178,18 +178,17 @@ async function fetchEntries() {
     });
     if (!res.ok) throw new Error('Failed to fetch entries');
 
-    window.entries = await res.json(); // ✅ Store globally
+    window.entries = await res.json();
+    window.entries = window.entries.sort((a, b) => b.date.localeCompare(a.date)); // sort newest first
     console.log("📦 Entries:", window.entries);
 
-    // ✅ Set global persons list
     window.persons = [...new Set(window.entries.map(e => e.person).filter(Boolean))];
     console.log("🧑‍🤝‍🧑 Found persons:", window.persons);
 
     renderEntries();
     populateNewEntryDropdowns();
     populateFilters();
-
-    renderBankBalanceForm(); // ✅ Add here (NOT fetchEntries again!)
+    renderBankBalanceForm();
 
   } catch (err) {
     console.error('❌ fetchEntries failed:', err);
@@ -197,9 +196,11 @@ async function fetchEntries() {
 }
 
 function populateNewEntryDropdowns() {
-  const persons = [...new Set(entries.map(e => e.person))].filter(Boolean);
-  const banks = [...new Set(entries.map(e => e.bank))].filter(Boolean);
-  const categories = [...new Set(entries.map(e => e.category))].filter(Boolean);
+  const entries = window.entries || [];
+
+  const persons = [...new Set(entries.map(e => e.person?.trim()).filter(Boolean))];
+  const banks = [...new Set(entries.map(e => e.bank?.trim()).filter(Boolean))];
+  const categories = [...new Set(entries.map(e => e.category?.trim()).filter(Boolean))];
 
   const personList = document.getElementById('personList');
   const bankList = document.getElementById('bankList');
@@ -218,38 +219,35 @@ function populateNewEntryDropdowns() {
 // Populate New Entry bank dropdown based on Account Balances table
 function populateBankDropdownFromBalances() {
   const bankTable = document.querySelector('#bankBalanceTableContainer table');
-if (!bankTable) return;
+  if (!bankTable) return;
 
-const bankCells = bankTable.querySelectorAll('thead th');
-const banks = [...bankCells].slice(1).map(th => th.textContent.replace(/\s+/g, ' ').trim());
-console.log("🏦 Bank headers found:", banks);
+  const bankCells = bankTable.querySelectorAll('thead th');
+  const banks = [...bankCells].slice(1).map(th => th.textContent.trim()); // ✅ use trim()
 
-
+  console.log("🏦 Bank headers found:", banks);
 
   const bankSelect = document.getElementById('newBank');
-  bankSelect.innerHTML = '<option value="">Select bank</option>';
+  if (!bankSelect) return;
 
-  bankCells.forEach((th, index) => {
-    if (index > 0) {
-      const bankName = th.textContent.trim();
-      const option = document.createElement('option');
-      option.value = bankName;
-      option.textContent = bankName;
-      bankSelect.appendChild(option);
-    }
+  bankSelect.innerHTML = '<option value="">Select bank</option>';
+  banks.forEach(bankName => {
+    const option = document.createElement('option');
+    option.value = bankName;
+    option.textContent = bankName;
+    bankSelect.appendChild(option);
   });
 }
-
 
 function populateFilters() {
   if (!window.entries || !Array.isArray(window.entries)) return;
 
   const entries = window.entries;
-  const banks = [...new Set(entries.map(e => e.bank).filter(Boolean))];
-  const months = [...new Set(entries.map(e => e.date?.slice(0, 7)))].filter(Boolean).sort();
-  const categories = [...new Set(entries.map(e => e.category).filter(Boolean))];
-  const persons = [...new Set(entries.map(e => e.person).filter(Boolean))];
   const excludedByDefault = ['Balance', 'Transfer'];
+
+  const banks = [...new Set(entries.map(e => e.bank?.trim()).filter(Boolean))].sort();
+  const months = [...new Set(entries.map(e => e.date?.slice(0, 7))).filter(Boolean)].sort();
+  const categories = [...new Set(entries.map(e => e.category?.trim()).filter(Boolean))].sort();
+  const persons = [...new Set(entries.map(e => e.person?.trim()).filter(Boolean))].sort();
 
   // ✅ Person checkbox group
   const personOptions = document.getElementById('personOptions');
@@ -267,7 +265,7 @@ function populateFilters() {
     `;
 
     const selectAllBox = document.getElementById('selectAllPersons');
-    if (selectAllBox) {
+    if (selectAllBox && !selectAllBox.dataset.listenerAttached) {
       selectAllBox.addEventListener('change', function () {
         document.querySelectorAll('.personOption').forEach(cb => cb.checked = this.checked);
         renderEntries();
@@ -285,6 +283,8 @@ function populateFilters() {
       // Set initial 'All' box status
       const initiallyChecked = document.querySelectorAll('.personOption:checked').length;
       selectAllBox.checked = initiallyChecked === (persons.length - excludedByDefault.length);
+
+      selectAllBox.dataset.listenerAttached = "true";
     }
   }
 
@@ -345,7 +345,6 @@ function populateFilters() {
     categoryFilterEl.innerHTML = `<option value="All">category</option>` + categories.map(c => `<option value="${c}">${c}</option>`).join('');
   }
 }
-
 
 function getDateLabel(dateStr) {
   const entryDate = new Date(dateStr);
