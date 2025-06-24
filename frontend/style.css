@@ -1000,49 +1000,6 @@ font-family: system-ui, sans-serif;
 font-size: 1.1rem;
 }
 
-.dark .left-filters {
- border: 1px solid #222222;
-
-}
-.dark .filters-table tr {
-
- border: 1px solid #222222;
-
-}
-
-
-.filters-table  {
-  width: 102%;
-  border-collapse: collapse;
-border: none;
-
-}
-
-
-.filters-table td {
- 
- margin-left: -20px;
-border: none;
-
-}
-
-.filters-table th {
-  vertical-align: top;
-
-border: none;
- margin-left: -5px;
-padding-top: 15px;
-}
-
-
-.left-filters label {
-  border: none;
- text-align: left;
-  color: #f372ce;
-
-}
-
-
 
 
  
@@ -2166,7 +2123,7 @@ margin-right: 10px;
 
 body.dark {
   background-color: #111;
-  color: #eee;
+  color: #ffffff;
 }
 
 body.dark input,
@@ -2200,7 +2157,7 @@ body.dark .filter-grid2  {
 
 body.dark .card {
   background-color: #2c2c2c; 
-  color: #f4f1f1;
+  color: #ffffff;
 }
 
 body.dark .card strong {
@@ -2214,18 +2171,55 @@ body.dark #entryForm input {
   border: 1px solid  #1e1d1d;
 }
 
-.dark .average-card {
+body.dark .filter-field {
   background-color: #2c2c2c; 
-  
+  color: #eee;
+  border: 1px solid  #1e1d1d;
+
+}
+
+
+
+
+.dark .average-card {
+  background-color: #2c2c2c;  
 }
 .dark .summary-card {
  background-color: #2c2c2c; 
 }
 
 
+.dark .balance-card {
+ background-color: #2c2c2c; 
+}
+
 .dark .input-wrapper select,
 .dark .input-wrapper input {
   background-color: #2c2c2c; 
   color: #eee;
   border: 1px solid  #111111;
+}
+
+
+/* Dark theme for entry cards */
+body.dark .desktop-card-list .entry-card {
+  background-color: #1f1f1f;
+  color: #e0e0e0;
+  border: 1px solid #333;
+}
+
+/* Optional: icon colors */
+body.dark .entry-card i {
+  color: #ccc;
+}
+
+/* Optional: entry labels (like "Open") */
+body.dark .entry-card .entry-label {
+  background-color: #333;
+  color: #ffb3c6;
+}
+
+/* Optional: amount coloring */
+body.dark .entry-card .amount {
+  color: #ff6666;
 }
