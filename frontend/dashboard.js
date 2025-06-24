@@ -1944,20 +1944,30 @@ renderBankBalanceForm();                // ✅ re-render balance inputs
   });
   
 
+function cleanBalances() {
+  const raw = window.initialBankBalances || {};
+
   const cleaned = Object.fromEntries(
-  Object.entries(window.initialBankBalances).filter(([key]) =>
-    !['Initial Balance', 'UBS Euro'].includes(key)
-  )
-);
+    Object.entries(raw).filter(([key]) =>
+      !['Initial Balance', 'UBS Euro'].includes(key)
+    )
+  );
 
-fetch('https://bookkeeping-i8e0.onrender.com/api/balances', {
-  method: 'POST',
-  headers: {
-    Authorization: `Bearer ${token}`,
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify(cleaned)
-}).then(() => {
-  alert("✅ Cleaned balances saved.");
-});
-
+  fetch('https://bookkeeping-i8e0.onrender.com/api/balances', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(cleaned)
+  })
+    .then(res => {
+      if (!res.ok) throw new Error("Failed to save cleaned balances");
+      window.initialBankBalances = cleaned; // ✅ Update memory too
+      alert("✅ Cleaned balances saved.");
+    })
+    .catch(err => {
+      console.error("❌ Failed to clean balances", err);
+      alert("Failed to save cleaned balances.");
+    });
+}
