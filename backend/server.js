@@ -271,24 +271,31 @@ app.post('/api/limits', auth, async (req, res) => {
   res.json({ success: true });
 });
 
+
+
+
 // add notes
 const Note = mongoose.model('Note', new mongoose.Schema({
   userId: String,
   title: String,
   content: String,
+  done: {
+    type: Boolean,
+    default: false
+  },
   createdAt: {
     type: Date,
     default: Date.now
   }
 }));
 
-// Get notes for current user
+// Get all notes for the current user
 app.get('/api/notes', auth, async (req, res) => {
   const notes = await Note.find({ userId: req.userId }).sort({ createdAt: -1 });
   res.json(notes);
 });
 
-// Save new note
+// Create a new note
 app.post('/api/notes', auth, async (req, res) => {
   const { title, content } = req.body;
   if (!title || !content) return res.status(400).json({ message: 'Missing fields' });
@@ -297,9 +304,18 @@ app.post('/api/notes', auth, async (req, res) => {
   res.json(note);
 });
 
-// Delete note by ID
+// Update a note (e.g., mark as done or edit title/content)
+app.put('/api/notes/:id', auth, async (req, res) => {
+  const updated = await Note.findOneAndUpdate(
+    { _id: req.params.id, userId: req.userId },
+    req.body,
+    { new: true }
+  );
+  res.json(updated);
+});
+
+// Delete a note
 app.delete('/api/notes/:id', auth, async (req, res) => {
-  const { id } = req.params;
-  await Note.deleteOne({ _id: id, userId: req.userId });
+  await Note.deleteOne({ _id: req.params.id, userId: req.userId });
   res.json({ success: true });
 });

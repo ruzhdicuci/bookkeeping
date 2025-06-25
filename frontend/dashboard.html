@@ -105,7 +105,7 @@
     <i id="themeIcon" class="fa-solid fa-moon"></i>
 </button>
 
-<button id="notesToggle" onclick="toggleNotesModal()">📝 Notes</button>
+<button onclick="window.location.href='notes.html'" class="small-btn" title="Open Notes">📝</button>
 
 
 </div>
@@ -975,30 +975,6 @@ if (tabId === 'chartsTab') {
 
 
 
-<!-- Notes Modal -->
-<div id="notesModal" class="modal hidden">
-  <div class="modal-content note-style">
-    <h3>📝 My Notes</h3>
-
-    <div class="note-form">
-      <input type="text" id="noteTitle" placeholder="Note Title" />
-      <textarea id="noteContent" placeholder="Write your note here..."></textarea>
-      <button onclick="saveNote()">💾 Save</button>
-      <button onclick="closeNotesModal()">Cancel</button>
-    </div>
-
-    <div class="note-sort">
-      <label>Sort by:</label>
-      <select onchange="renderNotes(this.value)">
-        <option value="date">Date</option>
-        <option value="title">Title</option>
-      </select>
-    </div>
-
-    <div id="notesList" class="notes-list"></div>
-  </div>
-</div>
-<!-- Notes Modal -->
 
 
 <div class="filter-grid">
