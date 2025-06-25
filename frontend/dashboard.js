@@ -1869,3 +1869,37 @@ renderBankBalanceForm();                // ✅ re-render balance inputs
     }
   });
   
+
+  // preven seesin source page code
+function checkAdminAccess() {
+  const token = localStorage.getItem('token');
+  if (!token) return;
+
+  fetch('https://bookkeeping-i8e0.onrender.com/api/admin/secret', {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+  .then(res => res.ok ? res.json() : Promise.reject())
+  .then(data => {
+    // If success, reveal admin-only elements
+    document.querySelectorAll('.admin-only').forEach(el => {
+      el.style.display = 'block';
+    });
+    console.log("✅ Admin access confirmed");
+  })
+  .catch(() => {
+    // Hide admin-only elements
+    document.querySelectorAll('.admin-only').forEach(el => {
+      el.style.display = 'none';
+    });
+    console.log("ℹ️ Not an admin");
+  });
+}
+
+
+// ✅ Add this after checkAdminAccess is declared
+window.addEventListener('DOMContentLoaded', () => {
+  checkAdminAccess();
+});
+// preven seesin source page code

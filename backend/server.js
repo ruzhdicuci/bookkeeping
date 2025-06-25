@@ -275,8 +275,10 @@ app.post('/api/limits', auth, async (req, res) => {
 
 // preven seesin source page code
 
+// Make sure jwt is imported only once at top
 const jwt = require('jsonwebtoken');
 
+// ✅ Middleware (you already have)
 function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1]; // Bearer <token>
@@ -285,25 +287,14 @@ function authenticateToken(req, res, next) {
 
   jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
     if (err) return res.sendStatus(403);
-    req.user = user; // Attach user info to request
+    req.user = user; // contains user id, email, role etc.
     next();
   });
 }
 
-
-// Example middleware to check if user is admin
-function authorizeAdmin(req, res, next) {
-  if (req.user && req.user.role === 'admin') {
-    next(); // allow through
-  } else {
-    res.status(403).json({ message: 'Forbidden: Admins only' });
-  }
-}
-
-// Secure admin route
-app.get('/api/admin/secret', authenticateToken, authorizeAdmin, (req, res) => {
-  res.json({ secret: 'Top secret data here' });
+// ✅ New route to get current user info (role, email etc.)
+app.get('/api/userinfo', authenticateToken, (req, res) => {
+  res.json({ email: req.user.email, role: req.user.role });
 });
-
 
 // preven seesin source page code
