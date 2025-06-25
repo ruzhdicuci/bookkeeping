@@ -1871,8 +1871,6 @@ renderBankBalanceForm();                // ✅ re-render balance inputs
   });
   
 
-  // add notes
-// Open modal
 // NOTES MODAL
 function toggleNotesModal() {
   const modal = document.getElementById('notesModal');
@@ -1883,20 +1881,23 @@ function toggleNotesModal() {
     modal.classList.add('hidden');
   }
 }
+
 function closeNotesModal() {
   document.getElementById('notesModal').classList.add('hidden');
   document.getElementById('noteTitle').value = '';
   document.getElementById('noteContent').value = '';
 }
 
-// SAVE
+const apiBase = 'https://bookkeeping-i8e0.onrender.com'; // ✅ Central base URL
+
+// SAVE NOTE
 async function saveNote() {
   const title = document.getElementById('noteTitle').value.trim();
   const content = document.getElementById('noteContent').value.trim();
   if (!title || !content) return alert('Please enter both title and content');
 
   const token = localStorage.getItem('token');
-  const res = await fetch('/api/notes', {
+  const res = await fetch(`${apiBase}/api/notes`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -1917,7 +1918,7 @@ async function saveNote() {
 let notes = [];
 async function loadNotesFromDB() {
   const token = localStorage.getItem('token');
-  const res = await fetch('/api/notes', {
+  const res = await fetch(`${apiBase}/api/notes`, {
     headers: { Authorization: `Bearer ${token}` }
   });
 
@@ -1955,11 +1956,16 @@ function renderNotes(sortBy = 'date') {
 // DELETE NOTE
 async function deleteNote(id) {
   const token = localStorage.getItem('token');
-  const res = await fetch(`/api/notes/${id}`, {
+  const res = await fetch(`${apiBase}/api/notes/${id}`, {
     method: 'DELETE',
     headers: { Authorization: `Bearer ${token}` }
   });
-  if (res.ok) loadNotesFromDB();
+
+  if (res.ok) {
+    loadNotesFromDB();
+  } else {
+    alert('Failed to delete note');
+  }
 }
 // theme
 function toggleTheme() {
