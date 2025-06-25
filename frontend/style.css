@@ -2038,7 +2038,7 @@ margin-right: 10px;
 .input-wrapper {
   position: relative;
   width: 100%;
-  gap: 1rem; /* ← controls space between filter blocks */
+
 }
 
 .input-wrapper input {
@@ -2047,7 +2047,7 @@ margin-right: 10px;
   height: 36px;
   box-sizing: border-box;
   border-radius: 8px;
-  gap: 1rem; /* ← controls space between filter blocks */
+
 }
 
 .clear-pill {
