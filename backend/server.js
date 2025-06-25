@@ -272,6 +272,25 @@ app.post('/api/limits', auth, async (req, res) => {
 });
 
 
+
+// preven seesin source page code
+
+const jwt = require('jsonwebtoken');
+
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1]; // Bearer <token>
+
+  if (!token) return res.sendStatus(401);
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user; // Attach user info to request
+    next();
+  });
+}
+
+
 // Example middleware to check if user is admin
 function authorizeAdmin(req, res, next) {
   if (req.user && req.user.role === 'admin') {
@@ -285,3 +304,6 @@ function authorizeAdmin(req, res, next) {
 app.get('/api/admin/secret', authenticateToken, authorizeAdmin, (req, res) => {
   res.json({ secret: 'Top secret data here' });
 });
+
+
+// preven seesin source page code
