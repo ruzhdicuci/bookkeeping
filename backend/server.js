@@ -2,8 +2,7 @@ const mongoose = require('mongoose');
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const jwt = require('jsonwebtoken');
-const token = jwt.sign(payload, 'your-hardcoded-secret', { expiresIn: '7d' });
+const jwt = require('jsonwebtoken'); // ✅ just import, no sign yet
 const bcrypt = require('bcrypt');
 
 const MONGO_URI = process.env.MONGODB_URI;
@@ -133,14 +132,14 @@ app.post('/api/login', async (req, res) => {
   const match = await bcrypt.compare(password, user.password);
   if (!match) return res.status(400).json({ message: 'Invalid credentials' });
 
-  // ✅ Include role and email in the JWT payload
+  // ✅ Securely generate token with role and email
   const token = jwt.sign(
     {
       userId: user._id,
       email: user.email,
-      role: user.role  // ✅ Required for admin check later
+      role: user.role
     },
-    process.env.JWT_SECRET, // or just `SECRET` if that's your defined constant
+    process.env.JWT_SECRET, // 🔐 must be defined on Render as env var
     { expiresIn: '7d' }
   );
 
