@@ -4,22 +4,34 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   const email = document.getElementById('loginUserSelect').value;
   const password = document.getElementById('loginPassword').value;
 
-  const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password })
-  });
+  try {
+    const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
 
-const data = await res.json();
-if (res.ok) {
-  localStorage.setItem('token', data.token);
-  window.location.href = 'dashboard.html';
-  localStorage.setItem('currentUser', email);
-  localStorage.setItem('lastLoginUser', email);
-  window.location.href = '/bookkeeping/client/dashboard.html';
-} else {
-  alert(data.message || 'Login failed');
-}
+    const data = await res.json();
+
+    if (res.ok) {
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('currentUser', email);
+      localStorage.setItem('lastLoginUser', email);
+      console.log("✅ Token stored:", data.token);
+
+      // Optional: decode the token to check if role is present
+      const payload = JSON.parse(atob(data.token.split('.')[1]));
+      console.log("🔍 Decoded JWT:", payload);
+
+      // ✅ Redirect only once
+      window.location.href = 'dashboard.html';
+    } else {
+      alert(data.message || 'Login failed');
+    }
+  } catch (err) {
+    console.error('❌ Login error:', err);
+    alert('Login failed: Network or server error');
+  }
 });
 
 // ✅ REGISTER
@@ -28,18 +40,24 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
   const email = document.getElementById('registerEmail').value.trim().toLowerCase();
   const password = document.getElementById('registerPassword').value;
 
-  const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/register', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password })
-  });
+  try {
+    const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
 
-  const data = await res.json();
-  if (res.ok) {
-    alert('✅ Registered successfully. You can now log in.');
-    populateLoginUserDropdown();
-  } else {
-    alert(data.message || 'Registration failed');
+    const data = await res.json();
+
+    if (res.ok) {
+      alert('✅ Registered successfully. You can now log in.');
+      populateLoginUserDropdown();
+    } else {
+      alert(data.message || 'Registration failed');
+    }
+  } catch (err) {
+    console.error('❌ Registration error:', err);
+    alert('Registration failed: Network or server error');
   }
 });
 
