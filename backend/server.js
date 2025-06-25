@@ -4,7 +4,7 @@ const cors = require('cors');
 const path = require('path');
 const jwt = require('jsonwebtoken'); // ✅ just import, no sign yet
 const bcrypt = require('bcrypt');
-
+const allowedOrigins = ['https://we-search.ch'];
 const MONGO_URI = process.env.MONGODB_URI;
 
 if (!MONGO_URI) {
@@ -44,7 +44,10 @@ app.use((req, res, next) => {
   next();
 });
 
-
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true
+}));
 
 // Serve static frontend
 app.use(express.static(path.join(__dirname, '../frontend')));
