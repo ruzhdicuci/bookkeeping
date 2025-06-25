@@ -141,8 +141,9 @@
   
 
 <canvas id="monthlyChart" class="chart-canvas"></canvas>
-<canvas id="summaryChart" class="chart-canvas"></canvas>
 <canvas id="averageChart" class="chart-canvas"></canvas>
+<canvas id="summaryChart" class="chart-canvas"></canvas>
+
 <canvas id="personChart" class="chart-canvas"></canvas>
 <canvas id="comparisonChart" class="chart-canvas"></canvas>
 <canvas id="pieChart" class="chart-canvas"></canvas>
@@ -439,7 +440,7 @@ totalsContainer.appendChild(summaryCard);
   
    </div>
 
-
+<div class="filters-row">
  <div class="filter-grid">
   <div class="filter-field">
     <div class="input-wrapper">
@@ -476,7 +477,7 @@ totalsContainer.appendChild(summaryCard);
     </div>
   </div>
 </div>
-
+</div>
 
   
 
@@ -597,22 +598,35 @@ const filteredEntries = entries.filter(e => {
         }]
       },
       plugins: [ChartDataLabels],
-      options: {
-        plugins: {
-          datalabels: {
-            anchor: 'end',
-            align: 'top',
-            font: { weight: 'bold' },
-            formatter: v => v.toLocaleString('en-US', { minimumFractionDigits: 2 })
-          }
-        },
-        responsive: true,
-        scales: {
-          y: { beginAtZero: true }
-        }
+  options: {
+  responsive: true,
+  plugins: {
+    tooltip: {
+      bodyFont: {
+        size: 18,
+        weight: 'bold'
+      },
+      titleFont: {
+        size: 16
+      },
+      callbacks: {
+        label: context => `${context.dataset.label}: CHF ${Number(context.raw).toLocaleString('en-US', { minimumFractionDigits: 2 })}`
       }
+    },
+    datalabels: {
+      anchor: 'end',
+      align: 'top',
+      font: { weight: 'bold' },
+      formatter: v => v.toLocaleString('en-US', { minimumFractionDigits: 2 })
+    }
+  },
+  scales: {
+    y: { beginAtZero: true }
+  }
+}
     });
   }
+  
 if (ctx1) {
   monthlyChartInstance = new Chart(ctx1, {
     type,
@@ -664,88 +678,176 @@ if (ctx1) {
   });
 }
 
-  if (ctx2) {
-    personChartInstance = new Chart(ctx2, {
-      type,
-      data: {
-        labels: persons,
-        datasets: [
-          { label: 'Income', data: incomePersonVals, backgroundColor: '#4caf50', borderColor: '#2e7d32', borderWidth: 1 },
-          { label: 'Expense', data: expensePersonVals, backgroundColor: '#f44336', borderColor: '#c62828', borderWidth: 1 }
-        ]
-      },
-      options: chartOptions(),
-      plugins: [ChartDataLabels]
-    });
-  }
-
-  if (ctx3) {
-    comparisonChartInstance = new Chart(ctx3, {
-      type,
-      data: {
-        labels: persons,
-        datasets: [
-          { label: 'Net Balance', data: persons.map(p => (personIncome[p] || 0) - (personExpense[p] || 0)), backgroundColor: '#2196f3', borderColor: '#1976d2', borderWidth: 1 }
-        ]
-      },
-      options: chartOptions(),
-      plugins: [ChartDataLabels]
-    });
-  }
-
-  if (ctx5) {
-    summaryChartInstance = new Chart(ctx5, {
-      type: 'bar',
-      data: {
-        labels: ['Income', 'Expenses', 'Difference'],
-        datasets: [{
-          label: 'Summary',
-          data: [incomeTotal, expenseTotal, difference],
-          backgroundColor: ['#4caf50', '#f44336', '#2196f3']
-        }]
-      },
-      options: {
-        plugins: {
-          datalabels: {
-            anchor: 'end',
-            align: 'top',
-            font: { weight: 'bold' },
-            formatter: value => value.toLocaleString('en-US', { minimumFractionDigits: 0 })
+if (ctx2) {
+  personChartInstance = new Chart(ctx2, {
+    type,
+    data: {
+      labels: persons,
+      datasets: [
+        { label: 'Income', data: incomePersonVals, backgroundColor: '#4caf50', borderColor: '#2e7d32', borderWidth: 1 },
+        { label: 'Expense', data: expensePersonVals, backgroundColor: '#f44336', borderColor: '#c62828', borderWidth: 1 }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        tooltip: {
+          bodyFont: {
+            size: 18,
+            weight: 'bold'
+          },
+          titleFont: {
+            size: 16
+          },
+          callbacks: {
+            label: context => `${context.dataset.label}: CHF ${Number(context.raw).toLocaleString('en-US', { minimumFractionDigits: 2 })}`
           }
         },
-        responsive: true,
-        scales: {
-          y: { beginAtZero: true }
-        }
-      }
-    });
-  }
-
-  if (ctx4) {
-    pieChartInstance = new Chart(ctx4, {
-      type: 'pie',
-      data: {
-        labels: categories,
-        datasets: [{
-          label: 'Spending Distribution',
-          data: pieValues,
-          backgroundColor: categories.map((_, i) => `hsl(${i * 35}, 70%, 60%)`)
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          tooltip: {
-            callbacks: {
-              label: context => `${context.label}: CHF ${context.raw.toFixed(2)}`
+        legend: {
+          position: 'top',
+          labels: {
+            font: {
+              size: 14
             }
+          }
+        },
+        datalabels: {
+          anchor: 'end',
+          align: 'top',
+          font: { weight: 'bold' },
+          formatter: v => v.toLocaleString('en-US', { minimumFractionDigits: 2 })
+        }
+      },
+      scales: {
+        y: { beginAtZero: true }
+      }
+    },
+    plugins: [ChartDataLabels]
+  });
+}
+
+if (ctx3) {
+  comparisonChartInstance = new Chart(ctx3, {
+    type,
+    data: {
+      labels: persons,
+      datasets: [
+        {
+          label: 'Net Balance',
+          data: persons.map(p => (personIncome[p] || 0) - (personExpense[p] || 0)),
+          backgroundColor: '#2196f3',
+          borderColor: '#1976d2',
+          borderWidth: 1
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        tooltip: {
+          bodyFont: {
+            size: 18,
+            weight: 'bold'
           },
-          legend: { position: 'bottom' }
+          titleFont: {
+            size: 16
+          },
+          callbacks: {
+            label: context => `${context.dataset.label}: CHF ${Number(context.raw).toLocaleString('en-US', { minimumFractionDigits: 2 })}`
+          }
+        },
+        legend: {
+          position: 'top',
+          labels: {
+            font: {
+              size: 14
+            }
+          }
+        },
+        datalabels: {
+          anchor: 'end',
+          align: 'top',
+          font: { weight: 'bold' },
+          formatter: v => v.toLocaleString('en-US', { minimumFractionDigits: 2 })
+        }
+      },
+      scales: {
+        y: { beginAtZero: true }
+      }
+    },
+    plugins: [ChartDataLabels]
+  });
+}
+if (ctx5) {
+  summaryChartInstance = new Chart(ctx5, {
+    type: 'bar',
+    data: {
+      labels: ['Income', 'Expenses', 'Difference'],
+      datasets: [{
+        label: 'Summary',
+        data: [incomeTotal, expenseTotal, difference],
+        backgroundColor: ['#4caf50', '#f44336', '#2196f3']
+      }]
+    },
+    options: {
+      plugins: {
+        tooltip: {
+          titleFont: { size: 18 },
+          bodyFont: { size: 16 },
+          footerFont: { size: 14 }
+        },
+        datalabels: {
+          anchor: 'end',
+          align: 'top',
+          font: { weight: 'bold' },
+          formatter: value => value.toLocaleString('en-US', { minimumFractionDigits: 0 })
+        }
+      },
+      responsive: true,
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
+  });
+}
+
+if (ctx4) {
+  pieChartInstance = new Chart(ctx4, {
+    type: 'pie',
+    data: {
+      labels: categories,
+      datasets: [{
+        label: 'Spending Distribution',
+        data: pieValues.map(v => +v.toFixed(2)), // ✅ Round to 2 decimals
+        backgroundColor: categories.map((_, i) => `hsl(${i * 35}, 70%, 60%)`)
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        tooltip: {
+          titleFont: {
+            size: 16 // 👈 Optional: increase title font size
+          },
+          bodyFont: {
+            size: 20, // 👈 Make sum larger
+            weight: 'bold'
+          },
+          callbacks: {
+            label: context => `${context.label}: CHF ${Number(context.raw).toFixed(2)}`
+          },
+          padding: 12
+        },
+        legend: { 
+          position: 'bottom',
+          labels: {
+            font: { size: 14 }
+          }
         }
       }
-    });
-  }
-
+    }
+  });
+}
 populatePersonDropdownForCharts(persons);
 } // ←✅ THIS is the real end of drawCharts()
 

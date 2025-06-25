@@ -2035,10 +2035,10 @@ margin-right: 10px;
 }
 
 
-
 .input-wrapper {
   position: relative;
   width: 100%;
+  gap: 1rem; /* ← controls space between filter blocks */
 }
 
 .input-wrapper input {
@@ -2047,6 +2047,7 @@ margin-right: 10px;
   height: 36px;
   box-sizing: border-box;
   border-radius: 8px;
+  gap: 1rem; /* ← controls space between filter blocks */
 }
 
 .clear-pill {
@@ -2250,7 +2251,7 @@ body.dark .entry-card .amount {
   justify-content: center;
   align-items: center;
   gap: 0.3rem; /* smaller space between buttons */
-  margin: 0.2rem 0;
+  margin: 0.3rem 0;
   flex-wrap: wrap;
 
 }
@@ -2307,3 +2308,5 @@ body.dark .entry-card .amount {
   background-color: #e44343;
   color: white;
 }
+
+
