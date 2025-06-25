@@ -1,77 +1,128 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>📝 My Notes</title>
-  <link rel="stylesheet" href="styles.css" /> <!-- reuse your CSS file -->
-  <style>
-    body {
-      font-family: sans-serif;
-      padding: 1rem;
-      background-color: var(--bg, #fff);
-      color: var(--text, #000);
-    }
-    body.dark-theme {
-      --bg: #111;
-      --text: #f0f0f0;
-    }
-    .top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-    }
-    .small-btn {
-      padding: 6px 10px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.9rem;
-    }
-    .note-entry {
-      background: var(--bgCard, #f7f7f7);
-      border: 1px solid #ddd;
-      padding: 12px;
-      border-radius: 6px;
-      margin-bottom: 10px;
-    }
-    body.dark-theme .note-entry {
-      --bgCard: #222;
-    }
-    .note-entry .note-controls {
-      margin-top: 6px;
-      display: flex;
-      gap: 8px;
-    }
-    .note-entry small {
-      font-size: 0.75rem;
-      color: gray;
-    }
-  </style>
-</head>
-<body>
-  <div class="top-bar">
-    <h2>📝 Notes</h2>
-    <div>
-      <button onclick="toggleTheme()" class="small-btn">🌓 Theme</button>
-      <a href="dashboard.html" class="small-btn">📋 Back</a>
-    </div>
-  </div>
+const apiBase = 'https://bookkeeping-i8e0.onrender.com';
+let notes = [];
+let hideDone = false;
 
-  <div class="note-form">
-    <input type="text" id="noteTitle" placeholder="Title" />
-    <textarea id="noteContent" placeholder="Write your note..."></textarea>
-    <button onclick="saveNote()" class="small-btn">💾 Save</button>
-    <button onclick="toggleHideDone()" class="small-btn">🙈 Hide Done</button>
-    <select onchange="renderNotes(this.value)" class="small-btn">
-      <option value="date">Sort by Date</option>
-      <option value="title">Sort by Title</option>
-    </select>
-  </div>
+function toggleTheme() {
+  document.body.classList.toggle('dark-theme');
+  localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
+}
 
-  <div id="notesList"></div>
+function goToDashboard() {
+  window.location.href = 'dashboard.html';
+}
 
-  <script src="notes.js"></script>
-</body>
-</html>
+window.addEventListener('DOMContentLoaded', () => {
+  if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-theme');
+  loadNotesFromDB();
+});
+
+async function loadNotesFromDB() {
+  const token = localStorage.getItem('token');
+  const res = await fetch(`${apiBase}/api/notes`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+
+  if (res.ok) {
+    notes = await res.json();
+    renderNotes();
+  } else {
+    console.error('Failed to fetch notes');
+  }
+}
+
+function renderNotes(sortBy = 'date') {
+  const container = document.getElementById('notesList');
+  container.innerHTML = '';
+
+  let filtered = hideDone ? notes.filter(n => !n.done) : [...notes];
+
+  const sorted = filtered.sort((a, b) => {
+    if (sortBy === 'title') return a.title.localeCompare(b.title);
+    return new Date(b.createdAt) - new Date(a.createdAt);
+  });
+
+  for (const note of sorted) {
+    const noteDiv = document.createElement('div');
+    noteDiv.className = 'note-entry';
+    if (note.done) noteDiv.classList.add('done');
+
+    const formattedDate = new Date(note.createdAt).toLocaleString('en-GB', {
+      day: '2-digit', month: 'short', year: '2-digit', hour: '2-digit', minute: '2-digit'
+    });
+
+    noteDiv.innerHTML = `
+      <div class="note-title"><strong>${note.title}</strong></div>
+      <small>${formattedDate}</small>
+      <p>${note.content}</p>
+      <div class="note-buttons">
+        <button onclick="toggleDone('${note._id}')">${note.done ? '✅' : '✔️'}</button>
+        <button onclick="editNote('${note._id}')">✏️</button>
+        <button onclick="deleteNote('${note._id}')">🗑️</button>
+      </div>
+    `;
+    container.appendChild(noteDiv);
+  }
+}
+
+async function saveNote() {
+  const title = document.getElementById('noteTitle').value.trim();
+  const content = document.getElementById('noteContent').value.trim();
+  if (!title || !content) return alert('Please enter both title and content');
+
+  const token = localStorage.getItem('token');
+  const res = await fetch(`${apiBase}/api/notes`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify({ title, content })
+  });
+
+  if (res.ok) {
+    document.getElementById('noteTitle').value = '';
+    document.getElementById('noteContent').value = '';
+    loadNotesFromDB();
+  } else {
+    alert('Failed to save note');
+  }
+}
+
+async function deleteNote(id) {
+  const token = localStorage.getItem('token');
+  const res = await fetch(`${apiBase}/api/notes/${id}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (res.ok) loadNotesFromDB();
+}
+
+function toggleHideDone() {
+  hideDone = !hideDone;
+  renderNotes();
+}
+
+function editNote(id) {
+  const note = notes.find(n => n._id === id);
+  if (!note) return;
+  document.getElementById('noteTitle').value = note.title;
+  document.getElementById('noteContent').value = note.content;
+  deleteNote(id); // Replace old one on save
+}
+
+async function toggleDone(id) {
+  const token = localStorage.getItem('token');
+  const note = notes.find(n => n._id === id);
+  if (!note) return;
+
+  await fetch(`${apiBase}/api/notes/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify({ done: !note.done })
+  });
+
+  loadNotesFromDB();
+}
