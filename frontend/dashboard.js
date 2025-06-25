@@ -174,12 +174,22 @@ function populatePersonDropdownForCharts(persons) {
 async function fetchEntries() {
   try {
     const token = localStorage.getItem('token');
+    if (!token) throw new Error("Missing auth token");
+
     const res = await fetch(`${apiBase}/api/entries`, {
       headers: { Authorization: `Bearer ${token}` }
     });
+
+    if (res.status === 401) {
+      console.warn("🔐 Unauthorized - invalid or expired token");
+      alert("🔐 Your session expired. Please log in again.");
+      window.location.href = '/login.html'; // Redirect to login
+      return;
+    }
+
     if (!res.ok) throw new Error('Failed to fetch entries');
 
-    const data = await res.json(); // ✅ ensure we get the data
+    const data = await res.json();
     window.entries = Array.isArray(data) ? data.sort((a, b) => b.date.localeCompare(a.date)) : [];
 
     console.log("📦 Entries:", window.entries);
@@ -190,9 +200,10 @@ async function fetchEntries() {
     populateNewEntryDropdowns();
     populateFilters();
     renderBankBalanceForm();
+
   } catch (err) {
     console.error('❌ fetchEntries failed:', err);
-    window.entries = []; // fallback to empty array
+    window.entries = []; // fallback
   }
 }
 
