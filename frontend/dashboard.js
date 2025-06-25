@@ -1873,28 +1873,23 @@ renderBankBalanceForm();                // ✅ re-render balance inputs
 
   // add notes
 // Open modal
-document.getElementById('openNotesBtn').addEventListener('click', () => {
-  loadNotesFromDB(); // Fetch from MongoDB
-  document.getElementById('notesModal').classList.remove('hidden');
-});
-
+// NOTES MODAL
 function toggleNotesModal() {
   const modal = document.getElementById('notesModal');
   if (modal.classList.contains('hidden')) {
-    loadNotesFromDB(); // Optional: fetch latest notes
+    loadNotesFromDB();
     modal.classList.remove('hidden');
   } else {
     modal.classList.add('hidden');
   }
 }
-
 function closeNotesModal() {
   document.getElementById('notesModal').classList.add('hidden');
   document.getElementById('noteTitle').value = '';
   document.getElementById('noteContent').value = '';
 }
 
-// Save note to backend
+// SAVE
 async function saveNote() {
   const title = document.getElementById('noteTitle').value.trim();
   const content = document.getElementById('noteContent').value.trim();
@@ -1911,13 +1906,14 @@ async function saveNote() {
   });
 
   if (res.ok) {
-    loadNotesFromDB();
-    document.getElementById('noteTitle').value = '';
-    document.getElementById('noteContent').value = '';
+    await loadNotesFromDB();
+    closeNotesModal();
+  } else {
+    alert('Failed to save note');
   }
 }
 
-// Load & render notes
+// FETCH NOTES
 let notes = [];
 async function loadNotesFromDB() {
   const token = localStorage.getItem('token');
@@ -1928,32 +1924,35 @@ async function loadNotesFromDB() {
   if (res.ok) {
     notes = await res.json();
     renderNotes('date');
+  } else {
+    console.warn("❌ Could not fetch notes");
   }
 }
 
+// RENDER NOTES
 function renderNotes(sortBy = 'date') {
   const container = document.getElementById('notesList');
   container.innerHTML = '';
 
-  const sorted = [...notes].sort((a, b) => {
-    if (sortBy === 'title') return a.title.localeCompare(b.title);
-    return new Date(b.createdAt) - new Date(a.createdAt);
-  });
+  const sorted = [...notes].sort((a, b) =>
+    sortBy === 'title' ? a.title.localeCompare(b.title)
+                       : new Date(b.createdAt) - new Date(a.createdAt)
+  );
 
-  sorted.forEach(note => {
+  for (const note of sorted) {
     const noteDiv = document.createElement('div');
     noteDiv.className = 'note-entry';
     noteDiv.innerHTML = `
-      <strong>${note.title}</strong>
+      <strong>${note.title}</strong><br>
       <small>${new Date(note.createdAt).toLocaleString()}</small>
       <p>${note.content}</p>
       <button onclick="deleteNote('${note._id}')">🗑️ Delete</button>
     `;
     container.appendChild(noteDiv);
-  });
+  }
 }
 
-// Delete note
+// DELETE NOTE
 async function deleteNote(id) {
   const token = localStorage.getItem('token');
   const res = await fetch(`/api/notes/${id}`, {
@@ -1962,7 +1961,6 @@ async function deleteNote(id) {
   });
   if (res.ok) loadNotesFromDB();
 }
-
 // theme
 function toggleTheme() {
   document.body.classList.toggle('dark-theme');

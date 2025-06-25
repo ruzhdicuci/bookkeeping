@@ -2316,71 +2316,125 @@ body.dark .entry-card .amount {
 
 .modal.note-style {
   background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(3px);
+  z-index: 1000;
 }
 
 .modal-content.note-style {
   background: white;
-  padding: 1.5rem;
+  color: #222;
+  padding: 2rem;
   border-radius: 12px;
-  max-width: 500px;
-  width: 90%;
-  max-height: 80vh;
+  max-width: 520px;
+  width: 95%;
+  max-height: 85vh;
   overflow-y: auto;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+  transition: all 0.3s ease-in-out;
 }
 
+/* Dark mode modal styling */
 .dark-theme .modal-content.note-style {
   background: #1e1e1e;
-  color: white;
+  color: #f0f0f0;
 }
 
+/* Form layout */
 .note-form {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-bottom: 1rem;
+  gap: 12px;
+  margin-bottom: 1.5rem;
 }
 
 .note-form input,
 .note-form textarea {
-  padding: 10px;
+  padding: 12px;
   font-size: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  resize: vertical;
+  border: 1px solid #bbb;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  color: #333;
+}
+
+.dark-theme .note-form input,
+.dark-theme .note-form textarea {
+  background-color: #2a2a2a;
+  border-color: #444;
+  color: #eee;
 }
 
 .note-form button {
-  padding: 8px 12px;
+  padding: 10px 14px;
   font-size: 1rem;
   border-radius: 6px;
   border: none;
   background: #007bff;
   color: white;
   cursor: pointer;
+  transition: background 0.2s ease;
 }
 
 .note-form button:hover {
   background: #0056b3;
 }
 
+/* Notes list */
 .notes-list .note-entry {
-  border-top: 1px solid #e0e0e0;
-  padding: 10px 0;
+  background: #f1f1f1;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.dark-theme .notes-list .note-entry {
+  background: #2c2c2c;
+}
+
+.notes-list .note-entry strong {
+  font-size: 1.05rem;
+}
+
+.notes-list .note-entry small {
+  display: block;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.dark-theme .notes-list .note-entry small {
+  color: #aaa;
 }
 
 .notes-list .note-entry p {
-  margin: 5px 0;
+  margin: 8px 0;
+  white-space: pre-wrap;
+  line-height: 1.4;
 }
 
+/* Delete button */
 .notes-list .note-entry button {
   background: none;
   border: none;
-  color: red;
+  color: #cc0000;
   cursor: pointer;
+  font-size: 0.9rem;
 }
 
+.notes-list .note-entry button:hover {
+  text-decoration: underline;
+}
+
+/* Sorting select */
 .note-sort {
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.note-sort select {
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.95rem;
 }
