@@ -121,6 +121,7 @@ app.post('/api/register', async (req, res) => {
   res.json({ message: 'Registered' });
 });
 
+
 app.post('/api/login', async (req, res) => {
   const email = req.body.email.trim().toLowerCase();
   const { password } = req.body;
@@ -131,9 +132,21 @@ app.post('/api/login', async (req, res) => {
   const match = await bcrypt.compare(password, user.password);
   if (!match) return res.status(400).json({ message: 'Invalid credentials' });
 
-  const token = jwt.sign({ userId: user._id }, SECRET);
+  // ✅ Include role and email in the JWT payload
+  const token = jwt.sign(
+    {
+      userId: user._id,
+      email: user.email,
+      role: user.role  // ✅ Required for admin check later
+    },
+    process.env.JWT_SECRET, // or just `SECRET` if that's your defined constant
+    { expiresIn: '7d' }
+  );
+
   res.json({ token });
 });
+
+
 
 app.get('/api/users', async (req, res) => {
   const users = await User.find({}, 'email');
@@ -278,23 +291,27 @@ app.post('/api/limits', auth, async (req, res) => {
 // Make sure jwt is imported only once at top
 
 
-// ✅ Middleware (you already have)
+
 function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1]; // Bearer <token>
-
+  const token = authHeader && authHeader.split(' ')[1];
   if (!token) return res.sendStatus(401);
-
   jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
     if (err) return res.sendStatus(403);
-    req.user = user; // contains user id, email, role etc.
+    req.user = user;
     next();
   });
 }
 
-// ✅ New route to get current user info (role, email etc.)
-app.get('/api/userinfo', authenticateToken, (req, res) => {
-  res.json({ email: req.user.email, role: req.user.role });
-});
+function authorizeAdmin(req, res, next) {
+  if (req.user && req.user.role === 'admin') {
+    next();
+  } else {
+    res.status(403).json({ message: 'Admins only' });
+  }
+}
 
+app.get('/api/admin/secret', authenticateToken, authorizeAdmin, (req, res) => {
+  res.json({ success: true });
+});
 // preven seesin source page code
