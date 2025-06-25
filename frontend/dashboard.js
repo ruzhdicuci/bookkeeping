@@ -1871,7 +1871,7 @@ renderBankBalanceForm();                // ✅ re-render balance inputs
   });
   
 
-// NOTES MODAL
+// add NOTES MODAL
 function toggleNotesModal() {
   const modal = document.getElementById('notesModal');
   if (modal.classList.contains('hidden')) {
@@ -1888,7 +1888,7 @@ function closeNotesModal() {
   document.getElementById('noteContent').value = '';
 }
 
-const apiBase = 'https://bookkeeping-i8e0.onrender.com'; // ✅ Central base URL
+
 
 // SAVE NOTE
 async function saveNote() {
