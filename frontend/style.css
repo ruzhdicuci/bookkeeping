@@ -2377,6 +2377,40 @@ body.dark .entry-card .amount {
 }
 
 
+.note-style {
+  background-color: var(--bg, white);
+  color: var(--text, black);
+  transition: background 0.3s, color 0.3s;
+}
+body.dark .note-style {
+  --bg: #222;
+  --text: white;
+}
+
+.note-form input,
+.note-form textarea {
+  width: 100%;
+  margin: 0.5rem 0;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.note-form button {
+  margin-right: 8px;
+  padding: 8px 14px;
+}
+
+.note-entry {
+  background: #f7f7f7;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 6px;
+}
+body.dark .note-entry {
+  background: #333;
+}
+
 /* Default (light mode) is already defined */
 
 body.dark-theme .fancy-modal {

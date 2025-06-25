@@ -971,14 +971,30 @@ if (tabId === 'chartsTab') {
 
 
 
+<!-- Notes Button -->
+<button id="openNotesBtn" title="Open Notes">📝 Notes</button>
+
+<!-- Notes Modal -->
 <div id="notesModal" class="modal hidden">
-  <div class="modal-content fancy-modal">
-    <h3 style="margin-top: 0;">📝 My Notes</h3>
-    <textarea id="notesText" class="notes-area" placeholder="Write your notes here..."></textarea>
-    <div class="notes-actions">
-      <button class="save-notes-btn" onclick="saveNotes()">💾 Save</button>
-      <button class="cancel-notes-btn" onclick="closeNotesModal()">Cancel</button>
+  <div class="modal-content note-style">
+    <h3>📝 My Notes</h3>
+    
+    <div class="note-form">
+      <input type="text" id="noteTitle" placeholder="Note Title" />
+      <textarea id="noteContent" placeholder="Write your note here..."></textarea>
+      <button onclick="saveNote()">💾 Save</button>
+      <button onclick="closeNotesModal()">Cancel</button>
     </div>
+
+    <div class="note-sort">
+      <label>Sort by:</label>
+      <select onchange="renderNotes(this.value)">
+        <option value="date">Date</option>
+        <option value="title">Title</option>
+      </select>
+    </div>
+
+    <div id="notesList" class="notes-list"></div>
   </div>
 </div>
 

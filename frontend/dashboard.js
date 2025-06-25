@@ -1872,24 +1872,88 @@ renderBankBalanceForm();                // ✅ re-render balance inputs
   
 
   // add notes
-function toggleNotesModal() {
-  const modal = document.getElementById('notesModal');
-  const notes = localStorage.getItem('userNotes') || '';
-  document.getElementById('notesText').value = notes;
-  modal.classList.remove('hidden');
-}
+// Open modal
+document.getElementById('openNotesBtn').addEventListener('click', () => {
+  loadNotesFromDB(); // Fetch from MongoDB
+  document.getElementById('notesModal').classList.remove('hidden');
+});
 
 function closeNotesModal() {
   document.getElementById('notesModal').classList.add('hidden');
+  document.getElementById('noteTitle').value = '';
+  document.getElementById('noteContent').value = '';
 }
 
-function saveNotes() {
-  const notes = document.getElementById('notesText').value;
-  localStorage.setItem('userNotes', notes);
-  showToast('📝 Notes saved');
-  closeNotesModal();
+// Save note to backend
+async function saveNote() {
+  const title = document.getElementById('noteTitle').value.trim();
+  const content = document.getElementById('noteContent').value.trim();
+  if (!title || !content) return alert('Please enter both title and content');
+
+  const token = localStorage.getItem('token');
+  const res = await fetch('/api/notes', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify({ title, content })
+  });
+
+  if (res.ok) {
+    loadNotesFromDB();
+    document.getElementById('noteTitle').value = '';
+    document.getElementById('noteContent').value = '';
+  }
 }
 
+// Load & render notes
+let notes = [];
+async function loadNotesFromDB() {
+  const token = localStorage.getItem('token');
+  const res = await fetch('/api/notes', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+
+  if (res.ok) {
+    notes = await res.json();
+    renderNotes('date');
+  }
+}
+
+function renderNotes(sortBy = 'date') {
+  const container = document.getElementById('notesList');
+  container.innerHTML = '';
+
+  const sorted = [...notes].sort((a, b) => {
+    if (sortBy === 'title') return a.title.localeCompare(b.title);
+    return new Date(b.createdAt) - new Date(a.createdAt);
+  });
+
+  sorted.forEach(note => {
+    const noteDiv = document.createElement('div');
+    noteDiv.className = 'note-entry';
+    noteDiv.innerHTML = `
+      <strong>${note.title}</strong>
+      <small>${new Date(note.createdAt).toLocaleString()}</small>
+      <p>${note.content}</p>
+      <button onclick="deleteNote('${note._id}')">🗑️ Delete</button>
+    `;
+    container.appendChild(noteDiv);
+  });
+}
+
+// Delete note
+async function deleteNote(id) {
+  const token = localStorage.getItem('token');
+  const res = await fetch(`/api/notes/${id}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (res.ok) loadNotesFromDB();
+}
+
+// theme
 function toggleTheme() {
   document.body.classList.toggle('dark-theme');
   const isDark = document.body.classList.contains('dark-theme');

@@ -271,4 +271,25 @@ app.post('/api/limits', auth, async (req, res) => {
   res.json({ success: true });
 });
 
+// add notes
+const Note = mongoose.model('Note', new mongoose.Schema({
+  userId: String,
+  title: String,
+  content: String,
+  createdAt: { type: Date, default: Date.now }
+}));
 
+app.get('/api/notes', auth, async (req, res) => {
+  const notes = await Note.find({ userId: req.userId });
+  res.json(notes);
+});
+
+app.post('/api/notes', auth, async (req, res) => {
+  const note = await Note.create({ ...req.body, userId: req.userId });
+  res.json(note);
+});
+
+app.delete('/api/notes/:id', auth, async (req, res) => {
+  await Note.deleteOne({ _id: req.params.id, userId: req.userId });
+  res.json({ success: true });
+});
