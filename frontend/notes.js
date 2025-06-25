@@ -1,6 +1,8 @@
 const apiBase = 'https://bookkeeping-i8e0.onrender.com';
 let notes = [];
 let hideDone = false;
+let editingNoteId = null;
+let deleteTargetId = null;
 
 function toggleTheme() {
   document.body.classList.toggle('dark-theme');
@@ -44,20 +46,24 @@ function renderNotes(sortBy = 'date') {
   for (const note of sorted) {
     const noteDiv = document.createElement('div');
     noteDiv.className = 'note-entry';
+    noteDiv.setAttribute('data-id', note._id);
     if (note.done) noteDiv.classList.add('done');
-
-    const formattedDate = new Date(note.createdAt).toLocaleString('en-GB', {
-      day: '2-digit', month: 'short', year: '2-digit', hour: '2-digit', minute: '2-digit'
-    });
+    if (note._id === editingNoteId) noteDiv.classList.add('highlight');
 
     noteDiv.innerHTML = `
-      <div class="note-title"><strong>${note.title}</strong></div>
-      <small>${formattedDate}</small>
-      <p>${note.content}</p>
-      <div class="note-buttons">
-        <button onclick="toggleDone('${note._id}')">${note.done ? '✅' : '✔️'}</button>
-        <button onclick="editNote('${note._id}')">✏️</button>
-        <button onclick="deleteNote('${note._id}')">🗑️</button>
+      <div class="note-entry-columns">
+        <div class="note-entry-left">
+          <div class="note-title"><strong>${note.title}</strong></div>
+          <div class="note-content">${note.content}</div>
+        </div>
+        <div class="note-entry-right">
+          <div class="note-date">${formatNoteDate(note.createdAt)}</div>
+          <div class="note-actions">
+            <button class="done-btn" onclick="confirmToggleDone('${note._id}', ${note.done})">✅</button>
+            <button class="edit-btn" onclick="editNote('${note._id}')">✏️</button>
+            <button class="delete-btn" onclick="openDeleteModal('${note._id}')">🗑️</button>
+          </div>
+        </div>
       </div>
     `;
     container.appendChild(noteDiv);
@@ -70,8 +76,13 @@ async function saveNote() {
   if (!title || !content) return alert('Please enter both title and content');
 
   const token = localStorage.getItem('token');
-  const res = await fetch(`${apiBase}/api/notes`, {
-    method: 'POST',
+  const method = editingNoteId ? 'PUT' : 'POST';
+  const url = editingNoteId
+    ? `${apiBase}/api/notes/${editingNoteId}`
+    : `${apiBase}/api/notes`;
+
+  const res = await fetch(url, {
+    method,
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`
@@ -80,6 +91,7 @@ async function saveNote() {
   });
 
   if (res.ok) {
+    editingNoteId = null;
     document.getElementById('noteTitle').value = '';
     document.getElementById('noteContent').value = '';
     loadNotesFromDB();
@@ -88,41 +100,114 @@ async function saveNote() {
   }
 }
 
-async function deleteNote(id) {
-  const token = localStorage.getItem('token');
-  const res = await fetch(`${apiBase}/api/notes/${id}`, {
-    method: 'DELETE',
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  if (res.ok) loadNotesFromDB();
-}
-
 function toggleHideDone() {
   hideDone = !hideDone;
+  const btn = document.getElementById('toggleHideBtn');
+  if (btn) btn.textContent = hideDone ? '👀 Show Done' : '🙈 Hide Done';
   renderNotes();
 }
 
 function editNote(id) {
   const note = notes.find(n => n._id === id);
   if (!note) return;
+
+  editingNoteId = id;
   document.getElementById('noteTitle').value = note.title;
   document.getElementById('noteContent').value = note.content;
-  deleteNote(id); // Replace old one on save
+
+  renderNotes();
+  setTimeout(() => {
+    const card = document.querySelector(`.note-entry[data-id="${id}"]`);
+    if (card) {
+      card.classList.add('highlight');
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(() => card.classList.remove('highlight'), 1200);
+    }
+  }, 100);
 }
 
-async function toggleDone(id) {
-  const token = localStorage.getItem('token');
-  const note = notes.find(n => n._id === id);
-  if (!note) return;
+function cancelEdit() {
+  editingNoteId = null;
+  document.getElementById('noteTitle').value = '';
+  document.getElementById('noteContent').value = '';
+  renderNotes();
+}
 
-  await fetch(`${apiBase}/api/notes/${id}`, {
+function formatNoteDate(dateStr) {
+  const date = new Date(dateStr);
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = date.toLocaleString('default', { month: 'short' });
+  const year = date.getFullYear();
+  const time = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  return `${day} ${month} ${year}, ${time}`;
+}
+
+let noteToDeleteId = null;
+function openDeleteModal(id) {
+  noteToDeleteId = id;
+  document.getElementById('deleteModal').classList.remove('hidden');
+}
+
+function closeDeleteModal() {
+  noteToDeleteId = null;
+  document.getElementById('deleteModal').classList.add('hidden');
+}
+
+document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+  if (!noteToDeleteId) return;
+  const token = localStorage.getItem('token');
+  const res = await fetch(`${apiBase}/api/notes/${noteToDeleteId}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (res.ok) {
+    closeDeleteModal();
+    loadNotesFromDB();
+  }
+});
+
+let toggleDoneTargetId = null;
+let toggleDoneCurrentState = false;
+function confirmToggleDone(id, currentState) {
+  toggleDoneTargetId = id;
+  toggleDoneCurrentState = currentState;
+  document.getElementById('doneModal').classList.remove('hidden');
+}
+
+function closeDoneModal() {
+  toggleDoneTargetId = null;
+  document.getElementById('doneModal').classList.add('hidden');
+}
+
+document.getElementById('confirmDoneBtn').addEventListener('click', async () => {
+  if (!toggleDoneTargetId) return;
+  const token = localStorage.getItem('token');
+  await fetch(`${apiBase}/api/notes/${toggleDoneTargetId}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`
     },
-    body: JSON.stringify({ done: !note.done })
+    body: JSON.stringify({ done: !toggleDoneCurrentState })
   });
+  closeDoneModal();
+  loadNotesFromDB();
+});
+
+window.addEventListener('DOMContentLoaded', () => {
+  if (localStorage.getItem('theme') === 'dark') {
+    document.body.classList.add('dark-theme');
+  }
 
   loadNotesFromDB();
-}
+
+  const cancelDelete = document.getElementById('cancelDeleteBtn');
+  if (cancelDelete) {
+    cancelDelete.addEventListener('click', closeDeleteModal);
+  }
+
+  const cancelDone = document.getElementById('cancelDoneBtn');
+  if (cancelDone) {
+    cancelDone.addEventListener('click', closeDoneModal);
+  }
+});
