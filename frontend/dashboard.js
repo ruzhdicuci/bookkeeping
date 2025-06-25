@@ -176,32 +176,22 @@ async function fetchEntries() {
     const res = await fetch(`${apiBase}/api/entries`, {
       headers: { Authorization: `Bearer ${token}` }
     });
-
     if (!res.ok) throw new Error('Failed to fetch entries');
 
-    // ✅ Store entries globally, sorted by newest date
-    const data = await res.json();
-    window.entries = data.sort((a, b) => b.date.localeCompare(a.date));
+    const data = await res.json(); // ✅ ensure we get the data
+    window.entries = Array.isArray(data) ? data.sort((a, b) => b.date.localeCompare(a.date)) : [];
+
     console.log("📦 Entries:", window.entries);
-
-    // ✅ Store unique persons, banks, and categories globally
     window.persons = [...new Set(window.entries.map(e => e.person).filter(Boolean))];
-    window.banks = [...new Set(window.entries.map(e => e.bank).filter(Boolean))];
-    window.categories = [...new Set(window.entries.map(e => e.category).filter(Boolean))];
+    console.log("🧑‍🤝‍🧑 Found persons:", window.persons);
 
-    console.log("👤 Persons:", window.persons);
-    console.log("🏦 Banks:", window.banks);
-    console.log("🏷️ Categories:", window.categories);
-
-    // ✅ Render all dependent components
     renderEntries();
     populateNewEntryDropdowns();
     populateFilters();
     renderBankBalanceForm();
-    drawCharts?.(); // optionally call if you use charts
-
   } catch (err) {
     console.error('❌ fetchEntries failed:', err);
+    window.entries = []; // fallback to empty array
   }
 }
 
@@ -607,13 +597,18 @@ sortedLabels.forEach(label => {
 
 
 
-function editEntry(id) {
+async function editEntry(id) {
+  // Ensure entries are loaded
+  if (!window.entries || window.entries.length === 0) {
+    await fetchEntries();
+  }
+
   const form = document.getElementById('entryForm');
   if (form) {
     form.dataset.editId = id;
   }
 
-  const entry = entries.find(e => e._id === id);
+  const entry = window.entries.find(e => e._id === id);
   if (!entry) return alert("❌ Entry not found");
 
   // Prefill form fields
@@ -629,23 +624,24 @@ function editEntry(id) {
 
   document.getElementById('newDescription').focus();
   document.getElementById('cancelEditBtn')?.classList.remove('hidden');
-updateEntryButtonLabel(); // still update Add/Save text
+  updateEntryButtonLabel();
 
-  renderEntries(); // ✅ Highlight row and show cancel button
-setTimeout(() => {
-  const rows = document.querySelectorAll('#entryTableBody tr');
-  const editForm = document.getElementById('entryForm');
-  const editingId = editForm?.dataset.editId;
+  renderEntries();
 
-  for (const row of rows) {
-    const idAttr = row.querySelector('button[onclick^="editEntry("]')?.getAttribute('onclick');
-    const rowId = idAttr?.match(/'([^']+)'/)?.[1];
-    if (rowId === editingId) {
-      row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      break;
+  setTimeout(() => {
+    const rows = document.querySelectorAll('#entryTableBody tr');
+    const editForm = document.getElementById('entryForm');
+    const editingId = editForm?.dataset.editId;
+
+    for (const row of rows) {
+      const idAttr = row.querySelector('button[onclick^="editEntry("]')?.getAttribute('onclick');
+      const rowId = idAttr?.match(/'([^']+)'/)?.[1];
+      if (rowId === editingId) {
+        row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        break;
+      }
     }
-  }
-}, 150);
+  }, 150);
 }
 
 async function updateStatus(id, newStatus) {
@@ -723,18 +719,19 @@ async function saveEdit(row) {
   }
 }
 
-
 async function duplicateEntry(id) {
-  console.log("🔍 Looking for ID to duplicate:", id);
-console.log("📦 All current entry IDs:", entries.map(e => e._id));
-  const entry = entries.find(e => e._id === id);
+  console.log("Looking for ID to duplicate:", id);
+  await fetchEntries(); // ✅ ensure entries are available
+
+  console.log("✅ All current entry IDs:", window.entries.map(e => e._id));
+  const entry = window.entries.find(e => e._id === id);
   if (!entry) return alert("Entry not found");
 
   const copy = { ...entry };
   delete copy._id;
   copy.description += ' (Copy)';
 
-  const res = await fetch('https://bookkeeping-i8e0.onrender.com/api/entries', {
+  const res = await fetch(`${apiBase}/api/entries`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -744,14 +741,9 @@ console.log("📦 All current entry IDs:", entries.map(e => e._id));
   });
 
   if (res.ok) {
-    const newEntry = await res.json(); // ⬅️ get the newly created entry with _id
+    const newEntry = await res.json();
     window.highlightedEntryId = newEntry._id;
-
-    await fetchEntries();
-    renderEntries();
-    populateNewEntryDropdowns();
-    populateFilters();
-    renderBankBalanceForm();
+    await fetchEntries(); // ✅ reload entries
     showToast("✅ Entry duplicated");
   } else {
     alert("❌ Failed to duplicate entry");
@@ -1840,6 +1832,8 @@ console.log("🧾 Entry being submitted:", entry);
       document.getElementById('entryForm').reset();
 await fetchEntries();                    // reload data from server
 if (editId) delete form.dataset.editId;
+document.getElementById('cancelEditBtn')?.classList.add('hidden');
+updateEntryButtonLabel(); // optional: if you toggle the Save/Add label
 
 populateNewEntryDropdowns();            // refresh datalists
 populateFilters();                      // refresh filters (e.g. categories)

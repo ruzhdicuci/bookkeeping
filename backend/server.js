@@ -272,3 +272,16 @@ app.post('/api/limits', auth, async (req, res) => {
 });
 
 
+// Example middleware to check if user is admin
+function authorizeAdmin(req, res, next) {
+  if (req.user && req.user.role === 'admin') {
+    next(); // allow through
+  } else {
+    res.status(403).json({ message: 'Forbidden: Admins only' });
+  }
+}
+
+// Secure admin route
+app.get('/api/admin/secret', authenticateToken, authorizeAdmin, (req, res) => {
+  res.json({ secret: 'Top secret data here' });
+});
