@@ -173,23 +173,12 @@ function populatePersonDropdownForCharts(persons) {
 
 async function fetchEntries() {
   try {
-    const token = localStorage.getItem('token');
-    if (!token) throw new Error("Missing auth token");
-
     const res = await fetch(`${apiBase}/api/entries`, {
       headers: { Authorization: `Bearer ${token}` }
     });
-
-    if (res.status === 401) {
-      console.warn("🔐 Unauthorized - invalid or expired token");
-      alert("🔐 Your session expired. Please log in again.");
-      window.location.href = '/login.html'; // Redirect to login
-      return;
-    }
-
     if (!res.ok) throw new Error('Failed to fetch entries');
 
-    const data = await res.json();
+    const data = await res.json(); // ✅ ensure we get the data
     window.entries = Array.isArray(data) ? data.sort((a, b) => b.date.localeCompare(a.date)) : [];
 
     console.log("📦 Entries:", window.entries);
@@ -200,10 +189,9 @@ async function fetchEntries() {
     populateNewEntryDropdowns();
     populateFilters();
     renderBankBalanceForm();
-
   } catch (err) {
     console.error('❌ fetchEntries failed:', err);
-    window.entries = []; // fallback
+    window.entries = []; // fallback to empty array
   }
 }
 
@@ -1881,37 +1869,3 @@ renderBankBalanceForm();                // ✅ re-render balance inputs
     }
   });
   
-
-  // preven seesin source page code
-function checkAdminAccess() {
-  const token = localStorage.getItem('token');
-  if (!token) return;
-
-  fetch('https://bookkeeping-i8e0.onrender.com/api/admin/secret', {
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  })
-  .then(res => res.ok ? res.json() : Promise.reject())
-  .then(data => {
-    // If success, reveal admin-only elements
-    document.querySelectorAll('.admin-only').forEach(el => {
-      el.style.display = 'block';
-    });
-    console.log("✅ Admin access confirmed");
-  })
-  .catch(() => {
-    // Hide admin-only elements
-    document.querySelectorAll('.admin-only').forEach(el => {
-      el.style.display = 'none';
-    });
-    console.log("ℹ️ Not an admin");
-  });
-}
-
-
-// ✅ Add this after checkAdminAccess is declared
-window.addEventListener('DOMContentLoaded', () => {
-  checkAdminAccess();
-});
-// preven seesin source page code

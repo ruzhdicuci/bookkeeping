@@ -2,9 +2,9 @@ const mongoose = require('mongoose');
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const jwt = require('jsonwebtoken'); // ✅ just import, no sign yet
+const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const allowedOrigins = ['https://we-search.ch'];
+
 const MONGO_URI = process.env.MONGODB_URI;
 
 if (!MONGO_URI) {
@@ -44,10 +44,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(cors({
-  origin: allowedOrigins,
-  credentials: true
-}));
+
 
 // Serve static frontend
 app.use(express.static(path.join(__dirname, '../frontend')));
@@ -124,7 +121,6 @@ app.post('/api/register', async (req, res) => {
   res.json({ message: 'Registered' });
 });
 
-
 app.post('/api/login', async (req, res) => {
   const email = req.body.email.trim().toLowerCase();
   const { password } = req.body;
@@ -135,21 +131,9 @@ app.post('/api/login', async (req, res) => {
   const match = await bcrypt.compare(password, user.password);
   if (!match) return res.status(400).json({ message: 'Invalid credentials' });
 
-  // ✅ Securely generate token with role and email
-  const token = jwt.sign(
-    {
-      userId: user._id,
-      email: user.email,
-      role: user.role
-    },
-    process.env.JWT_SECRET, // 🔐 must be defined on Render as env var
-    { expiresIn: '7d' }
-  );
-
+  const token = jwt.sign({ userId: user._id }, SECRET);
   res.json({ token });
 });
-
-
 
 app.get('/api/users', async (req, res) => {
   const users = await User.find({}, 'email');
@@ -288,33 +272,3 @@ app.post('/api/limits', auth, async (req, res) => {
 });
 
 
-
-// preven seesin source page code
-
-// Make sure jwt is imported only once at top
-
-
-
-function authenticateToken(req, res, next) {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-  if (!token) return res.sendStatus(401);
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    if (err) return res.sendStatus(403);
-    req.user = user;
-    next();
-  });
-}
-
-function authorizeAdmin(req, res, next) {
-  if (req.user && req.user.role === 'admin') {
-    next();
-  } else {
-    res.status(403).json({ message: 'Admins only' });
-  }
-}
-
-app.get('/api/admin/secret', authenticateToken, authorizeAdmin, (req, res) => {
-  res.json({ success: true });
-});
-// preven seesin source page code
