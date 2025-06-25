@@ -276,7 +276,7 @@ app.post('/api/limits', auth, async (req, res) => {
 // preven seesin source page code
 
 // Make sure jwt is imported only once at top
-const jwt = require('jsonwebtoken');
+
 
 // ✅ Middleware (you already have)
 function authenticateToken(req, res, next) {
