@@ -173,6 +173,7 @@ function populatePersonDropdownForCharts(persons) {
 
 async function fetchEntries() {
   try {
+    const token = localStorage.getItem('token');
     const res = await fetch(`${apiBase}/api/entries`, {
       headers: { Authorization: `Bearer ${token}` }
     });

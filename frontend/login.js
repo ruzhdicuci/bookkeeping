@@ -13,6 +13,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
 const data = await res.json();
 if (res.ok) {
   localStorage.setItem('token', data.token);
+  window.location.href = 'dashboard.html';
   localStorage.setItem('currentUser', email);
   localStorage.setItem('lastLoginUser', email);
   window.location.href = '/bookkeeping/client/dashboard.html';
