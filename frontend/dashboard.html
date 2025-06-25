@@ -972,12 +972,12 @@ if (tabId === 'chartsTab') {
 
 
 <div id="notesModal" class="modal hidden">
-  <div class="modal-content">
-    <h3>📝 My Notes</h3>
-    <textarea id="notesText" style="width: 100%; height: 150px;"></textarea>
-    <div style="margin-top: 10px;">
-      <button onclick="saveNotes()">💾 Save</button>
-      <button onclick="closeNotesModal()">Close</button>
+  <div class="modal-content fancy-modal">
+    <h3 style="margin-top: 0;">📝 My Notes</h3>
+    <textarea id="notesText" class="notes-area" placeholder="Write your notes here..."></textarea>
+    <div class="notes-actions">
+      <button class="save-notes-btn" onclick="saveNotes()">💾 Save</button>
+      <button class="cancel-notes-btn" onclick="closeNotesModal()">Cancel</button>
     </div>
   </div>
 </div>

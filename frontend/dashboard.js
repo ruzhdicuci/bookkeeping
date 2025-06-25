@@ -1889,3 +1889,16 @@ function saveNotes() {
   showToast('📝 Notes saved');
   closeNotesModal();
 }
+
+function toggleTheme() {
+  document.body.classList.toggle('dark-theme');
+  const isDark = document.body.classList.contains('dark-theme');
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+}
+window.addEventListener('DOMContentLoaded', () => {
+  if (localStorage.getItem('theme') === 'dark') {
+    document.body.classList.add('dark-theme');
+  }
+});
+
+ // add notes
