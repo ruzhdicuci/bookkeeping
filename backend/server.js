@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const jwt = require('jsonwebtoken');
+const token = jwt.sign(payload, 'your-hardcoded-secret', { expiresIn: '7d' });
 const bcrypt = require('bcrypt');
 
 const MONGO_URI = process.env.MONGODB_URI;
