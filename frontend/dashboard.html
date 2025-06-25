@@ -613,21 +613,56 @@ const filteredEntries = entries.filter(e => {
       }
     });
   }
-
-  if (ctx1) {
-    monthlyChartInstance = new Chart(ctx1, {
-      type,
-      data: {
-        labels: months,
-        datasets: [
-          { label: 'Income', data: incomeMonthVals, backgroundColor: '#4caf50', borderColor: '#2e7d32', borderWidth: 1 },
-          { label: 'Expense', data: expenseMonthVals, backgroundColor: '#f44336', borderColor: '#c62828', borderWidth: 1 }
-        ]
+if (ctx1) {
+  monthlyChartInstance = new Chart(ctx1, {
+    type,
+    data: {
+      labels: months,
+      datasets: [
+        { label: 'Income', data: incomeMonthVals, backgroundColor: '#4caf50', borderColor: '#2e7d32', borderWidth: 1 },
+        { label: 'Expense', data: expenseMonthVals, backgroundColor: '#f44336', borderColor: '#c62828', borderWidth: 1 }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: context => `${context.dataset.label}: CHF ${Number(context.raw).toLocaleString('en-US', { minimumFractionDigits: 2 })}`
+          },
+          titleFont: {
+            size: 14
+          },
+          bodyFont: {
+            size: 20, // 👈 Increase this to make sum larger
+            weight: 'bold'
+          },
+          padding: 12
+        },
+        legend: {
+          position: 'top',
+          labels: {
+            font: {
+              size: 14
+            }
+          }
+        },
+        datalabels: {
+          anchor: 'end',
+          align: 'top',
+          font: { weight: 'bold' },
+          formatter: v => v.toLocaleString('en-US', { minimumFractionDigits: 2 })
+        }
       },
-      options: chartOptions(),
-      plugins: [ChartDataLabels]
-    });
-  }
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    },
+    plugins: [ChartDataLabels]
+  });
+}
 
   if (ctx2) {
     personChartInstance = new Chart(ctx2, {
@@ -731,7 +766,7 @@ function chartOptions() {
     plugins: {
       tooltip: {
         callbacks: {
-          label: context => `CHF ${context.raw.toFixed(2)}`
+          label: context => `CHF ${Number(context.raw).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
         }
       },
       legend: { display: true },
