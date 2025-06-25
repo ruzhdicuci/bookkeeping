@@ -1878,6 +1878,16 @@ document.getElementById('openNotesBtn').addEventListener('click', () => {
   document.getElementById('notesModal').classList.remove('hidden');
 });
 
+function toggleNotesModal() {
+  const modal = document.getElementById('notesModal');
+  if (modal.classList.contains('hidden')) {
+    loadNotesFromDB(); // Optional: fetch latest notes
+    modal.classList.remove('hidden');
+  } else {
+    modal.classList.add('hidden');
+  }
+}
+
 function closeNotesModal() {
   document.getElementById('notesModal').classList.add('hidden');
   document.getElementById('noteTitle').value = '';

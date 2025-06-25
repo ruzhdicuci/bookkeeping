@@ -276,20 +276,30 @@ const Note = mongoose.model('Note', new mongoose.Schema({
   userId: String,
   title: String,
   content: String,
-  createdAt: { type: Date, default: Date.now }
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
 }));
 
+// Get notes for current user
 app.get('/api/notes', auth, async (req, res) => {
-  const notes = await Note.find({ userId: req.userId });
+  const notes = await Note.find({ userId: req.userId }).sort({ createdAt: -1 });
   res.json(notes);
 });
 
+// Save new note
 app.post('/api/notes', auth, async (req, res) => {
-  const note = await Note.create({ ...req.body, userId: req.userId });
+  const { title, content } = req.body;
+  if (!title || !content) return res.status(400).json({ message: 'Missing fields' });
+
+  const note = await Note.create({ userId: req.userId, title, content });
   res.json(note);
 });
 
+// Delete note by ID
 app.delete('/api/notes/:id', auth, async (req, res) => {
-  await Note.deleteOne({ _id: req.params.id, userId: req.userId });
+  const { id } = req.params;
+  await Note.deleteOne({ _id: id, userId: req.userId });
   res.json({ success: true });
 });

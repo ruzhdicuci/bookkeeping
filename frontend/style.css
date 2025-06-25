@@ -2309,134 +2309,78 @@ body.dark .entry-card .amount {
   color: white;
 }
 
+/* NOTES MODAL STYLING */
+.modal.hidden {
+  display: none;
+}
 
-/* Modern Notes Modal */
-.fancy-modal {
-  background: #fefefe;
+.modal.note-style {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.modal-content.note-style {
+  background: white;
   padding: 1.5rem;
-  border-radius: 16px;
-  max-width: 450px;
-  width: 100%;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.15);
-  animation: fadeInScale 0.3s ease;
-  font-family: sans-serif;
-}
-
-.notes-area {
-  width: 100%;
-  height: 180px;
-  padding: 1rem;
-  border: 1px solid #ccc;
   border-radius: 12px;
-  resize: vertical;
-  font-size: 1rem;
-  background-color: #fafafa;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
 }
 
-.notes-actions {
-  margin-top: 1rem;
-  text-align: right;
-}
-
-.save-notes-btn {
-  background-color: #13a07f;
+.dark-theme .modal-content.note-style {
+  background: #1e1e1e;
   color: white;
-  border: none;
-  padding: 10px 16px;
-  margin-right: 10px;
-  border-radius: 8px;
-  cursor: pointer;
 }
 
-.cancel-notes-btn {
-  background-color: #e0e0e0;
-  color: #333;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.save-notes-btn:hover {
-  background-color: #0c8d6e;
-}
-
-.cancel-notes-btn:hover {
-  background-color: #ccc;
-}
-
-@keyframes fadeInScale {
-  0% {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-
-.note-style {
-  background-color: var(--bg, white);
-  color: var(--text, black);
-  transition: background 0.3s, color 0.3s;
-}
-body.dark .note-style {
-  --bg: #222;
-  --text: white;
+.note-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 1rem;
 }
 
 .note-form input,
 .note-form textarea {
-  width: 100%;
-  margin: 0.5rem 0;
   padding: 10px;
+  font-size: 1rem;
   border: 1px solid #ccc;
   border-radius: 6px;
+  resize: vertical;
 }
 
 .note-form button {
-  margin-right: 8px;
-  padding: 8px 14px;
-}
-
-.note-entry {
-  background: #f7f7f7;
-  padding: 12px;
-  margin: 10px 0;
+  padding: 8px 12px;
+  font-size: 1rem;
   border-radius: 6px;
-}
-body.dark .note-entry {
-  background: #333;
-}
-
-/* Default (light mode) is already defined */
-
-body.dark-theme .fancy-modal {
-  background: #1f1f1f;
-  color: #f0f0f0;
+  border: none;
+  background: #007bff;
+  color: white;
+  cursor: pointer;
 }
 
-body.dark-theme .notes-area {
-  background-color: #2c2c2c;
-  color: #f0f0f0;
-  border: 1px solid #444;
+.note-form button:hover {
+  background: #0056b3;
 }
 
-body.dark-theme .save-notes-btn {
-  background-color: #00b894;
+.notes-list .note-entry {
+  border-top: 1px solid #e0e0e0;
+  padding: 10px 0;
 }
 
-body.dark-theme .save-notes-btn:hover {
-  background-color: #00a07a;
+.notes-list .note-entry p {
+  margin: 5px 0;
 }
 
-body.dark-theme .cancel-notes-btn {
-  background-color: #444;
-  color: #eee;
+.notes-list .note-entry button {
+  background: none;
+  border: none;
+  color: red;
+  cursor: pointer;
 }
 
-body.dark-theme .cancel-notes-btn:hover {
-  background-color: #666;
+.note-sort {
+  margin-bottom: 10px;
+  font-size: 0.9rem;
 }
