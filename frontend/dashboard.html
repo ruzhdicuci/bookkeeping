@@ -104,6 +104,9 @@
    <button id="themeToggle" onclick="toggleTheme()"> 
     <i id="themeIcon" class="fa-solid fa-moon"></i>
 </button>
+
+<button id="notesToggle" onclick="toggleNotesModal()">📝 Notes</button>
+
 </div>
 </div>
 
@@ -968,7 +971,16 @@ if (tabId === 'chartsTab') {
 
 
 
-
+<div id="notesModal" class="modal hidden">
+  <div class="modal-content">
+    <h3>📝 My Notes</h3>
+    <textarea id="notesText" style="width: 100%; height: 150px;"></textarea>
+    <div style="margin-top: 10px;">
+      <button onclick="saveNotes()">💾 Save</button>
+      <button onclick="closeNotesModal()">Close</button>
+    </div>
+  </div>
+</div>
 
 <div class="filter-grid">
  <!-- Entry table -->

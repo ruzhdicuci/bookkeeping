@@ -1870,3 +1870,22 @@ renderBankBalanceForm();                // ✅ re-render balance inputs
     }
   });
   
+
+  // add notes
+function toggleNotesModal() {
+  const modal = document.getElementById('notesModal');
+  const notes = localStorage.getItem('userNotes') || '';
+  document.getElementById('notesText').value = notes;
+  modal.classList.remove('hidden');
+}
+
+function closeNotesModal() {
+  document.getElementById('notesModal').classList.add('hidden');
+}
+
+function saveNotes() {
+  const notes = document.getElementById('notesText').value;
+  localStorage.setItem('userNotes', notes);
+  showToast('📝 Notes saved');
+  closeNotesModal();
+}
