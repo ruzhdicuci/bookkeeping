@@ -1593,13 +1593,14 @@ inputsToClear.forEach(id => {
 });
 
   // Re-enable and reset dropdown filters
-  ['categoryFilter', 'typeFilter', 'currencyFilter', 'statusFilter', 'bankFilter'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.disabled = false;
-      el.selectedIndex = 0;
-    }
-  });
+// Re-enable and reset dropdown filters, including timeSort
+['categoryFilter', 'typeFilter', 'currencyFilter', 'statusFilter', 'bankFilter', 'timeSort'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) {
+    el.disabled = false;
+    el.selectedIndex = 0;
+  }
+});
 
   // Re-enable and re-check all person checkboxes
 const excludedByDefault = ['Balance', 'Transfer'];
