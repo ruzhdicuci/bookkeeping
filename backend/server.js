@@ -27,9 +27,9 @@ mongoose.connect(MONGO_URI, {
 const app = express(); // ✅ Define app AFTER all setup
 // ✅ Updated CORS setup
 const allowedOrigins = [
-  'https://we-search.ch',        // Production frontend
-  'http://localhost:3000',       // Local dev
-  'http://127.0.0.1:3000'        // Alt local dev
+  'https://we-search.ch',
+  'http://localhost:3000',
+  'http://127.0.0.1:3000'
 ];
 
 app.use(cors({
@@ -44,7 +44,7 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
-app.options('*', cors(corsOptions));
+app.options('*', cors());
 app.use(express.json());
 
 // Optional: second logger
