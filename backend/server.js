@@ -25,16 +25,25 @@ mongoose.connect(MONGO_URI, {
 });
 
 const app = express(); // ✅ Define app AFTER all setup
-// CORS setup
-const corsOptions = {
-  origin: 'https://we-search.ch',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
-  optionsSuccessStatus: 204
-};
+// ✅ Updated CORS setup
+const allowedOrigins = [
+  'https://we-search.ch',        // Production frontend
+  'http://localhost:3000',       // Local dev
+  'http://127.0.0.1:3000'        // Alt local dev
+];
 
-app.use(cors(corsOptions));
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('❌ Not allowed by CORS: ' + origin));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.options('*', cors(corsOptions));
 app.use(express.json());
 
