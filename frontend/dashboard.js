@@ -176,19 +176,29 @@ async function fetchEntries() {
     const res = await fetch(`${apiBase}/api/entries`, {
       headers: { Authorization: `Bearer ${token}` }
     });
+
     if (!res.ok) throw new Error('Failed to fetch entries');
 
-    window.entries = await res.json();
-    window.entries = window.entries.sort((a, b) => b.date.localeCompare(a.date)); // sort newest first
+    // ✅ Store entries globally, sorted by newest date
+    const data = await res.json();
+    window.entries = data.sort((a, b) => b.date.localeCompare(a.date));
     console.log("📦 Entries:", window.entries);
 
+    // ✅ Store unique persons, banks, and categories globally
     window.persons = [...new Set(window.entries.map(e => e.person).filter(Boolean))];
-    console.log("🧑‍🤝‍🧑 Found persons:", window.persons);
+    window.banks = [...new Set(window.entries.map(e => e.bank).filter(Boolean))];
+    window.categories = [...new Set(window.entries.map(e => e.category).filter(Boolean))];
 
+    console.log("👤 Persons:", window.persons);
+    console.log("🏦 Banks:", window.banks);
+    console.log("🏷️ Categories:", window.categories);
+
+    // ✅ Render all dependent components
     renderEntries();
     populateNewEntryDropdowns();
     populateFilters();
     renderBankBalanceForm();
+    drawCharts?.(); // optionally call if you use charts
 
   } catch (err) {
     console.error('❌ fetchEntries failed:', err);
@@ -715,6 +725,8 @@ async function saveEdit(row) {
 
 
 async function duplicateEntry(id) {
+  console.log("🔍 Looking for ID to duplicate:", id);
+console.log("📦 All current entry IDs:", entries.map(e => e._id));
   const entry = entries.find(e => e._id === id);
   if (!entry) return alert("Entry not found");
 
