@@ -98,7 +98,7 @@ function renderNotes(sortBy = 'date') {
               <div class="note-content">${note.content}</div>
             </div>
             <div class="note-buttons">
-              <button onclick="toggleDone('${note._id}')">✔️</button>
+              <button onclick="toggleDone('${note._id}')"', ${note.done})">✔️</button>
               <button data-label="Edit" onclick="editNote('${note._id}')">✏️</button>
               <button data-label="Delete" onclick="openDeleteModal('${note._id}')">🥡</button>
             </div>
@@ -210,30 +210,13 @@ document.getElementById('confirmDeleteBtn').addEventListener('click', async () =
 
 let toggleDoneTargetId = null;
 let toggleDoneCurrentState = false;
-function confirmToggleDone(id, currentState) {
-  toggleDoneTargetId = id;
-  toggleDoneCurrentState = currentState;
-
 
 function closeDoneModal() {
   toggleDoneTargetId = null;
   document.getElementById('doneModal').classList.add('hidden');
 }
 
-document.getElementById('confirmDoneBtn').addEventListener('click', async () => {
-  if (!toggleDoneTargetId) return;
-  const token = localStorage.getItem('token');
-  await fetch(`${apiBase}/api/notes/${toggleDoneTargetId}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    },
-    body: JSON.stringify({ done: !toggleDoneCurrentState })
-  });
-  closeDoneModal();
-  loadNotesFromDB();
-});
+
 
 window.addEventListener('DOMContentLoaded', () => {
   if (localStorage.getItem('theme') === 'dark') {
