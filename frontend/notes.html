@@ -70,7 +70,7 @@ border-radius: 10px;
 
 
   .dark-theme {
-    --bg: #1e1e1e;
+    --bg:  #181717;
     --text: #eee;
   }
 
@@ -250,15 +250,7 @@ border-radius: 10px;
   color: white;
 }
 
-.dark-theme .modal-content {
-  background: #2b2b2b;
-  color: #eee;
-}
 
-.dark-theme .confirm-style {
-  background: #2a2a2a;
-  color: white;
-}
   .confirm-buttons {
     display: flex;
     justify-content: center;
@@ -364,7 +356,7 @@ border-radius: 10px;
   .note-main .note-title {
     font-weight: bold;
     font-size: 1.1rem;
-    margin-bottom: 4px;
+    margin-bottom: 8px;
     color: orangered;
   }
 
@@ -457,21 +449,24 @@ background-color: rgb(255, 205, 205);
 
 
 @media (max-width: 480px) {
-
+  
 
   .note-day {
     font-size: 1rem;
+         margin: 0;
   }
 
   .note-month,
   .note-year {
     font-size: 0.7rem;
+
   }
 
   .note-buttons button {
     font-size: 0.5rem;
     width: 20px;
     height: 20px;
+          margin-bottom: 4px;
   }
 
   .note-buttons::before {
@@ -479,18 +474,111 @@ background-color: rgb(255, 205, 205);
   }
 
   .note-main .note-title {
-     font-size: 1rem;
- 
+     font-size: 0.8rem;
+    margin-top: -3px;
   
   }
 
   .note-main .note-content {
     font-size: 0.8rem;
-
+   margin-top: -7px;
 
   }
 
 }
+
+
+
+
+body.dark-theme {
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+/* Inputs and textareas */
+body.dark-theme input[type="text"],
+body.dark-theme textarea {
+  background-color: #2c2c2c;
+  color: var(--text);
+  border:none;
+}
+
+/* Buttons (generic style) */
+body.dark-theme button {
+  background-color: #333;
+  color: var(--text);
+  border: 1px solid #555;
+}
+/* Buttons (generic style) */
+body.dark-theme .sections2 {
+  background-color: #222222;
+
+  
+}
+
+body.dark-theme button:hover {
+  background-color: #444;
+}
+
+/* Save/Cancel buttons in note form */
+body.dark-theme button.save {
+  background-color: #007bff;
+  color: #fff;
+}
+
+body.dark-theme button.cancel {
+  background-color: #666;
+  color: #eee;
+}
+
+/* Notes cards */
+body.dark-theme .note-entry {
+  background-color: #2b2b2b;
+  border-left-color: #4da3ff;
+  color: var(--text);
+}
+
+/* Title, content */
+body.dark-theme .note-title,
+body.dark-theme .note-content {
+  color: var(--text);
+}
+
+/* Vertical date */
+body.dark-theme .note-date-vertical {
+  color: #ccc;
+}
+
+/* Modals */
+body.dark-theme .modal-content,
+body.dark-theme .confirm-style {
+  background-color: #2a2a2a;
+  color: #eee;
+  border: 1px solid #555;
+}
+
+/* Buttons in modals */
+body.dark-theme .modal-actions button,
+body.dark-theme .confirm-buttons button {
+  background-color: #333;
+  color: #eee;
+  border: 1px solid #555;
+}
+
+body.dark-theme .modal-actions .danger,
+body.dark-theme .confirm-buttons .yes {
+  background-color: crimson;
+  color: white;
+}
+
+body.dark-theme .note-day {
+  color: #ffffff;
+}
+
+body.dark-theme .note-title {
+  color: rgb(222, 66, 97);
+}
+
 
   </style>
 </head>

@@ -1,6 +1,6 @@
 body {
 
-
+   margin: -0.4rem;
   overflow-x: hidden; /* Hide horizontal scrollbar */
 
    font-family: system-ui, sans-serif;
@@ -1085,7 +1085,7 @@ font-size: 0.7rem;
       margin-right: 3px;
       margin-top: 10px;
       margin-bottom: 5px;
-      width: 90px;
+      width: 40px;
       height: 40px;
     }
 
@@ -2281,7 +2281,8 @@ body.dark .entry-card .amount {
 
 #bt2 {
   background-color: rgb(255, 216, 239);
-  
+   width: 40px;
+      height: 40px;
 }
 #bt2:hover {
   background-color: rgb(255, 255, 255);
