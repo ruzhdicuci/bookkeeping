@@ -217,9 +217,22 @@ function closeDoneModal() {
   document.getElementById('doneModal').classList.add('hidden');
 }
 
+async function toggleDone(id) {
+  const token = localStorage.getItem('token');
+  const note = notes.find(n => n._id === id);
+  if (!note) return;
 
+  await fetch(`${apiBase}/api/notes/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify({ done: !note.done })
+  });
 
-
+  loadNotesFromDB();
+}
 
 window.addEventListener('DOMContentLoaded', () => {
   if (localStorage.getItem('theme') === 'dark') {
@@ -272,3 +285,5 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
+
