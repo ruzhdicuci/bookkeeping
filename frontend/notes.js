@@ -80,6 +80,7 @@ function renderNotes(sortBy = 'date') {
 
 
 
+
 async function saveNote() {
   const title = document.getElementById('noteTitle').value.trim();
   const content = document.getElementById('noteContent').value.trim();
@@ -181,6 +182,11 @@ let toggleDoneCurrentState = false;
 function confirmToggleDone(id, currentState) {
   toggleDoneTargetId = id;
   toggleDoneCurrentState = currentState;
+
+  // Set modal message dynamically
+  document.getElementById('doneModalText').textContent = 
+    `Mark this note as ${currentState ? 'undone' : 'done'}?`;
+
   document.getElementById('doneModal').classList.remove('hidden');
 }
 

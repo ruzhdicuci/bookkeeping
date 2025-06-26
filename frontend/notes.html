@@ -11,9 +11,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
-    border-bottom: 1px solid var(--border-color, #ccc);
-    padding-bottom: 0.5rem;
+    
+   
   }
 
   .notes-header h2 {
@@ -46,11 +45,23 @@
 
   body {
     font-family: system-ui, sans-serif;
-    margin: 0;
-    background: var(--bg, #e3e0db);
+   margin: 0.2rem;
+
     color: var(--text, #111);
     transition: background 0.3s, color 0.3s;
+      background: #f4f2ee;
   }
+
+   .sections {
+    font-family: system-ui, sans-serif;
+   margin-top: 10px;
+   margin-bottom: 10px;
+   margin-left: 10px;
+   margin-right: 10px;
+    background: var(--bg, #e3e0db);
+border-radius: 10px;
+  }
+
 
   .dark-theme {
     --bg: #1e1e1e;
@@ -255,7 +266,7 @@
 
   .note-entry {
     background: #f9f9f9;
-    border-left: 5px solid #007bff;
+  
     border-radius: 10px;
     padding: 12px 16px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
@@ -353,6 +364,8 @@
   </style>
 </head>
 <body>
+
+   <div class="sections">
   <div class="container">
 <div class="notes-header">
   <h2>📝 My Notes</h2>
@@ -361,7 +374,10 @@
     <button onclick="goToDashboard()" title="Back to Dashboard">🔙 Back</button>
   </div>
 </div>
+</div>
+</div>
 
+ <div class="sections">
   <!-- form area -->
   <div class="note-form">
     <input type="text" id="noteTitle" placeholder="Note Title" />
@@ -371,7 +387,7 @@
       <button onclick="cancelEdit()">Cancel</button>
     </div>
   </div>
-
+</div>
   <!-- top controls -->
   <div class="top-controls">
     <button id="toggleHideBtn" onclick="toggleHideDone()">🙈 Hide Done</button>
@@ -382,7 +398,7 @@
     </select>
   </div>
 
-
+ <div class="sections">
 <div class="note-entry" data-id="...">
   <div class="note-card-row">
     <div class="note-date">
@@ -406,7 +422,7 @@
   <div id="notesList" class="notes-list"></div>
 </div>
 
-
+</div>
 
 <!-- Modal for Delete Confirmation -->
 <!-- Modal for Delete Confirmation -->
@@ -423,7 +439,7 @@
 
 <div id="doneModal" class="modal hidden">
   <div class="modal-content">
-    <p>Mark this note as ${done ? 'undone' : 'done'}?</p>
+   <p id="doneModalText">Mark this note as done?</p>
     <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 1rem;">
       <button id="confirmDoneBtn">Yes, Mark</button>
       <button id="cancelDoneBtn" onclick="closeDoneModal()">Cancel</button>
