@@ -1,14 +1,19 @@
 body {
 
-   margin: 0.4rem;
 
-
-    transition: background 0.3s, color 0.3s;
-
+  overflow-x: hidden; /* Hide horizontal scrollbar */
 
    font-family: system-ui, sans-serif;
   background: #f4f2ee;
 }
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.example::-webkit-scrollbar {
+  display: none;
+}
+
+
+
 /* Base input styling */
 input[type="number"] {
   border: none;
@@ -1794,43 +1799,7 @@ width: 100px; /* Match credit limit cards */
 
 
 
-/* width */
-::-webkit-scrollbar {
-  overflow: hidden;
-   width: 0px;
-}
 
-/* Track */
-::-webkit-scrollbar-track {
-    overflow: hidden;
- width: 0px;
-}
- 
-/* Handle */
-::-webkit-scrollbar-thumb {
-overflow: hidden;
-  width: 0px;
-}
-
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-  background: black; 
-  width: 0px;
-}
-
-
-
-
-.scroll-toggle-wrapper {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  z-index: 9999;
-  
-}
 
 #scrollUpBtn {
   padding: 10px;

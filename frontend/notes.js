@@ -86,33 +86,24 @@ function renderNotes(sortBy = 'date') {
         const month = date.toLocaleString('default', { month: 'short' });
         const year = date.getFullYear();
 
-    noteDiv.innerHTML = `
-  <div class="note-card">
-    <div class="note-date-vertical">
-      <div class="note-day">${day}</div>
-      <div class="note-month">${month}</div>
-      <div class="note-year">${year}</div>
-    </div>
-    <div class="note-main">
-      <div class="note-title"><strong>${note.title}</strong></div>
-      <div class="note-content">${note.content}</div>
-    </div>
-    <div class="note-buttons">
-      <div>
-        <small>Done</small><br>
-        <button onclick="confirmToggleDone('${note._id}', ${note.done})">✔️</button>
-      </div>
-      <div>
-        <small>Edit</small><br>
-        <button onclick="editNote('${note._id}')">✏️</button>
-      </div>
-      <div>
-        <small>Delete</small><br>
-        <button onclick="openDeleteModal('${note._id}')">🗑️</button>
-      </div>
-    </div>
-  </div>
-`;
+        noteDiv.innerHTML = `
+          <div class="note-card">
+            <div class="note-date-vertical">
+              <div class="note-day">${day}</div>
+              <div class="note-month">${month}</div>
+              <div class="note-year">${year}</div>
+            </div>
+            <div class="note-main">
+              <div class="note-title"><strong>${note.title}</strong></div>
+              <div class="note-content">${note.content}</div>
+            </div>
+            <div class="note-buttons">
+              <button onclick="toggleDone('${note._id}')">✔️</button>
+              <button data-label="Edit" onclick="editNote('${note._id}')">✏️</button>
+              <button data-label="Delete" onclick="openDeleteModal('${note._id}')">🥡</button>
+            </div>
+          </div>
+        `;
         container.appendChild(noteDiv);
       }
     }
@@ -223,12 +214,6 @@ function confirmToggleDone(id, currentState) {
   toggleDoneTargetId = id;
   toggleDoneCurrentState = currentState;
 
-  // Set modal message dynamically
-  document.getElementById('doneModalText').textContent = 
-    `Mark this note as ${currentState ? 'undone' : 'done'}?`;
-
-  document.getElementById('doneModal').classList.remove('hidden');
-}
 
 function closeDoneModal() {
   toggleDoneTargetId = null;
