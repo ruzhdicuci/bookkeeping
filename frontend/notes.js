@@ -98,7 +98,8 @@ function renderNotes(sortBy = 'date') {
               <div class="note-content">${note.content}</div>
             </div>
             <div class="note-buttons">
-              <button onclick="toggleDone('${note._id}')"', ${note.done})">✔️</button>
+             
+               <button data-label="Done" onclick="toggleDone('${note._id}')">✔️</button>
               <button data-label="Edit" onclick="editNote('${note._id}')">✏️</button>
               <button data-label="Delete" onclick="openDeleteModal('${note._id}')">🥡</button>
             </div>
