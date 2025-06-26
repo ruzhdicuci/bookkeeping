@@ -189,25 +189,65 @@ border-radius: 10px;
     100% { background: inherit; }
   }
 
-  .modal.confirm-modal {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100vw; height: 100vh;
-    background: rgba(0, 0, 0, 0.6);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
+  ..modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
 
-  .modal-content.confirm-box {
-    background: white;
-    padding: 1.5rem;
-    border-radius: 10px;
-    max-width: 350px;
-    text-align: center;
-  }
+.modal.hidden {
+  display: none;
+}
 
+.confirm-style {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.modal-actions .danger {
+  background-color: #d9534f;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.modal-actions button {
+  padding: 10px 18px;
+  border-radius: 6px;
+  border: none;
+  background: #ccc;
+  cursor: pointer;
+}
+
+.modal-actions button:hover {
+  opacity: 0.9;
+}
+
+.dark-theme .confirm-style {
+  background: #2a2a2a;
+  color: white;
+}
   .confirm-buttons {
     display: flex;
     justify-content: center;
@@ -338,7 +378,7 @@ border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 17px;
+  margin-top: 20px;
 }
 
 .note-buttons button::before {
@@ -398,25 +438,7 @@ border-radius: 10px;
     </select>
   </div>
 
- <div class="sections">
-<div class="note-entry" data-id="...">
-  <div class="note-card-row">
-    <div class="note-date">
-      <div class="note-day">26</div>
-      <div class="note-month">Jun</div>
-      <div class="note-year">2025</div>
-    </div>
-    <div class="note-content-area">
-      <div class="note-title">Note Title</div>
-      <div class="note-description">This is a longer note that wraps naturally across multiple lines depending on content.</div>
-    </div>
-    <div class="note-buttons">
-      <button onclick="toggleDone('id')">✅</button>
-      <button onclick="editNote('id')">✏️</button>
-      <button onclick="openDeleteModal('id')">🗑️</button>
-    </div>
-  </div>
-</div>
+
 
   <!-- notes list -->
   <div id="notesList" class="notes-list"></div>
@@ -437,16 +459,15 @@ border-radius: 10px;
 </div>
 
 
-<div id="doneModal" class="modal hidden">
-  <div class="modal-content">
-   <p id="doneModalText">Mark this note as done?</p>
-    <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 1rem;">
-      <button id="confirmDoneBtn">Yes, Mark</button>
-      <button id="cancelDoneBtn" onclick="closeDoneModal()">Cancel</button>
+<div id="deleteModal" class="modal hidden">
+  <div class="confirm-style">
+    <p>🗑️ Are you sure you want to delete this note?</p>
+    <div class="modal-actions">
+      <button class="danger" id="confirmDeleteBtn">Delete</button>
+      <button onclick="closeDeleteModal()">Cancel</button>
     </div>
   </div>
 </div>
-
 
 <script src="notes.js"></script>
 </body>

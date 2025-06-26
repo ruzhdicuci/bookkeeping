@@ -227,21 +227,21 @@ window.addEventListener('DOMContentLoaded', () => {
     cancelDone.addEventListener('click', closeDoneModal);
   }
 
-  const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-  if (confirmDeleteBtn) {
-    confirmDeleteBtn.addEventListener('click', async () => {
-      if (!noteToDeleteId) return;
-      const token = localStorage.getItem('token');
-      const res = await fetch(`${apiBase}/api/notes/${noteToDeleteId}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (res.ok) {
-        closeDeleteModal();
-        loadNotesFromDB();
-      }
+const confirmDelete = document.getElementById('confirmDeleteBtn');
+if (confirmDelete) {
+  confirmDelete.addEventListener('click', async () => {
+    if (!noteToDeleteId) return;
+    const token = localStorage.getItem('token');
+    const res = await fetch(`${apiBase}/api/notes/${noteToDeleteId}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` }
     });
-  }
+    if (res.ok) {
+      closeDeleteModal();
+      loadNotesFromDB();
+    }
+  });
+}
 
   const confirmDoneBtn = document.getElementById('confirmDoneBtn');
   if (confirmDoneBtn) {
