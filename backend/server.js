@@ -325,6 +325,17 @@ app.put('/api/notes/:id', auth, async (req, res) => {
 
 // Delete a note
 app.delete('/api/notes/:id', auth, async (req, res) => {
-  await Note.deleteOne({ _id: req.params.id, userId: req.userId });
-  res.json({ success: true });
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ error: 'Invalid note ID' });
+  }
+
+  try {
+    await Note.deleteOne({ _id: id, userId: req.userId });
+    res.json({ success: true });
+  } catch (err) {
+    console.error('❌ Failed to delete note:', err);
+    res.status(500).json({ error: 'Failed to delete note' });
+  }
 });
