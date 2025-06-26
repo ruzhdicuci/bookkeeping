@@ -36,7 +36,7 @@ function renderNotes(sortBy = 'date') {
   const container = document.getElementById('notesList');
   container.innerHTML = '';
 
-  let filtered = hideDone ? notes.filter(n => !n.done) : [...notes];
+  const filtered = hideDone ? notes.filter(n => !n.done) : [...notes];
 
   const sorted = filtered.sort((a, b) => {
     if (sortBy === 'title') return a.title.localeCompare(b.title);
@@ -44,6 +44,11 @@ function renderNotes(sortBy = 'date') {
   });
 
   for (const note of sorted) {
+    const date = new Date(note.createdAt);
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = date.toLocaleString('default', { month: 'short' });
+    const year = date.getFullYear();
+
     const noteDiv = document.createElement('div');
     noteDiv.className = 'note-entry';
     noteDiv.setAttribute('data-id', note._id);
@@ -51,24 +56,29 @@ function renderNotes(sortBy = 'date') {
     if (note._id === editingNoteId) noteDiv.classList.add('highlight');
 
     noteDiv.innerHTML = `
-      <div class="note-entry-columns">
-        <div class="note-entry-left">
+      <div class="note-card">
+        <div class="note-date-vertical">
+          <div class="note-day">${day}</div>
+          <div class="note-month">${month}</div>
+          <div class="note-year">${year}</div>
+        </div>
+        <div class="note-main">
           <div class="note-title"><strong>${note.title}</strong></div>
           <div class="note-content">${note.content}</div>
         </div>
-        <div class="note-entry-right">
-          <div class="note-date">${formatNoteDate(note.createdAt)}</div>
-          <div class="note-actions">
-            <button class="done-btn" onclick="confirmToggleDone('${note._id}', ${note.done})">✅</button>
-            <button class="edit-btn" onclick="editNote('${note._id}')">✏️</button>
-            <button class="delete-btn" onclick="openDeleteModal('${note._id}')">🗑️</button>
-          </div>
-        </div>
+   <div class="note-buttons">
+  <button data-label="Done" onclick="confirmToggleDone('${note._id}', ${note.done})">✅</button>
+  <button data-label="Edit" onclick="editNote('${note._id}')">✏️</button>
+  <button data-label="Delete" onclick="openDeleteModal('${note._id}')">🗑️</button>
+</div>
       </div>
     `;
+
     container.appendChild(noteDiv);
   }
 }
+
+
 
 async function saveNote() {
   const title = document.getElementById('noteTitle').value.trim();
@@ -209,5 +219,39 @@ window.addEventListener('DOMContentLoaded', () => {
   const cancelDone = document.getElementById('cancelDoneBtn');
   if (cancelDone) {
     cancelDone.addEventListener('click', closeDoneModal);
+  }
+
+  const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+  if (confirmDeleteBtn) {
+    confirmDeleteBtn.addEventListener('click', async () => {
+      if (!noteToDeleteId) return;
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${apiBase}/api/notes/${noteToDeleteId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        closeDeleteModal();
+        loadNotesFromDB();
+      }
+    });
+  }
+
+  const confirmDoneBtn = document.getElementById('confirmDoneBtn');
+  if (confirmDoneBtn) {
+    confirmDoneBtn.addEventListener('click', async () => {
+      if (!toggleDoneTargetId) return;
+      const token = localStorage.getItem('token');
+      await fetch(`${apiBase}/api/notes/${toggleDoneTargetId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ done: !toggleDoneCurrentState })
+      });
+      closeDoneModal();
+      loadNotesFromDB();
+    });
   }
 });
