@@ -13,10 +13,7 @@ function goToDashboard() {
   window.location.href = 'dashboard.html';
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-  if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-theme');
-  loadNotesFromDB();
-});
+
 
 async function loadNotesFromDB() {
   const token = localStorage.getItem('token');
@@ -37,47 +34,81 @@ function renderNotes(sortBy = 'date') {
   container.innerHTML = '';
 
   const filtered = hideDone ? notes.filter(n => !n.done) : [...notes];
+  const sorted = filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-  const sorted = filtered.sort((a, b) => {
-    if (sortBy === 'title') return a.title.localeCompare(b.title);
-    return new Date(b.createdAt) - new Date(a.createdAt);
-  });
+  const groups = {
+    Today: [],
+    Yesterday: [],
+    'This Week': [],
+    'Last Week': [],
+    Older: []
+  };
+
+  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() - 1);
+
+  const oneWeekAgo = new Date();
+  oneWeekAgo.setDate(today.getDate() - 7);
 
   for (const note of sorted) {
-    const date = new Date(note.createdAt);
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = date.toLocaleString('default', { month: 'short' });
-    const year = date.getFullYear();
+    const created = new Date(note.createdAt);
+    const createdDate = created.toDateString();
 
-    const noteDiv = document.createElement('div');
-    noteDiv.className = 'note-entry';
-    noteDiv.setAttribute('data-id', note._id);
-    if (note.done) noteDiv.classList.add('done');
-    if (note._id === editingNoteId) noteDiv.classList.add('highlight');
+    if (createdDate === today.toDateString()) {
+      groups.Today.push(note);
+    } else if (createdDate === yesterday.toDateString()) {
+      groups.Yesterday.push(note);
+    } else if (created > oneWeekAgo) {
+      groups['This Week'].push(note);
+    } else if (created <= oneWeekAgo) {
+      groups['Last Week'].push(note);
+    } else {
+      groups.Older.push(note);
+    }
+  }
 
-    noteDiv.innerHTML = `
-      <div class="note-card">
-        <div class="note-date-vertical">
-          <div class="note-day">${day}</div>
-          <div class="note-month">${month}</div>
-          <div class="note-year">${year}</div>
-        </div>
-        <div class="note-main">
-          <div class="note-title"><strong>${note.title}</strong></div>
-          <div class="note-content">${note.content}</div>
-        </div>
-   <div class="note-buttons">
-  <button data-label="Done" onclick="confirmToggleDone('${note._id}', ${note.done})">✅</button>
-  <button data-label="Edit" onclick="editNote('${note._id}')">✏️</button>
-  <button data-label="Delete" onclick="openDeleteModal('${note._id}')">🗑️</button>
-</div>
-      </div>
-    `;
+  // Render each group
+  for (const label of ['Today', 'Yesterday', 'This Week', 'Last Week', 'Older']) {
+    if (groups[label].length > 0) {
+      const heading = document.createElement('h4');
+      heading.textContent = label;
+      heading.className = 'date-group-heading';
+      container.appendChild(heading);
 
-    container.appendChild(noteDiv);
+      for (const note of groups[label]) {
+        const noteDiv = document.createElement('div');
+        noteDiv.className = 'note-entry';
+        noteDiv.setAttribute('data-id', note._id);
+
+        const date = new Date(note.createdAt);
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = date.toLocaleString('default', { month: 'short' });
+        const year = date.getFullYear();
+
+        noteDiv.innerHTML = `
+          <div class="note-card">
+            <div class="note-date-vertical">
+              <div class="note-day">${day}</div>
+              <div class="note-month">${month}</div>
+              <div class="note-year">${year}</div>
+            </div>
+            <div class="note-main">
+              <div class="note-title"><strong>${note.title}</strong></div>
+              <div class="note-content">${note.content}</div>
+            </div>
+            <div class="note-buttons">
+              <button data-label="Done" onclick="confirmToggleDone('${note._id}', ${note.done})">✔️</button>
+              <button data-label="Edit" onclick="editNote('${note._id}')">✏️</button>
+              <button data-label="Delete" onclick="openDeleteModal('${note._id}')">🗑️</button>
+            </div>
+          </div>
+        `;
+        container.appendChild(noteDiv);
+      }
+    }
   }
 }
-
 
 
 
@@ -184,7 +215,7 @@ function confirmToggleDone(id, currentState) {
   toggleDoneCurrentState = currentState;
 
   // Set modal message dynamically
-  document.getElementById('doneModalText').textContent = 
+  document.getElementById('doneModal').textContent = 
     `Mark this note as ${currentState ? 'undone' : 'done'}?`;
 
   document.getElementById('doneModal').classList.remove('hidden');
@@ -227,21 +258,21 @@ window.addEventListener('DOMContentLoaded', () => {
     cancelDone.addEventListener('click', closeDoneModal);
   }
 
-const confirmDelete = document.getElementById('confirmDeleteBtn');
-if (confirmDelete) {
-  confirmDelete.addEventListener('click', async () => {
-    if (!noteToDeleteId) return;
-    const token = localStorage.getItem('token');
-    const res = await fetch(`${apiBase}/api/notes/${noteToDeleteId}`, {
-      method: 'DELETE',
-      headers: { Authorization: `Bearer ${token}` }
+  const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+  if (confirmDeleteBtn) {
+    confirmDeleteBtn.addEventListener('click', async () => {
+      if (!noteToDeleteId) return;
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${apiBase}/api/notes/${noteToDeleteId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        closeDeleteModal();
+        loadNotesFromDB();
+      }
     });
-    if (res.ok) {
-      closeDeleteModal();
-      loadNotesFromDB();
-    }
-  });
-}
+  }
 
   const confirmDoneBtn = document.getElementById('confirmDoneBtn');
   if (confirmDoneBtn) {

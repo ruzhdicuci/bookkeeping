@@ -2308,3 +2308,14 @@ body.dark .entry-card .amount {
   background-color: #e44343;
   color: white;
 }
+
+
+#bt2 {
+  background-color: rgb(255, 216, 239);
+  
+}
+#bt2:hover {
+  background-color: rgb(255, 255, 255);
+  color: red;
+}
+

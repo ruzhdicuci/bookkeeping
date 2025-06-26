@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>📝 My Notes</title>
+  <title>Notes</title>
 
   <style>
   /* Layout and spacing */
@@ -11,7 +11,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    
+      margin-top: -15px;
+   margin-bottom: -15px;
    
   }
 
@@ -45,22 +46,27 @@
 
   body {
     font-family: system-ui, sans-serif;
-   margin: 0.2rem;
+   margin: 0.4rem;
 
     color: var(--text, #111);
     transition: background 0.3s, color 0.3s;
       background: #f4f2ee;
   }
 
-   .sections {
+  
+
+   .sections2 {
     font-family: system-ui, sans-serif;
    margin-top: 10px;
-   margin-bottom: 10px;
-   margin-left: 10px;
-   margin-right: 10px;
+   padding: 10px;
+      padding-top: -10px;
+   padding-bottom: -10px;
     background: var(--bg, #e3e0db);
 border-radius: 10px;
   }
+
+ 
+
 
 
   .dark-theme {
@@ -72,7 +78,7 @@ border-radius: 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
+  
   }
 
   h1 {
@@ -147,15 +153,18 @@ border-radius: 10px;
   .notes-list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 6px;
     margin-top: 1.5rem;
+    font-size: 0.8rem;
+      
   }
 
   .note-form {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    margin: 1rem 0;
+   margin-top: 5px;
+   margin-bottom: -5px;
     width: 100%;
   }
 
@@ -189,59 +198,61 @@ border-radius: 10px;
     100% { background: inherit; }
   }
 
-  ..modal {
+/* Modal Overlay */
+.modal {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.5); /* semi-transparent overlay */
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   z-index: 1000;
 }
 
+/* Hide when not shown */
 .modal.hidden {
   display: none;
 }
 
-.confirm-style {
-  background: white;
+/* Modal Box Content */
+.modal-content {
+  background: var(--bg, #fff);
   padding: 2rem;
   border-radius: 12px;
-  max-width: 400px;
-  width: 90%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   text-align: center;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 350px;
 }
 
-.modal-actions {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-top: 1.5rem;
-}
-
-.modal-actions .danger {
-  background-color: #d9534f;
+/* Modal Buttons */
+.modal-content button {
+  padding: 8px 16px;
+  margin: 0 10px;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  border: none;
+  background:  crimson;
+  transition: background 0.2s ease;
   color: white;
-  border: none;
-  padding: 10px 18px;
-  border-radius: 6px;
-  cursor: pointer;
 }
 
-.modal-actions button {
-  padding: 10px 18px;
-  border-radius: 6px;
-  border: none;
-  background: #ccc;
-  cursor: pointer;
+.modal-content button:hover {
+  background: #bbb;
 }
 
-.modal-actions button:hover {
-  opacity: 0.9;
+.modal-content .danger {
+  background-color: crimson;
+  color: white;
+}
+
+.dark-theme .modal-content {
+  background: #2b2b2b;
+  color: #eee;
 }
 
 .dark-theme .confirm-style {
@@ -293,9 +304,10 @@ border-radius: 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 1.2rem;
+    
     flex-wrap: wrap;
-    gap: 10px;
+
+    margin-bottom: -20px;
   }
 
   .top-controls .right-side {
@@ -332,23 +344,27 @@ border-radius: 10px;
     min-width: 50px;
     font-size: 0.85rem;
     color: #666;
+     text-transform: uppercase;
   }
 
   .note-day {
     font-size: 1.4rem;
     font-weight: bold;
     line-height: 1;
+    color: #111;
   }
 
   .note-main {
     flex: 1;
     word-break: break-word;
+    color: #444;
   }
 
   .note-main .note-title {
     font-weight: bold;
     font-size: 1.1rem;
     margin-bottom: 4px;
+    color: orangered;
   }
 
   .note-main .note-content {
@@ -401,38 +417,80 @@ border-radius: 10px;
   display: none !important;
 }
 
+#bt1 {
+background-color: rgb(255, 255, 255);
+}
+
+#bt1:hover {
+background-color: rgb(255, 205, 205);
+}
+
+.date-group-heading {
+  margin: 0.7rem 0 0.2rem;
+  padding-left: 4px;
+  color: #666;
+  font-weight: bold;
+  font-size: 1rem;
+  text-transform: lowercase;
+  font-size: 0.8rem;
+}
+
+#save {
+  background-color: rgb(232, 255, 196);
+  color: black;
+  margin-top: -13px;
+}
+#save:hover {
+  background-color: black;
+  color: rgb(232, 255, 196);
+}
+#cancel{
+  background-color: rgb(219, 232, 255);
+  color: black;
+  margin-top: -13px;
+}
+#cancel:hover {
+  background-color: black;
+  color: lightsalmon;
+}
+
+
   </style>
 </head>
 <body>
 
-   <div class="sections">
+   <div class="sections2">
   <div class="container">
 <div class="notes-header">
-  <h2>📝 My Notes</h2>
+  <h2>📝 Notes</h2>
   <div class="header-buttons">
-    <button onclick="toggleTheme()" title="Toggle Theme">🌓 Theme</button>
-    <button onclick="goToDashboard()" title="Back to Dashboard">🔙 Back</button>
+    <button id="bt1"  onclick="toggleTheme()" title="Toggle Theme">🌓</button>
+    <button id="bt1"  onclick="goToDashboard()" title="Back to Dashboard">🔙 </button>
   </div>
+</div>
 </div>
 </div>
 </div>
 
- <div class="sections">
+ <div class="sections2">
   <!-- form area -->
   <div class="note-form">
     <input type="text" id="noteTitle" placeholder="Note Title" />
-    <textarea id="noteContent" placeholder="Write your note here..."></textarea>
+    <textarea id="noteContent" style="font-family: system-ui, sans-serif;" placeholder="Write your note here..."></textarea>
     <div class="note-actions">
-      <button onclick="saveNote()" class="save">💾 Save</button>
-      <button onclick="cancelEdit()">Cancel</button>
+      <button id="save" onclick="saveNote()" class="save">Save</button>
+      <button id="cancel" onclick="cancelEdit()">Cancel</button>
     </div>
   </div>
 </div>
+</div>
+
+ <div class="sections2">
   <!-- top controls -->
   <div class="top-controls">
-    <button id="toggleHideBtn" onclick="toggleHideDone()">🙈 Hide Done</button>
+    <button id="toggleHideBtn" style="background-color: white; color: rgb(103, 103, 104);" onclick="toggleHideDone()">Hide Done</button>
    
-    <select onchange="renderNotes(this.value)">
+    <select style="background-color: white; color: rgb(103, 103, 104);"  onchange="renderNotes(this.value)">
       <option value="date">Date</option>
       <option value="title">Title</option>
     </select>
@@ -444,29 +502,26 @@ border-radius: 10px;
   <div id="notesList" class="notes-list"></div>
 </div>
 
-</div>
 
-<!-- Modal for Delete Confirmation -->
-<!-- Modal for Delete Confirmation -->
+<!-- Delete Modal -->
 <div id="deleteModal" class="modal hidden">
   <div class="modal-content">
     <p>Are you sure you want to delete this note?</p>
-    <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 1rem;">
-      <button id="confirmDeleteBtn" class="danger">Yes, Delete</button>
-      <button id="cancelDeleteBtn" onclick="closeDeleteModal()">Cancel</button>
+    <div class="modal-actions">
+      <button id="confirmDeleteBtn">Yes, Delete</button>
+      <button id="cancelDeleteBtn">Cancel</button>
     </div>
   </div>
 </div>
 
-
-<div id="deleteModal" class="modal hidden">
-  <div class="confirm-style">
-    <p>🗑️ Are you sure you want to delete this note?</p>
-    <div class="modal-actions">
-      <button class="danger" id="confirmDeleteBtn">Delete</button>
-      <button onclick="closeDeleteModal()">Cancel</button>
-    </div>
+<!-- Done Modal -->
+<div id="doneModal" class="modal hidden">
+  <div class="modal-content">
+    <p>Mark this note as ${currentState ? 'not done' : 'done'}?</p>
+    <button id="confirmDoneBtn">Yes</button>
+    <button id="cancelDoneBtn" onclick="closeDoneModal()">Cancel</button>
   </div>
+</div>
 </div>
 
 <script src="notes.js"></script>
