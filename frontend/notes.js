@@ -143,10 +143,11 @@ async function saveNote() {
   }
 }
 
+
 function toggleHideDone() {
   hideDone = !hideDone;
   const btn = document.getElementById('toggleHideBtn');
-  if (btn) btn.textContent = hideDone ? '📑 Show Done' : '🪪 Hide Done';
+  btn.textContent = hideDone ? '📑 Show Done' : '🪪 Hide Done';
   renderNotes();
 }
 
