@@ -100,7 +100,7 @@ function renderNotes(sortBy = 'date') {
             <div class="note-buttons">
               <button data-label="Done" onclick="confirmToggleDone('${note._id}', ${note.done})">✔️</button>
               <button data-label="Edit" onclick="editNote('${note._id}')">✏️</button>
-              <button data-label="Delete" onclick="openDeleteModal('${note._id}')">🗑️</button>
+              <button data-label="Delete" onclick="openDeleteModal('${note._id}')">🥡</button>
             </div>
           </div>
         `;
@@ -145,7 +145,7 @@ async function saveNote() {
 function toggleHideDone() {
   hideDone = !hideDone;
   const btn = document.getElementById('toggleHideBtn');
-  if (btn) btn.textContent = hideDone ? '👀 Show Done' : '🙈 Hide Done';
+  if (btn) btn.textContent = hideDone ? '📑 Show Done' : '🪪 Hide Done';
   renderNotes();
 }
 
@@ -215,7 +215,7 @@ function confirmToggleDone(id, currentState) {
   toggleDoneCurrentState = currentState;
 
   // Set modal message dynamically
-  document.getElementById('doneModal').textContent = 
+  document.getElementById('doneModalText').textContent = 
     `Mark this note as ${currentState ? 'undone' : 'done'}?`;
 
   document.getElementById('doneModal').classList.remove('hidden');

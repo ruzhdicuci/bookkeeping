@@ -1,3 +1,6 @@
+2
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -335,14 +338,15 @@ border-radius: 10px;
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 1rem;
+    gap: 0.4rem;
+   
   }
 
   .note-date-vertical {
     text-align: center;
     margin-right: 0.5rem;
     min-width: 50px;
-    font-size: 0.85rem;
+    font-size: 0.7rem;
     color: #666;
      text-transform: uppercase;
   }
@@ -378,7 +382,7 @@ border-radius: 10px;
   justify-content: flex-end;
   align-items: center;
   flex-wrap: wrap;
-  min-width: 100px;
+  min-width: 80px;
 }
 
 .note-buttons button {
@@ -428,7 +432,7 @@ background-color: rgb(255, 205, 205);
 .date-group-heading {
   margin: 0.7rem 0 0.2rem;
   padding-left: 4px;
-  color: #666;
+  color: #426de3;
   font-weight: bold;
   font-size: 1rem;
   text-transform: lowercase;
@@ -454,6 +458,42 @@ background-color: rgb(255, 205, 205);
   color: lightsalmon;
 }
 
+
+@media (max-width: 480px) {
+
+
+  .note-day {
+    font-size: 1rem;
+  }
+
+  .note-month,
+  .note-year {
+    font-size: 0.7rem;
+  }
+
+  .note-buttons button {
+    font-size: 0.5rem;
+    width: 20px;
+    height: 20px;
+  }
+
+  .note-buttons::before {
+    font-size: 0.65rem;
+  }
+
+  .note-main .note-title {
+     font-size: 1rem;
+ 
+  
+  }
+
+  .note-main .note-content {
+    font-size: 0.8rem;
+
+
+  }
+
+}
 
   </style>
 </head>
@@ -488,7 +528,7 @@ background-color: rgb(255, 205, 205);
  <div class="sections2">
   <!-- top controls -->
   <div class="top-controls">
-    <button id="toggleHideBtn" style="background-color: white; color: rgb(103, 103, 104);" onclick="toggleHideDone()">Hide Done</button>
+    <button id="toggleHideBtn" style="background-color: white; color: rgb(103, 103, 104);" onclick="toggleHideDone()">🪪 Hide Done</button>
    
     <select style="background-color: white; color: rgb(103, 103, 104);"  onchange="renderNotes(this.value)">
       <option value="date">Date</option>

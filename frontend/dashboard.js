@@ -534,11 +534,11 @@ sortedLabels.forEach(label => {
           <div class="buttons">
             ${
               isEditing
-                ? `<button onclick="cancelEdit()" class="action-btn">❌ Cancel</button>`
-                : `<button onclick="editEntry('${e._id}')" class="action-btn">✏️</button>`
+                ? `<button onclick="cancelEdit()" style="border: 1px solid #f2f0f0;" class="action-btn">❌ Cancel</button>`
+                : `<button onclick="editEntry('${e._id}')" style="border: 1px solid #f2f0f0;" " class="action-btn">✏️</button>`
             }
-            <button onclick="duplicateEntry('${e._id}')" class="action-btn">📄</button>
-            <button onclick="showDeleteModal('${e._id}')" class="action-btn">🗑️</button>
+            <button onclick="duplicateEntry('${e._id}')" style="border: 1px solid #f2f0f0;" class="action-btn">📄</button>
+            <button onclick="showDeleteModal('${e._id}')" style="border: 1px solid #f2f0f0;"  class="action-btn">🗑️</button>
           </div>
         </div>
       `;
