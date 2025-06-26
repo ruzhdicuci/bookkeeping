@@ -557,11 +557,12 @@ background-color: rgb(255, 205, 205);
 <!-- Done Modal -->
 <div id="doneModal" class="modal hidden">
   <div class="modal-content">
-    <p>Mark this note as ${currentState ? 'not done' : 'done'}?</p>
-    <button id="confirmDoneBtn">Yes</button>
-    <button id="cancelDoneBtn" onclick="closeDoneModal()">Cancel</button>
+    <p>Mark this note as ${done ? 'not done' : 'done'}?</p>
+    <div class="modal-actions">
+      <button id="confirmDoneBtn">Yes</button>
+      <button id="cancelDoneBtn" onclick="closeDoneModal()">Cancel</button>
+    </div>
   </div>
-</div>
 </div>
 
 <script src="notes.js"></script>
