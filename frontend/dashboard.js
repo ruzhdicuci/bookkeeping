@@ -1285,19 +1285,6 @@ function showChangePassword(email) {
 }
 
 
-function showChangePassword(user) {
-  const newPassword = prompt(`Set new password for ${user}:`);
-  if (!newPassword) return;
-
-  fetch(`https://bookkeeping-i8e0.onrender.com/api/users/${encodeURIComponent(user)}/password`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ password: newPassword })
-  })
-    .then(res => res.json())
-    .then(data => alert(data.message || 'Password updated.'))
-    .catch(err => alert('❌ Failed to change password'));
-}
 
 
 
