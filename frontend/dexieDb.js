@@ -7,18 +7,17 @@ db.version(1).stores({
   notes: "_id, title, content, done, synced, lastUpdated"
 });
 
-// Save or update an entry locally
+// ✅ For entries
 export async function saveEntryLocally(entry) {
-  entry._id = entry._id || crypto.randomUUID();   // ✅ Ensure valid _id
+  entry._id = entry._id || crypto.randomUUID(); // Ensure ID is always present
   entry.synced = navigator.onLine;
   entry.lastUpdated = Date.now();
   await db.entries.put(entry);
 }
 
-
-// Save or update a note locally
+// ✅ For notes
 export async function saveNoteLocally(note) {
-  note._id = note._id || crypto.randomUUID();     // ✅ Ensure valid _id
+  note._id = note._id || crypto.randomUUID(); // This line is crucial!
   note.synced = navigator.onLine;
   note.lastUpdated = Date.now();
   await db.notes.put(note);
