@@ -4,7 +4,8 @@
   getUnsynced,
   markAsSynced
 } from './dexieDb.js';
-
+import db from './dexieDb.js';
+window.db = db; // 👈 for debugging in DevTools
 
 
 
@@ -1890,21 +1891,24 @@ window.addEventListener('load', async () => {
 async function syncToCloud() {
   try {
     const unsynced = await getUnsynced("entries");
+for (const entry of unsynced) {
+  // ✅ Remove _id before sending to backend
+  const { _id, ...entryToSend } = entry;
 
-    for (const entry of unsynced) {
-      try {
-        const res = await fetch('/api/entries', {
-          method: 'POST',
-          body: JSON.stringify(entry),
-          headers: { 'Content-Type': 'application/json' }
-        });
-        if (res.ok) await markAsSynced("entries", entry._id);
-      } catch (err) {
-        console.warn("❌ Failed to sync entry", entry._id, err);
-      }
-    }
-  } catch (outerErr) {
-    console.error("❌ syncToCloud outer error:", outerErr);
+  const res = await fetch(`${backend}/api/entries`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(entryToSend)
+  });
+
+  if (res.ok) {
+    await markAsSynced('entries', entry._id); // keep _id for Dexie removal
+    console.log(`✅ Synced entry: ${entry.description}`);
+  } else {
+    console.warn(`⚠️ Failed to sync entry: ${entry.description}`);
   }
 }
 
