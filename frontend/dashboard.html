@@ -983,21 +983,6 @@ if (tabId === 'chartsTab') {
 
 
 
-<div id="syncStatus" style="
-  text-align: center;
-  background: #fef4d2;
-  color: #333;
-  padding: 4px 8px;
-  font-size: 0.9rem;
-  display: none;
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  z-index: 999;
-">
-  Syncing...
-</div>
-
 
 
 <div class="filter-grid">
@@ -1011,6 +996,7 @@ if (tabId === 'chartsTab') {
 <script src="https://cdn.jsdelivr.net/npm/idb@7/build/iife/index-min.js"></script>
 
 <script type="module" src="dashboard.js"></script>
+<div id="syncOverlay" class="hidden">Synced</div>
 </body>
 </html>
 

@@ -1922,7 +1922,7 @@ async function syncToCloud() {
     }
 
     if (syncedCount > 0) {
-      showSyncStatus(`✅ Synced ${syncedCount} entries`);
+  showCenteredMessage(`✅ Synced ${syncedCount} entr${syncedCount === 1 ? 'y' : 'ies'}`);
       await fetchEntries(); // re-fetch from cloud
       renderEntries();
       renderBankBalanceForm();
@@ -1982,7 +1982,40 @@ window.addEventListener('online', async () => {
   }
 });
 
+function showCenteredMessage(msg, duration = 3000) {
+  let el = document.getElementById('syncStatus');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'syncStatus';
+    document.body.appendChild(el);
+  }
 
+  Object.assign(el.style, {
+    textAlign: 'center',
+    background: '#fef4d2',
+    color: '#222',
+    padding: '10px 16px',
+    fontSize: '1.2rem',
+    fontWeight: 'bold',
+    display: 'block',
+    position: 'fixed',
+    top: '0',
+    left: '50%',
+    transform: 'translateX(-50%)',
+    zIndex: '9999',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    borderRadius: '0 0 6px 6px',
+    maxWidth: '80%'
+  });
+
+  el.textContent = msg;
+
+  if (duration > 0) {
+    setTimeout(() => {
+      el.style.display = 'none';
+    }, duration);
+  }
+}
 
 
 window.getSelectedPersons = getSelectedPersons;
@@ -2017,3 +2050,5 @@ window.toggleAllPersons = toggleAllPersons;
 window.populatePersonFilterForDashboard = populatePersonFilterForDashboard;
 window.showChangePassword = showChangePassword
 window.showSyncStatus = showSyncStatus
+
+
