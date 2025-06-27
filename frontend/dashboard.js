@@ -1,5 +1,3 @@
-  import Dexie from 'dexie';
-
 const db = new Dexie('bookkeeping-db');
 db.version(1).stores({
   'offline-entries': '++id'
