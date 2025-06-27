@@ -353,7 +353,7 @@ window.openDeleteModal = openDeleteModal;
 window.toggleHideDone = toggleHideDone;
 window.editNote = editNote;
 window.toggleTheme = toggleTheme;
-
+window.toggleDone = toggleDone;
 window.saveNote = saveNote;
 window.cancelEdit = cancelEdit;
 window.formatNoteDate = formatNoteDate;
