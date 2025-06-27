@@ -1,8 +1,32 @@
 const db = new Dexie('bookkeeping-db');
+
 db.version(1).stores({
   entries: '_id, date, amount, category, person, bank, synced, lastUpdated',
-  notes: '_id, title, content, done, synced, lastUpdated'
+  notes: '_id, title, content, done, synced, lastUpdated',
+  balances: 'bank' // primary key is the bank name or ID
 });
+
+
+
+// Save an array of balances (overwrites existing entries)
+export async function saveBankBalances(balances) {
+  try {
+    await db.balances.clear(); // optional: remove old ones
+    await db.balances.bulkPut(balances); // fast insert/update
+  } catch (err) {
+    console.error('❌ Failed to save balances in Dexie:', err);
+  }
+}
+
+// Get all cached balances
+export async function getCachedBankBalances() {
+  try {
+    return await db.balances.toArray();
+  } catch (err) {
+    console.error('❌ Failed to get cached balances from Dexie:', err);
+    return [];
+  }
+}
 
 // ✅ Save entry to entries table
 export async function saveEntryLocally(entry) {

@@ -136,13 +136,30 @@ async function loadInitialBankBalances() {
 
     if (!res.ok) throw new Error('Failed to load balances');
 
-    initialBankBalances = await res.json();
-    localStorage.setItem('initialBankBalances', JSON.stringify(initialBankBalances));
+    const balances = await res.json();
+    initialBankBalances = balances;
+
+    // ✅ Save to Dexie instead of localStorage
+    await saveBankBalances(balances);
+
+    // ✅ Optional: also keep localStorage if you still use it elsewhere
+    localStorage.setItem('initialBankBalances', JSON.stringify(balances));
   } catch (err) {
-    console.warn('⚠️ Could not load balances from backend. Using localStorage fallback.');
-    const local = localStorage.getItem('initialBankBalances');
-    if (local) initialBankBalances = JSON.parse(local);
+    console.warn('⚠️ Could not load balances from backend. Trying IndexedDB...');
+    
+    // ✅ Try Dexie fallback first
+    const cached = await getCachedBankBalances();
+    if (cached.length > 0) {
+      initialBankBalances = cached;
+    } else {
+      // Optional final fallback
+      const local = localStorage.getItem('initialBankBalances');
+      if (local) initialBankBalances = JSON.parse(local);
+    }
   }
+
+  // ✅ Render bank balances from whatever was loaded
+  renderBankBalanceForm(initialBankBalances);
 }
 
  function populatePersonFilterForDashboard(persons) {
@@ -1887,10 +1904,17 @@ window.addEventListener('beforeunload', (e) => {
 // sync to cloud
 
 window.addEventListener('load', async () => {
-  const entries = await getCachedEntries();
-  renderEntries(entries); // your existing render logic
+  const cachedEntries = await getCachedEntries();
+  renderEntries(cachedEntries);
 
-  if (navigator.onLine) syncToCloud();
+  const cachedBalances = await getCachedBankBalances();
+  renderBankBalanceForm(cachedBalances);
+
+  if (navigator.onLine) {
+    await syncToCloud();
+    await fetchEntries();            // fetch + render fresh entries
+    await loadInitialBankBalances(); // fetch + render fresh balances
+  }
 });
 
 async function syncToCloud() {
