@@ -1,6 +1,5 @@
 const db = new Dexie('bookkeeping-db');
 db.version(1).stores({
-  'offline-entries': '++id',
   entries: '_id, date, amount, category, person, bank, synced, lastUpdated',
   notes: '_id, title, content, done, synced, lastUpdated'
 });
