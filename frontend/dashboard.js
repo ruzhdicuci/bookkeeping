@@ -1891,8 +1891,9 @@ window.addEventListener('load', async () => {
 async function syncToCloud() {
   try {
     const unsynced = await getUnsynced("entries");
+
     for (const entry of unsynced) {
-      // ✅ Remove _id before sending to backend
+      // ✅ Remove _id before sending
       const { _id, ...entryToSend } = entry;
 
       const res = await fetch(`${backend}/api/entries`, {
@@ -1905,10 +1906,11 @@ async function syncToCloud() {
       });
 
       if (res.ok) {
-        await markAsSynced('entries', entry._id); // keep _id for Dexie removal
-        console.log(`✅ Synced entry: ${entry.description}`);
+        await markAsSynced("entries", _id); // Keep Dexie ID to mark synced
+        console.log(`✅ Synced: ${entry.description}`);
       } else {
-        console.warn(`⚠️ Failed to sync entry: ${entry.description}`);
+        const err = await res.text();
+        console.warn(`⚠️ Failed to sync: ${entry.description}\n${err}`);
       }
     }
   } catch (err) {
