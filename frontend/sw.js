@@ -1,14 +1,13 @@
-const CACHE_NAME = 'bookkeeping-cache-v1';
+const CACHE_NAME = 'bookkeeping-v1';
 const urlsToCache = [
   '/',
   '/dashboard.html',
-  '/notes.html',
-  '/login.js',
   '/dashboard.js',
+  '/notes.html',
   '/notes.js',
+  '/login.js',
   '/style.css',
   '/manifest.json'
-  // Add more files here as needed
 ];
 
 self.addEventListener('install', event => {
@@ -17,7 +16,7 @@ self.addEventListener('install', event => {
       return cache.addAll(urlsToCache);
     })
   );
-  console.log('🔧 Service Worker installed');
+  console.log('✅ Service Worker installed');
 });
 
 self.addEventListener('fetch', event => {
