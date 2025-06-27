@@ -4,8 +4,7 @@
   getUnsynced,
   markAsSynced
 } from './dexieDb.js';
-import db from './dexieDb.js';
-window.db = db; // 👈 for debugging in DevTools
+
 
 
 
