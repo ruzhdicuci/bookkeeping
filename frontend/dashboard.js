@@ -1879,7 +1879,13 @@ try {
   
 
 // sync to cloud
-
+window.addEventListener('beforeunload', (e) => {
+  if (!navigator.onLine) {
+    e.preventDefault();
+    e.returnValue = ''; // 🛑 Triggers the browser's native "Leave site?" dialog
+  }
+});
+// sync to cloud
 
 window.addEventListener('load', async () => {
   const entries = await getCachedEntries();
@@ -1891,10 +1897,11 @@ window.addEventListener('load', async () => {
 async function syncToCloud() {
   try {
     const unsynced = await getUnsynced("entries");
+    let syncedCount = 0;
 
     for (const entry of unsynced) {
-      // ✅ Remove _id before sending
       const { _id, ...entryToSend } = entry;
+      console.log("🔁 Sending to backend:", entryToSend);
 
       const res = await fetch(`${backend}/api/entries`, {
         method: 'POST',
@@ -1906,15 +1913,23 @@ async function syncToCloud() {
       });
 
       if (res.ok) {
-        await markAsSynced("entries", _id); // Keep Dexie ID to mark synced
-        console.log(`✅ Synced: ${entry.description}`);
+        await markAsSynced('entries', _id);
+        console.log(`✅ Synced entry: ${entry.description}`);
+        syncedCount++;
       } else {
-        const err = await res.text();
-        console.warn(`⚠️ Failed to sync: ${entry.description}\n${err}`);
+        console.warn(`⚠️ Failed to sync entry: ${entry.description}`);
       }
     }
+
+    if (syncedCount > 0) {
+      showSyncStatus(`✅ Synced ${syncedCount} entries`);
+      await fetchEntries(); // re-fetch from cloud
+      renderEntries();
+      renderBankBalanceForm();
+    }
   } catch (err) {
-    console.error('❌ Sync error:', err);
+    console.error("❌ Sync error:", err);
+    showSyncStatus('❌ Sync failed – check console');
   }
 }
 // sync to cloud
