@@ -119,7 +119,6 @@ noteDiv.innerHTML = `
 }
 
 
-
 async function saveNote() {
   const title = document.getElementById('noteTitle').value.trim();
   const content = document.getElementById('noteContent').value.trim();
@@ -131,23 +130,44 @@ async function saveNote() {
     ? `${apiBase}/api/notes/${editingNoteId}`
     : `${apiBase}/api/notes`;
 
-  const res = await fetch(url, {
-    method,
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    },
-    body: JSON.stringify({ title, content })
-  });
+  const note = {
+    _id: editingNoteId || crypto.randomUUID(), // ensure local ID
+    title,
+    content,
+    done: false,
+    createdAt: new Date().toISOString()
+  };
 
-  if (res.ok) {
-    editingNoteId = null;
-    document.getElementById('noteTitle').value = '';
-    document.getElementById('noteContent').value = '';
-    loadNotesFromDB();
-  } else {
-    alert('Failed to save note');
+  // Save locally (offline support)
+  await saveNoteLocally(note);
+
+  // Sync to server if online
+  if (navigator.onLine) {
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(note)
+      });
+
+      if (res.ok) {
+        await markAsSynced("notes", note._id);
+      } else {
+        alert('Failed to save note to server');
+      }
+    } catch (err) {
+      console.warn("Sync failed, will retry later:", err);
+    }
   }
+
+  // Clear form and refresh
+  editingNoteId = null;
+  document.getElementById('noteTitle').value = '';
+  document.getElementById('noteContent').value = '';
+  loadNotesFromDB();
 }
 
 
