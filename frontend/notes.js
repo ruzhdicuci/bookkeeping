@@ -21,6 +21,41 @@ function goToDashboard() {
   window.location.href = 'dashboard.html';
 }
 
+// sync offline
+async function loadNotes() {
+  try {
+    const online = window.navigator.onLine;
+
+    let notes;
+    if (online) {
+      // Try backend first
+      const res = await fetch('/api/notes');
+      notes = await res.json();
+
+      // Save/update local
+      await db.notes.clear();
+      await db.notes.bulkPut(notes);
+    } else {
+      // Offline fallback
+      console.warn('📴 Offline: loading notes from Dexie');
+      notes = await db.notes.toArray();
+    }
+
+    renderNotes(notes);
+  } catch (err) {
+    console.error('Failed to load notes', err);
+    // Fallback if fetch fails
+    const fallbackNotes = await db.notes.toArray();
+    renderNotes(fallbackNotes);
+  }
+}
+
+async function saveNoteToDexie(note) {
+  note.lastUpdated = Date.now();
+  note.synced = false; // Mark as unsynced if offline
+
+  await db.notes.put(note);
+}
 
 
 async function loadNotesFromDB() {
