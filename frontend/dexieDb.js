@@ -16,14 +16,17 @@ export async function saveEntryLocally(entry) {
 
 // Save or update a note locally
 export async function saveNoteLocally(note) {
+  note._id = note._id || crypto.randomUUID();
   note.synced = navigator.onLine;
   note.lastUpdated = Date.now();
   await db.notes.put(note);
 }
 
-// Get all cached entries
-export async function getCachedEntries() {
-  return await db.entries.toArray();
+
+// Get unsynced entries or notes from local cache
+export async function getUnsynced(type = "entries") {
+  const all = await db[type].where("synced").equals(false).toArray();
+  return all.filter(item => item._id && typeof item._id === 'string');
 }
 
 // Get all cached notes
@@ -31,10 +34,6 @@ export async function getCachedNotes() {
   return await db.notes.toArray();
 }
 
-// Get entries/notes that need syncing
-export async function getUnsynced(type = "entries") {
-  return await db[type].where("synced").equals(false).toArray();
-}
 
 // Mark an entry/note as synced
 export async function markAsSynced(type, _id) {

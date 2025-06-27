@@ -126,7 +126,12 @@ async function syncNotesToCloud() {
   const unsynced = await getUnsynced("notes");
 
   for (const note of unsynced) {
-    if (!note._id) continue;
+    // ✅ skip notes with missing or bad _id
+    if (!note._id || typeof note._id !== 'string') {
+      console.warn("❌ Invalid _id on note:", note);
+      continue;
+    }
+
     try {
       const res = await fetch(`${apiBase}/api/notes`, {
         method: 'POST',
@@ -141,7 +146,7 @@ async function syncNotesToCloud() {
         await markAsSynced("notes", note._id);
       }
     } catch (err) {
-      console.warn("❌ Notes sync failed:", err);
+      console.warn("❌ Sync failed:", err);
     }
   }
 }
