@@ -119,6 +119,35 @@ noteDiv.innerHTML = `
 }
 
 
+
+
+// Save to Dexie
+async function syncNotesToCloud() {
+  const unsynced = await getUnsynced("notes");
+
+  for (const note of unsynced) {
+    if (!note._id) continue;
+    try {
+      const res = await fetch(`${apiBase}/api/notes`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(note)
+      });
+
+      if (res.ok) {
+        await markAsSynced("notes", note._id);
+      }
+    } catch (err) {
+      console.warn("❌ Notes sync failed:", err);
+    }
+  }
+}
+// sync to cloud
+
+
 async function saveNote() {
   const title = document.getElementById('noteTitle').value.trim();
   const content = document.getElementById('noteContent').value.trim();
@@ -130,16 +159,17 @@ async function saveNote() {
     ? `${apiBase}/api/notes/${editingNoteId}`
     : `${apiBase}/api/notes`;
 
-  const note = {
-    _id: editingNoteId || crypto.randomUUID(),  // ✅ generate _id if needed
-    title,                                      // ✅ use value from input
-    content,
-    done: false,
-    createdAt: new Date().toISOString()
-  };
+ const note = {
+  _id: editingNoteId || crypto.randomUUID(),  // ✅ Required!
+  title,
+  content,
+  done: false,
+  createdAt: new Date().toISOString()
+};
 
-  // Save offline
-  await saveNoteLocally(note);
+await saveNoteLocally(note);
+
+
 
   // Sync to backend
   if (navigator.onLine) {
@@ -332,32 +362,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
 
 
-// Save to Dexie
-await saveNoteLocally(note);
 
-// Send to server if online
-if (navigator.onLine) {
-  const res = await fetch(url, {
-    method,
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    },
-    body: JSON.stringify(note)
-  });
-
-  if (res.ok) {
-    editingNoteId = null;
-    document.getElementById('noteTitle').value = '';
-    document.getElementById('noteContent').value = '';
-    loadNotesFromDB();
-    await markAsSynced("notes", note._id);
-  } else {
-    alert('Failed to save note');
-  }
-}
-
-// sync to cloud
 
 window.goToDashboard = goToDashboard;
 window.openDeleteModal = openDeleteModal;
