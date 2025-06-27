@@ -25,10 +25,16 @@ export async function saveNoteLocally(note) {
 
 // Get unsynced entries or notes from local cache
 export async function getUnsynced(type = "entries") {
+  if (!['entries', 'notes'].includes(type)) {
+    console.error("❌ Invalid type passed to getUnsynced:", type);
+    return [];
+  }
+
   const all = await db[type].where("synced").equals(false).toArray();
-  // ✅ Filter out missing/bad _id values
   return all.filter(item => item._id && typeof item._id === 'string');
 }
+
+
 
 // Get all cached notes
 export async function getCachedNotes() {
