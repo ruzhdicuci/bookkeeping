@@ -39,3 +39,8 @@ export async function getCachedNotes() {
 export async function markAsSynced(type, _id) {
   await db[type].update(_id, { synced: true });
 }
+
+// Get all cached bookkeeping entries
+export async function getCachedEntries() {
+  return await db.entries.toArray();
+}
