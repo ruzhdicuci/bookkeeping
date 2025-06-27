@@ -37,15 +37,23 @@ export async function saveNoteLocally(note) {
 
 // Get unsynced entries or notes from local cache
 export async function getUnsynced(type = "entries") {
-  if (!['entries', 'notes'].includes(type)) {
-    console.error("❌ Invalid type passed to getUnsynced:", type);
+  try {
+    const all = await db[type].where("synced").equals(false).toArray();
+
+    // Check for bad _id values
+    const valid = all.filter(item => item._id && typeof item._id === 'string');
+    const invalid = all.filter(item => !item._id || typeof item._id !== 'string');
+
+    if (invalid.length > 0) {
+      console.warn(`❌ Found ${invalid.length} invalid ${type} in IndexedDB`, invalid);
+    }
+
+    return valid;
+  } catch (err) {
+    console.error(`❌ Dexie getUnsynced(${type}) failed:`, err);
     return [];
   }
-
-  const all = await db[type].where("synced").equals(false).toArray();
-  return all.filter(item => item._id && typeof item._id === 'string');
 }
-
 
 
 // Get all cached notes
