@@ -1,11 +1,10 @@
 const db = new Dexie('bookkeeping-db');
 
-db.version(1).stores({
+db.version(2).stores({
   entries: '_id, date, amount, category, person, bank, synced, lastUpdated',
   notes: '_id, title, content, done, synced, lastUpdated',
-  balances: 'bank' // primary key is the bank name or ID
+  balances: 'bank'
 });
-
 
 
 // Save an array of balances (overwrites existing entries)

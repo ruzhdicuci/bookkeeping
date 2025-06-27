@@ -1,15 +1,14 @@
-  import {
+import {
   saveEntryLocally,
   getCachedEntries,
   getUnsynced,
-  markAsSynced
+  markAsSynced,
+  getCachedBankBalances // just add it here
 } from './dexieDb.js';
 
-
-
-
 let entries = [];
-let persons = []; // <-- Add this
+let persons = [];
+
 const apiBase = 'https://bookkeeping-i8e0.onrender.com';
 const token = localStorage.getItem('token');
 const backend = 'https://bookkeeping-i8e0.onrender.com';
