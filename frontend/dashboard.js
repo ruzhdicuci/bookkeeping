@@ -1912,6 +1912,21 @@ window.addEventListener('beforeunload', (e) => {
     e.returnValue = ''; // 🛑 Triggers the browser's native "Leave site?" dialog
   }
 });
+
+
+async function saveBankBalances(balances) {
+  try {
+    await db.balances.clear(); // Optional: clear all before saving
+    for (const [bank, value] of Object.entries(balances)) {
+      await db.balances.put({ bank, value });
+    }
+    console.log("💾 Bank balances saved to IndexedDB via Dexie");
+  } catch (error) {
+    console.error("❌ Error saving bank balances to Dexie:", error);
+  }
+}
+
+
 // sync to cloud
 
 window.addEventListener('load', async () => {
