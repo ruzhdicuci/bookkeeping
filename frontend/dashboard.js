@@ -1886,19 +1886,23 @@ window.addEventListener('load', async () => {
 });
 
 async function syncToCloud() {
-  const unsynced = await getUnsynced("entries");
+  try {
+    const unsynced = await getUnsynced("entries");
 
-  for (const entry of unsynced) {
-    try {
-      const res = await fetch('/api/entries', {
-        method: 'POST',
-        body: JSON.stringify(entry),
-        headers: { 'Content-Type': 'application/json' }
-      });
-      if (res.ok) await markAsSynced("entries", entry._id);
-    } catch (err) {
-      console.warn("Sync failed", err);
+    for (const entry of unsynced) {
+      try {
+        const res = await fetch('/api/entries', {
+          method: 'POST',
+          body: JSON.stringify(entry),
+          headers: { 'Content-Type': 'application/json' }
+        });
+        if (res.ok) await markAsSynced("entries", entry._id);
+      } catch (err) {
+        console.warn("❌ Failed to sync entry", entry._id, err);
+      }
     }
+  } catch (outerErr) {
+    console.error("❌ syncToCloud outer error:", outerErr);
   }
 }
 
