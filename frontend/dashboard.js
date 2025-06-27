@@ -1903,3 +1903,34 @@ async function syncToCloud() {
 }
 
 // sync to cloud
+
+window.getSelectedPersons = getSelectedPersons;
+window.togglePersonDropdown = togglePersonDropdown;
+window.calculateCurrentBankBalance = calculateCurrentBankBalance;
+
+window.toggleDropdown = toggleDropdown;
+window.clearField = clearField;
+window.addSwipeListeners = addSwipeListeners;
+window.resetFilters = resetFilters;
+window.clearSearch = clearSearch;
+window.applyValueColor = applyValueColor;
+window.openUserManager = openUserManager;
+window.loadBankBalancesFromBackend = loadBankBalancesFromBackend;
+window.saveBankBalancesToBackend = saveBankBalancesToBackend;
+window.loginWithSelectedUser = loginWithSelectedUser;
+window.populateLoginUserDropdown = populateLoginUserDropdown;
+window.restoreBackup = restoreBackup;
+window.backupData = backupData;
+window.renderBankBalanceCards = renderBankBalanceCards;
+window.fetchBalancesFromBackend = fetchBalancesFromBackend;
+window.deleteAllEntries = deleteAllEntries;
+window.exportVisibleCardEntriesAsCSV = exportVisibleCardEntriesAsCSV;
+window.importEntriesFromCSV = importEntriesFromCSV;
+window.logout = logout;
+window.toggleTheme = toggleTheme;
+window.saveEdit = saveEdit;
+window.updateStatus = updateStatus;
+window.editEntry = editEntry;
+window.populateBankDropdownFromBalances = populateBankDropdownFromBalances;
+window.toggleAllPersons = toggleAllPersons;
+window.populatePersonFilterForDashboard = populatePersonFilterForDashboard;
