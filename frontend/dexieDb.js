@@ -17,10 +17,22 @@ export async function saveEntryLocally(entry) {
 
 // ✅ For notes
 export async function saveNoteLocally(note) {
-  note._id = note._id || crypto.randomUUID(); // This line is crucial!
+  note._id = note._id || crypto.randomUUID();
+
+  // 🛑 Defensive check
+  if (!note._id || typeof note._id !== 'string') {
+    console.error("❌ BAD _id passed to Dexie:", note);
+    return; // Stop before Dexie crashes
+  }
+
   note.synced = navigator.onLine;
   note.lastUpdated = Date.now();
-  await db.notes.put(note);
+
+  try {
+    await db.notes.put(note);
+  } catch (err) {
+    console.error("❌ Dexie put failed:", err, note);
+  }
 }
 
 // Get unsynced entries or notes from local cache
