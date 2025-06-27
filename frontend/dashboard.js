@@ -1903,16 +1903,22 @@ window.addEventListener('beforeunload', (e) => {
 // sync to cloud
 
 window.addEventListener('load', async () => {
+  // 1. Load cached entries (works offline)
   const cachedEntries = await getCachedEntries();
   renderEntries(cachedEntries);
 
-  const cachedBalances = await getCachedBankBalances();
-  renderBankBalanceForm(cachedBalances);
+  // 2. Load balances from backend or Dexie fallback
+  await loadInitialBankBalances(); // This sets initialBankBalances
+  renderBankBalanceForm(initialBankBalances);
 
+  // 3. If online, sync and refresh data
   if (navigator.onLine) {
     await syncToCloud();
-    await fetchEntries();            // fetch + render fresh entries
-    await loadInitialBankBalances(); // fetch + render fresh balances
+    await fetchEntries(); // fetch + render fresh entries
+
+    const freshBalances = await fetchBankBalances();
+    await saveBankBalances(freshBalances);
+    renderBankBalanceForm(freshBalances);
   }
 });
 
