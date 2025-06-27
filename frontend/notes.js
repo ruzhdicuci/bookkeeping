@@ -313,26 +313,49 @@ window.addEventListener('DOMContentLoaded', async () => {
 
 
 // sync to cloud
-async function syncNotesToCloud() {
-  const unsynced = await getUnsynced("notes");
+const note = {
+  _id: editingNoteId || crypto.randomUUID(), // ✅ generate if missing
+  title,
+  content,
+  done: false,
+  createdAt: new Date().toISOString()
+};
 
-  for (const note of unsynced) {
-    try {
-      const res = await fetch(`${apiBase}/api/notes`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify(note)
-      });
-      if (res.ok) {
-        await markAsSynced("notes", note._id);
-      }
-    } catch (err) {
-      console.warn("❌ Notes sync failed", err);
-    }
+// Save to Dexie
+await saveNoteLocally(note);
+
+// Send to server if online
+if (navigator.onLine) {
+  const res = await fetch(url, {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(note)
+  });
+
+  if (res.ok) {
+    editingNoteId = null;
+    document.getElementById('noteTitle').value = '';
+    document.getElementById('noteContent').value = '';
+    loadNotesFromDB();
+    await markAsSynced("notes", note._id);
+  } else {
+    alert('Failed to save note');
   }
 }
 
 // sync to cloud
+
+window.goToDashboard = goToDashboard;
+window.openDeleteModal = openDeleteModal;
+window.toggleHideDone = toggleHideDone;
+window.editNote = editNote;
+window.toggleTheme = toggleTheme;
+
+window.saveNote = saveNote;
+window.cancelEdit = cancelEdit;
+window.formatNoteDate = formatNoteDate;
+
+
