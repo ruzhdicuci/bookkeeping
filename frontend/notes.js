@@ -72,11 +72,11 @@ async function loadNotesFromDB() {
   }
 }
 
-function renderNotes(sortBy = 'date') {
+function renderNotes(inputNotes = notes, sortBy = 'date') {
   const container = document.getElementById('notesList');
   container.innerHTML = '';
 
-  const filtered = hideDone ? notes.filter(n => !n.done) : [...notes];
+  const filtered = hideDone ? inputNotes.filter(n => !n.done) : [...inputNotes];
   const sorted = filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
   const groups = {
@@ -416,4 +416,6 @@ window.saveNote = saveNote;
 window.cancelEdit = cancelEdit;
 window.formatNoteDate = formatNoteDate;
 window.syncNotesToCloud = syncNotesToCloud; // ✅ optional if used from DOM or window
+window.saveNoteToDexie = saveNoteToDexie;
+window.loadNotes = loadNotes;
 
