@@ -1893,6 +1893,18 @@ try {
   });
   
 
+
+  async function fetchBankBalances() {
+  const res = await fetch(`${backend}/api/balances`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+
+  if (!res.ok) throw new Error('Failed to fetch balances');
+  return await res.json();
+}
+
+
+
 // sync to cloud
 window.addEventListener('beforeunload', (e) => {
   if (!navigator.onLine) {
