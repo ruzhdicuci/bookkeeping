@@ -578,7 +578,14 @@ body.dark-theme .note-day {
 body.dark-theme .note-title {
   color: rgb(222, 66, 97);
 }
+body.dark-theme #date {
+ background-color: #2b2b2b;
+ color: white;
+}
 
+#toggleHideBtn {
+border: none;
+}
 
   </style>
 </head>
@@ -613,9 +620,9 @@ body.dark-theme .note-title {
  <div class="sections2">
   <!-- top controls -->
   <div class="top-controls">
-    <button id="toggleHideBtn" style="background-color: white; color: rgb(103, 103, 104);" onclick="toggleHideDone()">🪪 Hide Done</button>
+    <button id="toggleHideBtn"  onclick="toggleHideDone()">🪪 Hide Done</button>
    
-    <select style="background-color: white; color: rgb(103, 103, 104);"  onchange="renderNotes(this.value)">
+    <select id="date" onchange="renderNotes(this.value)">
       <option value="date">Date</option>
       <option value="title">Title</option>
     </select>

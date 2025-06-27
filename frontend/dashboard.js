@@ -1,3 +1,11 @@
+  import {
+  saveEntryLocally,
+  getCachedEntries,
+  getUnsynced,
+  markAsSynced
+} from './dexieDb.js';
+
+
 let entries = [];
 let persons = []; // <-- Add this
 const apiBase = 'https://bookkeeping-i8e0.onrender.com';
@@ -6,17 +14,25 @@ const backend = 'https://bookkeeping-i8e0.onrender.com';
 
 if (!token) {
   console.error('❌ No token found. Please log in.');
-  // Optionally redirect:
   // window.location.href = '/login.html';
 }
 
-
 document.addEventListener('DOMContentLoaded', async () => {
-  // 1. Fetch entries and balances
+  // Try loading cached entries first (safe)
+  const cached = await getCachedEntries();
+  if (cached.length) {
+    console.log("📦 Showing cached entries before server fetch");
+    renderEntries(cached); // This shows something while loading real data
+  }
+
+  // Then fetch the real entries from server as usual
   await fetchEntries();
   await loadInitialBankBalances();
 
-  // 2. Initialize flatpickr
+  // Sync any pending entries (only if online)
+  if (navigator.onLine) syncToCloud();
+
+  // Your flatpickr and other logic continues...
   const dateInput = document.getElementById('newDate');
   if (dateInput) {
     const fp = flatpickr(dateInput, {
@@ -27,6 +43,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       fp.setDate(new Date());
     }
   }
+
 
   // 3. Person search input logic
   document.getElementById('personSearch')?.addEventListener('input', () => {
@@ -534,11 +551,11 @@ sortedLabels.forEach(label => {
           <div class="buttons">
             ${
               isEditing
-                ? `<button onclick="cancelEdit()" style="border: 1px solid #f2f0f0;" class="action-btn">❌ Cancel</button>`
-                : `<button onclick="editEntry('${e._id}')" style="border: 1px solid #f2f0f0;" " class="action-btn">✏️</button>`
+                ? `<button onclick="cancelEdit()" class="action-btn">❌ Cancel</button>`
+                : `<button onclick="editEntry('${e._id}')"  class="action-btn">✏️</button>`
             }
-            <button onclick="duplicateEntry('${e._id}')" style="border: 1px solid #f2f0f0;" class="action-btn">📄</button>
-            <button onclick="showDeleteModal('${e._id}')" style="border: 1px solid #f2f0f0;"  class="action-btn">🗑️</button>
+            <button onclick="duplicateEntry('${e._id}')" class="action-btn">📄</button>
+            <button onclick="showDeleteModal('${e._id}')"  class="action-btn">🗑️</button>
           </div>
         </div>
       `;
@@ -1870,3 +1887,32 @@ renderBankBalanceForm();                // ✅ re-render balance inputs
     }
   });
   
+
+// sync to cloud
+
+
+window.addEventListener('load', async () => {
+  const entries = await getCachedEntries();
+  renderEntries(entries); // your existing render logic
+
+  if (navigator.onLine) syncToCloud();
+});
+
+async function syncToCloud() {
+  const unsynced = await getUnsynced("entries");
+
+  for (const entry of unsynced) {
+    try {
+      const res = await fetch('/api/entries', {
+        method: 'POST',
+        body: JSON.stringify(entry),
+        headers: { 'Content-Type': 'application/json' }
+      });
+      if (res.ok) await markAsSynced("entries", entry._id);
+    } catch (err) {
+      console.warn("Sync failed", err);
+    }
+  }
+}
+
+// sync to cloud

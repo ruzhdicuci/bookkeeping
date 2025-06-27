@@ -1,3 +1,11 @@
+import {
+  saveNoteLocally,
+  getCachedNotes,
+  getUnsynced,
+  markAsSynced
+} from './dexieDb.js';
+
+
 const apiBase = 'https://bookkeeping-i8e0.onrender.com';
 let notes = [];
 let hideDone = false;
@@ -234,13 +242,29 @@ async function toggleDone(id) {
   loadNotesFromDB();
 }
 
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', async () => {
   if (localStorage.getItem('theme') === 'dark') {
     document.body.classList.add('dark-theme');
   }
 
-  loadNotesFromDB();
+  // ✅ 1. Show cached notes first
+  try {
+    const cached = await getCachedNotes();
+    if (cached.length) {
+      console.log("📦 Showing cached notes");
+      renderNotes(cached); // Your render function
+    }
+  } catch (err) {
+    console.warn("⚠️ Could not load cached notes", err);
+  }
 
+  // ✅ 2. Then load from DB as usual
+  await loadNotesFromDB();
+
+  // ✅ 3. Sync unsynced notes (if any)
+  if (navigator.onLine) syncNotesToCloud();
+
+  // ✅ 4. Your modal/click logic remains untouched:
   const cancelDelete = document.getElementById('cancelDeleteBtn');
   if (cancelDelete) {
     cancelDelete.addEventListener('click', closeDeleteModal);
@@ -287,3 +311,28 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 
+
+// sync to cloud
+async function syncNotesToCloud() {
+  const unsynced = await getUnsynced("notes");
+
+  for (const note of unsynced) {
+    try {
+      const res = await fetch(`${apiBase}/api/notes`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(note)
+      });
+      if (res.ok) {
+        await markAsSynced("notes", note._id);
+      }
+    } catch (err) {
+      console.warn("❌ Notes sync failed", err);
+    }
+  }
+}
+
+// sync to cloud
