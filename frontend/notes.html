@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <script src="https://cdn.jsdelivr.net/npm/dexie@3.2.4/dist/dexie.min.js"></script>
+
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icon.jpg" type="image/jpeg">
 <script>
@@ -685,8 +686,11 @@ body.dark-theme .note-card.done .note-content {
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/idb@7/build/iife/index-min.js"></script>
+<!-- Dexie.js must be loaded before your modules -->
+<script src="https://cdn.jsdelivr.net/npm/dexie@3.2.4/dist/dexie.min.js"></script>
 
+<!-- Dexie wrapper and app logic -->
+<script type="module" src="dexieDb.js"></script>
 <script type="module" src="notes.js"></script>
 </body>
 </html>
