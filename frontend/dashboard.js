@@ -1932,52 +1932,44 @@ async function syncToCloud() {
   }
 }
 // sync to cloud
-
-function showSyncStatus(message, timeout = 3000) {
-  const el = document.getElementById('syncStatus');
-  if (!el) return;
-  el.textContent = message;
-  el.style.display = 'block';
-  if (timeout > 0) {
-    setTimeout(() => {
-      el.style.display = 'none';
-    }, timeout);
-  }
-}
 window.addEventListener('offline', () => {
-  showSyncStatus('📴 Offline mode – changes will sync later', 5000);
+  showCenteredMessage('📴 Offline mode – changes will sync later', 5000);
 });
 
 window.addEventListener('online', async () => {
-  showSyncStatus('📶 Back online – syncing...');
+  showCenteredMessage('📶 Back online – syncing...', 2000);
   console.log('📶 Back online – trying to sync entries...');
   try {
-    const unsynced = await getUnsynced(); // from dexieDb.js
+    const unsynced = await getUnsynced("entries");
     console.log(`🔁 Found ${unsynced.length} entries to sync...`);
 
     for (const entry of unsynced) {
+      const { _id, ...entryToSend } = entry;
       const res = await fetch(`${backend}/api/entries`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(entry)
+        body: JSON.stringify(entryToSend)
       });
 
       if (res.ok) {
-        await markAsSynced(entry.id); // mark as synced in IndexedDB
+        await markAsSynced("entries", _id);
         console.log(`✅ Synced entry: ${entry.description}`);
       } else {
         console.warn(`⚠️ Failed to sync entry: ${entry.description}`);
       }
     }
 
-    await fetchEntries(); // reload from server after syncing
+    await fetchEntries();
     renderEntries();
     renderBankBalanceForm();
+
+    showCenteredMessage(`✅ Synced ${unsynced.length} entr${unsynced.length === 1 ? 'y' : 'ies'}`);
   } catch (e) {
     console.error('❌ Sync error:', e);
+    showCenteredMessage('❌ Sync failed – check console');
   }
 });
 
@@ -2047,7 +2039,7 @@ window.editEntry = editEntry;
 window.populateBankDropdownFromBalances = populateBankDropdownFromBalances;
 window.toggleAllPersons = toggleAllPersons;
 window.populatePersonFilterForDashboard = populatePersonFilterForDashboard;
-window.showChangePassword = showChangePassword
-window.showSyncStatus = showSyncStatus
+window.showChangePassword = showChangePassword;
+window.showCenteredMessage = showCenteredMessage;
 
 
