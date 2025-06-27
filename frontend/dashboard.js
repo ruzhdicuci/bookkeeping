@@ -208,12 +208,13 @@ function populatePersonDropdownForCharts(persons) {
 
 async function fetchEntries() {
   try {
+    const token = localStorage.getItem('token');
     const res = await fetch(`${apiBase}/api/entries`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     if (!res.ok) throw new Error('Failed to fetch entries');
 
-    const data = await res.json(); // ✅ ensure we get the data
+    const data = await res.json();
     window.entries = Array.isArray(data) ? data.sort((a, b) => b.date.localeCompare(a.date)) : [];
 
     console.log("📦 Entries:", window.entries);
@@ -224,9 +225,28 @@ async function fetchEntries() {
     populateNewEntryDropdowns();
     populateFilters();
     renderBankBalanceForm();
+
+    // ✅ Save entries locally
+    await db.entries.clear();
+    await db.entries.bulkPut(window.entries);
   } catch (err) {
-    console.error('❌ fetchEntries failed:', err);
-    window.entries = []; // fallback to empty array
+    console.warn('⚠️ fetchEntries failed, loading from Dexie instead:', err);
+
+    try {
+      const cached = await db.entries.toArray();
+      window.entries = cached || [];
+
+      console.log("📦 Loaded entries from IndexedDB:", window.entries);
+      window.persons = [...new Set(window.entries.map(e => e.person).filter(Boolean))];
+
+      renderEntries();
+      populateNewEntryDropdowns();
+      populateFilters();
+      renderBankBalanceForm();
+    } catch (dexieErr) {
+      console.error('❌ Dexie fallback also failed:', dexieErr);
+      window.entries = [];
+    }
   }
 }
 
