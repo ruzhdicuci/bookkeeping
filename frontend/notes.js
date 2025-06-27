@@ -86,8 +86,8 @@ function renderNotes(sortBy = 'date') {
 
       for (const note of groups[label]) {
         const noteDiv = document.createElement('div');
-        noteDiv.className = 'note-entry';
-        noteDiv.setAttribute('data-id', note._id);
+   noteDiv.className = `note-entry ${note.done ? 'done' : ''}`;
+noteDiv.setAttribute('data-id', note._id);
 
         const date = new Date(note.createdAt);
         const day = date.getDate().toString().padStart(2, '0');
