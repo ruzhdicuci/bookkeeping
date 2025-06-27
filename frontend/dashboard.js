@@ -1891,27 +1891,30 @@ window.addEventListener('load', async () => {
 async function syncToCloud() {
   try {
     const unsynced = await getUnsynced("entries");
-for (const entry of unsynced) {
-  // ✅ Remove _id before sending to backend
-  const { _id, ...entryToSend } = entry;
+    for (const entry of unsynced) {
+      // ✅ Remove _id before sending to backend
+      const { _id, ...entryToSend } = entry;
 
-  const res = await fetch(`${backend}/api/entries`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(entryToSend)
-  });
+      const res = await fetch(`${backend}/api/entries`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(entryToSend)
+      });
 
-  if (res.ok) {
-    await markAsSynced('entries', entry._id); // keep _id for Dexie removal
-    console.log(`✅ Synced entry: ${entry.description}`);
-  } else {
-    console.warn(`⚠️ Failed to sync entry: ${entry.description}`);
+      if (res.ok) {
+        await markAsSynced('entries', entry._id); // keep _id for Dexie removal
+        console.log(`✅ Synced entry: ${entry.description}`);
+      } else {
+        console.warn(`⚠️ Failed to sync entry: ${entry.description}`);
+      }
+    }
+  } catch (err) {
+    console.error('❌ Sync error:', err);
   }
 }
-
 // sync to cloud
 
 function showSyncStatus(message, timeout = 3000) {
