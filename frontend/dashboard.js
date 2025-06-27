@@ -1,9 +1,9 @@
-import {
+import db, {
   saveEntryLocally,
   getCachedEntries,
   getUnsynced,
   markAsSynced,
-  getCachedBankBalances // just add it here
+  getCachedBankBalances
 } from './dexieDb.js';
 
 let entries = [];
