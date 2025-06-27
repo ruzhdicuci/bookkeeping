@@ -131,17 +131,17 @@ async function saveNote() {
     : `${apiBase}/api/notes`;
 
   const note = {
-    _id: editingNoteId || crypto.randomUUID(), // ensure local ID
-    title,
+    _id: editingNoteId || crypto.randomUUID(),  // ✅ generate _id if needed
+    title,                                      // ✅ use value from input
     content,
     done: false,
     createdAt: new Date().toISOString()
   };
 
-  // Save locally (offline support)
+  // Save offline
   await saveNoteLocally(note);
 
-  // Sync to server if online
+  // Sync to backend
   if (navigator.onLine) {
     try {
       const res = await fetch(url, {
@@ -156,20 +156,19 @@ async function saveNote() {
       if (res.ok) {
         await markAsSynced("notes", note._id);
       } else {
-        alert('Failed to save note to server');
+        alert('❌ Failed to sync note to server');
       }
     } catch (err) {
-      console.warn("Sync failed, will retry later:", err);
+      console.warn("🔁 Sync error — will retry later", err);
     }
   }
 
-  // Clear form and refresh
+  // Clear form + reload
   editingNoteId = null;
   document.getElementById('noteTitle').value = '';
   document.getElementById('noteContent').value = '';
   loadNotesFromDB();
 }
-
 
 function toggleHideDone() {
   hideDone = !hideDone;
@@ -332,14 +331,6 @@ window.addEventListener('DOMContentLoaded', async () => {
 
 
 
-// sync to cloud
-const note = {
-  _id: editingNoteId || crypto.randomUUID(), // ✅ generate if missing
-  title,
-  content,
-  done: false,
-  createdAt: new Date().toISOString()
-};
 
 // Save to Dexie
 await saveNoteLocally(note);
