@@ -38,17 +38,27 @@ export async function saveNoteLocally(note) {
 // Get unsynced entries or notes from local cache
 export async function getUnsynced(type = "entries") {
   try {
-    const all = await db[type].where("synced").equals(false).toArray();
+    const table = db[type];
 
-    // Check for bad _id values
-    const valid = all.filter(item => item._id && typeof item._id === 'string');
-    const invalid = all.filter(item => !item._id || typeof item._id !== 'string');
-
-    if (invalid.length > 0) {
-      console.warn(`❌ Found ${invalid.length} invalid ${type} in IndexedDB`, invalid);
+    // ✅ Check that 'synced' is an indexed field and the table exists
+    if (!table || typeof table.where !== 'function') {
+      console.warn(`⚠️ Dexie table '${type}' not found or invalid.`);
+      return [];
     }
 
-    return valid;
+    // ✅ Extra defensive: filter only valid records where synced === false
+    const all = await table.toArray();
+    const filtered = all.filter(item =>
+      item.synced === false &&
+      item._id &&
+      typeof item._id === 'string'
+    );
+
+    if (filtered.length < all.length) {
+      console.warn(`⚠️ Filtered out ${all.length - filtered.length} invalid '${type}' entries`);
+    }
+
+    return filtered;
   } catch (err) {
     console.error(`❌ Dexie getUnsynced(${type}) failed:`, err);
     return [];
