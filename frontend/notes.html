@@ -597,11 +597,33 @@ body.dark-theme #date {
 border: none;
 }
 
+
+
 .note-card.done {
   background-color: #e0f9e0; /* light green */
   opacity: 0.85;
+}
+
+/* Override dark theme text color for "done" notes */
+body.dark-theme .note-card.done {
+  color: #111 !important;
+}
+
+body.dark-theme .note-card.done .note-day {
+  color: #111 !important;
+  font-weight: bold;
+}
+
+body.dark-theme .note-card.done .note-date-vertical {
+  color: #111 !important;
 
 }
+
+
+body.dark-theme .note-card.done .note-content {
+  color: #333 !important;
+}
+
   </style>
 </head>
 <body>
@@ -661,7 +683,7 @@ border: none;
   </div>
 </div>
 
-
+<script src="https://cdn.jsdelivr.net/npm/idb@7/build/iife/index-min.js"></script>
 
 <script type="module" src="notes.js"></script>
 </body>

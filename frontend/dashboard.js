@@ -1,9 +1,34 @@
+  import Dexie from 'dexie';
+
+const db = new Dexie('bookkeeping-db');
+db.version(1).stores({
+  'offline-entries': '++id'
+});
+
+export function saveEntryLocally(entry) {
+  return db['offline-entries'].add(entry);
+}
+
+export function getUnsynced() {
+  return db['offline-entries'].toArray();
+}
+
+export function markAsSynced(id) {
+  return db['offline-entries'].delete(id);
+}
+
+export default db;
+// offline db 
+  
+  
   import {
   saveEntryLocally,
   getCachedEntries,
   getUnsynced,
   markAsSynced
 } from './dexieDb.js';
+
+
 
 
 let entries = [];
@@ -1808,48 +1833,48 @@ document.getElementById('entryForm').addEventListener('submit', async (e) => {
   };
 // ✅ Log the entry before sending
 console.log("🧾 Entry being submitted:", entry);
-    try {
-      const form = document.getElementById('entryForm');
-      const editId = form.dataset.editId;
+try {
+  const form = document.getElementById('entryForm');
+  const editId = form.dataset.editId;
 
-      const method = editId ? 'PUT' : 'POST';
-      const url = editId
-        ? `https://bookkeeping-i8e0.onrender.com/api/entries/${editId}`
-        : 'https://bookkeeping-i8e0.onrender.com/api/entries';
+  const method = editId ? 'PUT' : 'POST';
+  const url = editId
+    ? `https://bookkeeping-i8e0.onrender.com/api/entries/${editId}`
+    : 'https://bookkeeping-i8e0.onrender.com/api/entries';
 
- console.log('🧾 Entry being submitted:', entry);
+  const res = await fetch(url, {
+    method,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(entry)
+  });
 
-      const res = await fetch(url, {
-        method,
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(entry)
-      });
+  if (!res.ok) {
+    const err = await res.json();
+    alert('❌ Error saving entry: ' + (err.message || res.statusText));
+    return;
+  }
 
-      if (!res.ok) {
-        const err = await res.json();
-        alert('❌ Error saving entry: ' + (err.message || res.statusText));
-        return;
-      }
+  document.getElementById('entryForm').reset();
+  await fetchEntries();
+  if (editId) delete form.dataset.editId;
+  document.getElementById('cancelEditBtn')?.classList.add('hidden');
+  updateEntryButtonLabel();
+  populateNewEntryDropdowns();
+  populateFilters();
+  renderEntries();
+  renderBankBalanceForm();
 
-      document.getElementById('entryForm').reset();
-await fetchEntries();                    // reload data from server
-if (editId) delete form.dataset.editId;
-document.getElementById('cancelEditBtn')?.classList.add('hidden');
-updateEntryButtonLabel(); // optional: if you toggle the Save/Add label
-
-populateNewEntryDropdowns();            // refresh datalists
-populateFilters();                      // refresh filters (e.g. categories)
-renderEntries();                        // re-render entry table
-renderBankBalanceForm();                // ✅ re-render balance inputs
-
-
-    } catch (error) {
-      console.error('❌ Error saving entry:', error);
-      alert('Failed to save entry.');
-    }
+  console.log('✅ Entry synced to server.');
+} catch (error) {
+  console.warn('📴 Offline detected – saving entry locally.');
+  await saveEntryLocally(entry); // save to IndexedDB using dexieDb.js
+  document.getElementById('entryForm').reset();
+  renderEntries(); // so it's shown in UI even offline
+  alert('📥 Entry saved locally and will sync when back online.');
+}
   });
 
   
@@ -1908,6 +1933,57 @@ async function syncToCloud() {
 
 // sync to cloud
 
+function showSyncStatus(message, timeout = 3000) {
+  const el = document.getElementById('syncStatus');
+  if (!el) return;
+  el.textContent = message;
+  el.style.display = 'block';
+  if (timeout > 0) {
+    setTimeout(() => {
+      el.style.display = 'none';
+    }, timeout);
+  }
+}
+window.addEventListener('offline', () => {
+  showSyncStatus('📴 Offline mode – changes will sync later', 5000);
+});
+
+window.addEventListener('online', async () => {
+  showSyncStatus('📶 Back online – syncing...');
+  console.log('📶 Back online – trying to sync entries...');
+  try {
+    const unsynced = await getUnsynced(); // from dexieDb.js
+    console.log(`🔁 Found ${unsynced.length} entries to sync...`);
+
+    for (const entry of unsynced) {
+      const res = await fetch(`${backend}/api/entries`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(entry)
+      });
+
+      if (res.ok) {
+        await markAsSynced(entry.id); // mark as synced in IndexedDB
+        console.log(`✅ Synced entry: ${entry.description}`);
+      } else {
+        console.warn(`⚠️ Failed to sync entry: ${entry.description}`);
+      }
+    }
+
+    await fetchEntries(); // reload from server after syncing
+    renderEntries();
+    renderBankBalanceForm();
+  } catch (e) {
+    console.error('❌ Sync error:', e);
+  }
+});
+
+
+
+
 window.getSelectedPersons = getSelectedPersons;
 window.togglePersonDropdown = togglePersonDropdown;
 window.calculateCurrentBankBalance = calculateCurrentBankBalance;
@@ -1938,3 +2014,5 @@ window.editEntry = editEntry;
 window.populateBankDropdownFromBalances = populateBankDropdownFromBalances;
 window.toggleAllPersons = toggleAllPersons;
 window.populatePersonFilterForDashboard = populatePersonFilterForDashboard;
+window.showChangePassword = showChangePassword
+window.showSyncStatus = showSyncStatus
