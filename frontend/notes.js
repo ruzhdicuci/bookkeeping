@@ -357,5 +357,5 @@ window.toggleTheme = toggleTheme;
 window.saveNote = saveNote;
 window.cancelEdit = cancelEdit;
 window.formatNoteDate = formatNoteDate;
-
+window.syncNotesToCloud = syncNotesToCloud; // ✅ optional if used from DOM or window
 
