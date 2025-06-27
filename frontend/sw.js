@@ -1,13 +1,13 @@
 const CACHE_NAME = 'bookkeeping-cache-v1';
 const urlsToCache = [
-  '/',
-  '/dashboard.html',
-  '/dashboard.js',
-  '/notes.html',
-  '/notes.js',
-  '/login.js',
-  '/style.css',
-  '/manifest.json'
+  './',
+  './dashboard.html',
+  './dashboard.js',
+  './notes.html',
+  './notes.js',
+  './login.js',
+  './style.css',
+  './manifest.json'
 ];
 
 // Install event
