@@ -9,23 +9,25 @@ db.version(1).stores({
 
 // Save or update an entry locally
 export async function saveEntryLocally(entry) {
+  entry._id = entry._id || crypto.randomUUID();   // ✅ Ensure valid _id
   entry.synced = navigator.onLine;
   entry.lastUpdated = Date.now();
   await db.entries.put(entry);
 }
 
+
 // Save or update a note locally
 export async function saveNoteLocally(note) {
-  note._id = note._id || crypto.randomUUID();
+  note._id = note._id || crypto.randomUUID();     // ✅ Ensure valid _id
   note.synced = navigator.onLine;
   note.lastUpdated = Date.now();
   await db.notes.put(note);
 }
 
-
 // Get unsynced entries or notes from local cache
 export async function getUnsynced(type = "entries") {
   const all = await db[type].where("synced").equals(false).toArray();
+  // ✅ Filter out missing/bad _id values
   return all.filter(item => item._id && typeof item._id === 'string');
 }
 
