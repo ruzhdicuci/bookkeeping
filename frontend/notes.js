@@ -95,7 +95,7 @@ function renderNotes(sortBy = 'date') {
         const year = date.getFullYear();
 
 noteDiv.innerHTML = `
-  <div class="note-card">
+  <div class="note-card ${note.done ? 'done' : ''}">
     <div class="note-date-vertical">
       <div class="note-day">${day}</div>
       <div class="note-month">${month}</div>
