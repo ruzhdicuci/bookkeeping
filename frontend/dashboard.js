@@ -1,24 +1,3 @@
-const db = new Dexie('bookkeeping-db');
-db.version(1).stores({
-  'offline-entries': '++id'
-});
-
-export function saveEntryLocally(entry) {
-  return db['offline-entries'].add(entry);
-}
-
-export function getUnsynced() {
-  return db['offline-entries'].toArray();
-}
-
-export function markAsSynced(id) {
-  return db['offline-entries'].delete(id);
-}
-
-export default db;
-// offline db 
-  
-  
   import {
   saveEntryLocally,
   getCachedEntries,

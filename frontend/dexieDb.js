@@ -1,11 +1,25 @@
-import Dexie from "https://cdn.jsdelivr.net/npm/dexie@3.2.3/+esm";
+import Dexie from 'dexie';
 
-export const db = new Dexie("BookkeepingApp");
-
+const db = new Dexie('bookkeeping-db');
 db.version(1).stores({
-  entries: "_id, date, amount, category, person, bank, synced, lastUpdated",
-  notes: "_id, title, content, done, synced, lastUpdated"
+  'offline-entries': '++id',
+  entries: '_id, date, amount, category, person, bank, synced, lastUpdated',
+  notes: '_id, title, content, done, synced, lastUpdated'
 });
+
+export function saveEntryLocally(entry) {
+  return db['offline-entries'].add(entry);
+}
+
+export function getUnsynced() {
+  return db['offline-entries'].toArray();
+}
+
+export function markAsSynced(id) {
+  return db['offline-entries'].delete(id);
+}
+
+export default db;
 
 // ✅ For entries
 export async function saveEntryLocally(entry) {
