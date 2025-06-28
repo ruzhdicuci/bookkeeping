@@ -1833,22 +1833,19 @@ document.getElementById('entryForm').addEventListener('submit', async (e) => {
     return offsetDate.toISOString().split('T')[0];
   }
   const isoDate = inputDate ? formatDateToLocalISO(inputDate) : '';
-const selectedPersons = getSelectedPersons(); // ✅ Handles multi or fallback
 
   console.log('📥 Submitting entry...');
-const entry = {
-  date: isoDate,
-  description: document.getElementById('newDescription').value,
-  category: document.getElementById('newCategory').value,
-  amount: parseFloat(document.getElementById('newAmount').value),
-  currency: document.getElementById('newCurrency').value,
-  type: document.getElementById('newType').value,
-  person: selectedPersons[0] || '', // 👈 still supports legacy "person"
-  persons: selectedPersons,         // 👈 new multi-person support
-  bank: document.getElementById('newBank').value,
-  status: document.getElementById('newStatus')?.value || 'Paid'
-};
-
+  const entry = {
+    date: isoDate,
+    description: document.getElementById('newDescription').value,
+    category: document.getElementById('newCategory').value,
+    amount: parseFloat(document.getElementById('newAmount').value),
+    currency: document.getElementById('newCurrency').value,
+    type: document.getElementById('newType').value,
+    person: document.getElementById('newPerson').value,
+    bank: document.getElementById('newBank').value,
+    status: document.getElementById('newStatus')?.value || 'Paid' // ✅ Add this line
+  };
 // ✅ Log the entry before sending
 console.log("🧾 Entry being submitted:", entry);
 try {
@@ -2094,19 +2091,6 @@ function showCenteredMessage(msg, duration = 3000) {
   }
 }
 
-function getSelectedPersons() {
-  const selected = Array.from(
-    document.querySelectorAll('.multi-person-checkbox:checked')
-  ).map(cb => cb.value);
-
-  if (selected.length > 0) {
-    return selected;
-  }
-
-  // Fallback to single-person input if no checkboxes selected
-  const single = document.getElementById('newPerson')?.value?.trim();
-  return single ? [single] : [];
-}
 
 
 window.getSelectedPersons = getSelectedPersons;
