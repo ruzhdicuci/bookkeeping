@@ -16,7 +16,7 @@ const backend = 'https://bookkeeping-i8e0.onrender.com';
 if (!token) {
   console.warn('🔒 No token found. Redirecting to login...');
   alert('🔒 Please log in to access your bookkeeping data.');
-  window.location.href = '/login.html'; // Adjust if your login page is elsewhere
+  window.location.href = '/bookkeeping/client/login.html'; // Adjust if your login page is elsewhere
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
