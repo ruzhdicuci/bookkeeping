@@ -285,6 +285,7 @@ app.post('/api/limits', auth, async (req, res) => {
 
 // add notes
 const Note = mongoose.model('Note', new mongoose.Schema({
+  _id: String, // ✅ Accept string-based _id from Dexie/frontend
   userId: String,
   title: String,
   content: String,
@@ -292,6 +293,8 @@ const Note = mongoose.model('Note', new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  synced: Boolean,
+  lastUpdated: Number,
   createdAt: {
     type: Date,
     default: Date.now
@@ -306,11 +309,29 @@ app.get('/api/notes', auth, async (req, res) => {
 
 // Create a new note
 app.post('/api/notes', auth, async (req, res) => {
-  const { title, content } = req.body;
-  if (!title || !content) return res.status(400).json({ message: 'Missing fields' });
+  const { _id, title, content, done, createdAt, synced, lastUpdated } = req.body;
 
-  const note = await Note.create({ userId: req.userId, title, content });
-  res.json(note);
+  if (!title || !content) {
+    return res.status(400).json({ message: 'Missing title or content' });
+  }
+
+  try {
+    const note = await Note.create({
+      _id, // ✅ Let Dexie-generated ID be saved
+      userId: req.userId,
+      title,
+      content,
+      done: done ?? false,
+      createdAt: createdAt ? new Date(createdAt) : new Date(),
+      synced: synced ?? false,
+      lastUpdated: lastUpdated ?? Date.now()
+    });
+
+    res.json(note);
+  } catch (err) {
+    console.error('❌ Failed to create note:', err);
+    res.status(500).json({ error: 'Failed to create note' });
+  }
 });
 
 // Update a note (e.g., mark as done or edit title/content)
