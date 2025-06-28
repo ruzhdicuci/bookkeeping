@@ -70,9 +70,11 @@ async function loadNotes() {
 
 
 function renderNotes(inputNotes = notes, sortBy = currentSort) {
-  currentSort = sortBy; // store it for future use
   const container = document.getElementById('notesList');
   container.innerHTML = '';
+
+  // ✅ Filter out corrupted/incomplete notes
+  const cleanNotes = inputNotes.filter(n => n && n.title && n.content && n.createdAt);
 
   const filtered = hideDone ? inputNotes.filter(n => !n.done) : [...inputNotes];
  const sorted = sortBy === 'title'
@@ -94,22 +96,24 @@ function renderNotes(inputNotes = notes, sortBy = currentSort) {
   const oneWeekAgo = new Date();
   oneWeekAgo.setDate(today.getDate() - 7);
 
-  for (const note of sorted) {
-    const created = new Date(note.createdAt);
-    const createdDate = created.toDateString();
+for (const note of sorted) {
+  if (!note.createdAt || isNaN(new Date(note.createdAt))) continue; // ✅ skip bad notes
 
-    if (createdDate === today.toDateString()) {
-      groups.Today.push(note);
-    } else if (createdDate === yesterday.toDateString()) {
-      groups.Yesterday.push(note);
-    } else if (created > oneWeekAgo) {
-      groups['This Week'].push(note);
-    } else if (created <= oneWeekAgo) {
-      groups['Last Week'].push(note);
-    } else {
-      groups.Older.push(note);
-    }
+  const created = new Date(note.createdAt);
+  const createdDate = created.toDateString();
+
+  if (createdDate === today.toDateString()) {
+    groups.Today.push(note);
+  } else if (createdDate === yesterday.toDateString()) {
+    groups.Yesterday.push(note);
+  } else if (created > oneWeekAgo) {
+    groups['This Week'].push(note);
+  } else if (created <= oneWeekAgo) {
+    groups['Last Week'].push(note);
+  } else {
+    groups.Older.push(note);
   }
+}
 
   // Render each group
   for (const label of ['Today', 'Yesterday', 'This Week', 'Last Week', 'Older']) {
@@ -119,36 +123,38 @@ function renderNotes(inputNotes = notes, sortBy = currentSort) {
       heading.className = 'date-group-heading';
       container.appendChild(heading);
 
-      for (const note of groups[label]) {
-        const noteDiv = document.createElement('div');
-   noteDiv.className = `note-entry ${note.done ? 'done' : ''}`;
-noteDiv.setAttribute('data-id', note._id);
+for (const note of groups[label]) {
+  if (!note.createdAt || isNaN(new Date(note.createdAt))) continue; // ✅ skip broken notes
 
-        const date = new Date(note.createdAt);
-        const day = date.getDate().toString().padStart(2, '0');
-        const month = date.toLocaleString('default', { month: 'short' });
-        const year = date.getFullYear();
+  const noteDiv = document.createElement('div');
+  noteDiv.className = `note-entry ${note.done ? 'done' : ''}`;
+  noteDiv.setAttribute('data-id', note._id);
 
-noteDiv.innerHTML = `
-  <div class="note-card ${note.done ? 'done' : ''}">
-    <div class="note-date-vertical">
-      <div class="note-day">${day}</div>
-      <div class="note-month">${month}</div>
-      <div class="note-year">${year}</div>
+  const date = new Date(note.createdAt);
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = date.toLocaleString('default', { month: 'short' });
+  const year = date.getFullYear();
+
+  noteDiv.innerHTML = `
+    <div class="note-card ${note.done ? 'done' : ''}">
+      <div class="note-date-vertical">
+        <div class="note-day">${day}</div>
+        <div class="note-month">${month}</div>
+        <div class="note-year">${year}</div>
+      </div>
+      <div class="note-main">
+        <div class="note-title"><strong>${note.title}</strong></div>
+        <div class="note-content">${note.content}</div>
+      </div>
+      <div class="note-buttons">
+        <button data-label="Done" onclick="toggleDone('${note._id}')">✔️</button>
+        <button data-label="Edit" onclick="editNote('${note._id}')">✏️</button>
+        <button data-label="Delete" onclick="openDeleteModal('${note._id}')">🗑️</button>
+      </div>
     </div>
-    <div class="note-main">
-      <div class="note-title"><strong>${note.title}</strong></div>
-      <div class="note-content">${note.content}</div>
-    </div>
-    <div class="note-buttons">
-     <button data-label="Done" onclick="toggleDone('${note._id}')">✔️</button>
-      <button data-label="Edit" onclick="editNote('${note._id}')">✏️</button>
-      <button data-label="Delete" onclick="openDeleteModal('${note._id}')">🗑️</button>
-    </div>
-  </div>
-`;
-        container.appendChild(noteDiv);
-      }
+  `;
+  container.appendChild(noteDiv);
+}
     }
   }
 }
