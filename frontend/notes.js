@@ -25,28 +25,25 @@ function goToDashboard() {
 // ✅ Sync notes with backend or fallback to Dexie
 async function loadNotes() {
   try {
-    const online = navigator.onLine;
-    let notes = [];
+    const token = localStorage.getItem('token');
+    const online = window.navigator.onLine;
 
-    if (online) {
-      console.log("🌐 Online: trying to load notes from backend...");
+    let notes;
+    if (online && token) {
+      // ✅ Try backend first with token
       const res = await fetch(`${apiBase}/api/notes`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
       });
 
-      if (!res.ok) throw new Error(`Server error: ${res.status}`);
+      if (!res.ok) throw new Error("Failed to fetch notes");
 
       notes = await res.json();
-      console.log("📡 Fetched notes from backend:", notes);
 
-      if (Array.isArray(notes) && notes.length > 0) {
-        await db.notes.clear();
-        await db.notes.bulkPut(notes);
-        console.log("💾 Saved backend notes to Dexie");
-      } else {
-        console.warn("⚠️ No notes received from backend — keeping existing local cache");
-        notes = await db.notes.toArray();
-      }
+      // Save/update local
+      await db.notes.clear();
+      await db.notes.bulkPut(notes);
     } else {
       console.warn('📴 Offline: loading notes from Dexie');
       notes = await db.notes.toArray();
@@ -54,13 +51,11 @@ async function loadNotes() {
 
     renderNotes(notes);
   } catch (err) {
-    console.error('❌ Failed to load notes from backend:', err);
+    console.error('Failed to load notes', err);
     const fallbackNotes = await db.notes.toArray();
-    console.log("📥 Loaded fallback notes from Dexie:", fallbackNotes);
     renderNotes(fallbackNotes);
   }
 }
-
 async function saveNoteToDexie(note) {
   note.lastUpdated = Date.now();
   note.synced = false; // Mark as unsynced if offline
