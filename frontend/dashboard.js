@@ -2125,5 +2125,6 @@ window.populatePersonFilterForDashboard = populatePersonFilterForDashboard;
 window.showChangePassword = showChangePassword;
 window.showCenteredMessage = showCenteredMessage;
 window.cancelEdit = cancelEdit
-
+window.duplicateEntry = duplicateEntry
+window.deleteEntry = deleteEntry
 
