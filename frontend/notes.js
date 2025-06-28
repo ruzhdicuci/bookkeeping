@@ -315,21 +315,17 @@ function closeDoneModal() {
   document.getElementById('doneModal').classList.add('hidden');
 }
 
-async function toggleDone(id) {
-  const token = localStorage.getItem('token');
+function toggleDone(id) {
   const note = notes.find(n => n._id === id);
   if (!note) return;
 
-  await fetch(`${apiBase}/api/notes/${id}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    },
-    body: JSON.stringify({ done: !note.done })
-  });
+  toggleDoneTargetId = id;
+  toggleDoneCurrentState = note.done;
 
-  loadNotes();
+  const doneModal = document.getElementById('doneModal');
+  if (doneModal) {
+    doneModal.classList.remove('hidden'); // 👉 show confirmation modal
+  }
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
@@ -402,20 +398,6 @@ if (confirmDoneBtn) {
 
 
 
-
-window.goToDashboard = goToDashboard;
-window.openDeleteModal = openDeleteModal;
-window.toggleHideDone = toggleHideDone;
-window.editNote = editNote;
-window.toggleTheme = toggleTheme;
-window.toggleDone = toggleDone;
-window.saveNote = saveNote;
-window.cancelEdit = cancelEdit;
-window.formatNoteDate = formatNoteDate;
-window.syncNotesToCloud = syncNotesToCloud; // ✅ optional if used from DOM or window
-window.renderNotes = renderNotes
-window.loadNotes = loadNotes;
-
 // all your other functions above...
 // like renderNotes(), saveNoteLocally(), getCachedNotes()...
 
@@ -437,3 +419,19 @@ window.addEventListener('online', async () => {
 
   await loadNotes();
 });
+
+
+
+
+window.goToDashboard = goToDashboard;
+window.openDeleteModal = openDeleteModal;
+window.toggleHideDone = toggleHideDone;
+window.editNote = editNote;
+window.toggleTheme = toggleTheme;
+window.toggleDone = toggleDone;
+window.saveNote = saveNote;
+window.cancelEdit = cancelEdit;
+window.formatNoteDate = formatNoteDate;
+window.syncNotesToCloud = syncNotesToCloud; // ✅ optional if used from DOM or window
+window.renderNotes = renderNotes
+window.loadNotes = loadNotes;
