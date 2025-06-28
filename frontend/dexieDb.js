@@ -1,3 +1,4 @@
+// At the top of dexieDb.js
 import Dexie from 'dexie';
 
 const db = new Dexie('bookkeeping-db');
@@ -8,7 +9,22 @@ db.version(2).stores({
   balances: 'bank'
 });
 
-// Export everything by name
+// ✅ Define your functions here (DO NOT export individually below)
+async function saveNoteLocally(note) {
+  note._id = note._id || crypto.randomUUID();
+  note.lastUpdated = Date.now();
+  note.synced = false;
+  await db.notes.put(note);
+}
+
+async function saveAllNotesLocally(notesArray) {
+  await db.notes.clear();
+  await db.notes.bulkPut(notesArray);
+}
+
+// add your other functions: getCachedNotes, getUnsynced, markAsSynced, etc.
+
+// ✅ Export everything ONCE at the bottom:
 export {
   db,
   saveNoteLocally,
@@ -40,32 +56,6 @@ export async function getCachedBankBalances() {
   }
 }
 
-// ✅ Save entry to entries table
-export async function saveEntryLocally(entry) {
-  entry._id = entry._id || crypto.randomUUID(); // Ensure ID is present
-entry.synced = false;
-  entry.lastUpdated = Date.now();
-  await db.entries.put(entry);
-}
-
-// ✅ Save note to notes table
-export async function saveNoteLocally(note) {
-  note._id = note._id || crypto.randomUUID();
-console.log("💾 Saving note locally:", note);
-  if (!note._id || typeof note._id !== 'string') {
-    console.error("❌ BAD _id passed to Dexie:", note);
-    return;
-  }
-
-  note.synced = navigator.onLine;
-  note.lastUpdated = Date.now();
-
-  try {
-    await db.notes.put(note);
-  } catch (err) {
-    console.error("❌ Dexie put failed:", err, note);
-  }
-}
 
 // ✅ Get all unsynced entries or notes
 export async function getUnsynced(type = "entries") {
@@ -109,14 +99,31 @@ export async function getCachedNotes() {
   return await db.notes.toArray();
 }
 
-// ✅ Bulk save all notes (overwrites existing local cache)
-export async function saveAllNotesLocally(notesArray) {
-  try {
-    await db.notes.clear();           // Clear existing cached notes
-    await db.notes.bulkPut(notesArray); // Insert all at once
-  } catch (err) {
-    console.error("❌ Failed to bulk save notes:", err);
-  }
+
+
+// ✅ Save entry to entries table
+export async function saveEntryLocally(entry) {
+  entry._id = entry._id || crypto.randomUUID(); // Ensure ID is present
+entry.synced = false;
+  entry.lastUpdated = Date.now();
+  await db.entries.put(entry);
 }
 
+// ✅ Save note to notes table
+export async function saveNoteLocally(note) {
+  note._id = note._id || crypto.randomUUID();
+console.log("💾 Saving note locally:", note);
+  if (!note._id || typeof note._id !== 'string') {
+    console.error("❌ BAD _id passed to Dexie:", note);
+    return;
+  }
 
+  note.synced = navigator.onLine;
+  note.lastUpdated = Date.now();
+
+  try {
+    await db.notes.put(note);
+  } catch (err) {
+    console.error("❌ Dexie put failed:", err, note);
+  }
+}
