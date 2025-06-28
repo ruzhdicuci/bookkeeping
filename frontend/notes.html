@@ -654,7 +654,7 @@ body.dark-theme .note-card.done .note-content {
   <div class="top-controls">
     <button id="toggleHideBtn"  onclick="toggleHideDone()">🪪 Hide Done</button>
    
-    <select id="date" onchange="renderNotes(this.value)">
+   <select id="date" onchange="renderNotes(notes, this.value)">
       <option value="date">Date</option>
       <option value="title">Title</option>
     </select>
