@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bookkeeping-cache-v1';
+const CACHE_NAME = 'bookkeeping-cache-v2';
 const urlsToCache = [
   './',
   './dashboard.html',
