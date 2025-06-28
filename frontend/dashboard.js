@@ -2124,5 +2124,6 @@ window.toggleAllPersons = toggleAllPersons;
 window.populatePersonFilterForDashboard = populatePersonFilterForDashboard;
 window.showChangePassword = showChangePassword;
 window.showCenteredMessage = showCenteredMessage;
+window.cancelEdit = cancelEdit
 
 
