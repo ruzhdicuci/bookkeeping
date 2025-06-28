@@ -207,19 +207,22 @@ async function saveNote() {
     ? `${apiBase}/api/notes/${editingNoteId}`
     : `${apiBase}/api/notes`;
 
- const note = {
-  _id: editingNoteId || crypto.randomUUID(),  // ✅ Required!
-  title,
-  content,
-  done: false,
-  createdAt: new Date().toISOString()
-};
+  const note = {
+    _id: editingNoteId || crypto.randomUUID(),
+    title,
+    content,
+    done: false,
+    createdAt: new Date().toISOString()
+  };
 
-await saveNoteLocally(note);
+  try {
+    await saveNoteLocally(note); // 💾 Always save locally first
+  } catch (err) {
+    console.error("❌ Failed to save note locally:", err);
+    return;
+  }
 
-
-
-  // Sync to backend
+  // 🔁 Try to sync to backend if online
   if (navigator.onLine) {
     try {
       const res = await fetch(url, {
@@ -241,7 +244,7 @@ await saveNoteLocally(note);
     }
   }
 
-  // Clear form + reload
+  // ✅ Reset form and reload
   editingNoteId = null;
   document.getElementById('noteTitle').value = '';
   document.getElementById('noteContent').value = '';
