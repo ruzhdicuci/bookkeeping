@@ -1979,21 +1979,31 @@ margin-right: 10px;
 
 
 
-  .scroll-toggle-wrapper {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 9999;
-  }
-  .scroll-toggle-btn {
-    padding: 10px;
-    font-size: 14px;
-    border-radius: 50%;
-    background-color: #13a07f;
-    color: white;
-    border: none;
-    display: none;
-  }
+.scroll-toggle-wrapper {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 9999; /* ensure it's above other elements */
+}
+
+.scroll-toggle-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px;
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  transition: background-color 0.2s ease;
+}
+
+.scroll-toggle-btn:hover {
+  background-color: #0056b3;
+}
 .entry-header select {
   background: white;
   border: 1px solid #ccc;
