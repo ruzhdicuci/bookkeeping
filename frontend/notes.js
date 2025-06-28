@@ -64,27 +64,6 @@ async function saveNoteToDexie(note) {
 }
 
 
-async function loadNotes() {
-  try {
-    const res = await fetch(`${backend}/api/notes`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-
-    if (!res.ok) throw new Error('Failed to fetch notes');
-
-    const data = await res.json();
-    notes = data;
-    console.log("📒 Loaded notes from backend:", notes);
-
-    await saveAllNotesLocally(notes); // Optionally store latest notes
-  } catch (err) {
-    console.warn('⚠️ Failed to load from backend. Trying IndexedDB...');
-    notes = await getCachedNotes(); // ✅ fallback to offline
-    console.log("📥 Loaded notes from IndexedDB:", notes);
-  }
-
-  renderNotes();
-}
 
 function renderNotes(inputNotes = notes, sortBy = 'date') {
   const container = document.getElementById('notesList');
