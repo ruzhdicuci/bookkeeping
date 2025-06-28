@@ -118,4 +118,3 @@ export async function saveAllNotesLocally(notesArray) {
 }
 
 
-export { db };
