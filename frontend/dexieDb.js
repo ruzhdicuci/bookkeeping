@@ -121,3 +121,5 @@ export {
   getUnsynced,
   markAsSynced
 };
+
+window.db = db; // ✅ Expose Dexie globally for debugging
