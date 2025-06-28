@@ -365,59 +365,55 @@ window.addEventListener('DOMContentLoaded', async () => {
     console.warn("⚠️ Could not load cached notes", err);
   }
 
-  // ✅ Load from backend + sync to Dexie
   await loadNotes();
 
-  // ✅ Sync unsynced notes
   if (navigator.onLine) syncNotesToCloud();
-});
+}); // ✅ This closes the async DOMContentLoaded block cleanly
 
-  // ✅ 4. Your modal/click logic remains untouched:
-  const cancelDelete = document.getElementById('cancelDeleteBtn');
-  if (cancelDelete) {
-    cancelDelete.addEventListener('click', closeDeleteModal);
-  }
+// ✅ Outside the DOMContentLoaded scope — run anytime:
+const cancelDelete = document.getElementById('cancelDeleteBtn');
+if (cancelDelete) {
+  cancelDelete.addEventListener('click', closeDeleteModal);
+}
 
-  const cancelDone = document.getElementById('cancelDoneBtn');
-  if (cancelDone) {
-    cancelDone.addEventListener('click', closeDoneModal);
-  }
+const cancelDone = document.getElementById('cancelDoneBtn');
+if (cancelDone) {
+  cancelDone.addEventListener('click', closeDoneModal);
+}
 
-  const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-  if (confirmDeleteBtn) {
-    confirmDeleteBtn.addEventListener('click', async () => {
-      if (!noteToDeleteId) return;
-      const token = localStorage.getItem('token');
-      const res = await fetch(`${apiBase}/api/notes/${noteToDeleteId}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (res.ok) {
-        closeDeleteModal();
-        loadNotesFromDB();
-      }
+const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+if (confirmDeleteBtn) {
+  confirmDeleteBtn.addEventListener('click', async () => {
+    if (!noteToDeleteId) return;
+    const token = localStorage.getItem('token');
+    const res = await fetch(`${apiBase}/api/notes/${noteToDeleteId}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` }
     });
-  }
+    if (res.ok) {
+      closeDeleteModal();
+      loadNotes(); // ✅ Use loadNotes, not loadNotesFromDB
+    }
+  });
+}
 
-  const confirmDoneBtn = document.getElementById('confirmDoneBtn');
-  if (confirmDoneBtn) {
-    confirmDoneBtn.addEventListener('click', async () => {
-      if (!toggleDoneTargetId) return;
-      const token = localStorage.getItem('token');
-      await fetch(`${apiBase}/api/notes/${toggleDoneTargetId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ done: !toggleDoneCurrentState })
-      });
-      closeDoneModal();
-      loadNotesFromDB();
+const confirmDoneBtn = document.getElementById('confirmDoneBtn');
+if (confirmDoneBtn) {
+  confirmDoneBtn.addEventListener('click', async () => {
+    if (!toggleDoneTargetId) return;
+    const token = localStorage.getItem('token');
+    await fetch(`${apiBase}/api/notes/${toggleDoneTargetId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ done: !toggleDoneCurrentState })
     });
-  }
-});
-
+    closeDoneModal();
+    loadNotes(); // ✅ Use unified function
+  });
+}
 
 
 
