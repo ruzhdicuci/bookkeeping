@@ -59,17 +59,25 @@ async function saveNoteToDexie(note) {
 
 
 async function loadNotesFromDB() {
-  const token = localStorage.getItem('token');
-  const res = await fetch(`${apiBase}/api/notes`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
+  try {
+    const res = await fetch(`${backend}/api/notes`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
 
-  if (res.ok) {
-    notes = await res.json();
-    renderNotes();
-  } else {
-    console.error('Failed to fetch notes');
+    if (!res.ok) throw new Error('Failed to fetch notes');
+
+    const data = await res.json();
+    notes = data;
+    console.log("📒 Loaded notes from backend:", notes);
+
+    await saveAllNotesLocally(notes); // Optionally store latest notes
+  } catch (err) {
+    console.warn('⚠️ Failed to load from backend. Trying IndexedDB...');
+    notes = await getCachedNotes(); // ✅ fallback to offline
+    console.log("📥 Loaded notes from IndexedDB:", notes);
   }
+
+  renderNotes();
 }
 
 function renderNotes(inputNotes = notes, sortBy = 'date') {
@@ -406,6 +414,8 @@ window.addEventListener('DOMContentLoaded', async () => {
 
 
 
+
+
 window.goToDashboard = goToDashboard;
 window.openDeleteModal = openDeleteModal;
 window.toggleHideDone = toggleHideDone;
@@ -419,3 +429,29 @@ window.syncNotesToCloud = syncNotesToCloud; // ✅ optional if used from DOM or 
 window.saveNoteToDexie = saveNoteToDexie;
 window.loadNotes = loadNotes;
 
+// all your other functions above...
+// like renderNotes(), saveNoteLocally(), getCachedNotes()...
+
+window.addEventListener('DOMContentLoaded', () => {
+  loadNotesFromDB();
+  setupNoteFormListeners();
+});
+
+// ✅ Put this at the bottom of notes.js
+window.addEventListener('online', async () => {
+  const unsyncedNotes = await getUnsynced("notes");
+  for (const note of unsyncedNotes) {
+    const { _id, ...noteToSend } = note;
+    const res = await fetch(`${backend}/api/notes`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(noteToSend)
+    });
+    if (res.ok) await markAsSynced("notes", _id);
+  }
+
+  await loadNotesFromDB(); // ✅ reload to show synced notes
+});
