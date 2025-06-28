@@ -2130,7 +2130,8 @@ window.duplicateEntry = duplicateEntry
 window.deleteEntry = deleteEntry
 window.populateFilters = populateFilters
 window.populatePersonDropdownForCharts  = populatePersonDropdownForCharts 
-
+window.openFullscreen  = openFullscreen 
+window.closeFullscreen  = closeFullscreen 
 
 
 

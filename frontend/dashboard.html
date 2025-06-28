@@ -957,53 +957,7 @@ if (tabId === 'chartsTab') {
 
 
 
-<div id="smartScrollBtn" class="smart-scroll-btn" title="Scroll" >
-  ⬇
-</div>
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const scrollBtn = document.getElementById('smartScrollBtn');
-    let hideTimer;
 
-    function updateButtonState() {
-      const scrolled = window.scrollY;
-      const scrollBottom = window.innerHeight + scrolled;
-      const isNearBottom = scrollBottom >= document.body.scrollHeight - 100;
-      const isNearTop = scrolled <= 100;
-
-      // Set arrow based on position
-      scrollBtn.innerText = isNearBottom ? '⬆' : '⬇';
-
-      // Show the button
-      scrollBtn.classList.add('show');
-
-      // Auto-hide after inactivity
-      clearTimeout(hideTimer);
-      hideTimer = setTimeout(() => {
-        scrollBtn.classList.remove('show');
-      }, 3000);
-    }
-
-    // Scroll behavior when clicked
-    scrollBtn.addEventListener('click', () => {
-      const scrolled = window.scrollY;
-      const isNearBottom = (window.innerHeight + scrolled) >= (document.body.scrollHeight - 100);
-
-      window.scrollTo({
-        top: isNearBottom ? 0 : document.body.scrollHeight,
-        behavior: 'smooth'
-      });
-    });
-
-    // Listen to scroll and touch events
-    window.addEventListener('scroll', updateButtonState);
-    window.addEventListener('touchmove', updateButtonState);
-    window.addEventListener('resize', updateButtonState);
-
-    // Trigger once on load
-    updateButtonState();
-  });
-</script>
 
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
