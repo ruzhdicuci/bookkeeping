@@ -73,7 +73,9 @@ function renderNotes(inputNotes = notes, sortBy = 'date') {
   container.innerHTML = '';
 
   const filtered = hideDone ? inputNotes.filter(n => !n.done) : [...inputNotes];
-  const sorted = filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  const sorted = sortBy === 'title'
+  ? filtered.sort((a, b) => a.title.localeCompare(b.title))
+  : filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
   const groups = {
     Today: [],
@@ -267,6 +269,7 @@ function editNote(id) {
   }, 100);
 }
 
+
 function cancelEdit() {
   editingNoteId = null;
   document.getElementById('noteTitle').value = '';
@@ -316,18 +319,19 @@ function closeDoneModal() {
 }
 
 async function toggleDone(id) {
-  const token = localStorage.getItem('token');
   const note = notes.find(n => n._id === id);
   if (!note) return;
 
   const updatedDone = !note.done;
+  note.done = updatedDone;
+  note.synced = false;
+  note.lastUpdated = Date.now();
 
-  try {
-    // 💾 Update locally first
-    await saveNoteLocally({ ...note, done: updatedDone });
+  await saveNoteLocally(note); // local first
 
-    // 🌐 Then sync if online
-    if (navigator.onLine) {
+  if (navigator.onLine) {
+    try {
+      const token = localStorage.getItem('token');
       const res = await fetch(`${apiBase}/api/notes/${id}`, {
         method: 'PUT',
         headers: {
@@ -337,17 +341,14 @@ async function toggleDone(id) {
         body: JSON.stringify({ done: updatedDone })
       });
 
-      if (res.ok) {
-        await markAsSynced("notes", id);
-      }
+      if (res.ok) await markAsSynced("notes", id);
+    } catch (err) {
+      console.warn("🔁 Could not sync toggle done", err);
     }
-  } catch (err) {
-    console.warn("❌ Failed to toggle done", err);
   }
 
   loadNotes();
 }
-
 window.addEventListener('DOMContentLoaded', async () => {
   if (localStorage.getItem('theme') === 'dark') {
     document.body.classList.add('dark-theme');
