@@ -64,7 +64,7 @@ async function saveNoteToDexie(note) {
 }
 
 
-async function loadNotesFromDB() {
+async function loadNotes() {
   try {
     const res = await fetch(`${backend}/api/notes`, {
       headers: { Authorization: `Bearer ${token}` }
@@ -254,7 +254,7 @@ async function saveNote() {
   editingNoteId = null;
   document.getElementById('noteTitle').value = '';
   document.getElementById('noteContent').value = '';
-  loadNotesFromDB();
+  loadNotes();
 }
 
 // sync note
@@ -321,7 +321,7 @@ document.getElementById('confirmDeleteBtn').addEventListener('click', async () =
   });
   if (res.ok) {
     closeDeleteModal();
-    loadNotesFromDB();
+    loadNotes();
   }
 });
 
@@ -347,7 +347,7 @@ async function toggleDone(id) {
     body: JSON.stringify({ done: !note.done })
   });
 
-  loadNotesFromDB();
+  loadNotes();
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
@@ -453,5 +453,5 @@ window.addEventListener('online', async () => {
     if (res.ok) await markAsSynced("notes", _id);
   }
 
-  await loadNotesFromDB();
+  await loadNotes();
 });
