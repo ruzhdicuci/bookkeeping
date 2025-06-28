@@ -2129,34 +2129,3 @@ window.duplicateEntry = duplicateEntry
 window.deleteEntry = deleteEntry
 
 
-
-document.addEventListener('DOMContentLoaded', () => {
-  const scrollBtn = document.getElementById('smartScrollBtn');
-  let hideTimer;
-
-  function updateButtonState() {
-    const scrolled = window.scrollY;
-    const nearBottom = (window.innerHeight + scrolled) >= (document.body.scrollHeight - 100);
-
-    scrollBtn.innerText = nearBottom ? '⬆' : '⬇';
-    scrollBtn.classList.add('show');
-
-    clearTimeout(hideTimer);
-    hideTimer = setTimeout(() => {
-      scrollBtn.classList.remove('show');
-    }, 3000);
-  }
-
-  scrollBtn.addEventListener('click', () => {
-    const scrolled = window.scrollY;
-    const nearBottom = (window.innerHeight + scrolled) >= (document.body.scrollHeight - 100);
-
-    window.scrollTo({
-      top: nearBottom ? 0 : document.body.scrollHeight,
-      behavior: 'smooth'
-    });
-  });
-
-  window.addEventListener('scroll', updateButtonState);
-  window.addEventListener('touchstart', updateButtonState); // Mobile tap support
-});
