@@ -5,22 +5,30 @@ const urlsToCache = [
   './dashboard.js',
   './notes.html',
   './notes.js',
+  './login.html',
   './login.js',
+  './dexieDb.js',
   './style.css',
   './manifest.json',
+  './icon.jpg',
   'https://cdn.jsdelivr.net/npm/dexie@3.2.4/dist/dexie.min.js',
   'https://cdn.jsdelivr.net/npm/idb@7/build/iife/index-min.js'
 ];
-
 // Install event
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      console.log('✅ Service Worker caching files');
-      return cache.addAll(urlsToCache);
+    caches.open(CACHE_NAME).then(async cache => {
+      console.log('✅ Service Worker caching files individually...');
+      for (const url of urlsToCache) {
+        try {
+          await cache.add(url);
+          console.log(`📦 Cached: ${url}`);
+        } catch (err) {
+          console.warn(`⚠️ Failed to cache: ${url}`, err);
+        }
+      }
     })
   );
-  self.skipWaiting();
 });
 
 // Fetch event with navigation fallback
