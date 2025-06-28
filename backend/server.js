@@ -285,14 +285,21 @@ app.post('/api/limits', auth, async (req, res) => {
 
 // add notes
 const Note = mongoose.model('Note', new mongoose.Schema({
-  _id: String, // ✅ Accept Dexie-generated UUIDs
+  _id: {
+    type: String, // ✅ allow UUIDs
+    required: true
+  },
   userId: String,
   title: String,
   content: String,
-  done: { type: Boolean, default: false },
-  createdAt: { type: Date, default: Date.now },
-  synced: Boolean,
-  lastUpdated: Number
+  done: {
+    type: Boolean,
+    default: false
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
 }));
 
 // Get all notes for the current user
