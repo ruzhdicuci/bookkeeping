@@ -1,3 +1,5 @@
+import Dexie from 'dexie';
+
 const db = new Dexie('bookkeeping-db');
 
 db.version(2).stores({
@@ -7,7 +9,7 @@ db.version(2).stores({
 });
 
 // Export everything by name
-export { 
+export {
   db,
   saveNoteLocally,
   saveAllNotesLocally,
