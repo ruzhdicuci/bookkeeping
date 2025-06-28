@@ -107,3 +107,4 @@ export async function saveAllNotesLocally(notesArray) {
 }
 
 export default db;
+export { db };

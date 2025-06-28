@@ -1,6 +1,7 @@
 import {
+  db,               // 👈 add this
   saveNoteLocally,
-  saveAllNotesLocally, // ✅ Add this!
+  saveAllNotesLocally,
   getCachedNotes,
   getUnsynced,
   markAsSynced
