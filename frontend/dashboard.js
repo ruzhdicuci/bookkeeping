@@ -1883,9 +1883,11 @@ try {
   console.log('✅ Entry synced to server.');
 } catch (error) {
   console.warn('📴 Offline detected – saving entry locally.');
-  await saveEntryLocally(entry); // save to IndexedDB using dexieDb.js
+  await saveEntryLocally(entry); // Save to IndexedDB
+  entries.unshift(entry); // Show it immediately at the top of the list
+  renderEntries(entries); // Re-render UI with the updated list
+
   document.getElementById('entryForm').reset();
-  renderEntries(); // so it's shown in UI even offline
   alert('📥 Entry saved locally and will sync when back online.');
 }
   });
