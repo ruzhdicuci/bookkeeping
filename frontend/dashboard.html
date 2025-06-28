@@ -929,36 +929,7 @@ if (tabId === 'chartsTab') {
 }
 </script>
 
-<div class="scroll-toggle-wrapper">
-  
-  <button class="scroll-toggle-btn" id="scrollUpBtn" title="Scroll to Top">⬆</button>
-  <button class="scroll-toggle-btn" id="scrollDownBtn" title="Scroll to Bottom">⬇</button>
-</div>
 
-
- 
-
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-  const toggleBtn = document.querySelector('.dropdown-toggle');
-  const dropdown = document.getElementById('personDropdown');
-
-  if (toggleBtn && dropdown) {
-    toggleBtn.addEventListener('click', (e) => {
-      e.stopPropagation(); // don't bubble to body
-      dropdown.classList.toggle('show');
-      console.log("✅ Person dropdown clicked");
-    });
-
-    // Close dropdown on outside click
-    document.addEventListener('click', (e) => {
-      if (!dropdown.contains(e.target) && !toggleBtn.contains(e.target)) {
-        dropdown.classList.remove('show');
-      }
-    });
-  }
-});
-</script>
 
 
 <div id="confirmModal" class="modal hidden">
@@ -983,6 +954,48 @@ if (tabId === 'chartsTab') {
   <div id="entryTableBody" class="desktop-card-list"></div>
 </div>
 
+
+
+<div class="scroll-toggle-wrapper">
+  <button class="scroll-toggle-btn" id="scrollUpBtn" title="Scroll to Top">⬆</button>
+  <button class="scroll-toggle-btn" id="scrollDownBtn" title="Scroll to Bottom">⬇</button>
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', () => {
+  // ✅ Scroll buttons logic
+  const scrollUpBtn = document.getElementById('scrollUpBtn');
+  const scrollDownBtn = document.getElementById('scrollDownBtn');
+
+  if (scrollUpBtn && scrollDownBtn) {
+    scrollUpBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    scrollDownBtn.addEventListener('click', () => {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    });
+  }
+
+  // ✅ Your dropdown logic stays intact
+  const toggleBtn = document.querySelector('.dropdown-toggle');
+  const dropdown = document.getElementById('personDropdown');
+
+  if (toggleBtn && dropdown) {
+    toggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      dropdown.classList.toggle('show');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!dropdown.contains(e.target) && !toggleBtn.contains(e.target)) {
+        dropdown.classList.remove('show');
+      }
+    });
+  }
+});
+</script>
+
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
@@ -1000,4 +1013,8 @@ if (tabId === 'chartsTab') {
 </body>
 </html>
 
+
+
+
+ 
 
