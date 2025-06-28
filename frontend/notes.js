@@ -1,5 +1,6 @@
 import {
   saveNoteLocally,
+  saveAllNotesLocally, // ✅ Add this!
   getCachedNotes,
   getUnsynced,
   markAsSynced

@@ -38,7 +38,7 @@ entry.synced = false;
 // ✅ Save note to notes table
 export async function saveNoteLocally(note) {
   note._id = note._id || crypto.randomUUID();
-
+console.log("💾 Saving note locally:", note);
   if (!note._id || typeof note._id !== 'string') {
     console.error("❌ BAD _id passed to Dexie:", note);
     return;
@@ -94,6 +94,16 @@ export async function getCachedEntries() {
 // ✅ Get all cached notes
 export async function getCachedNotes() {
   return await db.notes.toArray();
+}
+
+// ✅ Bulk save all notes (overwrites existing local cache)
+export async function saveAllNotesLocally(notesArray) {
+  try {
+    await db.notes.clear();           // Clear existing cached notes
+    await db.notes.bulkPut(notesArray); // Insert all at once
+  } catch (err) {
+    console.error("❌ Failed to bulk save notes:", err);
+  }
 }
 
 export default db;
