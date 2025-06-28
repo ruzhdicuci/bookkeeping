@@ -1,4 +1,5 @@
-import db, {
+import {
+  db,
   saveEntryLocally,
   getCachedEntries,
   getUnsynced,

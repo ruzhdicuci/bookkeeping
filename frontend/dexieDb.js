@@ -6,6 +6,17 @@ db.version(2).stores({
   balances: 'bank'
 });
 
+// Export everything by name
+export { 
+  db,
+  saveNoteLocally,
+  saveAllNotesLocally,
+  getCachedNotes,
+  getUnsynced,
+  markAsSynced,
+  getCachedBankBalances,
+  saveEntryLocally
+};
 
 // Save an array of balances (overwrites existing entries)
 export async function saveBankBalances(balances) {
@@ -106,5 +117,5 @@ export async function saveAllNotesLocally(notesArray) {
   }
 }
 
-export default db;
+
 export { db };

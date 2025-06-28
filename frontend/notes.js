@@ -1,12 +1,11 @@
 import {
-  db,               // 👈 add this
+  db,
   saveNoteLocally,
   saveAllNotesLocally,
   getCachedNotes,
   getUnsynced,
   markAsSynced
 } from './dexieDb.js';
-
 
 const apiBase = 'https://bookkeeping-i8e0.onrender.com';
 let notes = [];
