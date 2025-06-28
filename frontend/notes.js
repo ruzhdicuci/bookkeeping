@@ -434,7 +434,6 @@ window.loadNotes = loadNotes;
 
 window.addEventListener('DOMContentLoaded', () => {
   loadNotesFromDB();
-  setupNoteFormListeners();
 });
 
 // ✅ Put this at the bottom of notes.js
