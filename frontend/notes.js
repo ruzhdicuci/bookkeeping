@@ -355,22 +355,22 @@ window.addEventListener('DOMContentLoaded', async () => {
     document.body.classList.add('dark-theme');
   }
 
-  // ✅ 1. Show cached notes first
   try {
     const cached = await getCachedNotes();
     if (cached.length) {
       console.log("📦 Showing cached notes");
-      renderNotes(cached); // Your render function
+      renderNotes(cached);
     }
   } catch (err) {
     console.warn("⚠️ Could not load cached notes", err);
   }
 
-  // ✅ 2. Then load from DB as usual
-  await loadNotesFromDB();
+  // ✅ Load from backend + sync to Dexie
+  await loadNotes();
 
-  // ✅ 3. Sync unsynced notes (if any)
+  // ✅ Sync unsynced notes
   if (navigator.onLine) syncNotesToCloud();
+});
 
   // ✅ 4. Your modal/click logic remains untouched:
   const cancelDelete = document.getElementById('cancelDeleteBtn');
