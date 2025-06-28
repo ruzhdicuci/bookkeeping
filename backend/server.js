@@ -349,9 +349,9 @@ app.put('/api/notes/:id', auth, async (req, res) => {
 app.delete('/api/notes/:id', auth, async (req, res) => {
   const { id } = req.params;
 
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).json({ error: 'Invalid note ID' });
-  }
+if (!id || typeof id !== 'string') {
+  return res.status(400).json({ error: 'Invalid note ID format' });
+}
 
   try {
     await Note.deleteOne({ _id: id, userId: req.userId });
