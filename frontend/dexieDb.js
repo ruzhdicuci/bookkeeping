@@ -30,7 +30,7 @@ export async function getCachedBankBalances() {
 // ✅ Save entry to entries table
 export async function saveEntryLocally(entry) {
   entry._id = entry._id || crypto.randomUUID(); // Ensure ID is present
-  entry.synced = navigator.onLine;
+entry.synced = false;
   entry.lastUpdated = Date.now();
   await db.entries.put(entry);
 }
@@ -82,8 +82,13 @@ export async function markAsSynced(type, _id) {
 
 // ✅ Get all cached entries
 export async function getCachedEntries() {
-  const all = await db.entries.toArray();
-  return all.sort((a, b) => b.date.localeCompare(a.date));
+  try {
+    const all = await db.entries.toArray();
+    return all.sort((a, b) => b.date.localeCompare(a.date)); // newest first
+  } catch (err) {
+    console.error("❌ Failed to read cached entries:", err);
+    return [];
+  }
 }
 
 // ✅ Get all cached notes
