@@ -413,7 +413,7 @@ window.saveNote = saveNote;
 window.cancelEdit = cancelEdit;
 window.formatNoteDate = formatNoteDate;
 window.syncNotesToCloud = syncNotesToCloud; // ✅ optional if used from DOM or window
-window.saveNoteToDexie = saveNoteToDexie;
+
 window.loadNotes = loadNotes;
 
 // all your other functions above...
