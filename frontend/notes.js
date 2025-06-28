@@ -315,17 +315,37 @@ function closeDoneModal() {
   document.getElementById('doneModal').classList.add('hidden');
 }
 
-function toggleDone(id) {
+async function toggleDone(id) {
+  const token = localStorage.getItem('token');
   const note = notes.find(n => n._id === id);
   if (!note) return;
 
-  toggleDoneTargetId = id;
-  toggleDoneCurrentState = note.done;
+  const updatedDone = !note.done;
 
-  const doneModal = document.getElementById('doneModal');
-  if (doneModal) {
-    doneModal.classList.remove('hidden'); // 👉 show confirmation modal
+  try {
+    // 💾 Update locally first
+    await saveNoteLocally({ ...note, done: updatedDone });
+
+    // 🌐 Then sync if online
+    if (navigator.onLine) {
+      const res = await fetch(`${apiBase}/api/notes/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ done: updatedDone })
+      });
+
+      if (res.ok) {
+        await markAsSynced("notes", id);
+      }
+    }
+  } catch (err) {
+    console.warn("❌ Failed to toggle done", err);
   }
+
+  loadNotes();
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
@@ -337,13 +357,14 @@ window.addEventListener('DOMContentLoaded', async () => {
     const cached = await getCachedNotes();
     if (cached.length) {
       console.log("📦 Showing cached notes");
-      renderNotes(cached);
+      notes = cached;             // ✅ IMPORTANT: update global notes array
+      renderNotes(notes);
     }
   } catch (err) {
     console.warn("⚠️ Could not load cached notes", err);
   }
 
-  await loadNotes();
+  await loadNotes(); // This will override notes again with fresh data
 
   if (navigator.onLine) syncNotesToCloud();
 }); // ✅ This closes the async DOMContentLoaded block cleanly
@@ -398,6 +419,19 @@ if (confirmDoneBtn) {
 
 
 
+window.goToDashboard = goToDashboard;
+window.openDeleteModal = openDeleteModal;
+window.toggleHideDone = toggleHideDone;
+window.editNote = editNote;
+window.toggleTheme = toggleTheme;
+window.toggleDone = toggleDone;
+window.saveNote = saveNote;
+window.cancelEdit = cancelEdit;
+window.formatNoteDate = formatNoteDate;
+window.syncNotesToCloud = syncNotesToCloud; // ✅ optional if used from DOM or window
+window.renderNotes = renderNotes
+window.loadNotes = loadNotes;
+
 // all your other functions above...
 // like renderNotes(), saveNoteLocally(), getCachedNotes()...
 
@@ -419,19 +453,3 @@ window.addEventListener('online', async () => {
 
   await loadNotes();
 });
-
-
-
-
-window.goToDashboard = goToDashboard;
-window.openDeleteModal = openDeleteModal;
-window.toggleHideDone = toggleHideDone;
-window.editNote = editNote;
-window.toggleTheme = toggleTheme;
-window.toggleDone = toggleDone;
-window.saveNote = saveNote;
-window.cancelEdit = cancelEdit;
-window.formatNoteDate = formatNoteDate;
-window.syncNotesToCloud = syncNotesToCloud; // ✅ optional if used from DOM or window
-window.renderNotes = renderNotes
-window.loadNotes = loadNotes;
