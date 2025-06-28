@@ -1,4 +1,4 @@
-import Dexie from 'dexie';
+import Dexie from 'https://cdn.jsdelivr.net/npm/dexie@3.2.4/dist/dexie.mjs';
 
 const db = new Dexie('bookkeeping-db');
 
