@@ -11,7 +11,8 @@ const apiBase = 'https://bookkeeping-i8e0.onrender.com';
 let notes = [];
 let hideDone = false;
 let editingNoteId = null;
-let deleteTargetId = null;
+
+let currentSort = 'date'; // or 'title'
 
 function toggleTheme() {
   document.body.classList.toggle('dark-theme');
@@ -59,21 +60,22 @@ async function loadNotes() {
       notes = await db.notes.toArray();
     }
 
-    renderNotes(notes);
+    renderNotes(notes, currentSort);
   } catch (err) {
     console.error('Failed to load notes', err);
     const fallbackNotes = await db.notes.toArray();
-    renderNotes(fallbackNotes);
+    renderNotes(fallbackNotes, currentSort); // On error fallback
   }
 }
 
 
-function renderNotes(inputNotes = notes, sortBy = 'date') {
+function renderNotes(inputNotes = notes, sortBy = currentSort) {
+  currentSort = sortBy; // store it for future use
   const container = document.getElementById('notesList');
   container.innerHTML = '';
 
   const filtered = hideDone ? inputNotes.filter(n => !n.done) : [...inputNotes];
-  const sorted = sortBy === 'title'
+ const sorted = sortBy === 'title'
   ? filtered.sort((a, b) => a.title.localeCompare(b.title))
   : filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
@@ -247,7 +249,7 @@ function toggleHideDone() {
   hideDone = !hideDone;
   const btn = document.getElementById('toggleHideBtn');
   btn.textContent = hideDone ? '📑 Show Done' : '🪪 Hide Done';
-  renderNotes();
+  renderNotes(notes, currentSort);
 }
 
 function editNote(id) {
@@ -258,7 +260,7 @@ function editNote(id) {
   document.getElementById('noteTitle').value = note.title;
   document.getElementById('noteContent').value = note.content;
 
-  renderNotes();
+  renderNotes(notes, currentSort);
   setTimeout(() => {
     const card = document.querySelector(`.note-entry[data-id="${id}"]`);
     if (card) {
@@ -274,7 +276,7 @@ function cancelEdit() {
   editingNoteId = null;
   document.getElementById('noteTitle').value = '';
   document.getElementById('noteContent').value = '';
-  renderNotes();
+  renderNotes(notes, currentSort);
 }
 
 function formatNoteDate(dateStr) {
@@ -359,7 +361,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     if (cached.length) {
       console.log("📦 Showing cached notes");
       notes = cached;             // ✅ IMPORTANT: update global notes array
-      renderNotes(notes);
+      renderNotes(notes, currentSort); // After successful backend load
     }
   } catch (err) {
     console.warn("⚠️ Could not load cached notes", err);
