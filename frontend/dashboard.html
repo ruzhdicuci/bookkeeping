@@ -3,15 +3,7 @@
 <head>
    <script src="https://cdn.jsdelivr.net/npm/dexie@3.2.4/dist/dexie.min.js"></script>
 <link rel="manifest" href="manifest.json" />
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('✅ Service Worker registered:', reg.scope))
-        .catch(err => console.warn('❌ Service Worker failed:', err));
-    });
-  }
-</script>
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -997,6 +989,14 @@ if (tabId === 'chartsTab') {
 
 <script type="module" src="dashboard.js"></script>
 <div id="syncOverlay" class="hidden">Synced</div>
+<!-- at end of body -->
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('✅ Service Worker registered:', reg.scope))
+      .catch(err => console.warn('❌ Service Worker registration failed:', err));
+  }
+</script>
 </body>
 </html>
 

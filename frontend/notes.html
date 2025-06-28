@@ -5,15 +5,7 @@
 
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icon.jpg" type="image/jpeg">
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('✅ Service Worker registered:', reg.scope))
-        .catch(err => console.warn('❌ Service Worker failed:', err));
-    });
-  }
-</script>
+
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Notes</title>
@@ -692,5 +684,13 @@ body.dark-theme .note-card.done .note-content {
 <!-- Dexie wrapper and app logic -->
 <script type="module" src="dexieDb.js"></script>
 <script type="module" src="notes.js"></script>
+<!-- at end of body -->
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('✅ Service Worker registered:', reg.scope))
+      .catch(err => console.warn('❌ Service Worker registration failed:', err));
+  }
+</script>
 </body>
 </html>
