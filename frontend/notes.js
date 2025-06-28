@@ -357,6 +357,7 @@ async function toggleDone(id) {
 
   loadNotes();
 }
+
 window.addEventListener('DOMContentLoaded', async () => {
   if (localStorage.getItem('theme') === 'dark') {
     document.body.classList.add('dark-theme');
@@ -367,6 +368,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     if (cached.length) {
       console.log("📦 Showing cached notes");
       notes = cached;             // ✅ IMPORTANT: update global notes array
+      window.notes = notes;
       renderNotes(notes, currentSort); // After successful backend load
     }
   } catch (err) {
