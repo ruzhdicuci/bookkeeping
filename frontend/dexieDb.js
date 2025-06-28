@@ -10,10 +10,16 @@ db.version(2).stores({
 
 // ✅ Save single note
 async function saveNoteLocally(note) {
-  note._id = note._id || crypto.randomUUID();
-  if (!note._id || typeof note._id !== 'string') {
-    console.error("❌ BAD _id passed to Dexie:", note);
-    return;
+  if (!note._id) {
+    note._id = crypto.randomUUID();
+  } else if (typeof note._id !== 'string') {
+    // Convert _id object to string (handles MongoDB ObjectId format)
+    try {
+      note._id = note._id.toString();
+    } catch (e) {
+      console.warn("⚠️ Could not convert _id to string, generating new one");
+      note._id = crypto.randomUUID();
+    }
   }
 
   note.synced = navigator.onLine;
@@ -21,7 +27,6 @@ async function saveNoteLocally(note) {
 
   try {
     await db.notes.put(note);
-    console.log("💾 Saved note locally:", note);
   } catch (err) {
     console.error("❌ Dexie put failed:", err, note);
   }
