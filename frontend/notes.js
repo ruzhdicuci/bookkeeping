@@ -435,16 +435,12 @@ window.loadNotes = loadNotes;
 // all your other functions above...
 // like renderNotes(), saveNoteLocally(), getCachedNotes()...
 
-window.addEventListener('DOMContentLoaded', () => {
-  loadNotesFromDB();
-});
-
-// ✅ Put this at the bottom of notes.js
 window.addEventListener('online', async () => {
+  const token = localStorage.getItem('token'); // ✅ define here
   const unsyncedNotes = await getUnsynced("notes");
   for (const note of unsyncedNotes) {
     const { _id, ...noteToSend } = note;
-    const res = await fetch(`${backend}/api/notes`, {
+    const res = await fetch(`${apiBase}/api/notes`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -455,5 +451,5 @@ window.addEventListener('online', async () => {
     if (res.ok) await markAsSynced("notes", _id);
   }
 
-  await loadNotesFromDB(); // ✅ reload to show synced notes
+  await loadNotesFromDB();
 });
