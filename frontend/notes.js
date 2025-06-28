@@ -30,7 +30,6 @@ async function loadNotes() {
 
     let notes;
     if (online && token) {
-      // ✅ Try backend first with token
       const res = await fetch(`${apiBase}/api/notes`, {
         headers: {
           Authorization: `Bearer ${token}`
@@ -41,7 +40,18 @@ async function loadNotes() {
 
       notes = await res.json();
 
-      // Save/update local
+      // 🛠️ Sanitize _id values
+      notes = notes.map(note => {
+        if (typeof note._id !== 'string') {
+          try {
+            note._id = note._id.toString();
+          } catch {
+            note._id = crypto.randomUUID();
+          }
+        }
+        return note;
+      });
+
       await db.notes.clear();
       await db.notes.bulkPut(notes);
     } else {
@@ -56,13 +66,6 @@ async function loadNotes() {
     renderNotes(fallbackNotes);
   }
 }
-async function saveNoteToDexie(note) {
-  note.lastUpdated = Date.now();
-  note.synced = false; // Mark as unsynced if offline
-
-  await db.notes.put(note);
-}
-
 
 
 function renderNotes(inputNotes = notes, sortBy = 'date') {
