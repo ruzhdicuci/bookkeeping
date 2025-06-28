@@ -82,7 +82,8 @@ export async function markAsSynced(type, _id) {
 
 // ✅ Get all cached entries
 export async function getCachedEntries() {
-  return await db.entries.toArray();
+  const all = await db.entries.toArray();
+  return all.sort((a, b) => b.date.localeCompare(a.date));
 }
 
 // ✅ Get all cached notes

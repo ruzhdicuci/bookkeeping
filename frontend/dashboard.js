@@ -1883,9 +1883,12 @@ try {
   console.log('✅ Entry synced to server.');
 } catch (error) {
   console.warn('📴 Offline detected – saving entry locally.');
-  await saveEntryLocally(entry); // Save to IndexedDB
-  entries.unshift(entry); // Show it immediately at the top of the list
-  renderEntries(entries); // Re-render UI with the updated list
+  await saveEntryLocally(entry); // ✅ save to IndexedDB
+
+  // ✅ read entries from IndexedDB and re-render
+  const cachedEntries = await getCachedEntries(); 
+  window.entries = cachedEntries; // optionally update global cache
+  renderEntries(cachedEntries);
 
   document.getElementById('entryForm').reset();
   alert('📥 Entry saved locally and will sync when back online.');
