@@ -162,9 +162,8 @@ for (const note of groups[label]) {
 
 
 
-// Save to Dexie
+
 // Save to Dexie and sync to cloud when online
-// ✅ Sync notes to cloud from Dexie
 async function syncNotesToCloud() {
   const unsynced = await getUnsynced("notes");
   console.log("🧪 Unsynced notes:", unsynced);
@@ -185,7 +184,13 @@ async function syncNotesToCloud() {
       continue;
     }
 
-    console.log("📤 Syncing cleaned note to cloud:", cleanNote);
+    // ✅ Add userId if missing
+    const noteToSend = {
+      ...cleanNote,
+      userId: cleanNote.userId || localStorage.getItem('userId')
+    };
+
+    console.log("📤 Syncing note to server:", noteToSend);
 
     try {
       const res = await fetch(`${apiBase}/api/notes`, {
@@ -194,12 +199,12 @@ async function syncNotesToCloud() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify(cleanNote)
+        body: JSON.stringify(noteToSend)
       });
 
       if (res.ok) {
-        console.log(`✅ Synced note: ${cleanNote._id}`);
-        await markAsSynced("notes", cleanNote._id);
+        console.log(`✅ Synced note: ${noteToSend._id}`);
+        await markAsSynced("notes", noteToSend._id);
       } else {
         const text = await res.text();
         console.error(`❌ Server rejected note (${res.status}):`, text);
