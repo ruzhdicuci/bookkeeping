@@ -164,22 +164,26 @@ for (const note of groups[label]) {
 
 // Save to Dexie
 // Save to Dexie and sync to cloud when online
-// ✅ Save to Dexie
+// ✅ Save to Dexie and sync
 async function syncNotesToCloud() {
   const unsynced = await getUnsynced("notes");
   console.log("🧪 Unsynced notes:", unsynced);
 
   for (const note of unsynced) {
-    // ✅ Deep clone to remove Proxy/IndexDB junk
     const cleanNote = JSON.parse(JSON.stringify(note));
-    console.log("🛰️ Syncing note to cloud:", cleanNote);
 
-    // ✅ Ensure _id exists and is a string
+    // ✅ Fix malformed _id if needed
+    if (typeof cleanNote._id === 'object' && cleanNote._id !== null) {
+      cleanNote._id = cleanNote._id.$oid || cleanNote._id.toString();
+    }
+
     if (!cleanNote._id || typeof cleanNote._id !== 'string') {
       console.error("❌ Invalid or missing _id on cleanNote:", cleanNote);
-      alert("❌ Note _id is missing! Cannot sync.");
+      alert("❌ _id is still missing! Cannot sync note.");
       continue;
     }
+
+    console.log("🛰️ Syncing cleaned note:", cleanNote);
 
     try {
       const res = await fetch(`${apiBase}/api/notes`, {
@@ -188,7 +192,7 @@ async function syncNotesToCloud() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify(cleanNote) // ✅ Use cleanNote
+        body: JSON.stringify(cleanNote)
       });
 
       if (res.ok) {
