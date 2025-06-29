@@ -167,6 +167,7 @@ async function syncNotesToCloud() {
   const unsynced = await getUnsynced("notes");
 
   for (const note of unsynced) {
+    console.log("🛰️ Syncing note to cloud:", note);
     // ✅ skip notes with missing or bad _id
     if (!note._id || typeof note._id !== 'string') {
       console.warn("❌ Invalid _id on note:", note);
