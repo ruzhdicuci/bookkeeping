@@ -169,15 +169,14 @@ async function syncNotesToCloud() {
   console.log("📦 Unsynced notes to sync:", unsynced);
 
   for (let note of unsynced) {
-    // ✅ Force assign _id if missing or invalid
+    // 🛡️ Ensure _id is valid
     if (!note._id || typeof note._id !== 'string') {
-      console.warn("⚠️ Invalid _id detected, generating new one");
+      console.warn("⚠️ Invalid _id, generating new one before sync");
       note._id = crypto.randomUUID();
-      await saveNoteLocally(note); // Save back to Dexie
+      await saveNoteLocally(note); // Save corrected note back to Dexie
     }
 
-    // ✅ Log payload before sending
-    console.log("📤 Sending note to server:", JSON.stringify(note, null, 2));
+    console.log("📤 Sending note to server:", note);
 
     try {
       const res = await fetch(`${apiBase}/api/notes`, {
@@ -193,11 +192,11 @@ async function syncNotesToCloud() {
         console.log(`✅ Synced note: ${note._id}`);
         await markAsSynced("notes", note._id);
       } else {
-        const text = await res.text();
-        console.warn(`❌ Sync failed for note ${note._id}:`, text);
+        const errorText = await res.text();
+        console.warn(`❌ Failed to sync note:`, errorText);
       }
     } catch (err) {
-      console.error("❌ Network or server error:", err);
+      console.error("❌ Network/server sync error:", err);
     }
   }
 }
