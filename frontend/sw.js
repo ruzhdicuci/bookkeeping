@@ -31,17 +31,38 @@ self.addEventListener('install', event => {
   );
 });
 
+
+
+// ✅ ACTIVATE event (add this here)
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key)))
+    )
+  );
+});
+
+
+
 // Fetch event with navigation fallback
 self.addEventListener('fetch', event => {
-  // Handle navigation requests (like refreshing dashboard.html)
   if (event.request.mode === 'navigate') {
     event.respondWith(
-      fetch(event.request).catch(() => caches.match('./dashboard.html'))
+      fetch(event.request).catch(() => {
+        const url = new URL(event.request.url);
+        if (url.pathname.includes('notes.html')) {
+          return caches.match('./notes.html');
+        }
+        if (url.pathname.includes('login.html')) {
+          return caches.match('./login.html');
+        }
+        return caches.match('./dashboard.html'); // default fallback
+      })
     );
     return;
   }
 
-  // For other requests (JS, CSS, etc.)
+  // Static files
   event.respondWith(
     caches.match(event.request).then(response => {
       return response || fetch(event.request);

@@ -1369,34 +1369,11 @@ function calculateCurrentBankBalance(bankName) {
     }
 
 
+    function setFontSize(size) {
+  document.documentElement.style.setProperty('--app-font-size', size + 'px');
+  console.log(`🔠 Font size set to ${size}px`);
+}
 
-
-        // Initial zoom level
-        let zoomLevel = 1;
-
-        // Function to update the zoom
-        function updateZoom() {
-            document.body.style.zoom = zoomLevel;
-        }
-
-        // Zoom in button
-        document.getElementById('zoomInButton').addEventListener('click', () => {
-            zoomLevel += 0.1;
-            updateZoom();
-        });
-
-        // Zoom out button
-        document.getElementById('zoomOutButton').addEventListener('click', () => {
-            zoomLevel -= 0.1;
-            updateZoom();
-        });
-
-        // Reset zoom button
-        document.getElementById('resetZoomButton').addEventListener('click', () => {
-            zoomLevel = 1;
-            updateZoom();
-        });
- 
 
  document.addEventListener('click', function (e) {
   const dropdown = document.getElementById('personOptions');
@@ -2132,6 +2109,5 @@ window.populateFilters = populateFilters
 window.populatePersonDropdownForCharts  = populatePersonDropdownForCharts 
 window.openFullscreen  = openFullscreen 
 window.closeFullscreen  = closeFullscreen 
-
-
+window.setFontSize  = setFontSize
 

@@ -1977,39 +1977,16 @@ margin-right: 10px;
   margin-left: 3px;
 }
 
-
-
-.smart-scroll-btn {
-  position: fixed;
-  top: 50%;
-  right: 50%;
-  transform: translateY(-50%);
-  background-color: #007bff;
-  color: white;
-
- padding: 10px;
- padding-right: 14px;
- padding-left: 14px;
-
-  border-radius: 50%;
-  font-size: 20px;
-  cursor: pointer;
-  z-index: 9999;
-  transition: opacity 0.3s ease, transform 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-  opacity: 0;
-  pointer-events: none;
+html {
+  --app-font-size: 16px; /* default font size */
+  font-size: var(--app-font-size);
 }
 
-.smart-scroll-btn.show {
-  opacity: 1;
-  pointer-events: auto;
+body, input, button, select, .card, .entry-row {
+  font-size: inherit;
 }
 
-.smart-scroll-btn:hover {
-background-color: white;
-color: blue;
-}
+
 
 
 .entry-header select {

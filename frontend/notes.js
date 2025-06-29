@@ -426,10 +426,31 @@ if (confirmDoneBtn) {
 }
 
 
+  // Using JavaScript to open the page in fullscreen mode
+    const elem = document.documentElement;
+    function openFullscreen() {
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+      }
+    }
+    
+    function closeFullscreen() {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+
+
+    function setFontSize(size) {
+  document.documentElement.style.setProperty('--app-font-size', size + 'px');
+  console.log(`🔠 Font size set to ${size}px`);
+}
 
 
 
-
+window.setFontSize  = setFontSize 
+window.openFullscreen  = openFullscreen 
+window.closeFullscreen  = closeFullscreen 
 window.goToDashboard = goToDashboard;
 window.openDeleteModal = openDeleteModal;
 window.toggleHideDone = toggleHideDone;
@@ -464,3 +485,5 @@ window.addEventListener('online', async () => {
 
   await loadNotes();
 });
+
+
