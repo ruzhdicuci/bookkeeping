@@ -169,28 +169,31 @@ async function syncNotesToCloud() {
   console.log("🧪 Unsynced notes:", unsynced);
 
   for (const note of unsynced) {
-    // ✅ Flatten the note in case it's a Dexie prototype object
     const cleanNote = JSON.parse(JSON.stringify(note));
 
-    // ✅ Fix malformed _id if it was stored as an object
     if (typeof cleanNote._id === 'object' && cleanNote._id !== null) {
       cleanNote._id = cleanNote._id.$oid || cleanNote._id.toString();
     }
 
-    // ✅ Ensure _id is a valid string
     if (!cleanNote._id || typeof cleanNote._id !== 'string') {
       console.error("❌ Invalid or missing _id on cleanNote:", cleanNote);
       alert("❌ _id is still missing! Cannot sync note.");
       continue;
     }
 
-    // ✅ Add userId if missing
+    // ⬅️ Force-add all required fields
     const noteToSend = {
-      ...cleanNote,
-      userId: cleanNote.userId || localStorage.getItem('userId')
+      _id: cleanNote._id,
+      userId: cleanNote.userId || localStorage.getItem('userId'),
+      title: cleanNote.title || '',
+      content: cleanNote.content || '',
+      done: cleanNote.done ?? false,
+      createdAt: cleanNote.createdAt || new Date().toISOString(),
+      synced: true,
+      lastUpdated: cleanNote.lastUpdated || Date.now()
     };
 
-    console.log("📤 Syncing note to server:", noteToSend);
+    console.log("📤 Final note to send:", noteToSend);
 
     try {
       const res = await fetch(`${apiBase}/api/notes`, {

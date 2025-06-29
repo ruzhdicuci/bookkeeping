@@ -308,7 +308,7 @@ app.get('/api/notes', auth, async (req, res) => {
   res.json(notes);
 });
 
-// Create a new note
+
 // Create a new note
 app.post('/api/notes', auth, async (req, res) => {
   const { _id, title, content, done, createdAt, synced, lastUpdated } = req.body;
