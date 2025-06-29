@@ -9,8 +9,7 @@ import {
 
 let entries = [];
 let persons = [];
-let currentPage = 1;
-const ENTRIES_PER_PAGE = 30;
+
 
 const apiBase = 'https://bookkeeping-i8e0.onrender.com';
 const token = localStorage.getItem('token');
@@ -405,13 +404,15 @@ function populateFilters() {
 }
 
 
+let currentPage = 1;
+const ENTRIES_PER_PAGE = 30;
+
 function getDateLabel(dateStr) {
   const entryDate = new Date(dateStr);
   const today = new Date();
   const yesterday = new Date();
   yesterday.setDate(today.getDate() - 1);
 
-  // Clear time components for accurate date-only comparison
   entryDate.setHours(0, 0, 0, 0);
   today.setHours(0, 0, 0, 0);
   yesterday.setHours(0, 0, 0, 0);
@@ -436,6 +437,7 @@ function getDateLabel(dateStr) {
     year: 'numeric'
   });
 }
+
 function getLabelRank(label) {
   const ranks = {
     "Today": 1,
@@ -444,14 +446,8 @@ function getLabelRank(label) {
     "Last Week": 4,
     "This Month": 5,
   };
-  return ranks[label] || 9999; // fallback for full dates
+  return ranks[label] || 9999;
 }
-
-document.getElementById('descSearch').addEventListener('input', () => {
-  currentPage = 1;
-  renderEntries();
-});
-
 
 function renderEntries() {
   const entries = window.entries || [];
@@ -473,7 +469,7 @@ function renderEntries() {
       .map(s => s.trim().toLowerCase())
       .some(val => (target || '').toLowerCase().includes(val));
 
- let filtered = entries.filter(e => {
+  let filtered = entries.filter(e => {
     const entryDay = e.date?.split('-')[2];
     const personMatches =
       personSearch?.length > 0
@@ -501,84 +497,64 @@ function renderEntries() {
   });
 
   const selectedTime = document.getElementById('timeSort')?.value;
-if (selectedTime) {
-  const now = new Date();
-  filtered = filtered.filter(e => {
-    const entryDate = new Date(e.date);
-    const daysDiff = Math.floor((now - entryDate) / (1000 * 60 * 60 * 24));
-
-    switch (selectedTime) {
-      case 'Today': return daysDiff === 0;
-      case 'Yesterday': return daysDiff === 1;
-      case 'This Week': return daysDiff <= 6;
-      case 'Last Week': return daysDiff >= 7 && daysDiff <= 13;
-      case '2 Weeks Ago': return daysDiff >= 14 && daysDiff <= 20;
-      case '3 Weeks Ago': return daysDiff >= 21 && daysDiff <= 27;
-      default: return true;
-    }
-  });
-}
-
-
-
+  if (selectedTime) {
+    const now = new Date();
+    filtered = filtered.filter(e => {
+      const entryDate = new Date(e.date);
+      const daysDiff = Math.floor((now - entryDate) / (1000 * 60 * 60 * 24));
+      switch (selectedTime) {
+        case 'Today': return daysDiff === 0;
+        case 'Yesterday': return daysDiff === 1;
+        case 'This Week': return daysDiff <= 6;
+        case 'Last Week': return daysDiff >= 7 && daysDiff <= 13;
+        case '2 Weeks Ago': return daysDiff >= 14 && daysDiff <= 20;
+        case '3 Weeks Ago': return daysDiff >= 21 && daysDiff <= 27;
+        default: return true;
+      }
+    });
+  }
 
   const container = document.getElementById('entryTableBody');
-  if (!container) {
-    console.error("❌ Missing #entryTableBody container in DOM");
-    return;
-  }
+  if (!container) return;
   container.innerHTML = '';
-  let lastDateGroup = null;
 
-  // Group entries by label
-const groupedEntries = {};
-filtered.forEach(e => {
-  const label = getDateLabel(e.date);
-  if (!groupedEntries[label]) groupedEntries[label] = [];
-  groupedEntries[label].push(e);
-});
+  const groupedEntries = {};
+  filtered.forEach(e => {
+    const label = getDateLabel(e.date);
+    if (!groupedEntries[label]) groupedEntries[label] = [];
+    groupedEntries[label].push(e);
+  });
 
-// Sort groups by rank
-const sortedLabels = Object.keys(groupedEntries).sort((a, b) => getLabelRank(a) - getLabelRank(b));
+  const sortedLabels = Object.keys(groupedEntries).sort((a, b) => getLabelRank(a) - getLabelRank(b));
+  let entriesRendered = 0;
 
-sortedLabels.forEach(label => {
-  const labelEl = document.createElement('div');
-  labelEl.className = 'entry-date-label';
-  if (['Today', 'Yesterday', 'This Week', 'Last Week', 'This Month'].includes(label)) {
-    labelEl.classList.add('special-label');
-  }
+  for (const label of sortedLabels) {
+    if (entriesRendered >= currentPage * ENTRIES_PER_PAGE) break;
 
+    const labelEl = document.createElement('div');
+    labelEl.className = 'entry-date-label';
+    if (["Today", "Yesterday", "This Week", "Last Week", "This Month"].includes(label)) {
+      labelEl.classList.add('special-label');
+    }
+    labelEl.textContent = label;
+    container.appendChild(labelEl);
 
-if (filtered.length > currentPage * ENTRIES_PER_PAGE) {
-  const loadMoreBtn = document.createElement('button');
-  loadMoreBtn.textContent = 'Load more';
-  loadMoreBtn.className = 'load-more-btn';
-  loadMoreBtn.onclick = () => {
-    currentPage++;
-    renderEntries();
-  };
-  container.appendChild(loadMoreBtn);
-}
-
-  
-  labelEl.textContent = label;
-  container.appendChild(labelEl);
-
-  groupedEntries[label]
-    .sort((a, b) => new Date(b.date) - new Date(a.date))
-    .forEach(e => {
-      const isEditing = document.getElementById('entryForm')?.dataset.editId === e._id;
-      const amountClass = e.type === 'Income' ? 'income' : 'expense';
+    const group = groupedEntries[label].sort((a, b) => new Date(b.date) - new Date(a.date));
+    for (const e of group) {
+      if (entriesRendered >= currentPage * ENTRIES_PER_PAGE) break;
 
       const card = document.createElement('div');
       card.className = 'entry-card';
       card.dataset.id = e._id;
 
+      const isEditing = document.getElementById('entryForm')?.dataset.editId === e._id;
       if (isEditing) card.classList.add('editing-row');
       if (e._id === window.highlightedEntryId) {
         card.classList.add('highlighted');
         card.id = 'highlighted-entry';
       }
+
+      const amountClass = e.type === 'Income' ? 'income' : 'expense';
 
       card.innerHTML = `
         <div class="entry-date">
@@ -592,9 +568,7 @@ if (filtered.length > currentPage * ENTRIES_PER_PAGE) {
         </div>
         <div class="entry-main">
           <div class="description">${e.description}</div>
-          <div class="meta">
-            ${e.category || ''} • ${e.person} • ${e.bank}
-          </div>
+          <div class="meta">${e.category || ''} • ${e.person} • ${e.bank}</div>
           <div class="status">
             <span class="status-pill ${e.status === 'Paid' ? 'paid' : 'open'}">${e.status}</span>
           </div>
@@ -605,23 +579,31 @@ if (filtered.length > currentPage * ENTRIES_PER_PAGE) {
             <span class="amount ${amountClass}">${parseFloat(e.amount).toFixed(2)}</span>
           </div>
           <div class="buttons">
-            ${
-              isEditing
-                ? `<button onclick="cancelEdit()" class="action-btn">❌ Cancel</button>`
-                : `<button onclick="editEntry('${e._id}')"  class="action-btn">✏️</button>`
+            ${isEditing
+              ? `<button onclick="cancelEdit()" class="action-btn">❌ Cancel</button>`
+              : `<button onclick="editEntry('${e._id}')" class="action-btn">✏️</button>`
             }
             <button onclick="duplicateEntry('${e._id}')" class="action-btn">📄</button>
-            <button onclick="showDeleteModal('${e._id}')"  class="action-btn">🗑️</button>
+            <button onclick="showDeleteModal('${e._id}')" class="action-btn">🗑️</button>
           </div>
-        </div>
-      `;
-
+        </div>`;
       container.appendChild(card);
-    });
-});
+      entriesRendered++;
+    }
+  }
 
+  if (filtered.length > currentPage * ENTRIES_PER_PAGE) {
+    const loadMoreBtn = document.createElement('button');
+    loadMoreBtn.textContent = 'Load more';
+    loadMoreBtn.className = 'load-more-btn';
+    loadMoreBtn.onclick = () => {
+      currentPage++;
+      renderEntries();
+    };
+    container.appendChild(loadMoreBtn);
+  }
 
-  // ✅ Auto-scroll to highlighted row after render
+  // Highlight scroll
   setTimeout(() => {
     const el = document.getElementById('highlighted-entry');
     if (el) {
@@ -633,6 +615,7 @@ if (filtered.length > currentPage * ENTRIES_PER_PAGE) {
       }, 2000);
     }
   }, 100);
+}
 
   // ✅ Totals + Averages (moved inside the function)
   let incomeTotal = 0, expenseTotal = 0;
