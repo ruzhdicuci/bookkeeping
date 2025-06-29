@@ -205,13 +205,15 @@ async function saveNote() {
     ? `${apiBase}/api/notes/${editingNoteId}`
     : `${apiBase}/api/notes`;
 
-  const note = {
-    _id: editingNoteId || crypto.randomUUID(),
-    title,
-    content,
-    done: false,
-    createdAt: new Date().toISOString()
-  };
+const note = {
+  _id: editingNoteId || crypto.randomUUID(),
+  title,
+  content,
+  done: false,
+  createdAt: new Date().toISOString(),
+  synced: false, // 🔁 mark it as unsynced initially
+  lastUpdated: new Date().toISOString() // 🕓 needed by Dexie
+};
 
   try {
     await saveNoteLocally(note); // 💾 Always save locally first
