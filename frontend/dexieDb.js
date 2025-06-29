@@ -93,11 +93,18 @@ async function getUnsynced(type = "entries") {
     }
 
     const all = await table.toArray();
-    return all.filter(item =>
+
+    console.log(`📋 All ${type} loaded from Dexie:`, all);
+
+    const filtered = all.filter(item =>
       item.synced === false &&
       item._id &&
       typeof item._id === 'string'
     );
+
+    console.log(`📦 Unsynced ${type} entries: ${filtered.length}`, filtered);
+
+    return filtered;
   } catch (err) {
     console.error(`❌ Dexie getUnsynced(${type}) failed:`, err);
     return [];

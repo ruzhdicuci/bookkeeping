@@ -165,7 +165,7 @@ for (const note of groups[label]) {
 // Save to Dexie
 async function syncNotesToCloud() {
   const unsynced = await getUnsynced("notes");
-
+console.log("🧪 Unsynced notes:", unsynced);
   for (const note of unsynced) {
     console.log("🛰️ Syncing note to cloud:", note);
     // ✅ skip notes with missing or bad _id
