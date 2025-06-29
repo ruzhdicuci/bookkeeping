@@ -615,7 +615,7 @@ function renderEntries() {
       }, 2000);
     }
   }, 100);
-}
+
 
   // ✅ Totals + Averages (moved inside the function)
   let incomeTotal = 0, expenseTotal = 0;
