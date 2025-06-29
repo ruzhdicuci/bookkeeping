@@ -2327,7 +2327,7 @@ body.dark .entry-card .amount {
   padding: 10px 20px;
   font-size: 1rem;
   font-weight: 500;
-  background-color:#45a09a; /* soft green - adjust to your theme */
+  background-color:blue; /* soft green - adjust to your theme */
   color: white;
   border: none;
   border-radius: 12px;
@@ -2337,11 +2337,12 @@ body.dark .entry-card .amount {
 }
 
 .load-more-btn:hover {
-  background-color: #10544f;
+  background-color: rgb(25, 25, 138);
   transform: scale(1.02);
 }
 
 .load-more-btn:active {
-  background-color: #083835;
+  background-color: white;
   transform: scale(0.98);
+  color: blue;
 }
