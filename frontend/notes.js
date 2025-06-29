@@ -164,25 +164,22 @@ for (const note of groups[label]) {
 
 // Save to Dexie
 // Save to Dexie and sync to cloud when online
+// ✅ Save to Dexie
 async function syncNotesToCloud() {
   const unsynced = await getUnsynced("notes");
+  console.log("🧪 Unsynced notes:", unsynced);
 
-  for (let note of unsynced) {
-    // ✅ Ensure _id is a string
-    if (!note._id || typeof note._id !== 'string') {
-      console.warn("⚠️ Missing or invalid _id, generating new one");
-      note._id = crypto.randomUUID();
-      await saveNoteLocally(note); // Update Dexie with new ID
-    }
-
-    // ✅ Flatten to plain object
+  for (const note of unsynced) {
+    // ✅ Deep clone to remove Proxy/IndexDB junk
     const cleanNote = JSON.parse(JSON.stringify(note));
-    console.log("📤 About to POST note:", cleanNote);
-    if (!cleanNote._id) {
-  console.error("❌ cleanNote._id is still missing!", cleanNote);
-  alert("❌ _id is still missing! Please check syncNotesToCloud()");
-  continue;
-}
+    console.log("🛰️ Syncing note to cloud:", cleanNote);
+
+    // ✅ Ensure _id exists and is a string
+    if (!cleanNote._id || typeof cleanNote._id !== 'string') {
+      console.error("❌ Invalid or missing _id on cleanNote:", cleanNote);
+      alert("❌ Note _id is missing! Cannot sync.");
+      continue;
+    }
 
     try {
       const res = await fetch(`${apiBase}/api/notes`, {
@@ -191,18 +188,18 @@ async function syncNotesToCloud() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify(cleanNote)
+        body: JSON.stringify(cleanNote) // ✅ Use cleanNote
       });
 
       if (res.ok) {
-        await markAsSynced("notes", note._id);
-        console.log("✅ Synced:", note._id);
+        console.log(`✅ Note synced: ${cleanNote._id}`);
+        await markAsSynced("notes", cleanNote._id);
       } else {
-        const msg = await res.text();
-        console.warn("❌ Server response error:", msg);
+        const text = await res.text();
+        console.error("❌ Server rejected note:", text);
       }
     } catch (err) {
-      console.error("❌ Sync error:", err);
+      console.warn("❌ Sync failed:", err);
     }
   }
 }
