@@ -309,16 +309,28 @@ app.get('/api/notes', auth, async (req, res) => {
 });
 
 // Create a new note
+// Create a new note
 app.post('/api/notes', auth, async (req, res) => {
   const { _id, title, content, done, createdAt, synced, lastUpdated } = req.body;
+
+  console.log("📝 Incoming note body:", req.body);
+  console.log("👤 Authenticated userId:", req.userId);
+
+  if (!_id || typeof _id !== 'string') {
+    return res.status(400).json({ message: 'Missing or invalid _id' });
+  }
 
   if (!title || !content) {
     return res.status(400).json({ message: 'Missing title or content' });
   }
 
+  if (!req.userId) {
+    return res.status(401).json({ message: 'User ID missing or not authenticated' });
+  }
+
   try {
     const note = await Note.create({
-      _id, // ✅ Let Dexie-generated ID be saved
+      _id,
       userId: req.userId,
       title,
       content,
@@ -328,10 +340,10 @@ app.post('/api/notes', auth, async (req, res) => {
       lastUpdated: lastUpdated ?? Date.now()
     });
 
-    res.json(note);
+    res.status(201).json(note);
   } catch (err) {
     console.error('❌ Failed to create note:', err);
-    res.status(500).json({ error: 'Failed to create note' });
+    res.status(500).json({ error: err.message });
   }
 });
 
