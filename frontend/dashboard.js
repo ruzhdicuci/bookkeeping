@@ -9,6 +9,8 @@ import {
 
 let entries = [];
 let persons = [];
+let currentPage = 1;
+const ENTRIES_PER_PAGE = 30;
 
 const apiBase = 'https://bookkeeping-i8e0.onrender.com';
 const token = localStorage.getItem('token');
@@ -445,6 +447,11 @@ function getLabelRank(label) {
   return ranks[label] || 9999; // fallback for full dates
 }
 
+document.getElementById('descSearch').addEventListener('input', () => {
+  currentPage = 1;
+  renderEntries();
+});
+
 
 function renderEntries() {
   const entries = window.entries || [];
@@ -542,7 +549,16 @@ sortedLabels.forEach(label => {
   }
 
 
-
+if (filtered.length > currentPage * ENTRIES_PER_PAGE) {
+  const loadMoreBtn = document.createElement('button');
+  loadMoreBtn.textContent = 'Load more';
+  loadMoreBtn.className = 'load-more-btn';
+  loadMoreBtn.onclick = () => {
+    currentPage++;
+    renderEntries();
+  };
+  container.appendChild(loadMoreBtn);
+}
 
   
   labelEl.textContent = label;
