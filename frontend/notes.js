@@ -496,19 +496,41 @@ window.loadNotes = loadNotes;
 // like renderNotes(), saveNoteLocally(), getCachedNotes()...
 
 window.addEventListener('online', async () => {
-  const token = localStorage.getItem('token'); // ✅ define here
+  const token = localStorage.getItem('token');
   const unsyncedNotes = await getUnsynced("notes");
+
   for (const note of unsyncedNotes) {
-    const { _id, ...noteToSend } = note;
-    const res = await fetch(`${apiBase}/api/notes`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(noteToSend)
-    });
-    if (res.ok) await markAsSynced("notes", _id);
+    const cleanNote = JSON.parse(JSON.stringify(note));
+    const noteToSend = {
+      _id: cleanNote._id,
+      userId: cleanNote.userId || localStorage.getItem('userId'),
+      title: cleanNote.title || '',
+      content: cleanNote.content || '',
+      done: cleanNote.done ?? false,
+      createdAt: cleanNote.createdAt || new Date().toISOString(),
+      synced: true,
+      lastUpdated: cleanNote.lastUpdated || Date.now()
+    };
+
+    try {
+      const res = await fetch(`${apiBase}/api/notes`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(noteToSend)
+      });
+
+      if (res.ok) {
+        await markAsSynced("notes", noteToSend._id);
+      } else {
+        const errText = await res.text();
+        console.error(`❌ Failed to sync during 'online' event (${res.status}):`, errText);
+      }
+    } catch (err) {
+      console.warn("❌ Sync error during 'online' event:", err);
+    }
   }
 
   await loadNotes();
