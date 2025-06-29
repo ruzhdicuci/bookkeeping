@@ -166,14 +166,14 @@ for (const note of groups[label]) {
 // Save to Dexie and sync to cloud when online
 async function syncNotesToCloud() {
   const unsynced = await getUnsynced("notes");
-
   console.log("🧪 Unsynced notes:", unsynced);
 
-  for (const note of unsynced) {
-    // ✅ Check if _id is valid
+  for (let note of unsynced) {
+    // ✅ Ensure _id is valid string
     if (!note._id || typeof note._id !== 'string') {
-      console.warn("❌ Skipping note with invalid _id:", note);
-      continue;
+      console.warn("❌ Invalid or missing _id — generating new UUID for note:", note);
+      note._id = crypto.randomUUID(); // fallback
+      await saveNoteLocally(note); // re-save locally with valid _id
     }
 
     console.log("🛰️ Syncing note to cloud:", note);
@@ -189,13 +189,10 @@ async function syncNotesToCloud() {
       });
 
       if (res.ok) {
-        console.log(`✅ Note synced: ${note._id}`);
         await markAsSynced("notes", note._id);
       } else {
-        const errText = await res.text();
-        console.warn(`⚠️ Server responded with ${res.status}:`, errText);
+        console.warn("❌ Failed to sync note — HTTP error:", await res.text());
       }
-
     } catch (err) {
       console.warn("❌ Sync failed:", err);
     }
