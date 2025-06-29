@@ -168,15 +168,16 @@ async function syncNotesToCloud() {
   const unsynced = await getUnsynced("notes");
 
   for (let note of unsynced) {
-    // 🛡️ Ensure _id exists and is a string
+    // ✅ Ensure _id is a string
     if (!note._id || typeof note._id !== 'string') {
+      console.warn("⚠️ Missing or invalid _id, generating new one");
       note._id = crypto.randomUUID();
-      await saveNoteLocally(note);
+      await saveNoteLocally(note); // Update Dexie with new ID
     }
 
-    // 🧽 Ensure it's plain data
-    note = JSON.parse(JSON.stringify(note));
-    console.log("📤 About to POST note:", note);
+    // ✅ Flatten to plain object
+    const cleanNote = JSON.parse(JSON.stringify(note));
+    console.log("📤 About to POST note:", cleanNote);
 
     try {
       const res = await fetch(`${apiBase}/api/notes`, {
@@ -185,15 +186,15 @@ async function syncNotesToCloud() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify(note)
+        body: JSON.stringify(cleanNote)
       });
 
       if (res.ok) {
         await markAsSynced("notes", note._id);
-        console.log("✅ Note synced:", note._id);
+        console.log("✅ Synced:", note._id);
       } else {
         const msg = await res.text();
-        console.warn("❌ Failed to sync note:", msg);
+        console.warn("❌ Server response error:", msg);
       }
     } catch (err) {
       console.error("❌ Sync error:", err);
