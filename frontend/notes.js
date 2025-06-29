@@ -164,26 +164,28 @@ for (const note of groups[label]) {
 
 // Save to Dexie
 // Save to Dexie and sync to cloud when online
-// ✅ Save to Dexie and sync
+// ✅ Sync notes to cloud from Dexie
 async function syncNotesToCloud() {
   const unsynced = await getUnsynced("notes");
   console.log("🧪 Unsynced notes:", unsynced);
 
   for (const note of unsynced) {
+    // ✅ Flatten the note in case it's a Dexie prototype object
     const cleanNote = JSON.parse(JSON.stringify(note));
 
-    // ✅ Fix malformed _id if needed
+    // ✅ Fix malformed _id if it was stored as an object
     if (typeof cleanNote._id === 'object' && cleanNote._id !== null) {
       cleanNote._id = cleanNote._id.$oid || cleanNote._id.toString();
     }
 
+    // ✅ Ensure _id is a valid string
     if (!cleanNote._id || typeof cleanNote._id !== 'string') {
       console.error("❌ Invalid or missing _id on cleanNote:", cleanNote);
       alert("❌ _id is still missing! Cannot sync note.");
       continue;
     }
 
-    console.log("🛰️ Syncing cleaned note:", cleanNote);
+    console.log("📤 Syncing cleaned note to cloud:", cleanNote);
 
     try {
       const res = await fetch(`${apiBase}/api/notes`, {
@@ -196,11 +198,11 @@ async function syncNotesToCloud() {
       });
 
       if (res.ok) {
-        console.log(`✅ Note synced: ${cleanNote._id}`);
+        console.log(`✅ Synced note: ${cleanNote._id}`);
         await markAsSynced("notes", cleanNote._id);
       } else {
         const text = await res.text();
-        console.error("❌ Server rejected note:", text);
+        console.error(`❌ Server rejected note (${res.status}):`, text);
       }
     } catch (err) {
       console.warn("❌ Sync failed:", err);
