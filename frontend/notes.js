@@ -178,6 +178,11 @@ async function syncNotesToCloud() {
     // ✅ Flatten to plain object
     const cleanNote = JSON.parse(JSON.stringify(note));
     console.log("📤 About to POST note:", cleanNote);
+    if (!cleanNote._id) {
+  console.error("❌ cleanNote._id is still missing!", cleanNote);
+  alert("❌ _id is still missing! Please check syncNotesToCloud()");
+  continue;
+}
 
     try {
       const res = await fetch(`${apiBase}/api/notes`, {
