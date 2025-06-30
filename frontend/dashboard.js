@@ -1490,12 +1490,14 @@ function showCardEditModal(cardIndex, currentName) {
   modal.style.display = "flex";
   input.focus();
 
-  // Clear previous handlers to avoid multiple bindings
+  // ✅ Clean previous event handlers
   confirmBtn.onclick = null;
   cancelBtn.onclick = null;
   deleteBtn.onclick = null;
-  document.onkeydown = null;
+  document.removeEventListener("keydown", handleEscape);
+  modal.removeEventListener("click", handleOutsideClick);
 
+  // ✅ Confirm button
   confirmBtn.onclick = () => {
     const newName = input.value.trim();
     if (newName) {
@@ -1504,14 +1506,16 @@ function showCardEditModal(cardIndex, currentName) {
       renderEditableCreditCards();
       renderCreditLimitTable();
     }
-    modal.style.display = "none";
+    closeCardModal();
   };
 
+  // ✅ Cancel button
   cancelBtn.onclick = () => {
     console.log("❌ Cancel clicked");
-    modal.style.display = "none";
+    closeCardModal();
   };
 
+  // ✅ Delete button
   deleteBtn.onclick = () => {
     if (confirm(`Delete card "${currentName}"?`)) {
       window.customCreditCards.splice(cardIndex, 1);
@@ -1519,25 +1523,31 @@ function showCardEditModal(cardIndex, currentName) {
       renderEditableCreditCards();
       renderCreditLimitTable();
     }
-    modal.style.display = "none";
+    closeCardModal();
   };
 
-  document.onkeydown = (e) => {
-    if (e.key === "Escape") modal.style.display = "none";
-  };
-}
-  // ✅ Optional: Click outside modal-content to close
-  modal.onclick = (e) => {
+  // ✅ Escape key listener
+  function handleEscape(e) {
+    if (e.key === "Escape") {
+      closeCardModal();
+    }
+  }
+
+  // ✅ Outside click
+  function handleOutsideClick(e) {
     if (e.target === modal) {
       closeCardModal();
     }
-  };
+  }
 
-  // ✅ Reusable close function
+  document.addEventListener("keydown", handleEscape);
+  modal.addEventListener("click", handleOutsideClick);
+
+  // ✅ Close function
   function closeCardModal() {
     modal.style.display = "none";
-    document.onkeydown = null;
-    modal.onclick = null;
+    document.removeEventListener("keydown", handleEscape);
+    modal.removeEventListener("click", handleOutsideClick);
   }
 }
 
