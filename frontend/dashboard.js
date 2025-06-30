@@ -2036,7 +2036,7 @@ function showToast(message, success = true) {
   if (!toast) return;
 
   toast.textContent = message;
-  toast.style.background = success ? 'white' : '#c0392b'; //  green for success, red for error
+  toast.style.background = success ? 'black' : '#c0392b'; //  green for success, red for error
   toast.style.display = 'block';
 
   setTimeout(() => {
