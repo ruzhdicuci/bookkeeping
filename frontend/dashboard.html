@@ -280,8 +280,11 @@ totalsContainer.appendChild(summaryCard);
 }
 </script>
 <h3 style="margin-left: 10px; margin-top:-2px; margin-bottom: -5px; font-size: 0.9rem; color: #727272;">Kredit Limits</h3>
+
 <div class="filter-grid">
-<div class="credit-grid">
+
+
+<div class="credit-grid" id="creditGrid">
   <!-- Input Cards -->
   <div class="card">
     <div>UBS Master</div>
@@ -299,6 +302,10 @@ totalsContainer.appendChild(summaryCard);
     <div>Cembra</div>
     <input type="number" id="creditLimit-cembra" value="10000" />
   </div>
+
+
+
+
 
   <!-- Summary Cards -->
   <div class="card">
@@ -318,12 +325,16 @@ totalsContainer.appendChild(summaryCard);
     <strong id="v-limitPlusTotal">0.00</strong>
   </div>
 
-  <!-- Button Card -->
+
  <!-- Button Card -->
 <div class="button-card">
   <button id="unlockBtn">Unlock</button>
+   
   <button id="lockBtn" style="display: none;">Lock & Save</button>
   <button id="saveLimitsBtn" style="display: none;">Save Limits</button>
+<button id="addCardBtn" onclick="addCreditCard()">Add</button>
+<button id="toggleEditModeBtn">🛠️ Edit</button>
+
 </div>
 </div>
  
@@ -943,7 +954,7 @@ if (tabId === 'chartsTab') {
     </div>
   </div>
 </div>
-<div id="toast" style="display:none; position: fixed; bottom: 20px; right: 20px; background: #13a07f; color: white; padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); font-size: 16px; z-index: 1000;"></div>
+
 
 
 
@@ -956,8 +967,19 @@ if (tabId === 'chartsTab') {
   <div id="entryTableBody" class="desktop-card-list"></div>
 </div>
 
+<div id="toast" style="display:none; position: fixed; bottom: 20px; right: 20px; background: #13a07f; color: white; padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); font-size: 16px; z-index: 1000;"></div>
 
-
+<div id="cardEditModal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <label>Edit card name:</label>
+    <input type="text" id="editCardNameInput" />
+    <div class="modal-buttons">
+      <button id="confirmEditBtn">OK</button>
+      <button id="cancelEditBtn">Cancel</button>
+      <button id="deleteCardBtn" style="color: red;">Delete</button>
+    </div>
+  </div>
+</div>
 
 
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>

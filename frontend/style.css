@@ -604,58 +604,6 @@ font-weight: bolder;
             text-decoration: none;
           }
          
-.button-card {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end; /* Push buttons to bottom */
-}
-
-
-       #unlockBtn {background-color: #fdf6de;
-        border: 1px solid transparent;
-         border-radius: 10px;
-font-weight: bold;
-  color: rgb(171, 32, 94);
-
-font-size: 0.8rem;
-  
-  cursor: pointer;
-
-   width: 60px;
- height: 44px;
-          font-family: system-ui, sans-serif;
-
-          }
-
-         .unlockBtn:hover {
-          background-color: black;
-            color: #FF512F ;
-            text-decoration: none;
-          }
-
-        #lockBtn{background-color: #fdf6de;
-   border: none ;
-font-weight: bold;
-  color: rgb(255, 85, 0);
-padding-bottom: 2px;
-
-     border: 1px solid transparent;
-         border-radius: 10px;
-  cursor: pointer;
-font-size: 0.8rem;
-   
-   width: 100px;
- height: 44px;
-          font-family: system-ui, sans-serif;
-
-          }
-
-          #lockBtn:hover {
-          background-color: black;
-            color: #FF512F ;
-            text-decoration: none;
-          }
-         
 
 
 
@@ -687,7 +635,26 @@ font-size: 0.8rem;
 }
 
 
+.modal-content input {
+  padding: 0.5rem;
+  font-size: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+}
 
+.modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+  gap: 0.5rem;
+}
+
+.modal-buttons button {
+  flex: 1;
+  padding: 0.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
 
 
 
@@ -2327,8 +2294,8 @@ body.dark .entry-card .amount {
   padding: 10px 20px;
   font-size: 1rem;
   font-weight: 500;
-  background-color:blue; /* soft green - adjust to your theme */
-  color: white;
+  background-color:rgb(255, 255, 255); /* soft green - adjust to your theme */
+  color: blue;
   border: none;
   border-radius: 12px;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -2345,4 +2312,113 @@ body.dark .entry-card .amount {
   background-color: white;
   transform: scale(0.98);
   color: blue;
+}
+
+
+
+
+.button-card {
+  display: flex;
+  flex-direction: row; /* ⬅️ change from column to row */
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* Unlock Button */
+#unlockBtn {
+  background-color: #fdf6de;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font-weight: bold;
+  color: rgb(171, 32, 94);
+  font-size: 0.8rem;
+  cursor: pointer;
+  width: 60px;
+  height: 44px;
+  font-family: system-ui, sans-serif;
+}
+#unlockBtn:hover {
+  background-color: black;
+  color: #FF512F;
+  text-decoration: none;
+}
+
+/* Lock Button */
+#lockBtn {
+  background-color: #fdf6de;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font-weight: bold;
+  color: rgb(255, 85, 0);
+  font-size: 0.8rem;
+  cursor: pointer;
+  width: 100px;
+  height: 44px;
+  font-family: system-ui, sans-serif;
+}
+#lockBtn:hover {
+  background-color: black;
+  color: #FF512F;
+  text-decoration: none;
+}
+
+/* Save Limits Button */
+#saveLimitsBtn {
+  background-color: #fdf6de;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font-weight: bold;
+  color: #336699;
+  font-size: 0.8rem;
+  cursor: pointer;
+  width: 100px;
+  height: 44px;
+  font-family: system-ui, sans-serif;
+}
+#saveLimitsBtn:hover {
+  background-color: black;
+  color: #00aaff;
+}
+
+/* Add Card Button */
+#addCardBtn {
+  background-color: #fdf6de;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font-weight: bold;
+  color: #1e5631;
+  font-size: 0.8rem;
+  cursor: pointer;
+
+  height: 44px;
+  font-family: system-ui, sans-serif;
+}
+#addCardBtn:hover {
+  background-color: #b6e7b6;
+  color: #145214;
+}
+
+
+.card .credit-name {
+  font-size: 0.6rem;
+  color: #555;
+ 
+}
+
+.card input.custom-card-limit {
+  width: 100%;
+  font-size: 1rem;
+  text-align: center;
+  border: 1px solid #e0dede;
+  border-radius: 8px;
+  padding: 4px 8px;
+  color: #005086;
+margin-top: -20px;
+}
+
+
+.edit-mode-highlight {
+  border: 2px solid red;
+  box-shadow: 0 0 5px red;
 }

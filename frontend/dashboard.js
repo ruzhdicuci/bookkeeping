@@ -4,12 +4,21 @@ import {
   getCachedEntries,
   getUnsynced,
   markAsSynced,
-  getCachedBankBalances
+  getCachedBankBalances,
+  saveAllCustomCards,
+  getCachedCustomCards,
+  syncCustomCardsToMongo,
+  loadCustomCardsFromMongo,
+  getUnsyncedCustomCards    // ✅ Add this here too
 } from './dexieDb.js';
 
 let entries = [];
 let persons = [];
-
+let creditCards = [
+  { name: "UBS Master", limit: 3000 },
+  { name: "Corner Master", limit: 9900 }
+];
+let editModeActive = false;
 
 const apiBase = 'https://bookkeeping-i8e0.onrender.com';
 const token = localStorage.getItem('token');
@@ -1409,7 +1418,24 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   renderCreditLimitTable(); // ✅ Show limits table
 
-  // ✅ Status filter listener (INSIDE this block!)
+    // 🛠️ Toggle edit/delete mode
+  document.getElementById("toggleEditModeBtn").addEventListener("click", () => {
+    window.editModeActive = !window.editModeActive; // define globally so you can check inside render
+    renderEditableCreditCards(); // re-render with mode logic
+  });
+
+
+// ✅ Load custom cards from Dexie (fallbacks to empty array)
+try {
+  await loadCustomCardsFromMongo(); // ⬅️ loads into window.customCreditCards and saves to Dexie
+} catch (err) {
+  console.warn("⚠️ Failed to load from MongoDB, using Dexie cache");
+  window.customCreditCards = await getCachedCustomCards();
+}
+
+renderEditableCreditCards(); // ✅ Render into UI
+
+  // ✅ Status filter listener
   document.getElementById('statusFilter')?.addEventListener('change', () => {
     renderEntries();
     renderBankBalanceForm();
@@ -1434,16 +1460,63 @@ const lockBtn = document.getElementById('lockBtn');
 const unlockBtn = document.getElementById('unlockBtn');
 
 function setLockState(locked) {
+  // 🔐 Handle static inputs
   Object.values(limitInputs).forEach(input => {
     if (input) input.disabled = locked;
   });
 
+  // 🔐 Handle custom card inputs (by class name)
+  document.querySelectorAll('.custom-card-limit').forEach(input => {
+    input.disabled = locked;
+  });
+
+  // 🔄 Toggle button visibility
   if (lockBtn) lockBtn.style.display = locked ? 'none' : 'inline-block';
   if (unlockBtn) unlockBtn.style.display = locked ? 'inline-block' : 'none';
 }
 
+
+// ✅ Modal handler for card editing
+function showCardEditModal(cardIndex, currentName) {
+  const modal = document.getElementById("cardEditModal");
+  const input = document.getElementById("editCardNameInput");
+  const confirmBtn = document.getElementById("confirmEditBtn");
+  const cancelBtn = document.getElementById("cancelEditBtn");
+  const deleteBtn = document.getElementById("deleteCardBtn");
+
+  input.value = currentName;
+  modal.style.display = "flex";
+
+  confirmBtn.onclick = () => {
+    const newName = input.value.trim();
+    if (newName) {
+      window.customCreditCards[cardIndex].name = newName;
+      saveCustomCreditCards();
+      renderEditableCreditCards();
+      renderCreditLimitTable();
+    }
+    modal.style.display = "none";
+  };
+
+  cancelBtn.onclick = () => {
+    modal.style.display = "none";
+  };
+
+  deleteBtn.onclick = () => {
+    if (confirm(`Delete card "${currentName}"?`)) {
+      window.customCreditCards.splice(cardIndex, 1);
+      saveCustomCreditCards();
+      renderEditableCreditCards();
+      renderCreditLimitTable();
+    }
+    modal.style.display = "none";
+  };
+}
+
 function renderCreditLimitTable() {
-  // ✅ Read limits from input fields
+  if (!Array.isArray(window.customCreditCards)) {
+    window.customCreditCards = [];
+  }
   const limits = {
     "UBS Master": parseFloat(document.getElementById("creditLimit-ubs")?.value || 0),
     "Corner": parseFloat(document.getElementById("creditLimit-corner")?.value || 0),
@@ -1451,9 +1524,12 @@ function renderCreditLimitTable() {
     "Cembra": parseFloat(document.getElementById("creditLimit-cembra")?.value || 0)
   };
 
+  (window.customCreditCards || []).forEach(card => {
+    limits[card.name] = parseFloat(card.limit || 0);
+  });
+
   const totalLimit = Object.values(limits).reduce((a, b) => a + b, 0);
 
-  // ✅ Get Total Plus and Minus from rendered summary card
   const totalPlusEl = document.getElementById('v-totalPlus');
   const totalMinusEl = document.getElementById('v-totalMinus');
 
@@ -1463,21 +1539,18 @@ function renderCreditLimitTable() {
   const left = totalLimit - totalMinus;
   const limitPlusTotal = left + totalPlus;
 
-  // ✅ Update UI
   document.getElementById('v-totalLimit').textContent = totalLimit.toFixed(2);
   document.getElementById('v-totalUsed').textContent = totalMinus.toFixed(2);
   document.getElementById('v-diffUsed').textContent = left.toFixed(2);
   document.getElementById('v-limitPlusTotal').textContent = limitPlusTotal.toFixed(2);
   if (totalPlusEl) totalPlusEl.textContent = '+' + totalPlus.toFixed(2);
 
-  // ✅ Logging
   console.log("📊 TOTAL LIMIT:", totalLimit.toFixed(2));
   console.log("🔻 TOTAL MINUS (Used):", totalMinus.toFixed(2));
   console.log("🟢 TOTAL PLUS:", totalPlus.toFixed(2));
   console.log("🧮 LEFT (Limit - Used):", left.toFixed(2));
   console.log("➕ LEFT + TOTAL PLUS:", limitPlusTotal.toFixed(2));
 
-  // ✅ Update summary card
   updateCreditSummaryCard({
     totalLimit,
     totalUsed: totalMinus,
@@ -1486,6 +1559,7 @@ function renderCreditLimitTable() {
     totalPlus
   });
 }
+
 function updateCreditSummaryCard({
   totalLimit = 0,
   totalUsed = 0,
@@ -1503,6 +1577,83 @@ function updateCreditSummaryCard({
   setText('v-diffUsed', diffUsed.toFixed(2));
   setText('v-limitPlusTotal', limitPlusTotal.toFixed(2));
   setText('v-totalPlus', '+' + totalPlus.toFixed(2));
+}
+
+function renderEditableCreditCards() {
+  const grid = document.getElementById("creditGrid");
+  grid.querySelectorAll(".custom-credit-card").forEach(el => el.remove());
+  const firstSummaryCard = Array.from(grid.children).find(child =>
+    child.querySelector("#v-totalLimit")
+  );
+
+  (window.customCreditCards || []).forEach((card, index) => {
+    const wrapper = document.createElement("div");
+    wrapper.className = "card custom-credit-card";
+    wrapper.style.position = "relative";
+
+    if (window.editModeActive) {
+      wrapper.classList.add('edit-mode-highlight');
+      wrapper.onclick = () => {
+        showCardEditModal(index, card.name);
+      };
+    } else {
+      wrapper.classList.remove('edit-mode-highlight');
+      wrapper.onclick = null;
+    }
+
+    const nameWrapper = document.createElement("div");
+    nameWrapper.style.display = "flex";
+    nameWrapper.style.justifyContent = "space-between";
+    nameWrapper.style.alignItems = "center";
+    nameWrapper.style.marginBottom = "4px";
+
+    const nameLabel = document.createElement("div");
+    nameLabel.textContent = card.name;
+    nameLabel.className = "credit-name";
+    nameLabel.style.fontSize = "0.6rem";
+    nameLabel.style.color = "#555";
+    nameLabel.style.flex = "1";
+
+    nameWrapper.appendChild(nameLabel);
+
+    const limitInput = document.createElement("input");
+    limitInput.type = "number";
+    limitInput.value = card.limit;
+    limitInput.disabled = window.initialLocked;
+    limitInput.className = "custom-card-limit";
+
+    limitInput.addEventListener("input", () => {
+      window.customCreditCards[index].limit = parseFloat(limitInput.value || 0);
+      saveCustomCreditCards();
+      renderCreditLimitTable();
+    });
+
+    wrapper.appendChild(nameWrapper);
+    wrapper.appendChild(limitInput);
+
+    if (firstSummaryCard) {
+      grid.insertBefore(wrapper, firstSummaryCard);
+    } else {
+      grid.appendChild(wrapper);
+    }
+  });
+}
+// ✅ Save cards
+function saveCustomCreditCards() {
+  saveAllCustomCards(window.customCreditCards); // ✅ Save to Dexie
+  syncCustomCardsToMongo();                     // ✅ Sync to backend
+}
+// ✅ Add card
+function addCreditCard() {
+  const name = prompt("Card name?");
+  if (!name) return;
+
+  const limit = parseFloat(prompt("Card limit (e.g. 5000)?")) || 0;
+
+  window.customCreditCards.push({ name: name.trim(), limit });
+  saveCustomCreditCards();
+  renderEditableCreditCards();
+  renderCreditLimitTable();
 }
 
 
@@ -1599,6 +1750,39 @@ function clearSearch(id) {
 }
 
 
+window.addEventListener("online", async () => {
+  console.log("🔌 Back online. Attempting to sync custom cards...");
+
+  const unsynced = await getUnsyncedCustomCards();
+  if (unsynced.length > 0) {
+    try {
+      const res = await fetch('/api/custom-limits', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ cards: unsynced }),
+      });
+
+      if (res.ok) {
+        console.log(`✅ Synced ${unsynced.length} custom cards`);
+        for (const card of unsynced) {
+          await db.customCards.update(card.id, { synced: true });
+        }
+        showToast(`✅ Synced ${unsynced.length} cards`);
+      } else {
+        console.warn("⚠️ Sync failed with response:", await res.text());
+        showToast("❌ Failed to sync cards", false);
+      }
+    } catch (err) {
+      console.error("❌ Failed to sync on reconnect:", err);
+      showToast("❌ Sync error: " + err.message, false);
+    }
+  } else {
+    console.log("📭 No unsynced cards to sync.");
+  }
+});
 
 
 function resetFilters() {
@@ -1720,19 +1904,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-function showToast(message = "Done!", color = "#13a07f") {
-  const toast = document.getElementById("toast");
+function showToast(message, success = true) {
+  const toast = document.getElementById('toast');
   if (!toast) return;
 
   toast.textContent = message;
-  toast.style.backgroundColor = color;
-  toast.style.display = "block";
+  toast.style.background = success ? '#13a07f' : '#c0392b'; // ✅ green for success, red for error
+  toast.style.display = 'block';
 
   setTimeout(() => {
-    toast.style.display = "none";
+    toast.style.display = 'none';
   }, 3000);
 }
-
 
 
 function addSwipeListeners(targetElement, onSwipeLeft, onSwipeRight) {
@@ -1776,24 +1959,7 @@ function toggleDropdown(id) {
 }
 
 
-document.addEventListener("DOMContentLoaded", () => {
-  const upBtn = document.getElementById('scrollUpBtn');
-  const downBtn = document.getElementById('scrollDownBtn');
 
-  if (upBtn) {
-    upBtn.addEventListener('click', () => {
-      console.log("⬆ Scroll Up button clicked");
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-  }
-
-  if (downBtn) {
-    downBtn.addEventListener('click', () => {
-      console.log("⬇ Scroll Down button clicked");
-      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-    });
-  }
-});
 
 
 
@@ -2109,4 +2275,11 @@ window.populatePersonDropdownForCharts  = populatePersonDropdownForCharts
 window.openFullscreen  = openFullscreen 
 window.closeFullscreen  = closeFullscreen 
 window.setFontSize  = setFontSize
+
+
+
+window.addCreditCard  = addCreditCard
+
+
+
 

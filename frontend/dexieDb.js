@@ -2,10 +2,11 @@ import Dexie from 'https://cdn.jsdelivr.net/npm/dexie@3.2.4/dist/dexie.mjs';
 
 const db = new Dexie('bookkeeping-db');
 
-db.version(2).stores({
+db.version(3).stores({
   entries: '_id, date, amount, category, person, bank, synced, lastUpdated',
   notes: '_id, title, content, done, synced, lastUpdated',
-  balances: 'bank'
+  balances: 'bank',
+  customCards: '++id,name,limit,synced,lastUpdated' // ✅ extended fields
 });
 
 // ✅ Save single note
@@ -84,6 +85,28 @@ async function getCachedBankBalances() {
   }
 }
 
+async function saveAllCustomCards(cards) {
+  try {
+    await db.customCards.clear();
+    await db.customCards.bulkPut(cards.map(card => ({
+      ...card,
+      synced: navigator.onLine,
+      lastUpdated: Date.now()
+    })));
+  } catch (err) {
+    console.error('❌ Failed to save custom cards:', err);
+  }
+}
+
+async function getCachedCustomCards() {
+  try {
+    return await db.customCards.toArray();
+  } catch (err) {
+    console.error("❌ Failed to load custom cards from Dexie:", err);
+    return [];
+  }
+}
+
 async function getUnsynced(type = "entries") {
   try {
     const table = db[type];
@@ -111,9 +134,55 @@ async function getUnsynced(type = "entries") {
   }
 }
 
+
+// ✅ Sync to MongoDB
+async function syncCustomCardsToMongo() {
+  try {
+    await fetch('/api/custom-limits', {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('token')}` // include token if needed
+      },
+      body: JSON.stringify({ cards: window.customCreditCards }),
+    });
+  } catch (err) {
+    console.error("❌ Failed to sync custom cards to MongoDB:", err);
+  }
+}
+
+// ✅ Load from MongoDB
+async function loadCustomCardsFromMongo() {
+  try {
+    const res = await fetch('/api/custom-limits', {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+    const data = await res.json();
+    if (data.cards) {
+      window.customCreditCards = data.cards;
+      await saveAllCustomCards(data.cards); // ✅ sync to Dexie too
+    }
+  } catch (err) {
+    console.warn("⚠️ Failed to load custom cards from MongoDB:", err);
+  }
+}
+
+async function getUnsyncedCustomCards() {
+  try {
+    const all = await db.customCards.toArray();
+    return all.filter(card => card.synced === false);
+  } catch (err) {
+    console.error("❌ Failed to get unsynced custom cards:", err);
+    return [];
+  }
+}
+
 async function markAsSynced(type, _id) {
   await db[type].update(_id, { synced: true });
 }
+
+
+
 
 // ✅ Export all at once (no inline `export function` anymore!)
 export {
@@ -126,7 +195,11 @@ export {
   getCachedEntries,
   getCachedBankBalances,
   getUnsynced,
-  markAsSynced
+  markAsSynced,
+   saveAllCustomCards,
+  getCachedCustomCards,
+  syncCustomCardsToMongo,
+  loadCustomCardsFromMongo,
+  getUnsyncedCustomCards
 };
-
 window.db = db; // ✅ Expose Dexie globally for debugging

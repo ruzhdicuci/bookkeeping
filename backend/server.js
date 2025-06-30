@@ -1,9 +1,25 @@
+require('dotenv').config();
 const mongoose = require('mongoose');
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+
+// ✅ Add the middleware here:
+function authMiddleware(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return res.status(401).json({ message: "No token provided" });
+
+  const token = authHeader.split(' ')[1];
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET); // ⚠️ Make sure JWT_SECRET is defined
+    req.user = decoded;
+    next();
+  } catch (err) {
+    res.status(403).json({ message: "Invalid token" });
+  }
+}
 
 const MONGO_URI = process.env.MONGODB_URI;
 
@@ -372,4 +388,20 @@ if (!id || typeof id !== 'string') {
     console.error('❌ Failed to delete note:', err);
     res.status(500).json({ error: 'Failed to delete note' });
   }
+});
+
+
+// In your Express backend (e.g., routes/customLimits.js or similar)
+app.get('/api/custom-limits', authMiddleware, async (req, res) => {
+  const userId = req.user.id;
+  const cards = await db.collection('customCards').find({ userId }).toArray();
+  res.json({ cards });
+});
+
+app.post('/api/custom-limits', authMiddleware, async (req, res) => {
+  const userId = req.user.id;
+  const { cards } = req.body;
+  await db.collection('customCards').deleteMany({ userId });
+  await db.collection('customCards').insertMany(cards.map(c => ({ ...c, userId })));
+  res.status(200).send("✅ Custom cards saved");
 });
