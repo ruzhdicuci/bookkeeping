@@ -86,10 +86,7 @@ app.get('/', (req, res) => {
 
 const SECRET = 'rudi-bookkeeping-secret'; // replace with env var for production
 
-mongoose.connect('mongodb+srv://ruzhdicuci:9BgBDMYEJBjMGFid@bookkeeping.bcakntz.mongodb.net/bookkeeping?retryWrites=true&w=majority&appName=bookkeeping', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-});
+
 
 // Define MongoDB Schemas
 const Balance = mongoose.model('Balance', new mongoose.Schema({
@@ -120,18 +117,7 @@ status: {
 }));
 
 // Auth middleware
-function auth(req, res, next) {
-  const token = req.headers.authorization?.split(' ')[1];
-  if (!token) return res.status(401).json({ message: 'Missing token' });
-
-  try {
-    const decoded = jwt.verify(token, SECRET);
-    req.userId = decoded.userId;
-    next();
-  } catch {
-    res.status(401).json({ message: 'Invalid token' });
-  }
-}
+const auth = authMiddleware; 
 
 // Routes
 app.post('/api/register', async (req, res) => {
@@ -390,18 +376,25 @@ if (!id || typeof id !== 'string') {
   }
 });
 
+const CustomCard = mongoose.model('CustomCard', new mongoose.Schema({
+  userId: String,
+  name: String,
+  limit: Number,
+  locked: Boolean
+}));
+
 
 // In your Express backend (e.g., routes/customLimits.js or similar)
 app.get('/api/custom-limits', authMiddleware, async (req, res) => {
-  const userId = req.user.id;
-  const cards = await db.collection('customCards').find({ userId }).toArray();
+  const cards = await CustomCard.find({ userId: req.user.userId });
   res.json({ cards });
 });
 
+
 app.post('/api/custom-limits', authMiddleware, async (req, res) => {
-  const userId = req.user.id;
   const { cards } = req.body;
-  await db.collection('customCards').deleteMany({ userId });
-  await db.collection('customCards').insertMany(cards.map(c => ({ ...c, userId })));
+  await CustomCard.deleteMany({ userId: req.user.userId });
+  await CustomCard.insertMany(cards.map(c => ({ ...c, userId: req.user.userId })));
+ 
   res.status(200).send("✅ Custom cards saved");
 });
