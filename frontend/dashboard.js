@@ -1768,7 +1768,6 @@ async function loadCreditLimits() {
   }
 }
 
-// ✅ Save to backend
 function saveCreditLimits() {
   const limits = {
     ubs: parseFloat(limitInputs.ubs.value || 0),
@@ -1788,12 +1787,12 @@ function saveCreditLimits() {
   })
     .then(res => {
       if (!res.ok) throw new Error("Failed to save credit limits.");
-      alert("✅ Kredit limits saved");
+      showToast("✅ Kredit limits saved", true); // ✅ Replaced alert
       renderCreditLimitTable();
     })
     .catch(err => {
       console.error("❌ Failed to save limits:", err);
-      alert("❌ Could not save limits");
+      showToast("❌ Could not save limits", false); // ✅ Replaced alert
     });
 }
 

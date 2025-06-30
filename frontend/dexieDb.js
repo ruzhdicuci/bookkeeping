@@ -15,6 +15,21 @@ db.version(3).stores({
   customCards: '++id,name,limit,synced,lastUpdated'
 });
 
+
+// ✅ Universal Dexie write fallback handler
+async function safeDexieWrite(fn, fallbackMessage = "⚠️ Offline cache issue. Reloading...") {
+  try {
+    await fn();
+  } catch (err) {
+    console.error("❌ Dexie write failed:", err);
+    if (err.name === "InvalidStateError" || err.message.includes("indexedDB")) {
+      alert(fallbackMessage);
+      location.reload();
+    }
+  }
+}
+
+
 // ✅ Save single note
 async function saveNoteLocally(note) {
   if (!note._id) {
