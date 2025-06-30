@@ -108,7 +108,7 @@
     <i id="themeIcon" class="fa-solid fa-moon"></i>
 </button>
 
-<button onclick="window.location.href='notes.html'" class="tab-button" id="bt2"  title="Open Notes">📝</button>
+<button onclick="location.replace('notes.html')" class="tab-button" id="bt2" title="Open Notes">📝</button>
 
 
 </div>
@@ -327,15 +327,23 @@ totalsContainer.appendChild(summaryCard);
 
 
  <!-- Button Card -->
-<div class="button-card">
+<div class="addCardBtn" >
   <button id="unlockBtn">Unlock</button>
-   
-  <button id="lockBtn" style="display: none;">Save</button>
-  <button id="saveLimitsBtn" style="display: none;">Save Limits</button>
-<button id="addCardBtn" onclick="addCreditCard()">Add</button>
-<button id="toggleEditModeBtn">Edit</button>
+ 
 
-</div>
+  <button id="lockBtn" style="display: none;">Save</button>
+ 
+
+  <button id="saveLimitsBtn" style="display: none;">Save Limits</button>
+  </div>
+    <div class="buttonCard">
+  <button id="addCardBtn" onclick="addCreditCard()">Add</button>
+  </div>
+      <div class="addCardBtn" >
+  <button id="toggleEditModeBtn">Edit</button>
+  </div>
+
+
 </div>
  
   </div>
