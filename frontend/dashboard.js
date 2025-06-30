@@ -1551,39 +1551,52 @@ function showCardEditModal(cardIndex, currentName) {
   }
 }
 
-
 function addCreditCard() {
   const modal = document.getElementById("cardAddModal");
-  const input = document.getElementById("addCardNameInput");
+  const nameInput = document.getElementById("addCardNameInput");
+  const limitInput = document.getElementById("addCardLimitInput");
   const confirmBtn = document.getElementById("confirmAddCardBtn");
   const cancelBtn = document.getElementById("cancelAddCardBtn");
 
-  input.value = "";
+  nameInput.value = "";
+  limitInput.value = "";
   modal.style.display = "flex";
-  input.focus();
+  nameInput.focus();
 
+  // Clean up old listeners
   confirmBtn.onclick = null;
   cancelBtn.onclick = null;
   document.removeEventListener("keydown", handleEscape);
   modal.removeEventListener("click", handleOutsideClick);
 
   confirmBtn.onclick = () => {
-    const name = input.value.trim();
-    if (name) {
-      window.customCreditCards.push({
-        name,
-        limit: 0,
-        synced: false,
-        lastUpdated: Date.now()
-      });
-      saveCustomCreditCards();
-      renderEditableCreditCards();
-      renderCreditLimitTable();
+    const name = nameInput.value.trim();
+    const limit = parseFloat(limitInput.value);
+
+    if (!name) {
+      alert("Please enter a card name.");
+      return;
     }
+
+    if (isNaN(limit)) {
+      alert("Please enter a valid number for limit.");
+      return;
+    }
+
+    window.customCreditCards.push({
+      name,
+      limit,
+      synced: false,
+      lastUpdated: Date.now()
+    });
+
+    saveCustomCreditCards();
+    renderEditableCreditCards();
+    renderCreditLimitTable();
     closeAddModal();
   };
 
-  cancelBtn.onclick = () => closeAddModal();
+  cancelBtn.onclick = closeAddModal;
 
   function handleEscape(e) {
     if (e.key === "Escape") closeAddModal();
