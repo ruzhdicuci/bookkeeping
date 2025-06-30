@@ -1478,8 +1478,7 @@ function setLockState(locked) {
   if (unlockBtn) unlockBtn.style.display = locked ? 'inline-block' : 'none';
 }
 
-
-// ✅ Modal handler for card editing
+// ✅ Modal handler for card editing (safe binding)
 function showCardEditModal(cardIndex, currentName) {
   const modal = document.getElementById("cardEditModal");
   const input = document.getElementById("editCardNameInput");
@@ -1489,6 +1488,11 @@ function showCardEditModal(cardIndex, currentName) {
 
   input.value = currentName;
   modal.style.display = "flex";
+
+  // Clear previous handlers to prevent stacking
+  confirmBtn.onclick = null;
+  cancelBtn.onclick = null;
+  deleteBtn.onclick = null;
 
   confirmBtn.onclick = () => {
     const newName = input.value.trim();
