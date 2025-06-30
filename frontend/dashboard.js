@@ -1404,9 +1404,6 @@ function calculateCurrentBankBalance(bankName) {
 
 
 
-  
-
-
 
 
 // ✅ Initialization
@@ -1692,7 +1689,7 @@ function renderEditableCreditCards() {
 
   (window.customCreditCards || []).forEach((card, index) => {
     const wrapper = document.createElement("div");
-    wrapper.className = "card custom-credit-card";
+    wrapper.className = "card custom-credit-card editable-card";
     wrapper.style.position = "relative";
 
     if (window.editModeActive) {
@@ -2012,7 +2009,7 @@ function showToast(message, success = true) {
 
   setTimeout(() => {
     toast.style.display = 'none';
-  }, 3000);
+  }, 4000);
 }
 
 

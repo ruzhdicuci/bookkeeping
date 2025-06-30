@@ -373,10 +373,12 @@ totalsContainer.appendChild(summaryCard);
         </div>
  </div> 
        
- <div class="dropdown2">
-  <button id="bt1"  class="dropdown-toggle" onclick="toggleDropdown('monthOptions')">📅  &nbsp; month </button>
+<div class="dropdown2" id="monthDropdown">
+  <button id="bt1" class="dropdown-toggle" onclick="toggleDropdown('monthOptions')">
+    📅 &nbsp; month
+  </button>
   <div class="dropdown-content2" id="monthOptions">
-    <!-- Checkboxes will be inserted here dynamically -->
+    <!-- Month checkboxes inserted dynamically -->
   </div>
 </div>
      <div class="tooltip-wrapper">
@@ -967,7 +969,7 @@ if (tabId === 'chartsTab') {
   <div id="entryTableBody" class="desktop-card-list"></div>
 </div>
 
-<div id="toast" style="display:none; position: fixed; bottom: 20px; right: 20px; background: #13a07f; color: white; padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); font-size: 16px; z-index: 1000;"></div>
+<div id="toast"></div>
 
 <div id="cardAddModal" class="modal" style="display: none;">
   <div class="modal-content">
@@ -991,7 +993,7 @@ if (tabId === 'chartsTab') {
     <div class="modal-buttons">
       <button id="confirmEditBtn">OK</button>
       <button id="cancelEditBtn">Cancel</button>
-      <button id="deleteCardBtn" style="color: red;">Delete</button>
+      <button id="deleteCardBtn">Delete</button>
     </div>
   </div>
 </div>
