@@ -1208,7 +1208,7 @@ color:  #71d0ff !important; /* optional: blue checkmark */
 
 
 .reset-btn {
-  background:  #fdf6de;
+  background:  #ffffff;
 
  border:none;
   border-radius: 8px;
@@ -2334,8 +2334,8 @@ body.dark .entry-card .amount {
   color: rgb(171, 32, 94);
   font-size: 0.8rem;
   cursor: pointer;
-  width: 60px;
-  height: 44px;
+width: 120px;
+  height: 36px;
   font-family: system-ui, sans-serif;
 }
 #unlockBtn:hover {
@@ -2353,8 +2353,8 @@ body.dark .entry-card .amount {
   color: rgb(255, 85, 0);
   font-size: 0.8rem;
   cursor: pointer;
-  width: 100px;
-  height: 44px;
+
+   height: 36px;
   font-family: system-ui, sans-serif;
 }
 #lockBtn:hover {
@@ -2372,8 +2372,7 @@ body.dark .entry-card .amount {
   color: #336699;
   font-size: 0.8rem;
   cursor: pointer;
-  width: 100px;
-  height: 44px;
+  height: 36px;
   font-family: system-ui, sans-serif;
 }
 #saveLimitsBtn:hover {
@@ -2390,8 +2389,9 @@ body.dark .entry-card .amount {
   color: #2c8249;
   font-size: 0.8rem;
   cursor: pointer;
-
-  height: 44px;
+margin-left: -2px;
+margin-right: -2px;
+  height: 36px;
   font-family: system-ui, sans-serif;
 }
 #addCardBtn:hover {
@@ -2400,7 +2400,7 @@ body.dark .entry-card .amount {
 }
 
 #toggleEditModeBtn {
-  background-color: #fde8de;
+  background-color: #fdf6de;
   border: 1px solid transparent;
   border-radius: 10px;
   font-weight: bold;
@@ -2408,7 +2408,7 @@ body.dark .entry-card .amount {
   font-size: 0.8rem;
   cursor: pointer;
 
-  height: 44px;
+   height: 36px;
   font-family: system-ui, sans-serif;
 }
 

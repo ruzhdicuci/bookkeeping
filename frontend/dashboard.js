@@ -1551,6 +1551,59 @@ function showCardEditModal(cardIndex, currentName) {
   }
 }
 
+
+function addCreditCard() {
+  const modal = document.getElementById("cardAddModal");
+  const input = document.getElementById("addCardNameInput");
+  const confirmBtn = document.getElementById("confirmAddCardBtn");
+  const cancelBtn = document.getElementById("cancelAddCardBtn");
+
+  input.value = "";
+  modal.style.display = "flex";
+  input.focus();
+
+  confirmBtn.onclick = null;
+  cancelBtn.onclick = null;
+  document.removeEventListener("keydown", handleEscape);
+  modal.removeEventListener("click", handleOutsideClick);
+
+  confirmBtn.onclick = () => {
+    const name = input.value.trim();
+    if (name) {
+      window.customCreditCards.push({
+        name,
+        limit: 0,
+        synced: false,
+        lastUpdated: Date.now()
+      });
+      saveCustomCreditCards();
+      renderEditableCreditCards();
+      renderCreditLimitTable();
+    }
+    closeAddModal();
+  };
+
+  cancelBtn.onclick = () => closeAddModal();
+
+  function handleEscape(e) {
+    if (e.key === "Escape") closeAddModal();
+  }
+
+  function handleOutsideClick(e) {
+    if (e.target === modal) closeAddModal();
+  }
+
+  function closeAddModal() {
+    modal.style.display = "none";
+    document.removeEventListener("keydown", handleEscape);
+    modal.removeEventListener("click", handleOutsideClick);
+  }
+
+  document.addEventListener("keydown", handleEscape);
+  modal.addEventListener("click", handleOutsideClick);
+}
+
+
 function renderCreditLimitTable() {
   if (!Array.isArray(window.customCreditCards)) {
     window.customCreditCards = [];
@@ -1680,18 +1733,6 @@ function renderEditableCreditCards() {
 function saveCustomCreditCards() {
   saveAllCustomCards(window.customCreditCards); // ✅ Save to Dexie
   syncCustomCardsToMongo();                     // ✅ Sync to backend
-}
-// ✅ Add card
-function addCreditCard() {
-  const name = prompt("Card name?");
-  if (!name) return;
-
-  const limit = parseFloat(prompt("Card limit (e.g. 5000)?")) || 0;
-
-  window.customCreditCards.push({ name: name.trim(), limit });
-  saveCustomCreditCards();
-  renderEditableCreditCards();
-  renderCreditLimitTable();
 }
 
 

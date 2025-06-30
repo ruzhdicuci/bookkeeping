@@ -330,7 +330,7 @@ totalsContainer.appendChild(summaryCard);
 <div class="button-card">
   <button id="unlockBtn">Unlock</button>
    
-  <button id="lockBtn" style="display: none;">Lock & Save</button>
+  <button id="lockBtn" style="display: none;">Save</button>
   <button id="saveLimitsBtn" style="display: none;">Save Limits</button>
 <button id="addCardBtn" onclick="addCreditCard()">Add</button>
 <button id="toggleEditModeBtn">Edit</button>
@@ -968,6 +968,17 @@ if (tabId === 'chartsTab') {
 </div>
 
 <div id="toast" style="display:none; position: fixed; bottom: 20px; right: 20px; background: #13a07f; color: white; padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); font-size: 16px; z-index: 1000;"></div>
+
+<div id="cardAddModal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <label>New card name:</label>
+    <input type="text" id="addCardNameInput" placeholder="e.g. Visa Corner" />
+    <div class="modal-buttons">
+      <button id="confirmAddCardBtn">Add</button>
+      <button id="cancelAddCardBtn">Cancel</button>
+    </div>
+  </div>
+</div>
 
 <div id="cardEditModal" class="modal" style="display: none;">
   <div class="modal-content">
