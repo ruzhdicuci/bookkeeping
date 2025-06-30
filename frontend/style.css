@@ -2387,7 +2387,7 @@ body.dark .entry-card .amount {
   border: 1px solid transparent;
   border-radius: 10px;
   font-weight: bold;
-  color: #1e5631;
+  color: #2c8249;
   font-size: 0.8rem;
   cursor: pointer;
 
@@ -2395,8 +2395,26 @@ body.dark .entry-card .amount {
   font-family: system-ui, sans-serif;
 }
 #addCardBtn:hover {
-  background-color: #b6e7b6;
-  color: #145214;
+  background-color: black;
+  color: #6ed86e;
+}
+
+#toggleEditModeBtn {
+  background-color: #fde8de;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font-weight: bold;
+  color: orangered;
+  font-size: 0.8rem;
+  cursor: pointer;
+
+  height: 44px;
+  font-family: system-ui, sans-serif;
+}
+
+#toggleEditModeBtn:hover {
+  background-color: black;
+  color: rgb(229, 144, 113);
 }
 
 

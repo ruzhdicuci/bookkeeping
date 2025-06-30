@@ -1490,13 +1490,12 @@ function showCardEditModal(cardIndex, currentName) {
   modal.style.display = "flex";
   input.focus();
 
-  // ✅ Remove previous listeners
+  // Clear previous handlers to avoid multiple bindings
   confirmBtn.onclick = null;
   cancelBtn.onclick = null;
   deleteBtn.onclick = null;
   document.onkeydown = null;
 
-  // ✅ Confirm rename
   confirmBtn.onclick = () => {
     const newName = input.value.trim();
     if (newName) {
@@ -1505,13 +1504,14 @@ function showCardEditModal(cardIndex, currentName) {
       renderEditableCreditCards();
       renderCreditLimitTable();
     }
-    closeCardModal();
+    modal.style.display = "none";
   };
 
-  // ✅ Cancel
-  cancelBtn.onclick = () => closeCardModal();
+  cancelBtn.onclick = () => {
+    console.log("❌ Cancel clicked");
+    modal.style.display = "none";
+  };
 
-  // ✅ Delete
   deleteBtn.onclick = () => {
     if (confirm(`Delete card "${currentName}"?`)) {
       window.customCreditCards.splice(cardIndex, 1);
@@ -1519,16 +1519,13 @@ function showCardEditModal(cardIndex, currentName) {
       renderEditableCreditCards();
       renderCreditLimitTable();
     }
-    closeCardModal();
+    modal.style.display = "none";
   };
 
-  // ✅ Escape closes modal
   document.onkeydown = (e) => {
-    if (e.key === "Escape") {
-      closeCardModal();
-    }
+    if (e.key === "Escape") modal.style.display = "none";
   };
-
+}
   // ✅ Optional: Click outside modal-content to close
   modal.onclick = (e) => {
     if (e.target === modal) {
