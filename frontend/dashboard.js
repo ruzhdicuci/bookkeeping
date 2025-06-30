@@ -1405,7 +1405,6 @@ function calculateCurrentBankBalance(bankName) {
 
 
 
-
 // ✅ Initialization
 window.addEventListener('DOMContentLoaded', async () => {
   await fetchEntries();
@@ -1514,13 +1513,8 @@ function showCardEditModal(cardIndex, currentName) {
 
   // ✅ Delete button
   deleteBtn.onclick = () => {
-    if (confirm(`Delete card "${currentName}"?`)) {
-      window.customCreditCards.splice(cardIndex, 1);
-      saveCustomCreditCards();
-      renderEditableCreditCards();
-      renderCreditLimitTable();
-    }
     closeCardModal();
+showDeleteCardModal(cardIndex, currentName);
   };
 
   // ✅ Escape key listener
@@ -1604,6 +1598,44 @@ function addCreditCard() {
   }
 
   function closeAddModal() {
+    modal.style.display = "none";
+    document.removeEventListener("keydown", handleEscape);
+    modal.removeEventListener("click", handleOutsideClick);
+  }
+
+  document.addEventListener("keydown", handleEscape);
+  modal.addEventListener("click", handleOutsideClick);
+}
+
+
+function showDeleteCardModal(cardIndex, cardName) {
+  const modal = document.getElementById("cardDeleteModal");
+  const confirmBtn = document.getElementById("confirmDeleteCardBtn");
+  const cancelBtn = document.getElementById("cancelDeleteCardBtn");
+  const message = document.getElementById("deleteCardMessage");
+
+  message.textContent = `Delete card "${cardName}"?`;
+  modal.style.display = "flex";
+
+  confirmBtn.onclick = () => {
+    window.customCreditCards.splice(cardIndex, 1);
+    saveCustomCreditCards();
+    renderEditableCreditCards();
+    renderCreditLimitTable();
+    closeDeleteModal();
+  };
+
+  cancelBtn.onclick = closeDeleteModal;
+
+  function handleEscape(e) {
+    if (e.key === "Escape") closeDeleteModal();
+  }
+
+  function handleOutsideClick(e) {
+    if (e.target === modal) closeDeleteModal();
+  }
+
+  function closeDeleteModal() {
     modal.style.display = "none";
     document.removeEventListener("keydown", handleEscape);
     modal.removeEventListener("click", handleOutsideClick);
@@ -2004,7 +2036,7 @@ function showToast(message, success = true) {
   if (!toast) return;
 
   toast.textContent = message;
-  toast.style.background = success ? '#13a07f' : '#c0392b'; // ✅ green for success, red for error
+  toast.style.background = success ? 'white' : '#c0392b'; //  green for success, red for error
   toast.style.display = 'block';
 
   setTimeout(() => {

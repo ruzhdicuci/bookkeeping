@@ -1245,12 +1245,21 @@ margin-bottom: -10px;
   background: #f3f2f1;
   padding: 2rem;
   border-radius: 8px;
-  max-width: 400px;
-  width: 100%;
+
+  width: 30%;
   box-shadow: 0 0 10px rgba(0,0,0,0.2);
   color: rgb(50, 48, 48);
 }
 
+.modal-content2 {
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 8px;
+
+  width: 20%;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  color: rgb(50, 48, 48);
+}
 
 select:disabled {
   background-color: #c7bebe;
@@ -2503,10 +2512,11 @@ margin-top: -20px;
   left: 50%;
   transform: translate(-50%, -50%); /* centers it */
   z-index: 1100;
-  background: #13a07f;
-  color: white;
+  background-color: #000000;
+  color: #4ed7b7;
   padding: 1rem 2rem;
   border-radius: 8px;
+  border: 1px solid #13a07f;
   font-size: 1rem;
   display: none;
   box-shadow: 0 0 10px rgba(0,0,0,0.2);
@@ -2518,5 +2528,15 @@ margin-top: -20px;
   cursor: pointer;
   transition: border 0.2s ease, box-shadow 0.2s ease;
  
+}
+
+#confirmDeleteCardBtn {
+  background-color: #13a07f;
+ color: white;
+}
+
+#cancelDeleteCardBtn {
+  background-color: crimson;
+ color: white;
 }
 
