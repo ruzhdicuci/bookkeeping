@@ -6,18 +6,17 @@ const path = require('path');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
-// ✅ Add the middleware here:
-function authMiddleware(req, res, next) {
+function auth(req, res, next) {
   const authHeader = req.headers.authorization;
-  if (!authHeader) return res.status(401).json({ message: "No token provided" });
+  if (!authHeader) return res.status(401).json({ message: 'No token provided' });
 
   const token = authHeader.split(' ')[1];
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET); // ⚠️ Make sure JWT_SECRET is defined
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;
     next();
-  } catch (err) {
-    res.status(403).json({ message: "Invalid token" });
+  } catch {
+    res.status(403).json({ message: 'Invalid token' });
   }
 }
 
@@ -28,8 +27,6 @@ if (!MONGO_URI) {
   process.exit(1);
 }
 
-
-// ✅ MongoDB Connection
 mongoose.connect(MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -40,8 +37,7 @@ mongoose.connect(MONGO_URI, {
   console.error('❌ MongoDB initial connection error:', err);
 });
 
-const app = express(); // ✅ Define app AFTER all setup
-// ✅ Updated CORS setup
+const app = express();
 const allowedOrigins = [
   'https://we-search.ch',
   'http://localhost:3000',
@@ -63,32 +59,23 @@ app.use(cors({
 app.options('*', cors());
 app.use(express.json());
 
-// Optional: second logger
 app.use((req, res, next) => {
   console.log(`🔍 ${req.method} ${req.url}`);
   next();
 });
 
-
-
-// Serve static frontend
 app.use(express.static(path.join(__dirname, '../frontend')));
 
-// Route to mobile version
 app.get('/mobile', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/mobile/mobile.html'));
 });
 
-// Default route
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/dashboard.html'));
 });
 
-const SECRET = 'rudi-bookkeeping-secret'; // replace with env var for production
+const SECRET = 'rudi-bookkeeping-secret';
 
-
-
-// Define MongoDB Schemas
 const Balance = mongoose.model('Balance', new mongoose.Schema({
   userId: String,
   balances: Object
@@ -109,17 +96,13 @@ const Entry = mongoose.model('Entry', new mongoose.Schema({
   bank: String,
   category: String,
   currency: String,
-status: {
-  type: String,
-  enum: ['Open', 'Paid'],
-  default: 'Paid'
-}
+  status: {
+    type: String,
+    enum: ['Open', 'Paid'],
+    default: 'Paid'
+  }
 }));
 
-// Auth middleware
-const auth = authMiddleware; 
-
-// Routes
 app.post('/api/register', async (req, res) => {
   const email = req.body.email.trim().toLowerCase();
   const { password } = req.body;
@@ -173,19 +156,18 @@ app.put('/api/users/:email/password', async (req, res) => {
 });
 
 app.get('/api/entries', auth, async (req, res) => {
-  const entries = await Entry.find({ userId: req.userId });
+  const entries = await Entry.find({ userId: req.user.userId });
   res.json(entries);
 });
 
 app.post('/api/entries', auth, async (req, res) => {
-  const entry = await Entry.create({ ...req.body, userId: req.userId });
+  const entry = await Entry.create({ ...req.body, userId: req.user.userId });
   res.json(entry);
 });
 
 app.put('/api/entries/:id', auth, async (req, res) => {
-  console.log("🛠️ Received update:", req.body); // 👈 see what's coming in
   const updated = await Entry.findOneAndUpdate(
-    { _id: req.params.id, userId: req.userId },
+    { _id: req.params.id, userId: req.user.userId },
     req.body,
     { new: true }
   );
@@ -193,14 +175,9 @@ app.put('/api/entries/:id', auth, async (req, res) => {
 });
 
 app.delete('/api/entries/delete-all', auth, async (req, res) => {
-  console.log("🧹 Reached DELETE-ALL route");
-  console.log(`🔴 DELETE all entries for user: ${req.userId}`);
-
-  await Entry.deleteMany({ userId: req.userId });
+  await Entry.deleteMany({ userId: req.user.userId });
   res.json({ success: true });
 });
-
-
 
 app.delete('/api/entries/:id', auth, async (req, res) => {
   const { id } = req.params;
@@ -208,15 +185,13 @@ app.delete('/api/entries/:id', auth, async (req, res) => {
     return res.status(400).json({ message: 'Invalid entry ID' });
   }
 
-  await Entry.deleteOne({ _id: id, userId: req.userId });
+  await Entry.deleteOne({ _id: id, userId: req.user.userId });
   res.json({ success: true });
 });
 
-
-// Balances per user
 app.post('/api/balances', auth, async (req, res) => {
   await Balance.findOneAndUpdate(
-    { userId: req.userId },
+    { userId: req.user.userId },
     { balances: req.body },
     { upsert: true }
   );
@@ -224,37 +199,12 @@ app.post('/api/balances', auth, async (req, res) => {
 });
 
 app.get('/api/balances', auth, async (req, res) => {
-  const doc = await Balance.findOne({ userId: req.userId });
+  const doc = await Balance.findOne({ userId: req.user.userId });
   res.json(doc?.balances || {});
 });
 
-app.listen(3210, () => {
-  console.log('✅ API running on https://bookkeeping-i8e0.onrender.com');
-});
-
-
-
-
-app.get('/api/balances', auth, async (req, res) => {
-  const doc = await Balance.findOne({ userId: req.userId });
-  res.json(doc?.balances || {});
-});
-
-
-const Limit = mongoose.model('Limit', new mongoose.Schema({
-  userId: String,
-  limits: {
-    ubs: Number,
-    corner: Number,
-    pfm: Number,
-    cembra: Number
-  },
-  locked: Boolean
-}));
-
-// GET limits + lock state
 app.get('/api/limits', auth, async (req, res) => {
-  const doc = await Limit.findOne({ userId: req.userId });
+  const doc = await Limit.findOne({ userId: req.user.userId });
 
   const defaultLimits = {
     ubs: 3000,
@@ -271,52 +221,23 @@ app.get('/api/limits', auth, async (req, res) => {
   }
 });
 
-// POST (save) limits
 app.post('/api/limits', auth, async (req, res) => {
   const { ubs, corner, pfm, cembra, locked } = req.body;
   await Limit.findOneAndUpdate(
-    { userId: req.userId },
+    { userId: req.user.userId },
     { limits: { ubs, corner, pfm, cembra }, locked },
     { upsert: true }
   );
   res.json({ success: true });
 });
 
-
-
-
-// add notes
-const Note = mongoose.model('Note', new mongoose.Schema({
-  _id: {
-    type: String, // ✅ allow UUIDs
-    required: true
-  },
-  userId: String,
-  title: String,
-  content: String,
-  done: {
-    type: Boolean,
-    default: false
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  }
-}));
-
-// Get all notes for the current user
 app.get('/api/notes', auth, async (req, res) => {
-  const notes = await Note.find({ userId: req.userId }).sort({ createdAt: -1 });
+  const notes = await Note.find({ userId: req.user.userId }).sort({ createdAt: -1 });
   res.json(notes);
 });
 
-
-// Create a new note
 app.post('/api/notes', auth, async (req, res) => {
   const { _id, title, content, done, createdAt, synced, lastUpdated } = req.body;
-
-  console.log("📝 Incoming note body:", req.body);
-  console.log("👤 Authenticated userId:", req.userId);
 
   if (!_id || typeof _id !== 'string') {
     return res.status(400).json({ message: 'Missing or invalid _id' });
@@ -326,14 +247,14 @@ app.post('/api/notes', auth, async (req, res) => {
     return res.status(400).json({ message: 'Missing title or content' });
   }
 
-  if (!req.userId) {
+  if (!req.user.userId) {
     return res.status(401).json({ message: 'User ID missing or not authenticated' });
   }
 
   try {
     const note = await Note.create({
       _id,
-      userId: req.userId,
+      userId: req.user.userId,
       title,
       content,
       done: done ?? false,
@@ -344,57 +265,41 @@ app.post('/api/notes', auth, async (req, res) => {
 
     res.status(201).json(note);
   } catch (err) {
-    console.error('❌ Failed to create note:', err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// Update a note (e.g., mark as done or edit title/content)
 app.put('/api/notes/:id', auth, async (req, res) => {
   const updated = await Note.findOneAndUpdate(
-    { _id: req.params.id, userId: req.userId },
+    { _id: req.params.id, userId: req.user.userId },
     req.body,
     { new: true }
   );
   res.json(updated);
 });
 
-// Delete a note
 app.delete('/api/notes/:id', auth, async (req, res) => {
   const { id } = req.params;
-
-if (!id || typeof id !== 'string') {
-  return res.status(400).json({ error: 'Invalid note ID format' });
-}
+  if (!id || typeof id !== 'string') {
+    return res.status(400).json({ error: 'Invalid note ID format' });
+  }
 
   try {
-    await Note.deleteOne({ _id: id, userId: req.userId });
+    await Note.deleteOne({ _id: id, userId: req.user.userId });
     res.json({ success: true });
   } catch (err) {
-    console.error('❌ Failed to delete note:', err);
     res.status(500).json({ error: 'Failed to delete note' });
   }
 });
 
-const CustomCard = mongoose.model('CustomCard', new mongoose.Schema({
-  userId: String,
-  name: String,
-  limit: Number,
-  locked: Boolean
-}));
-
-
-// In your Express backend (e.g., routes/customLimits.js or similar)
-app.get('/api/custom-limits', authMiddleware, async (req, res) => {
+app.get('/api/custom-limits', auth, async (req, res) => {
   const cards = await CustomCard.find({ userId: req.user.userId });
   res.json({ cards });
 });
 
-
-app.post('/api/custom-limits', authMiddleware, async (req, res) => {
+app.post('/api/custom-limits', auth, async (req, res) => {
   const { cards } = req.body;
   await CustomCard.deleteMany({ userId: req.user.userId });
   await CustomCard.insertMany(cards.map(c => ({ ...c, userId: req.user.userId })));
- 
   res.status(200).send("✅ Custom cards saved");
 });
