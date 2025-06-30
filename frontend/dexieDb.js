@@ -138,11 +138,11 @@ async function getUnsynced(type = "entries") {
 // ✅ Sync to MongoDB
 async function syncCustomCardsToMongo() {
   try {
-    await fetch('/api/custom-limits', {
+    await fetch(`${backend}/api/custom-limits`, {
       method: 'POST',
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('token')}` // include token if needed
+        Authorization: `Bearer ${localStorage.getItem('token')}`
       },
       body: JSON.stringify({ cards: window.customCreditCards }),
     });
@@ -154,8 +154,10 @@ async function syncCustomCardsToMongo() {
 // ✅ Load from MongoDB
 async function loadCustomCardsFromMongo() {
   try {
-    const res = await fetch('/api/custom-limits', {
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    const res = await fetch(`${backend}/api/custom-limits`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
     });
     const data = await res.json();
     if (data.cards) {

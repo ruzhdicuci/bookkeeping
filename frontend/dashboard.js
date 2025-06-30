@@ -22,7 +22,10 @@ let editModeActive = false;
 
 const apiBase = 'https://bookkeeping-i8e0.onrender.com';
 const token = localStorage.getItem('token');
-const backend = 'https://bookkeeping-i8e0.onrender.com';
+const backend =
+  location.hostname === 'localhost'
+    ? 'http://localhost:3000'
+    : 'https://bookkeeping-i8e0.onrender.com';
 
 if (!token) {
   console.warn('🔒 No token found. Redirecting to login...');
@@ -2275,11 +2278,9 @@ window.populatePersonDropdownForCharts  = populatePersonDropdownForCharts
 window.openFullscreen  = openFullscreen 
 window.closeFullscreen  = closeFullscreen 
 window.setFontSize  = setFontSize
-
-
-
+window.editModeActive   = editModeActive 
+window.persons  = persons
+window.creditCards  = creditCards
 window.addCreditCard  = addCreditCard
-
-
 
 
