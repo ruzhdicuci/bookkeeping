@@ -303,3 +303,8 @@ app.post('/api/custom-limits', auth, async (req, res) => {
   await CustomCard.insertMany(cards.map(c => ({ ...c, userId: req.user.userId })));
   res.status(200).send("✅ Custom cards saved");
 });
+
+const PORT = process.env.PORT || 3210;
+app.listen(PORT, () => {
+  console.log(`✅ API running on port ${PORT}`);
+});
