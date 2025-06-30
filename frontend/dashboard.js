@@ -1908,7 +1908,14 @@ document.addEventListener("DOMContentLoaded", () => {
   fetchEntries(); // or whatever starts your rendering logic
 });
 
-
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    const modal = document.getElementById("cardEditModal");
+    if (modal.style.display === 'flex') {
+      modal.style.display = 'none';
+    }
+  }
+});
 
 
 function showToast(message, success = true) {
