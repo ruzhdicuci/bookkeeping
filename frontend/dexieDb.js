@@ -1,12 +1,18 @@
 import Dexie from 'https://cdn.jsdelivr.net/npm/dexie@3.2.4/dist/dexie.mjs';
 
+// ✅ Set backend base URL
+const backend =
+  location.hostname === 'localhost'
+    ? 'http://localhost:3000'
+    : 'https://bookkeeping-i8e0.onrender.com';
+
 const db = new Dexie('bookkeeping-db');
 
 db.version(3).stores({
   entries: '_id, date, amount, category, person, bank, synced, lastUpdated',
   notes: '_id, title, content, done, synced, lastUpdated',
   balances: 'bank',
-  customCards: '++id,name,limit,synced,lastUpdated' // ✅ extended fields
+  customCards: '++id,name,limit,synced,lastUpdated'
 });
 
 // ✅ Save single note
@@ -14,7 +20,6 @@ async function saveNoteLocally(note) {
   if (!note._id) {
     note._id = crypto.randomUUID();
   } else if (typeof note._id !== 'string') {
-    // Convert _id object to string (handles MongoDB ObjectId format)
     try {
       note._id = note._id.toString();
     } catch (e) {
@@ -22,10 +27,8 @@ async function saveNoteLocally(note) {
       note._id = crypto.randomUUID();
     }
   }
-
   note.synced = navigator.onLine;
   note.lastUpdated = Date.now();
-
   try {
     await db.notes.put(note);
   } catch (err) {
@@ -114,26 +117,20 @@ async function getUnsynced(type = "entries") {
       console.warn(`⚠️ Dexie table '${type}' not found or invalid.`);
       return [];
     }
-
     const all = await table.toArray();
-
     console.log(`📋 All ${type} loaded from Dexie:`, all);
-
     const filtered = all.filter(item =>
       item.synced === false &&
       item._id &&
       typeof item._id === 'string'
     );
-
     console.log(`📦 Unsynced ${type} entries: ${filtered.length}`, filtered);
-
     return filtered;
   } catch (err) {
     console.error(`❌ Dexie getUnsynced(${type}) failed:`, err);
     return [];
   }
 }
-
 
 // ✅ Sync to MongoDB
 async function syncCustomCardsToMongo() {
@@ -162,7 +159,7 @@ async function loadCustomCardsFromMongo() {
     const data = await res.json();
     if (data.cards) {
       window.customCreditCards = data.cards;
-      await saveAllCustomCards(data.cards); // ✅ sync to Dexie too
+      await saveAllCustomCards(data.cards);
     }
   } catch (err) {
     console.warn("⚠️ Failed to load custom cards from MongoDB:", err);
@@ -183,10 +180,7 @@ async function markAsSynced(type, _id) {
   await db[type].update(_id, { synced: true });
 }
 
-
-
-
-// ✅ Export all at once (no inline `export function` anymore!)
+// ✅ Export all at once
 export {
   db,
   saveNoteLocally,
@@ -198,10 +192,11 @@ export {
   getCachedBankBalances,
   getUnsynced,
   markAsSynced,
-   saveAllCustomCards,
+  saveAllCustomCards,
   getCachedCustomCards,
   syncCustomCardsToMongo,
   loadCustomCardsFromMongo,
   getUnsyncedCustomCards
 };
-window.db = db; // ✅ Expose Dexie globally for debugging
+
+window.db = db; // ✅ For debugging

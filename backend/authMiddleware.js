@@ -6,7 +6,7 @@ export function authMiddleware(req, res, next) {
     return res.status(401).json({ error: 'Missing or invalid token' });
   }
 
-  const token = authHeader.split(' ')[1];
+ const token = req.headers.authorization?.split(' ')[1];
 
   try {
     const user = jwt.verify(token, process.env.JWT_SECRET || 'your-secret');
