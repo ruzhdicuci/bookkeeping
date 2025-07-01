@@ -19,9 +19,7 @@ function toggleTheme() {
   localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
 }
 
-function goToDashboard() {
-  location.replace('dashboard.html');
-}
+
 
 // ✅ Sync notes with backend or fallback to Dexie
 async function loadNotes() {
