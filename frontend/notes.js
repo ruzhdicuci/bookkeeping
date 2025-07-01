@@ -20,7 +20,7 @@ function toggleTheme() {
 }
 
 function goToDashboard() {
-  window.location.href = 'dashboard.html';
+  location.replace('dashboard.html');
 }
 
 // ✅ Sync notes with backend or fallback to Dexie
