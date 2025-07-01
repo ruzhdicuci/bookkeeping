@@ -1981,6 +1981,15 @@ margin-right: 10px;
   
 }
 
+.dark .credit-grid  input[type="number"]  { 
+  border:1px solid #161515; 
+
+ 
+    color: yellowgreen;
+ 
+    }
+ 
+
 .card {
   background: #ffffff;
   padding: 10px;
