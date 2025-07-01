@@ -198,7 +198,6 @@ async function markAsSynced(type, _id) {
 
 // ✅ Export all at once
 export {
-  db,
   saveNoteLocally,
   saveAllNotesLocally,
   saveEntryLocally,
