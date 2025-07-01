@@ -6,9 +6,10 @@ const backend =
     ? 'http://localhost:3000'
     : 'https://bookkeeping-i8e0.onrender.com';
 
-const db = new Dexie('bookkeeping-db');
+export const db = new Dexie('bookkeeping-db');
 
-db.version(3).stores({
+// Always keep the highest version here
+db.version(30).stores({
   entries: '_id, date, amount, category, person, bank, synced, lastUpdated',
   notes: '_id, title, content, done, synced, lastUpdated',
   balances: 'bank',
@@ -211,7 +212,8 @@ export {
   getCachedCustomCards,
   syncCustomCardsToMongo,
   loadCustomCardsFromMongo,
-  getUnsyncedCustomCards
+  getUnsyncedCustomCards,
+  safeDexieWrite
 };
 
 window.db = db; // ✅ For debugging

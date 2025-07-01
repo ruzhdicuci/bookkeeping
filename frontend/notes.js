@@ -7,13 +7,6 @@ import {
   markAsSynced
 } from './dexieDb.js';
 
-const db = new Dexie("bookkeeping");
-db.version(30).stores({ 
-  entries: '++id,date,amount,category',
-  notes: '++id,title,content,date',
-  balances: '++id,bank,balance',
-  customLimits: '++id,name,limit'
-});
 
 const apiBase = 'https://bookkeeping-i8e0.onrender.com';
 let notes = [];
