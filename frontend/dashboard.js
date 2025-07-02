@@ -1,3 +1,6 @@
+const DEBUG_MODE = false; // set to true during dev
+const debug = (...args) => DEBUG_MODE && debug(...args);
+
 import {
   db,
   saveEntryLocally,
@@ -37,7 +40,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Try loading cached entries first (safe)
   const cached = await getCachedEntries();
   if (cached.length) {
-    console.log("📦 Showing cached entries before server fetch");
+    debug("📦 Showing cached entries before server fetch");
     renderEntries(cached); // This shows something while loading real data
   }
 
@@ -232,9 +235,9 @@ async function fetchEntries() {
     const data = await res.json();
     window.entries = Array.isArray(data) ? data.sort((a, b) => b.date.localeCompare(a.date)) : [];
 
-    console.log("📦 Entries:", window.entries);
+    debug("📦 Entries:", window.entries);
     window.persons = [...new Set(window.entries.map(e => e.person).filter(Boolean))];
-    console.log("🧑‍🤝‍🧑 Found persons:", window.persons);
+    debug("🧑‍🤝‍🧑 Found persons:", window.persons);
 
     renderEntries();
     populateNewEntryDropdowns();
@@ -251,7 +254,7 @@ async function fetchEntries() {
       const cached = await db.entries.toArray();
       window.entries = cached || [];
 
-      console.log("📦 Loaded entries from IndexedDB:", window.entries);
+      debug("📦 Loaded entries from IndexedDB:", window.entries);
       window.persons = [...new Set(window.entries.map(e => e.person).filter(Boolean))];
 
       renderEntries();
@@ -280,9 +283,9 @@ function populateNewEntryDropdowns() {
   if (bankList) bankList.innerHTML = banks.map(b => `<option value="${b}">`).join('');
   if (categoryList) categoryList.innerHTML = categories.map(c => `<option value="${c}">`).join('');
 
-  console.log("👤 Loaded persons:", persons);
-  console.log("🏦 Loaded banks:", banks);
-  console.log("🏷️ Loaded categories:", categories);
+  debug("👤 Loaded persons:", persons);
+  debug("🏦 Loaded banks:", banks);
+  debug("🏷️ Loaded categories:", categories);
 }
 
 
@@ -294,7 +297,7 @@ function populateBankDropdownFromBalances() {
   const bankCells = bankTable.querySelectorAll('thead th');
   const banks = [...bankCells].slice(1).map(th => th.textContent.trim()); // ✅ use trim()
 
-  console.log("🏦 Bank headers found:", banks);
+  debug("🏦 Bank headers found:", banks);
 
   const bankSelect = document.getElementById('newBank');
   if (!bankSelect) return;
@@ -713,7 +716,7 @@ async function editEntry(id) {
 }
 
 async function updateStatus(id, newStatus) {
-  console.log("Sending status update", id, newStatus);
+  debug("Sending status update", id, newStatus);
 
   const res = await fetch(`${apiBase}/api/entries/${id}`, {
     method: 'PUT',
@@ -725,7 +728,7 @@ async function updateStatus(id, newStatus) {
   });
 
   const data = await res.json();
-  console.log("Server response", data);
+  debug("Server response", data);
 
   if (res.ok) {
     const index = entries.findIndex(e => e._id === id);
@@ -788,10 +791,10 @@ async function saveEdit(row) {
 }
 
 async function duplicateEntry(id) {
-  console.log("Looking for ID to duplicate:", id);
+  debug("Looking for ID to duplicate:", id);
   await fetchEntries(); // ✅ ensure entries are available
 
-  console.log("✅ All current entry IDs:", window.entries.map(e => e._id));
+  debug("✅ All current entry IDs:", window.entries.map(e => e._id));
   const entry = window.entries.find(e => e._id === id);
   if (!entry) return alert("Entry not found");
 
@@ -997,15 +1000,15 @@ async function fetchBalancesFromBackend() {
 
 
 function renderBankBalanceForm() {
-  console.log("📊 renderBankBalanceForm called");
+  debug("📊 renderBankBalanceForm called");
 const entries = window.entries || [];
   const container = document.getElementById('bankBalanceTableContainer');
   const banks = [...new Set(entries.map(e => e.bank).filter(Boolean))];
   const selectedMonths = Array.from(document.querySelectorAll('#monthOptions input[type="checkbox"]:checked')).map(cb => cb.value);
 
-  console.log("📦 Entries count:", entries.length);
-  console.log("🏦 Banks found:", banks);
-  console.log("📆 Selected months:", selectedMonths);
+  debug("📦 Entries count:", entries.length);
+  debug("🏦 Banks found:", banks);
+  debug("📆 Selected months:", selectedMonths);
 
   if (!banks.length) {
     console.warn("⚠️ No banks found in entries.");
@@ -1382,7 +1385,7 @@ function calculateCurrentBankBalance(bankName) {
 
     function setFontSize(size) {
   document.documentElement.style.setProperty('--app-font-size', size + 'px');
-  console.log(`🔠 Font size set to ${size}px`);
+  debug(`🔠 Font size set to ${size}px`);
 }
 
 
@@ -1507,7 +1510,7 @@ function showCardEditModal(cardIndex, currentName) {
 
   // ✅ Cancel button
   cancelBtn.onclick = () => {
-    console.log("❌ Cancel clicked");
+    debug("❌ Cancel clicked");
     closeCardModal();
   };
 
@@ -1678,11 +1681,11 @@ function renderCreditLimitTable() {
   document.getElementById('v-limitPlusTotal').textContent = limitPlusTotal.toFixed(2);
   if (totalPlusEl) totalPlusEl.textContent = '+' + totalPlus.toFixed(2);
 
-  console.log("📊 TOTAL LIMIT:", totalLimit.toFixed(2));
-  console.log("🔻 TOTAL MINUS (Used):", totalMinus.toFixed(2));
-  console.log("🟢 TOTAL PLUS:", totalPlus.toFixed(2));
-  console.log("🧮 LEFT (Limit - Used):", left.toFixed(2));
-  console.log("➕ LEFT + TOTAL PLUS:", limitPlusTotal.toFixed(2));
+  debug("📊 TOTAL LIMIT:", totalLimit.toFixed(2));
+  debug("🔻 TOTAL MINUS (Used):", totalMinus.toFixed(2));
+  debug("🟢 TOTAL PLUS:", totalPlus.toFixed(2));
+  debug("🧮 LEFT (Limit - Used):", left.toFixed(2));
+  debug("➕ LEFT + TOTAL PLUS:", limitPlusTotal.toFixed(2));
 
   updateCreditSummaryCard({
     totalLimit,
@@ -1871,7 +1874,7 @@ function clearSearch(id) {
 
 
 window.addEventListener("online", async () => {
-  console.log("🔌 Back online. Attempting to sync custom cards...");
+  debug("🔌 Back online. Attempting to sync custom cards...");
 
   const unsynced = await getUnsyncedCustomCards();
   if (unsynced.length > 0) {
@@ -1886,7 +1889,7 @@ window.addEventListener("online", async () => {
       });
 
       if (res.ok) {
-        console.log(`✅ Synced ${unsynced.length} custom cards`);
+        debug(`✅ Synced ${unsynced.length} custom cards`);
         for (const card of unsynced) {
           await db.customCards.update(card.id, { synced: true });
         }
@@ -1900,7 +1903,7 @@ window.addEventListener("online", async () => {
       showToast("❌ Sync error: " + err.message, false);
     }
   } else {
-    console.log("📭 No unsynced cards to sync.");
+    debug("📭 No unsynced cards to sync.");
   }
 });
 
@@ -2103,7 +2106,7 @@ document.getElementById('entryForm').addEventListener('submit', async (e) => {
   }
   const isoDate = inputDate ? formatDateToLocalISO(inputDate) : '';
 
-  console.log('📥 Submitting entry...');
+  debug('📥 Submitting entry...');
   const entry = {
     date: isoDate,
     description: document.getElementById('newDescription').value,
@@ -2116,7 +2119,7 @@ document.getElementById('entryForm').addEventListener('submit', async (e) => {
     status: document.getElementById('newStatus')?.value || 'Paid' // ✅ Add this line
   };
 // ✅ Log the entry before sending
-console.log("🧾 Entry being submitted:", entry);
+debug("🧾 Entry being submitted:", entry);
 try {
   const form = document.getElementById('entryForm');
   const editId = form.dataset.editId;
@@ -2151,7 +2154,7 @@ try {
   renderEntries();
   renderBankBalanceForm();
 
-  console.log('✅ Entry synced to server.');
+  debug('✅ Entry synced to server.');
 } catch (error) {
   console.warn('📴 Offline detected – saving entry locally.');
   await saveEntryLocally(entry); // ✅ save to IndexedDB
@@ -2216,7 +2219,7 @@ async function saveBankBalances(balances) {
     for (const [bank, value] of Object.entries(balances)) {
       await db.balances.put({ bank, value });
     }
-    console.log("💾 Bank balances saved to IndexedDB via Dexie");
+    debug("💾 Bank balances saved to IndexedDB via Dexie");
   } catch (error) {
     console.error("❌ Error saving bank balances to Dexie:", error);
   }
@@ -2252,7 +2255,7 @@ async function syncToCloud() {
 
     for (const entry of unsynced) {
       const { _id, ...entryToSend } = entry;
-      console.log("🔁 Sending to backend:", entryToSend);
+      debug("🔁 Sending to backend:", entryToSend);
 
       const res = await fetch(`${backend}/api/entries`, {
         method: 'POST',
@@ -2265,7 +2268,7 @@ async function syncToCloud() {
 
       if (res.ok) {
         await markAsSynced('entries', _id);
-        console.log(`✅ Synced entry: ${entry.description}`);
+        debug(`✅ Synced entry: ${entry.description}`);
         syncedCount++;
       } else {
         console.warn(`⚠️ Failed to sync entry: ${entry.description}`);
@@ -2290,10 +2293,10 @@ window.addEventListener('offline', () => {
 
 window.addEventListener('online', async () => {
   showCenteredMessage('📶 Back online – syncing...', 2000);
-  console.log('📶 Back online – trying to sync entries...');
+  debug('📶 Back online – trying to sync entries...');
   try {
     const unsynced = await getUnsynced("entries");
-    console.log(`🔁 Found ${unsynced.length} entries to sync...`);
+    debug(`🔁 Found ${unsynced.length} entries to sync...`);
 
     for (const entry of unsynced) {
       const { _id, ...entryToSend } = entry;
@@ -2308,7 +2311,7 @@ window.addEventListener('online', async () => {
 
       if (res.ok) {
         await markAsSynced("entries", _id);
-        console.log(`✅ Synced entry: ${entry.description}`);
+        debug(`✅ Synced entry: ${entry.description}`);
       } else {
         console.warn(`⚠️ Failed to sync entry: ${entry.description}`);
       }

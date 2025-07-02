@@ -165,7 +165,7 @@ for (const note of groups[label]) {
 // Save to Dexie and sync to cloud when online
 async function syncNotesToCloud() {
   const unsynced = await getUnsynced("notes");
-  console.log("🧪 Unsynced notes:", unsynced);
+  debug("🧪 Unsynced notes:", unsynced);
 
   for (const note of unsynced) {
     const cleanNote = JSON.parse(JSON.stringify(note));
@@ -192,7 +192,7 @@ async function syncNotesToCloud() {
       lastUpdated: cleanNote.lastUpdated || Date.now()
     };
 
-    console.log("📤 Final note to send:", noteToSend);
+    debug("📤 Final note to send:", noteToSend);
 
     try {
       const res = await fetch(`${apiBase}/api/notes`, {
@@ -205,7 +205,7 @@ async function syncNotesToCloud() {
       });
 
       if (res.ok) {
-        console.log(`✅ Synced note: ${noteToSend._id}`);
+        debug(`✅ Synced note: ${noteToSend._id}`);
         await markAsSynced("notes", noteToSend._id);
       } else {
         const text = await res.text();
@@ -393,7 +393,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   try {
     const cached = await getCachedNotes();
     if (cached.length) {
-      console.log("📦 Showing cached notes");
+      debug("📦 Showing cached notes");
       notes = cached;             // ✅ IMPORTANT: update global notes array
       window.notes = notes;
       renderNotes(notes, currentSort); // After successful backend load
@@ -470,7 +470,7 @@ if (confirmDoneBtn) {
 
     function setFontSize(size) {
   document.documentElement.style.setProperty('--app-font-size', size + 'px');
-  console.log(`🔠 Font size set to ${size}px`);
+  debug(`🔠 Font size set to ${size}px`);
 }
 
 
