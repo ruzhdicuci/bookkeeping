@@ -952,7 +952,13 @@ if (tabId === 'chartsTab') {
 }
 </script>
 
-
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    document.body.style.userSelect = 'none';
+    document.body.style.webkitUserSelect = 'none';
+    document.body.style.msUserSelect = 'none';
+  });
+</script>
 
 
 <div id="confirmModal" class="modal hidden">
