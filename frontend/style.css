@@ -1,17 +1,14 @@
 
-body {
-  overflow-x: hidden;
-  margin: 0;
-  padding: 0;
-  
-     font-family: system-ui, sans-serif;
-  background: #f4f2ee;
-  
-}
 body, html {
   user-select: none;
   -webkit-user-select: none;
   -ms-user-select: none;
+    overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+    font-family: system-ui, sans-serif;
+  background: #f4f2ee;
+  
 }
 input, textarea, [contenteditable="true"] {
   user-select: text !important;
@@ -22,11 +19,6 @@ input, textarea, [contenteditable="true"] {
   }
 
 
-html {
-  overflow-x: hidden;
-  margin: 0;
-  padding: 0;
-}
 
 
 /* Hide scrollbar for Chrome, Safari and Opera */

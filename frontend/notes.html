@@ -40,18 +40,17 @@
     background: #666;
   }
 
-  body {
-        font-family: system-ui, sans-serif;
+
+body, html {
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+          font-family: system-ui, sans-serif;
    margin: 0.4rem;
 
     color: var(--text, #111);
     transition: background 0.3s, color 0.3s;
       background: #f4f2ee;
-  }
-body, html {
-  user-select: none;
-  -webkit-user-select: none;
-  -ms-user-select: none;
 }
 input, textarea, [contenteditable="true"] {
   user-select: text !important;
