@@ -449,15 +449,15 @@ totalsContainer.appendChild(summaryCard);
   <option value="Open">Open</option>
 </select>
 
- <select id="timeSort" onchange="renderEntries()">
-    <option value="">dates</option>
-    <option value="Today">Today</option>
-    <option value="Yesterday">Yesterday</option>
-    <option value="This Week">This Week</option>
-    <option value="Last Week">Last Week</option>
-    <option value="2 Weeks Ago">2 Weeks Ago</option>
-    <option value="3 Weeks Ago">3 Weeks Ago</option>
-  </select>
+<select id="timeSort" onchange="filterEntriesByDate(this.value)">
+  <option value="">dates</option>
+  <option value="Today">Today</option>
+  <option value="Yesterday">Yesterday</option>
+  <option value="This Week">This Week</option>
+  <option value="Last Week">Last Week</option>
+  <option value="2 Weeks Ago">2 Weeks Ago</option>
+  <option value="3 Weeks Ago">3 Weeks Ago</option>
+</select>
      
     
    </div>    

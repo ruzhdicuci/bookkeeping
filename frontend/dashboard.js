@@ -2407,4 +2407,4 @@ window.persons  = persons
 window.creditCards  = creditCards
 window.addCreditCard  = addCreditCard
 
-
+window.renderEntries = renderEntries;
