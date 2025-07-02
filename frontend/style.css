@@ -2579,3 +2579,22 @@ margin-top: -20px;
  color: white;
 }
 
+#confirmDelete {
+  background-color: #13a07f;
+ color: white;
+}
+
+#cancelDelete {
+  background-color: crimson;
+ color: white;
+}
+#confirmDelete:hover {
+  color: #13a07f;
+ background-color: white;
+}
+
+#cancelDelete:hover {
+  color: crimson;
+ background-color: white;
+}
+
