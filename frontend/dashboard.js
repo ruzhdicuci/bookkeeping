@@ -1477,7 +1477,22 @@ function setLockState(locked) {
   if (unlockBtn) unlockBtn.style.display = locked ? 'inline-block' : 'none';
 }
 
-// ✅ Modal handler for card editing (safe binding)
+function closeCardModal() {
+  const modal = document.getElementById("cardEditModal");
+  modal.style.display = "none";
+  document.removeEventListener("keydown", handleEscape);
+  modal.removeEventListener("click", handleOutsideClick);
+}
+
+  function handleEscape(e) {
+    if (e.key === "Escape") closeCardModal();
+  }
+
+  function handleOutsideClick(e) {
+    if (e.target === modal) closeCardModal();
+  }
+
+// ✅ Modal handler for card editing
 function showCardEditModal(cardIndex, currentName) {
   const modal = document.getElementById("cardEditModal");
   const input = document.getElementById("editCardNameInput");
@@ -1489,14 +1504,13 @@ function showCardEditModal(cardIndex, currentName) {
   modal.style.display = "flex";
   input.focus();
 
-  // ✅ Clean previous event handlers
+  // Clean old handlers
   confirmBtn.onclick = null;
   cancelBtn.onclick = null;
   deleteBtn.onclick = null;
   document.removeEventListener("keydown", handleEscape);
   modal.removeEventListener("click", handleOutsideClick);
 
-  // ✅ Confirm button
   confirmBtn.onclick = () => {
     const newName = input.value.trim();
     if (newName) {
@@ -1508,42 +1522,22 @@ function showCardEditModal(cardIndex, currentName) {
     closeCardModal();
   };
 
-  // ✅ Cancel button
   cancelBtn.onclick = () => {
-    debug("❌ Cancel clicked");
     closeCardModal();
   };
 
-  // ✅ Delete button
   deleteBtn.onclick = () => {
     closeCardModal();
-showDeleteCardModal(cardIndex, currentName);
+    showDeleteCardModal(cardIndex, currentName);
   };
 
-  // ✅ Escape key listener
-  function handleEscape(e) {
-    if (e.key === "Escape") {
-      closeCardModal();
-    }
-  }
 
-  // ✅ Outside click
-  function handleOutsideClick(e) {
-    if (e.target === modal) {
-      closeCardModal();
-    }
-  }
+
 
   document.addEventListener("keydown", handleEscape);
   modal.addEventListener("click", handleOutsideClick);
-
-  // ✅ Close function
-  function closeCardModal() {
-    modal.style.display = "none";
-    document.removeEventListener("keydown", handleEscape);
-    modal.removeEventListener("click", handleOutsideClick);
-  }
 }
+
 
 function addCreditCard() {
   const modal = document.getElementById("cardAddModal");
