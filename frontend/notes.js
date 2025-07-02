@@ -1,3 +1,6 @@
+const DEBUG_MODE = false; // set to true during dev
+const debug = (...args) => DEBUG_MODE && debug(...args);
+
 import {
   db,
   saveNoteLocally,
