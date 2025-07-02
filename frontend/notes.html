@@ -48,10 +48,13 @@
     transition: background 0.3s, color 0.3s;
       background: #f4f2ee;
   }
-* {
+body, html {
   user-select: none;
   -webkit-user-select: none;
   -ms-user-select: none;
+}
+input, textarea, [contenteditable="true"] {
+  user-select: text !important;
 }
 
    .sections2 {

@@ -8,12 +8,15 @@ body {
   background: #f4f2ee;
   
 }
-
-* {
+body, html {
   user-select: none;
   -webkit-user-select: none;
   -ms-user-select: none;
 }
+input, textarea, [contenteditable="true"] {
+  user-select: text !important;
+}
+
     input, textarea, [contenteditable="true"] {
     user-select: text !important;
   }
