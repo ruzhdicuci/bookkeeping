@@ -22,6 +22,9 @@ body::-webkit-scrollbar, html::-webkit-scrollbar {
     user-select: text !important;
   }
 
+h2 {
+  display: none;
+}
 
 
 
@@ -2369,4 +2372,143 @@ margin-top: -20px;
   }
 
 
+}
+
+#customizeSidebar {
+   transition: transform 0.3s ease;
+  transform: translateX(-100%);
+  position: absolute; /* or fixed */
+  top: 50px; /* adjust based on your header height */
+  left: 0;
+  height: calc(50% - 100px);
+  width: 180px;
+
+  background-color:   white;
+  border: 1px solid  #63ddf8;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+  padding: 16px 20px;
+  z-index: 1000;
+ 
+
+    font-family: system-ui, sans-serif;
+}
+
+#customizeSidebar.show {
+  transform: translateX(0);
+}
+
+#customizeSidebar h4 {
+  font-size: 16px;
+  margin-bottom: 12px;
+  margin-top: 6px;
+  color: black;
+  font-weight: 600;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 4px;
+}
+
+/* Sidebar checkbox wrapper */
+.custom-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0;
+  font-size: 15px;
+  color: rgb(38, 36, 36);
+  cursor: pointer;
+  position: relative;
+}
+
+.custom-checkbox:hover {
+  background-color: #eaebec;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  margin-top: 2px;
+  margin-right: 6px;
+}
+
+/* Hide native checkbox */
+.custom-checkbox input[type="checkbox"] {
+  display: none;
+}
+
+/* Style fake checkbox box */
+.custom-checkbox .checkmark {
+  width: 14px;
+  height: 14px;
+  background-color: transparent;
+  border: 2px solid #63ddf8;
+  display: inline-block;
+  position: relative;
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+/* Add white checkmark when checked */
+.custom-checkbox input[type="checkbox"]:checked + .checkmark::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 0px;
+  width: 5px;
+  height: 10px;
+ border: solid rgb(112, 110, 110);/* ← changed from white to black */
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+
+#sidebarToggleBtn {
+  margin-top: 8px;
+  margin-left: 3px;
+ 
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -300px; /* hide it by default */
+  width: 280px;
+  height: 100%;
+  background: #f4f4f4;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.3);
+  transition: left 0.3s ease;
+  z-index: 999;
+}
+
+.sidebar.show {
+  left: 0; /* slide into view */
+}
+
+.sidebar {
+  display: none; /* or transform: translateX(-100%); */
+  /* other hidden styles */
+}
+
+.sidebar.show {
+  display: block; /* or transform: translateX(0); */
+}
+
+#sidebarClosePillar {
+  position: absolute;
+  top: 10px;
+  right: -12px;
+  width: 24px;
+  height: 40px;
+  background-color:#63ddf8;
+  color: white;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+  cursor: pointer;
+  z-index: 1001;
+  transition: background 0.2s ease;
+}
+
+#sidebarClosePillar:hover {
+  background-color: #222;
 }

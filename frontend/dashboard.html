@@ -42,6 +42,50 @@
 
 <div class="navbar">
   
+<button id="sidebarToggleBtn">☰</button>
+
+<div id="customizeSidebar" class="sidebar">
+  <h4>Customize View</h4> 
+    <div id="sidebarClosePillar" title="Close Sidebar">⟨</div>
+
+<label class="custom-checkbox">
+  <input type="checkbox" id="toggleAddEntry" checked />
+  <span class="checkmark"></span>
+  Add Entry
+</label>
+
+<label class="custom-checkbox">
+  <input type="checkbox" id="toggleBankBalances" checked />
+  <span class="checkmark"></span>
+  Bank Balances
+</label>
+
+  <label class="custom-checkbox"><input type="checkbox" checked /> 
+  <span class="checkmark"></span>
+Kredit Limits
+</label>
+
+   <label class="custom-checkbox"><input type="checkbox" checked />
+    <span class="checkmark"></span>
+   Income
+  </label>
+      <label class="custom-checkbox"><input type="checkbox" checked /> 
+      <span class="checkmark"></span>
+    Average
+  </label>
+<label class="custom-checkbox"><input type="checkbox" checked /> 
+  <span class="checkmark"></span>
+Mutliselect
+</label>
+   <label class="custom-checkbox"><input type="checkbox" checked /> 
+    <span class="checkmark"></span>
+  Filters
+</label>
+    <label class="custom-checkbox"><input type="checkbox" checked /> 
+      <span class="checkmark"></span>
+    Searches
+  </label>
+</div>
   <div class="dropdown">
     
     <button class="dropbtn">Settings
@@ -108,7 +152,7 @@
     <i id="themeIcon" class="fa-solid fa-moon"></i>
 </button>
 
-<button onclick="location.replace('notes.html')" class="tab-button" id="bt2" title="Open Notes">📝</button>
+<button onclick="location.href='notes.html'" class="tab-button" id="bt2" title="Open Notes">📝</button>
 
 
 </div>
@@ -156,7 +200,10 @@
 <canvas id="pieChart" class="chart-canvas"></canvas>
   </div></div>  
 
+
+    <div id="addEntrySection">
 <div class="filter-grid">
+
  <form id="entryForm" class="entry-form responsive-form">
   <div class="form-grid">
     <input type="text" id="newDate" placeholder="Select Date" class="flatpickr-input">
@@ -196,7 +243,7 @@
     
   </div> </div>
 </form>
-   
+   </div>
        </div>
 
 
@@ -208,7 +255,7 @@
      </div>
   </div>
 
-
+<div id="bankBalancesSection">
 <h3 style="margin-left: 10px; margin-bottom: -10px; font-size: 0.9rem; color: #727272;">Bank Balances</h3>
 <div class="filter-grid2">
   
@@ -222,7 +269,7 @@
 
 
 <div id="bankBalanceTotals"></div>
-
+</div>
 
 <script>
 function renderBankBalanceCards() {

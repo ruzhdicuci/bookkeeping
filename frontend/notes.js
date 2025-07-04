@@ -393,6 +393,10 @@ window.addEventListener('DOMContentLoaded', async () => {
     document.body.classList.add('dark-theme');
   }
 
+    // ✅ Auto-hide done notes on load
+  toggleHideDone();
+
+
   try {
     const cached = await getCachedNotes();
     if (cached.length) {

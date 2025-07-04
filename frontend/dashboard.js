@@ -1308,7 +1308,7 @@ function closeModal() {
   const modal = document.querySelector('.modal');
   if (modal) modal.remove();
 }
-
+window.closeModal = closeModal;
 
 
 function deleteUser(email) {
@@ -2369,7 +2369,48 @@ function showCustomAlert(message) {
   okBtn.addEventListener("click", closeModal);
 }
 
-window.showCustomAlert = showCustomAlert
+
+document.addEventListener('DOMContentLoaded', () => {
+  const toggleBtn = document.getElementById("sidebarToggleBtn");
+  const sidebar = document.getElementById("customizeSidebar");
+  const closeBtn = document.getElementById("sidebarClosePillar");
+
+  if (toggleBtn && sidebar) {
+    toggleBtn.addEventListener("click", () => {
+      sidebar.classList.toggle("show");
+    });
+  }
+
+  if (sidebar && closeBtn) {
+    closeBtn.addEventListener("click", () => {
+      sidebar.classList.remove("show");
+    });
+  }
+
+  // Toggle Bank Balances
+  const toggleBank = document.getElementById('toggleBankBalances');
+  const bankSection = document.getElementById('bankBalancesSection');
+  if (toggleBank && bankSection) {
+    toggleBank.addEventListener('change', (e) => {
+      bankSection.style.display = e.target.checked ? 'block' : 'none';
+    });
+  }
+
+  // Toggle Add Entry
+  const toggleAdd = document.getElementById('toggleAddEntry');
+  const entrySection = document.getElementById('addEntrySection');
+  if (toggleAdd && entrySection) {
+    toggleAdd.addEventListener('change', (e) => {
+      entrySection.style.display = e.target.checked ? 'block' : 'none';
+    });
+  }
+
+}); // ← ✅ This closing brace was missing
+
+
+window.sidebarToggleBtn = sidebarToggleBtn;
+window.customizeSidebar = customizeSidebar;
+window.showCustomAlert = showCustomAlert;
 window.getSelectedPersons = getSelectedPersons;
 window.togglePersonDropdown = togglePersonDropdown;
 window.calculateCurrentBankBalance = calculateCurrentBankBalance;
@@ -2402,17 +2443,19 @@ window.toggleAllPersons = toggleAllPersons;
 window.populatePersonFilterForDashboard = populatePersonFilterForDashboard;
 window.showChangePassword = showChangePassword;
 window.showCenteredMessage = showCenteredMessage;
-window.cancelEdit = cancelEdit
-window.duplicateEntry = duplicateEntry
-window.deleteEntry = deleteEntry
-window.populateFilters = populateFilters
-window.populatePersonDropdownForCharts  = populatePersonDropdownForCharts 
-window.openFullscreen  = openFullscreen 
-window.closeFullscreen  = closeFullscreen 
-window.setFontSize  = setFontSize
-window.editModeActive   = editModeActive 
-window.persons  = persons
-window.creditCards  = creditCards
-window.addCreditCard  = addCreditCard
-window.cancelCardEditBtn = addCreditCard
+window.cancelEdit = cancelEdit;
+window.duplicateEntry = duplicateEntry;
+window.deleteEntry = deleteEntry;
+window.populateFilters = populateFilters;
+window.populatePersonDropdownForCharts = populatePersonDropdownForCharts;
+window.openFullscreen = openFullscreen;
+window.closeFullscreen = closeFullscreen;
+window.setFontSize = setFontSize;
+window.editModeActive = editModeActive;
+window.persons = persons;
+window.creditCards = creditCards;
+window.addCreditCard = addCreditCard;
 window.renderEntries = renderEntries;
+window.showUserManagerModal = showUserManagerModal;
+window.deleteUser = deleteUser;
+
