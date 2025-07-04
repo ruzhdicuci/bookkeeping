@@ -1477,36 +1477,37 @@ function setLockState(locked) {
   if (unlockBtn) unlockBtn.style.display = locked ? 'inline-block' : 'none';
 }
 
+// ✅ Define globally (not nested inside another function)
 function closeCardModal() {
   const modal = document.getElementById("cardEditModal");
   modal.style.display = "none";
   document.removeEventListener("keydown", handleEscape);
   modal.removeEventListener("click", handleOutsideClick);
 }
-
   function handleEscape(e) {
     if (e.key === "Escape") closeCardModal();
   }
 
-  function handleOutsideClick(e) {
-    if (e.target === modal) closeCardModal();
+function handleOutsideClick(e) {
+  const modal = document.getElementById("cardEditModal"); // ✅ define it here
+  if (e.target === modal) {
+    closeCardModal();
   }
-
-// ✅ Modal handler for card editing
+}
 function showCardEditModal(cardIndex, currentName) {
   const modal = document.getElementById("cardEditModal");
   const input = document.getElementById("editCardNameInput");
   const confirmBtn = document.getElementById("confirmEditBtn");
-  const cancelBtn = document.getElementById("cancelEditBtn");
+  const cancelCardEditBtn = document.getElementById("cancelCardEditBtn");
   const deleteBtn = document.getElementById("deleteCardBtn");
 
   input.value = currentName;
   modal.style.display = "flex";
   input.focus();
 
-  // Clean old handlers
+  // Remove old handlers
   confirmBtn.onclick = null;
-  cancelBtn.onclick = null;
+  cancelCardEditBtn.onclick = null;
   deleteBtn.onclick = null;
   document.removeEventListener("keydown", handleEscape);
   modal.removeEventListener("click", handleOutsideClick);
@@ -1522,8 +1523,8 @@ function showCardEditModal(cardIndex, currentName) {
     closeCardModal();
   };
 
-  cancelBtn.onclick = () => {
-    closeCardModal();
+  cancelCardEditBtn.onclick = () => {
+     closeCardModal();
   };
 
   deleteBtn.onclick = () => {
@@ -1531,13 +1532,9 @@ function showCardEditModal(cardIndex, currentName) {
     showDeleteCardModal(cardIndex, currentName);
   };
 
-
-
-
   document.addEventListener("keydown", handleEscape);
   modal.addEventListener("click", handleOutsideClick);
 }
-
 
 function addCreditCard() {
   const modal = document.getElementById("cardAddModal");
@@ -1562,12 +1559,12 @@ function addCreditCard() {
     const limit = parseFloat(limitInput.value);
 
     if (!name) {
-      alert("Please enter a card name.");
+      showCustomAlert("⚠️ Please enter a card name.");
       return;
     }
 
     if (isNaN(limit)) {
-      alert("Please enter a valid number for limit.");
+      showCustomAlert("⚠️ Please enter a valid number for limit.");
       return;
     }
 
@@ -1603,7 +1600,6 @@ function addCreditCard() {
   document.addEventListener("keydown", handleEscape);
   modal.addEventListener("click", handleOutsideClick);
 }
-
 
 function showDeleteCardModal(cardIndex, cardName) {
   const modal = document.getElementById("cardDeleteModal");
@@ -2357,8 +2353,23 @@ function showCenteredMessage(msg, duration = 3000) {
   }
 }
 
+function showCustomAlert(message) {
+  const modal = document.getElementById("customAlertModal");
+  const messageEl = document.getElementById("customAlertMessage");
+  const okBtn = document.getElementById("customAlertOkBtn");
 
+  messageEl.textContent = message;
+  modal.style.display = "flex";
 
+  function closeModal() {
+    modal.style.display = "none";
+    okBtn.removeEventListener("click", closeModal);
+  }
+
+  okBtn.addEventListener("click", closeModal);
+}
+
+window.showCustomAlert = showCustomAlert
 window.getSelectedPersons = getSelectedPersons;
 window.togglePersonDropdown = togglePersonDropdown;
 window.calculateCurrentBankBalance = calculateCurrentBankBalance;
@@ -2403,5 +2414,5 @@ window.editModeActive   = editModeActive
 window.persons  = persons
 window.creditCards  = creditCards
 window.addCreditCard  = addCreditCard
-
+window.cancelCardEditBtn = addCreditCard
 window.renderEntries = renderEntries;

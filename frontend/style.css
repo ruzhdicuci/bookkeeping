@@ -1052,8 +1052,7 @@ text-align: left;
     border: none;
    height: 30px;
      color: white;
-      margin-bottom: -10px;
-margin-top: -10px;
+   
   background-color: #e91e46;
  
      color: white;
@@ -1072,12 +1071,11 @@ margin-top: -10px;
   font-size: 0.8rem;
   cursor: pointer;
  padding: 0.5rem;
-   background-color: #138066;
+   background-color: #21a183;
     border: none;
    height: 30px;
      color: white;
-      margin-bottom: -10px;
-margin-top: -10px;
+    
  border-radius: 6px;
  width: 60px;
 }
@@ -1087,24 +1085,23 @@ margin-top: -10px;
 }
 
 
-#cancelEditBtn {
+#cancelCardEditBtn {
   flex: 1;
   padding: 0.5rem;
   font-size: 0.8rem;
   cursor: pointer;
-    background-color: #9d218a;
+    background-color: #de6332;
 
 height: 30px;
   border-radius: 6px;
     border: none;
      color: white;
-margin-bottom: -10px;
-margin-top: -10px;
+
 }
 
-#cancelEditBtn:hover {
+#cancelCardEditBtn:hover {
      background-color:white;
-     color: #9d218a;
+     color: #de6332;
 }
 
 #confirmEditBtn {
@@ -1112,10 +1109,10 @@ margin-top: -10px;
   padding: 0.5rem;
   font-size: 0.8rem;
   cursor: pointer;
-    background-color: #138066; 
+    background-color: #21a183;
     border: none;
   color: white; 
-margin-top: -10px;
+
 height: 30px;
   border-radius: 6px;
    margin-bottom: -10px;
@@ -1133,7 +1130,7 @@ height: 30px;
   background-color: #e91e46;
     border: none;
      color: white;
-margin-top: -10px;
+
 height: 30px;
   border-radius: 6px;
   margin-bottom: -10px;
@@ -1970,10 +1967,7 @@ body.dark .entry-card .entry-label {
   color: #ffb3c6;
 }
 
-/* Optional: amount coloring */
-body.dark .entry-card .amount {
-  color: #ff6666;
-}
+
 
 
 .dropdown3 .dropdown-menu {
@@ -2339,3 +2333,40 @@ margin-top: -20px;
  background-color: white;
 }
 
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.modal-box {
+  background-color: #2c2c2c;
+  color: #fff;
+  padding: 20px 24px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px #000;
+  text-align: center;
+  max-width: 320px;
+}
+
+.modal-box p {
+  margin-bottom: 16px;
+  font-size: 16px;
+}
+
+
+
+@media screen and (max-width: 600px) {
+  .addCardBtn, .buttonCard, .addCardBtn {
+  
+  
+
+    margin-top: -20px;
+  }
+
+
+}
