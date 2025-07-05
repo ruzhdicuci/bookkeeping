@@ -497,7 +497,7 @@ function renderEntries() {
         : !bankFilter.value || e.bank === bankFilter.value;
 
     return (
-      matchesMulti(dateSearch, entryDay) &&
+      matchesMulti(dateSearch, `${entryDay} ${new Date(e.date).toLocaleString('default', { month: 'short' })}`) &&
       (selectedMonths.length === 0 || selectedMonths.includes(e.date?.slice(0, 7))) &&
       personMatches &&
       bankMatches &&
@@ -2408,9 +2408,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ✅ Setup for each toggle
-setupToggle('toggleBankBalances', 'bankBalancesSection', true);
+setupToggle('toggleBankBalances', 'bankBalancesSection');
   setupToggle('toggleAddEntry', 'addEntrySection');
-setupToggle('toggleCreditLimits', 'creditLimitsSection', true);
+setupToggle('toggleCreditLimits', 'creditLimitsSection');
 setupToggle('toggleTotals', 'totalsSection');
 setupToggle('toggleAverage', 'averageSection');
 setupToggle('toggleMultiselect', 'multiselectSection');
@@ -2470,4 +2470,17 @@ window.addCreditCard = addCreditCard;
 window.renderEntries = renderEntries;
 window.showUserManagerModal = showUserManagerModal;
 window.deleteUser = deleteUser;
+
+document.addEventListener('DOMContentLoaded', () => {
+  const themeSelect = document.getElementById('dropbtn');
+  const saved = localStorage.getItem('theme') || 'theme-default';
+  document.body.className = saved;
+  if (themeSelect) themeSelect.value = saved;
+
+  themeSelect.addEventListener('change', (e) => {
+    const selectedTheme = e.target.value;
+    document.body.className = selectedTheme;
+    localStorage.setItem('theme', selectedTheme);
+  });
+});
 

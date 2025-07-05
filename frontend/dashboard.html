@@ -101,8 +101,14 @@ Kredit Limits
 </label>
 
 </div>
+
+
+
+
+
+
   <div class="dropdown">
-    
+
     <button class="dropbtn">Settings
       <i class="fa fa-caret-down"></i>
     </button>
@@ -158,13 +164,21 @@ Kredit Limits
 
 <div class="tabs-wrapper">
  <div class="tabs">
+      <select id="dropbtn">
+    <option value="theme-default">Theme</option> <!-- Your original theme -->
+  <option value="theme-ocean">Ocean</option>
+  <option value="theme-sunset">Sunset</option>
+  <option value="theme-forest">Forest</option>
+  <option value="theme-mono-dark">Mono</option>
+</select>
+
  <button class="tab-button active" onclick="openTab('dashboardTab', this)">📊</button>
       <button class="tab-button" onclick="openTab('chartsTab', this)">📈</button>
     
    
 
    <button id="themeToggle" onclick="toggleTheme()"> 
-    <i id="themeIcon" class="fa-solid fa-moon"></i>
+    <i id="themeIcon" style="color:white" class="fa-solid fa-moon"></i>
 </button>
 
 <button onclick="location.href='notes.html'" class="tab-button" id="bt2" title="Open Notes">📝</button>
@@ -217,9 +231,9 @@ Kredit Limits
 
 
     <div id="addEntrySection">
-<div class="filter-grid">
+<div class="filter-grid" >
 
- <form id="entryForm" class="entry-form responsive-form">
+ <form id="entryForm" class="entry-form responsive-form" style="margin-top: -2px; padding-bottom: 5px; padding-top: 5px;">
   <div class="form-grid">
     <input type="text" id="newDate" placeholder="Select Date" class="flatpickr-input">
     <input type="text" id="newDescription" placeholder="Description" required />
@@ -272,10 +286,10 @@ Kredit Limits
 
 <div id="bankBalancesSection">
 
-<div class="filter-grid2" style="margin-top: -5px;">
+<div class="filter-grid" style="margin-top: 10px;">
   
     <!-- Original table rendering (can stay for fallback/testing) -->
-<div id="bankBalanceTableContainer" ></div>
+<div id="bankBalanceTableContainer"></div>
 </div>
 <!-- New card-based layout -->
 <div id="bankBalanceCards" class="balance-card-grid"></div>
@@ -343,7 +357,7 @@ totalsContainer.appendChild(summaryCard);
 </script>
 <div id="creditLimitsSection">
 
-<div class="filter-grid" style="margin-top: -6px;">
+<div class="filter-grid" style="margin-top: -11px;">
 
 
 <div class="credit-grid" id="creditGrid">
@@ -601,7 +615,16 @@ let pieChartInstance = null;
 let summaryChartInstance = null;
 let averageChartInstance = null;
 
+
+
 function drawCharts() {
+  // ✅ First: clean up old charts before redrawing
+  if (monthlyChartInstance) monthlyChartInstance.destroy();
+if (personChartInstance) personChartInstance.destroy();
+if (comparisonChartInstance) comparisonChartInstance.destroy();
+if (pieChartInstance) pieChartInstance.destroy();
+if (summaryChartInstance) summaryChartInstance.destroy();
+if (averageChartInstance) averageChartInstance.destroy();
   Chart.register(ChartDataLabels);
 const persons = window.persons || [];
   const categoryFilter = document.getElementById('categoryFilter')?.value || 'All';
@@ -1012,15 +1035,23 @@ function openTab(tabId, btn) {
 
   const targetTab = document.getElementById(tabId);
   if (targetTab) targetTab.classList.add('active');
-
   if (btn) btn.classList.add('active');
 
-if (tabId === 'chartsTab') {
-  setTimeout(() => {
-    populateFilters();  // ← ✅ Add this
-    drawCharts();
-  }, 50);
-}
+  if (tabId === 'chartsTab') {
+    setTimeout(() => {
+      populateFilters();
+      drawCharts();
+
+      // ⏱ Resize charts once they are visible
+      setTimeout(() => {
+        if (Array.isArray(window.myCharts)) {
+          window.myCharts.forEach(chart => {
+            if (chart && chart.resize) chart.resize();
+          });
+        }
+      }, 50);
+    }, 50);
+  }
 }
 </script>
 

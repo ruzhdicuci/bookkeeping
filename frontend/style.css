@@ -335,22 +335,20 @@ font-weight: bolder;
 
 }
 
-body.dark .fa-sun {
-  color: black;
-}
+
 #themeToggle {
-  background: rgb(192, 250, 255);
+  background: #63ddf8;
     cursor: pointer;
    border: none;
  height:40px;
 margin-top: 4px;
   width:40px;
-    margin-left: 3px;
+    margin-left: 1px;
     font-size: 0.7;
 
 }
 #themeToggle:hover {
-  background: white;
+  background: black;
 
 }
 
@@ -373,7 +371,22 @@ border-radius: 10px;
   text-decoration: none;
 }
 
+#dropbtn {
+   font-size: 12px;
+  border: none;
+  outline: none;
+  color: white;
+width: 70px;
+padding-left: 5px;
 
+  background-color: #63ddf8;
+  font-family: system-ui, sans-serif;
+  height: 40px;
+  border-radius: 6px;
+  margin-right: 1px;
+  margin-top: 5px;
+ 
+}
 .dropbtn {
    font-size: 14px;
   border: none;
@@ -706,14 +719,14 @@ gap: 0;
 
     .tab-button {
    
-      background-color: rgb(252, 252, 153);
+      background-color: #63ddf8;
       border: none;
      font-family: system-ui, sans-serif;
 font-size: 0.7rem;
       cursor: pointer;
       border-radius: 10px;
-      margin-left: 3px;
-      margin-right: 3px;
+      margin-left: 1px;
+   
       margin-top: 10px;
       margin-bottom: 5px;
       width: 40px;
@@ -734,7 +747,7 @@ font-size: 0.7rem;
 
 
     .tab-button.active {
-      background-color: rgb(164, 255, 187);
+      background-color: #63ddf8;
     }
     .tab-content {
       display: none;
@@ -926,8 +939,10 @@ height: 40px;
 }
 
 #bankBalanceTableContainer {
-    margin-top: 15px;
-margin-bottom: -10px;
+    margin-top: -7px;
+margin-bottom: -13px;
+margin-left: -8px;
+margin-right: -8px;
 }
 
 .filter-grid3 {
@@ -1665,6 +1680,7 @@ width: 100px; /* Match credit limit cards */
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 1rem;
   align-items: stretch;
+  margin-right: -5px;
 }
 
 .balance-summary-card {
@@ -1708,6 +1724,11 @@ margin-right: 10px;
   justify-content: center;
  
   
+}
+
+body.dark .credit-name {
+
+  color: #ffffff !important;
 }
 
 .dark .credit-grid  input[type="number"]  { 
@@ -2062,9 +2083,10 @@ body.dark .entry-card .entry-label {
 
 
     .chart-canvas {
-  width: 1200px;
+  width: 100% !important;
   height: 300px;
   max-width: 100%;
+  max-height: 300px;
   transition: all 0.3s ease;
   display: block;
    
@@ -2083,13 +2105,13 @@ body.dark .entry-card .entry-label {
 
 
 #bt2 {
-  background-color: rgb(255, 216, 239);
+  background-color: #63ddf8;
    width: 40px;
       height: 40px;
 }
 #bt2:hover {
-  background-color: rgb(255, 255, 255);
-  color: red;
+  background-color: black;
+ 
 }
 
 #syncOverlay {
@@ -2361,18 +2383,10 @@ margin-top: -20px;
   font-size: 16px;
 }
 
-
-
-@media screen and (max-width: 600px) {
   .addCardBtn, .buttonCard, .addCardBtn {
-  
-  
-
-    margin-top: -20px;
+      margin-top: -20px;
   }
 
-
-}
 
 #customizeSidebar {
    transition: transform 0.3s ease;
@@ -2381,11 +2395,11 @@ margin-top: -20px;
   top: 50px; /* adjust based on your header height */
   left: 0;
   height: 320px;
-  width: 160px;
+  width: 130px;
 
   background-color:   white;
-  border: 1px solid  #63ddf8;
-  box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+ 
+  box-shadow: 1px 0 8px   #63ddf8;
   padding: 16px 20px;
   z-index: 1000;
  
@@ -2459,9 +2473,10 @@ border-radius: 8px;
 
 
 #sidebarToggleBtn {
-  margin-top: 8px;
-  margin-left: 3px;
- 
+  margin-top: 10px;
+  margin-left: 10px;
+  border: 1px solid white;
+ background-color: white;
 }
 
 .sidebar {
@@ -2495,7 +2510,8 @@ border-radius: 8px;
   right: -12px;
   width: 24px;
   height: 40px;
-  background-color:#63ddf8;
+  background-color:black;
+ border: 1px solid #63ddf8;
   color: white;
   font-size: 20px;
   display: flex;
@@ -2510,7 +2526,7 @@ border-radius: 8px;
 }
 
 #sidebarClosePillar:hover {
-  background-color: #222;
+  background-color: #63ddf8;
 }
 
 @media (max-width: 600px) {
@@ -2536,4 +2552,91 @@ border-radius: 8px;
 }
 
 
+:root {
+  --bg-color: #f4f2ee;
+
+  --primary-color: #e3e0db;
+
+
+  
+}
+
+
+
+.theme-default {
+  --bg-color: #f4f2ee;
+ 
+    --primary-color: #e3e0db;
+  --border-color:#e3e0db;
+   --date-color:  #2b79cc;
+ 
+}
+
+.theme-ocean {
+  --bg-color:   #e0f7fa;
+  --text-color: #003b46;
+  --primary-color: #00acc1;
+  --accent-color: #00796b;
+  --link-color: white; /* ✅ Always white in default */
+  
+     --border-color: #00acc1;
+}
+
+.theme-sunset {
+  --bg-color: #feece7;
+ --text-color: #4e342e;
+  --primary-color: #ff7043;
+ --link-color: white; /* ✅ Always white in default */
+  --border-color: #ff7043;
+
+}
+
+.theme-forest {
+  --bg-color: #e8f5e9;
+  --text-color: #1b5e20;
+  --primary-color: #56c55c;
+  --accent-color: #2e7d32;
+ --link-color: white; /* ✅ Always white in default */
+   --border-color: #56c55c;
+}
+
+.theme-mono-dark {
+  --bg-color: #121212;
+  
+  --primary-color: #444;
+   --link-color: white; /* ✅ Always white in default */
+ --border-color:  #444;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+.filter-grid {
+  background: var(--primary-color);
+
+}
+
+
+.navbar{
+  background: var(--primary-color);
+
+}
+
+.filter-grid input, .filter-grid select {
+   border: 1px solid  var( --border-color);
+}
+
+.entry-date-label.special-label {
+  color: var(--date-color);
+}
+
+.dropbtn {
+  color: var(--link-color);
+}
+.dropbtn:hover {
+  text-decoration: underline;
+  color: var(--link-color); /* Or a fixed hover color */
+}
 
