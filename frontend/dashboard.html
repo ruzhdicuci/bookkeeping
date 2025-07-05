@@ -60,31 +60,46 @@
   Bank Balances
 </label>
 
-  <label class="custom-checkbox"><input type="checkbox" checked /> 
+  <label class="custom-checkbox">
+      <input type="checkbox" id="toggleCreditLimits" checked />
   <span class="checkmark"></span>
 Kredit Limits
 </label>
 
-   <label class="custom-checkbox"><input type="checkbox" checked />
-    <span class="checkmark"></span>
-   Income
-  </label>
-      <label class="custom-checkbox"><input type="checkbox" checked /> 
-      <span class="checkmark"></span>
-    Average
-  </label>
-<label class="custom-checkbox"><input type="checkbox" checked /> 
+<label class="custom-checkbox">
+  <input type="checkbox" id="toggleTotals" checked />
   <span class="checkmark"></span>
-Mutliselect
+  Totals
 </label>
-   <label class="custom-checkbox"><input type="checkbox" checked /> 
-    <span class="checkmark"></span>
+
+ <label class="custom-checkbox">
+  <input type="checkbox" id="toggleAverage" checked />
+  <span class="checkmark"></span>
+  Average
+</label>
+
+
+<label class="custom-checkbox">
+  <input type="checkbox" id="toggleMultiselect" checked />
+  <span class="checkmark"></span>
+  Multiselect
+</label>
+
+ 
+<label class="custom-checkbox">
+  <input type="checkbox" id="toggleFilters" checked />
+  <span class="checkmark"></span>
   Filters
 </label>
-    <label class="custom-checkbox"><input type="checkbox" checked /> 
-      <span class="checkmark"></span>
-    Searches
-  </label>
+
+
+
+<label class="custom-checkbox">
+  <input type="checkbox" id="toggleSearches" checked />
+  <span class="checkmark"></span>
+  Searches
+</label>
+
 </div>
   <div class="dropdown">
     
@@ -326,6 +341,7 @@ Differe = `
 totalsContainer.appendChild(summaryCard);
 }
 </script>
+<div id="creditLimitsSection">
 <h3 style="margin-left: 10px; margin-top:-2px; margin-bottom: -5px; font-size: 0.9rem; color: #727272;">Kredit Limits</h3>
 
 <div class="filter-grid">
@@ -390,9 +406,11 @@ totalsContainer.appendChild(summaryCard);
   <button id="toggleEditModeBtn">Edit</button>
   </div>
 </div>
-
+</div>
  
   </div>
+
+ <div id="totalsSection">
 <div class="filter-grid" >
 <div class="summary-totals-card ">
   <div class="summary-card">
@@ -407,15 +425,20 @@ totalsContainer.appendChild(summaryCard);
     <div class="label">Balance</div>
     <a id="totalBalance" class="balance-color">0.00</a>
   </div>
-
+</div>
  </div>
 </div>
+
+<div id="averageSection">
 <div class="filter-grid" >
 <div id="monthlyAverageCard"></div>
   </div>
-
+</div>
  </div>
 
+ 
+
+ <div id="multiselectSection">
   <div class="tabs-wrapper">
  <div class="tabs">
       <div   id="personMultiSelect" onclick="togglePersonDropdown()">
@@ -441,7 +464,7 @@ totalsContainer.appendChild(summaryCard);
   </button>
   <span class="tooltip-text">Reset all filters to default</span>
      
-     
+     </div>
    
     </div> 
 </div>
@@ -456,7 +479,8 @@ totalsContainer.appendChild(summaryCard);
 
 
 
-
+<!-- Dropdown filters (category, type, etc.) -->
+<div id="filtersSection">
   <div class="filter-grid">
 
 <select id="categoryFilter">
@@ -505,7 +529,7 @@ totalsContainer.appendChild(summaryCard);
   <option value="3 Weeks Ago">3 Weeks Ago</option>
 </select>
      
-    
+    </div>
    </div>    
  
 
@@ -514,6 +538,9 @@ totalsContainer.appendChild(summaryCard);
      
   
    </div>
+
+  <!-- Search filter tags -->
+<div id="searchesSection"> 
 
 <div class="filters-row">
  <div class="filter-grid">
@@ -553,7 +580,7 @@ totalsContainer.appendChild(summaryCard);
   </div>
 </div>
 </div>
-
+</div>
   
 
   <!-- Dashboard Tab -->

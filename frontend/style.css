@@ -2389,7 +2389,7 @@ margin-top: -20px;
   padding: 16px 20px;
   z-index: 1000;
  
-
+border-radius: 8px;
     font-family: system-ui, sans-serif;
 }
 
@@ -2511,4 +2511,29 @@ margin-top: -20px;
 
 #sidebarClosePillar:hover {
   background-color: #222;
+}
+
+@media (max-width: 600px) {
+  #customizeSidebar {
+    width: 90vw;
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .custom-checkbox {
+    font-size: 14px;
+    gap: 8px;
+    margin: 6px 0;
+  }
+
+  .custom-checkbox .checkmark {
+    width: 12px;
+    height: 12px;
+  }
+
+  #sidebarClosePillar {
+    right: -10px;
+    top: 10px;
+    transform: scale(0.8);
+  }
 }

@@ -2387,25 +2387,37 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Toggle Bank Balances
-  const toggleBank = document.getElementById('toggleBankBalances');
-  const bankSection = document.getElementById('bankBalancesSection');
-  if (toggleBank && bankSection) {
-    toggleBank.addEventListener('change', (e) => {
-      bankSection.style.display = e.target.checked ? 'block' : 'none';
-    });
+  // Reusable function for toggle setup with localStorage
+  function setupToggle(toggleId, sectionId) {
+    const toggle = document.getElementById(toggleId);
+    const section = document.getElementById(sectionId);
+    if (toggle && section) {
+      // Load stored value
+      const saved = localStorage.getItem(toggleId);
+      if (saved !== null) {
+        toggle.checked = saved === 'true';
+        section.style.display = toggle.checked ? 'block' : 'none';
+      }
+
+      toggle.addEventListener('change', (e) => {
+        const show = e.target.checked;
+        section.style.display = show ? 'block' : 'none';
+        localStorage.setItem(toggleId, show);
+      });
+    }
   }
 
-  // Toggle Add Entry
-  const toggleAdd = document.getElementById('toggleAddEntry');
-  const entrySection = document.getElementById('addEntrySection');
-  if (toggleAdd && entrySection) {
-    toggleAdd.addEventListener('change', (e) => {
-      entrySection.style.display = e.target.checked ? 'block' : 'none';
-    });
-  }
+  // ✅ Setup for each toggle
+  setupToggle('toggleBankBalances', 'bankBalancesSection');
+  setupToggle('toggleAddEntry', 'addEntrySection');
+setupToggle('toggleCreditLimits', 'creditLimitsSection');
+setupToggle('toggleTotals', 'totalsSection');
+setupToggle('toggleAverage', 'averageSection');
+setupToggle('toggleMultiselect', 'multiselectSection');
+setupToggle('toggleFilters', 'filtersSection');
+setupToggle('toggleSearches', 'searchesSection');
 
-}); // ← ✅ This closing brace was missing
+});
 
 
 window.sidebarToggleBtn = sidebarToggleBtn;
