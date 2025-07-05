@@ -2388,30 +2388,37 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Reusable function for toggle setup with localStorage
-  function setupToggle(toggleId, sectionId) {
-    const toggle = document.getElementById(toggleId);
-    const section = document.getElementById(sectionId);
-    if (toggle && section) {
-      // Load stored value
-      const saved = localStorage.getItem(toggleId);
-      if (saved !== null) {
-        toggle.checked = saved === 'true';
-        section.style.display = toggle.checked ? 'block' : 'none';
-      }
+function setupToggle(toggleId, sectionId, adjustMargin = false) {
+  const toggle = document.getElementById(toggleId);
+  const section = document.getElementById(sectionId);
 
-      toggle.addEventListener('change', (e) => {
-        const show = e.target.checked;
-        section.style.display = show ? 'block' : 'none';
-        localStorage.setItem(toggleId, show);
-      });
+  if (toggle && section) {
+    const saved = localStorage.getItem(toggleId);
+    const shouldShow = saved !== null ? saved === 'true' : true;
+
+    toggle.checked = shouldShow;
+    section.style.display = shouldShow ? 'block' : 'none';
+
+    if (adjustMargin) {
+      section.style.marginTop = shouldShow ? '-15px' : '0';
     }
+
+    toggle.addEventListener('change', (e) => {
+      const show = e.target.checked;
+      section.style.display = show ? 'block' : 'none';
+      if (adjustMargin) {
+        section.style.marginTop = show ? '-15px' : '0';
+      }
+      localStorage.setItem(toggleId, show);
+    });
   }
+}
 
   // ✅ Setup for each toggle
-  setupToggle('toggleBankBalances', 'bankBalancesSection');
+setupToggle('toggleBankBalances', 'bankBalancesSection', true);
   setupToggle('toggleAddEntry', 'addEntrySection');
-setupToggle('toggleCreditLimits', 'creditLimitsSection');
-setupToggle('toggleTotals', 'totalsSection');
+setupToggle('toggleCreditLimits', 'creditLimitsSection', true);
+setupToggle('toggleTotals', 'totalsSection', true);
 setupToggle('toggleAverage', 'averageSection');
 setupToggle('toggleMultiselect', 'multiselectSection');
 setupToggle('toggleFilters', 'filtersSection');
