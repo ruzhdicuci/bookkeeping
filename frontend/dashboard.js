@@ -252,7 +252,7 @@ async function fetchEntries() {
       window.entries = cached || [];
 
       debug("📦 Loaded entries from IndexedDB:", window.entries);
-      window.persons = [...new Set(window.entries.map(e => entry.person).filter(Boolean))];
+    window.persons = [...new Set(window.entries.map(e => e.person).filter(Boolean))];
 
       renderEntries();
       populateNewEntryDropdowns();
