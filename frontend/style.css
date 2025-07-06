@@ -2705,11 +2705,12 @@ border-radius: 6px;
 .entry-card.has-note::after {
   content: '';
   position: absolute;
-  top: 6px;
-  right: 6px;
-  width: 10px;
-  height: 10px;
-  background-color: black;
-  border-radius: 50%; /* rounded circle */
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-top: 16px solid rgb(0, 0, 0); /* triangle color */
+  border-left: 16px solid transparent;
   z-index: 2;
+  border-top-right-radius: 10px;
 }
