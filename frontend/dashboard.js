@@ -1421,7 +1421,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 
   window.customCreditCards = await getCachedCustomCards(); // always use latest
-  window.creditCards = window.customCreditCards; // ✅ assign globally here
+ 
 
   renderCreditLimitTable();       // ✅ Safe to render limits
   renderEditableCreditCards();    // ✅ Show dynamic card inputs
@@ -1624,8 +1624,7 @@ function renderCreditLimitTable() {
   }
 
   const allCards = [
-    ...(window.creditCards || []),           // Default/static cards
-    ...(window.customCreditCards || [])      // User-added cards
+     ...(window.customCreditCards || [])      // User-added cards
   ];
 
   const limits = {};
@@ -2445,7 +2444,6 @@ window.closeFullscreen = closeFullscreen;
 window.setFontSize = setFontSize;
 window.editModeActive = editModeActive;
 window.persons = persons;
-window.creditCards = creditCards;
 window.addCreditCard = addCreditCard;
 window.renderEntries = renderEntries;
 window.showUserManagerModal = showUserManagerModal;
