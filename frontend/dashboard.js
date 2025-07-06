@@ -1403,11 +1403,9 @@ function calculateCurrentBankBalance(bankName) {
 });
 
 
-
 window.addEventListener('DOMContentLoaded', async () => {
   await fetchEntries();
   await loadInitialBankBalances();
-
 
   populateNewEntryDropdowns();
   populateFilters();
@@ -1421,32 +1419,30 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 
   window.customCreditCards = await getCachedCustomCards(); // always use latest
- 
 
   renderCreditLimitTable();       // ✅ Safe to render limits
   renderEditableCreditCards();    // ✅ Show dynamic card inputs
-  }); 
 
-  // 🛠️ Toggle edit/delete mode
-const editBtn = document.getElementById("toggleEditModeBtn");
-const cancelBtn = document.getElementById("cancelEditModeBtn");
+  // 🛠️ Toggle edit/delete mode (✅ Moved inside DOMContentLoaded)
+  const editBtn = document.getElementById("toggleEditModeBtn");
+  const cancelBtn = document.getElementById("cancelEditModeBtn");
 
-if (editBtn && cancelBtn) {
-  editBtn.addEventListener("click", () => {
-    window.editModeActive = true;
-    renderEditableCreditCards();
-    editBtn.style.display = "none";
-    cancelBtn.style.display = "inline-block";
-  });
+  if (editBtn && cancelBtn) {
+    editBtn.addEventListener("click", () => {
+      window.editModeActive = true;
+      renderEditableCreditCards();
+      editBtn.style.display = "none";
+      cancelBtn.style.display = "inline-block";
+    });
 
-  cancelBtn.addEventListener("click", () => {
-    window.editModeActive = false;
-    renderEditableCreditCards();
-    cancelBtn.style.display = "none";
-    editBtn.style.display = "inline-block";
-  });
-}
-});
+    cancelBtn.addEventListener("click", () => {
+      window.editModeActive = false;
+      renderEditableCreditCards();
+      cancelBtn.style.display = "none";
+      editBtn.style.display = "inline-block";
+    });
+  }
+});  // ✅ Final and only closing parenthesis for the DOMContentLoaded block
 
 // ✅ Status filter listener
 document.getElementById('statusFilter')?.addEventListener('change', () => {
