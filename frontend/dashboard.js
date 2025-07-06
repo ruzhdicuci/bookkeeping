@@ -2280,22 +2280,34 @@ window.addEventListener('online', async () => {
 });
 
 // entry notes
-const note = document.getElementById('entryNoteTextarea').value;
+// ✅ New wrapped function (safe, async, and complete)
+async function saveNoteForEntry() {
+  const note = document.getElementById('entryNoteTextarea').value;
 
-if (!currentNoteEntryId || currentNoteEntryId === "null") {
-  console.warn("❌ Skipping note update: Invalid or missing entry ID", currentNoteEntryId);
-  return;
+  if (!currentNoteEntryId || currentNoteEntryId === "null") {
+    console.warn("❌ Skipping note update: Invalid or missing entry ID", currentNoteEntryId);
+    return;
+  }
+
+  try {
+    const res = await fetch(`${backend}/api/entries/${currentNoteEntryId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      },
+      body: JSON.stringify({ note })
+    });
+
+    if (!res.ok) throw new Error("Failed to update note");
+    console.log("✅ Note updated!");
+  } catch (err) {
+    console.error("❌ Error updating note:", err);
+  }
 }
 
-await fetch(`${backend}/api/entries/${currentNoteEntryId}`, {
-  method: 'PATCH',
-  headers: {
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${localStorage.getItem('token')}`
-  },
-  body: JSON.stringify({ note })
-});
-
+// ✅ Attach to button
+document.getElementById('saveNoteBtn').addEventListener('click', saveNoteForEntry);
 
 function showCenteredMessage(msg, duration = 3000) {
   let el = document.getElementById('syncStatus');
