@@ -1445,6 +1445,7 @@ if (editBtn && cancelBtn) {
     editBtn.style.display = "inline-block";
   });
 }
+});
 
 // ✅ Status filter listener
 document.getElementById('statusFilter')?.addEventListener('change', () => {
