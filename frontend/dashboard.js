@@ -17,10 +17,7 @@ import {
 
 let entries = [];
 let persons = [];
-let creditCards = [
-  { name: "UBS Master", limit: 3000 },
-  { name: "Corner Master", limit: 9900 }
-];
+
 let editModeActive = false;
 
 const apiBase = 'https://bookkeeping-i8e0.onrender.com';
@@ -1407,8 +1404,6 @@ function calculateCurrentBankBalance(bankName) {
 
 
 
-
-// ✅ Initialization
 window.addEventListener('DOMContentLoaded', async () => {
   await fetchEntries();
   await loadInitialBankBalances();
@@ -1418,24 +1413,25 @@ window.addEventListener('DOMContentLoaded', async () => {
   populateFilters();
   renderEntries();
 
-  renderCreditLimitTable(); // ✅ Show limits table
+  // ✅ Load custom cards from MongoDB and Dexie
+  try {
+    await loadCustomCardsFromMongo(); // loads and saves to Dexie
+  } catch (err) {
+    console.warn("⚠️ Failed to load from MongoDB, using Dexie cache");
+  }
 
-    // 🛠️ Toggle edit/delete mode
+  window.customCreditCards = await getCachedCustomCards(); // always use latest
+  window.creditCards = window.customCreditCards; // ✅ assign globally here
+
+  renderCreditLimitTable(); // ✅ Now safe to render table
+  renderEditableCreditCards(); // ✅ Show custom card inputs
+
+  // 🛠️ Toggle edit/delete mode
   document.getElementById("toggleEditModeBtn").addEventListener("click", () => {
-    window.editModeActive = !window.editModeActive; // define globally so you can check inside render
-    renderEditableCreditCards(); // re-render with mode logic
+    window.editModeActive = !window.editModeActive;
+    renderEditableCreditCards();
   });
-
-
-// ✅ Load custom cards from Dexie (fallbacks to empty array)
-try {
-  await loadCustomCardsFromMongo(); // ⬅️ loads into window.customCreditCards and saves to Dexie
-} catch (err) {
-  console.warn("⚠️ Failed to load from MongoDB, using Dexie cache");
-  window.customCreditCards = await getCachedCustomCards();
-}
-
-renderEditableCreditCards(); // ✅ Render into UI
+});
 
   // ✅ Status filter listener
   document.getElementById('statusFilter')?.addEventListener('change', () => {
@@ -1638,19 +1634,18 @@ function showDeleteCardModal(cardIndex, cardName) {
   modal.addEventListener("click", handleOutsideClick);
 }
 
-
 function renderCreditLimitTable() {
   if (!Array.isArray(window.customCreditCards)) {
     window.customCreditCards = [];
   }
-  const limits = {
-    "UBS Master": parseFloat(document.getElementById("creditLimit-ubs")?.value || 0),
-    "Corner": parseFloat(document.getElementById("creditLimit-corner")?.value || 0),
-    "Postfinance Master": parseFloat(document.getElementById("creditLimit-pfm")?.value || 0),
-    "Cembra": parseFloat(document.getElementById("creditLimit-cembra")?.value || 0)
-  };
 
-  (window.customCreditCards || []).forEach(card => {
+  const allCards = [
+    ...(window.creditCards || []),           // Default/static cards
+    ...(window.customCreditCards || [])      // User-added cards
+  ];
+
+  const limits = {};
+  allCards.forEach(card => {
     limits[card.name] = parseFloat(card.limit || 0);
   });
 
@@ -1685,6 +1680,7 @@ function renderCreditLimitTable() {
     totalPlus
   });
 }
+
 
 function updateCreditSummaryCard({
   totalLimit = 0,
