@@ -2280,7 +2280,7 @@ window.addEventListener('online', async () => {
 });
 
 // entry notes
-await fetch(`${backend}/api/entries/${entry._id}`, {
+await fetch(`${backend}/api/entries/${currentNoteEntryId}`, {
   method: 'PATCH',
   headers: {
     'Content-Type': 'application/json',
