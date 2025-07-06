@@ -1807,11 +1807,6 @@ lockBtn.addEventListener('click', () => {
   saveCreditLimits();
 });
 
-// ✅ Recalculate on input change
-['creditLimit-ubs', 'creditLimit-corner', 'creditLimit-pfm', 'creditLimit-cembra'].forEach(id => {
-  const input = document.getElementById(id);
-  if (input) input.addEventListener('input', renderCreditLimitTable);
-});
 
 window.addEventListener('entriesUpdated', renderCreditLimitTable);
 window.addEventListener('bankBalanceUpdated', renderCreditLimitTable);
