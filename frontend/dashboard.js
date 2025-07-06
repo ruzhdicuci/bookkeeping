@@ -1407,7 +1407,7 @@ function calculateCurrentBankBalance(bankName) {
 window.addEventListener('DOMContentLoaded', async () => {
   await fetchEntries();
   await loadInitialBankBalances();
-  await loadCreditLimits();
+
 
   populateNewEntryDropdowns();
   populateFilters();
@@ -1750,24 +1750,6 @@ function saveCustomCreditCards() {
 }
 
 
-// ✅ Load credit limits from backend
-async function loadCreditLimits() {
-  try {
-   const res = await fetch(`https://bookkeeping-i8e0.onrender.com/api/limits`, { headers: { Authorization: `Bearer ${token}` } });
-    const data = await res.json();
-
-    limitInputs.ubs.value = (data.ubs ?? 3000).toString();
-    limitInputs.corner.value = (data.corner ?? 9900).toString();
-    limitInputs.pfm.value = (data.pfm ?? 1000).toString();
-    limitInputs.cembra.value = (data.cembra ?? 10000).toString();
-
-    window.initialLocked = data.locked ?? true;
-    setLockState(window.initialLocked);
-    renderCreditLimitTable();
-  } catch (err) {
-    console.error("❌ Failed to load limits:", err);
-  }
-}
 
 function saveCreditLimits() {
   const limits = {
