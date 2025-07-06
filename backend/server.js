@@ -329,7 +329,7 @@ app.post('/api/limits', auth, async (req, res) => {
 });
 
 
-app.patch('/api/entries/:id', authenticate, async (req, res) => {
+app.patch('/api/entries/:id', auth, async (req, res) => {
   try {
     const { note } = req.body;
     const { id } = req.params;
