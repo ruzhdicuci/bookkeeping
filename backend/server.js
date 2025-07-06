@@ -121,9 +121,9 @@ const Limit = mongoose.model('Limit', new mongoose.Schema({
 }));
 
 const CustomCard = mongoose.model('CustomCard', new mongoose.Schema({
-  userId: String,
-  name: String,
-  limit: Number,
+  userId: { type: String, required: true },
+  name: { type: String, required: true },
+  limit: { type: Number, required: true },
   synced: Boolean,
   lastUpdated: Number
 }, { versionKey: false }));
@@ -298,7 +298,7 @@ app.post('/api/custom-limits', auth, async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     console.error('❌ Failed to save custom cards:', err);
-    res.status(500).json({ error: 'Failed to save custom cards' });
+   res.status(500).json({ error: 'Failed to save custom cards', details: err.message });
   }
 });
 
