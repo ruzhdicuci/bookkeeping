@@ -329,6 +329,22 @@ app.post('/api/limits', auth, async (req, res) => {
 });
 
 
+app.put('/api/entries/:id', auth, async (req, res) => {
+  try {
+    const { note } = req.body;
+    const updated = await Entry.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user.userId },
+      { $set: { note } },
+      { new: true }
+    );
+    res.json(updated);
+  } catch (err) {
+    console.error('❌ Failed to update entry note:', err);
+    res.status(500).json({ error: 'Failed to update note' });
+  }
+});
+
+
 // ✅ Global error fallback
 app.use((err, req, res, next) => {
   console.error("❌ Unexpected server error:", err);

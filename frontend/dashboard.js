@@ -552,7 +552,7 @@ function renderEntries() {
     container.appendChild(labelEl);
 
     const group = groupedEntries[label].sort((a, b) => new Date(b.date) - new Date(a.date));
-    for (const e of group) {
+   for (const entry of group) {
       if (entriesRendered >= currentPage * ENTRIES_PER_PAGE) break;
 
       const card = document.createElement('div');
@@ -599,6 +599,12 @@ function renderEntries() {
             <button onclick="showDeleteModal('${e._id}')" class="action-btn">🗑️</button>
           </div>
         </div>`;
+
+card.addEventListener('click', (e) => {
+  if (e.target.closest('.action-btn')) return;
+  openEntryNoteModal(entry);
+});
+
       container.appendChild(card);
       entriesRendered++;
     }
@@ -2324,6 +2330,46 @@ function showCustomAlert(message) {
   okBtn.addEventListener("click", closeModal);
 }
 
+
+let currentNoteEntryId = null;
+
+function openEntryNoteModal(entry) {
+  currentNoteEntryId = entry._id;
+  document.getElementById('entryNoteTextarea').value = entry.note || '';
+  document.getElementById('entryNoteModal').classList.remove('hidden');
+}
+
+document.getElementById('closeNoteModal').onclick = () => {
+  document.getElementById('entryNoteModal').classList.add('hidden');
+};
+
+document.getElementById('saveNoteBtn').onclick = async () => {
+  const newNote = document.getElementById('entryNoteTextarea').value;
+  if (!currentNoteEntryId) return;
+
+  try {
+    const token = localStorage.getItem('token');
+    const res = await fetch(`${backend}/api/entries/${currentNoteEntryId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ note: newNote })
+    });
+
+    if (!res.ok) throw new Error("Failed to update note");
+
+    showToast("✅ Note saved");
+    document.getElementById('entryNoteModal').classList.add('hidden');
+
+    // Optional: refresh entries from Dexie/Server
+    await loadEntries();
+  } catch (err) {
+    console.error('❌ Failed to save note:', err);
+    showToast("❌ Failed to save note");
+  }
+};
 
 document.addEventListener('DOMContentLoaded', () => {
   const toggleBtn = document.getElementById("sidebarToggleBtn");
