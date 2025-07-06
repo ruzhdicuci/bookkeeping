@@ -233,7 +233,7 @@ async function fetchEntries() {
     window.entries = Array.isArray(data) ? data.sort((a, b) => b.date.localeCompare(a.date)) : [];
 
     debug("📦 Entries:", window.entries);
-    window.persons = [...new Set(window.entries.map(e => e.person).filter(Boolean))];
+    window.persons = [...new Set(window.entries.map(e => entry.person).filter(Boolean))];
     debug("🧑‍🤝‍🧑 Found persons:", window.persons);
 
     renderEntries();
@@ -252,7 +252,7 @@ async function fetchEntries() {
       window.entries = cached || [];
 
       debug("📦 Loaded entries from IndexedDB:", window.entries);
-      window.persons = [...new Set(window.entries.map(e => e.person).filter(Boolean))];
+      window.persons = [...new Set(window.entries.map(e => entry.person).filter(Boolean))];
 
       renderEntries();
       populateNewEntryDropdowns();
@@ -268,9 +268,9 @@ async function fetchEntries() {
 function populateNewEntryDropdowns() {
   const entries = window.entries || [];
 
-  const persons = [...new Set(entries.map(e => e.person?.trim()).filter(Boolean))];
-  const banks = [...new Set(entries.map(e => e.bank?.trim()).filter(Boolean))];
-  const categories = [...new Set(entries.map(e => e.category?.trim()).filter(Boolean))];
+  const persons = [...new Set(entries.map(e => entry.person?.trim()).filter(Boolean))];
+  const banks = [...new Set(entries.map(e => entry.bank?.trim()).filter(Boolean))];
+  const categories = [...new Set(entries.map(e => entry.category?.trim()).filter(Boolean))];
 
   const personList = document.getElementById('personList');
   const bankList = document.getElementById('bankList');
@@ -314,10 +314,10 @@ function populateFilters() {
   const entries = window.entries;
 
   // ✅ Cleaned, trimmed, sorted
-  const banks = [...new Set(entries.map(e => e.bank?.trim()))].filter(Boolean).sort();
-  const persons = [...new Set(entries.map(e => e.person?.trim()))].filter(Boolean).sort();
-  const categories = [...new Set(entries.map(e => e.category?.trim()))].filter(Boolean).sort();
-  const months = [...new Set(entries.map(e => e.date?.slice(0, 7)))].filter(Boolean).sort();
+  const banks = [...new Set(entries.map(e => entry.bank?.trim()))].filter(Boolean).sort();
+  const persons = [...new Set(entries.map(e => entry.person?.trim()))].filter(Boolean).sort();
+  const categories = [...new Set(entries.map(e => entry.category?.trim()))].filter(Boolean).sort();
+  const months = [...new Set(entries.map(e => entry.date?.slice(0, 7)))].filter(Boolean).sort();
 
   const excludedByDefault = ['Balance', 'Transfer'];
 
@@ -482,29 +482,29 @@ function renderEntries() {
       .some(val => (target || '').toLowerCase().includes(val));
 
   let filtered = entries.filter(e => {
-    const entryDay = e.date?.split('-')[2];
+    const entryDay = entry.date?.split('-')[2];
     const personMatches =
       personSearch?.length > 0
-        ? matchesMulti(personSearch, e.person)
-        : selectedPersons.length === 0 || selectedPersons.includes(e.person);
+        ? matchesMulti(personSearch, entry.person)
+        : selectedPersons.length === 0 || selectedPersons.includes(entry.person);
 
     const bankMatches =
       bankSearch?.length > 0
-        ? matchesMulti(bankSearch, e.bank)
-        : !bankFilter.value || e.bank === bankFilter.value;
+        ? matchesMulti(bankSearch, entry.bank)
+        : !bankFilter.value || entry.bank === bankFilter.value;
 
     return (
-      matchesMulti(dateSearch, `${entryDay} ${new Date(e.date).toLocaleString('default', { month: 'short' })}`) &&
-      (selectedMonths.length === 0 || selectedMonths.includes(e.date?.slice(0, 7))) &&
+      matchesMulti(dateSearch, `${entryDay} ${new Date(entry.date).toLocaleString('default', { month: 'short' })}`) &&
+      (selectedMonths.length === 0 || selectedMonths.includes(entry.date?.slice(0, 7))) &&
       personMatches &&
       bankMatches &&
       (!typeFilter.value || e.type === typeFilter.value) &&
       (!currencyFilter.value || e.currency === currencyFilter.value) &&
-      matchesMulti(descSearch, e.description) &&
-      (categoryValue === "All" || e.category === categoryValue) &&
-      matchesMulti(categorySearch, e.category) &&
-      (statusValue === 'All' || e.status === statusValue) &&
-      matchesMulti(amountSearch, e.amount + '')
+      matchesMulti(descSearch, entry.description) &&
+      (categoryValue === "All" || entry.category === categoryValue) &&
+      matchesMulti(categorySearch, entry.category) &&
+      (statusValue === 'All' || entry.status === statusValue) &&
+      matchesMulti(amountSearch, entry.amount + '')
     );
   });
 
@@ -512,7 +512,7 @@ function renderEntries() {
   if (selectedTime) {
     const now = new Date();
     filtered = filtered.filter(e => {
-      const entryDate = new Date(e.date);
+      const entryDate = new Date(entry.date);
       const daysDiff = Math.floor((now - entryDate) / (1000 * 60 * 60 * 24));
       switch (selectedTime) {
         case 'Today': return daysDiff === 0;
@@ -532,7 +532,7 @@ function renderEntries() {
 
   const groupedEntries = {};
   filtered.forEach(e => {
-    const label = getDateLabel(e.date);
+    const label = getDateLabel(entry.date);
     if (!groupedEntries[label]) groupedEntries[label] = [];
     groupedEntries[label].push(e);
   });
@@ -557,11 +557,11 @@ function renderEntries() {
 
       const card = document.createElement('div');
       card.className = 'entry-card';
-      card.dataset.id = e._id;
+      card.dataset.id = entry._id;
 
-      const isEditing = document.getElementById('entryForm')?.dataset.editId === e._id;
+      const isEditing = document.getElementById('entryForm')?.dataset.editId === entry._id;
       if (isEditing) card.classList.add('editing-row');
-      if (e._id === window.highlightedEntryId) {
+      if (entry._id === window.highlightedEntryId) {
         card.classList.add('highlighted');
         card.id = 'highlighted-entry';
       }
@@ -571,32 +571,32 @@ function renderEntries() {
       card.innerHTML = `
         <div class="entry-date">
           <div class="date-block">
-            <div class="day">${new Date(e.date).getDate().toString().padStart(2, '0')}</div>
+            <div class="day">${new Date(entry.date).getDate().toString().padStart(2, '0')}</div>
             <div class="month-year">
-              ${new Date(e.date).toLocaleString('default', { month: 'short' })}<br>
-              ${new Date(e.date).getFullYear()}
+              ${new Date(entry.date).toLocaleString('default', { month: 'short' })}<br>
+              ${new Date(entry.date).getFullYear()}
             </div>
           </div>
         </div>
         <div class="entry-main">
-          <div class="description">${e.description}</div>
-          <div class="meta">${e.category || ''} • ${e.person} • ${e.bank}</div>
+          <div class="description">${entry.description}</div>
+          <div class="meta">${entry.category || ''} • ${entry.person} • ${entry.bank}</div>
           <div class="status">
-            <span class="status-pill ${e.status === 'Paid' ? 'paid' : 'open'}">${e.status}</span>
+            <span class="status-pill ${entry.status === 'Paid' ? 'paid' : 'open'}">${entry.status}</span>
           </div>
         </div>
         <div class="entry-amount">
           <div class="amount-line">
             <span class="currency small">CHF</span>
-            <span class="amount ${amountClass}">${parseFloat(e.amount).toFixed(2)}</span>
+            <span class="amount ${amountClass}">${parseFloat(entry.amount).toFixed(2)}</span>
           </div>
           <div class="buttons">
             ${isEditing
               ? `<button onclick="cancelEdit()" class="action-btn">❌ Cancel</button>`
-              : `<button onclick="editEntry('${e._id}')" class="action-btn">✏️</button>`
+              : `<button onclick="editEntry('${entry._id}')" class="action-btn">✏️</button>`
             }
-            <button onclick="duplicateEntry('${e._id}')" class="action-btn">📄</button>
-            <button onclick="showDeleteModal('${e._id}')" class="action-btn">🗑️</button>
+            <button onclick="duplicateEntry('${entry._id}')" class="action-btn">📄</button>
+            <button onclick="showDeleteModal('${entry._id}')" class="action-btn">🗑️</button>
           </div>
         </div>`;
 
@@ -638,12 +638,12 @@ card.addEventListener('click', (e) => {
   // ✅ Totals + Averages (moved inside the function)
   let incomeTotal = 0, expenseTotal = 0;
   filtered.forEach(e => {
-    const amount = parseFloat(e.amount) || 0;
+    const amount = parseFloat(entry.amount) || 0;
     if ((e.type || '').toLowerCase() === 'income') incomeTotal += amount;
     else expenseTotal += amount;
   });
 
-  const monthsUsed = [...new Set(filtered.map(e => e.date?.slice(0, 7)))].filter(Boolean);
+  const monthsUsed = [...new Set(filtered.map(e => entry.date?.slice(0, 7)))].filter(Boolean);
   const avgIncome = incomeTotal / monthsUsed.length || 0;
   const avgExpense = expenseTotal / monthsUsed.length || 0;
 
@@ -682,7 +682,7 @@ async function editEntry(id) {
     form.dataset.editId = id;
   }
 
-  const entry = window.entries.find(e => e._id === id);
+  const entry = window.entries.find(e => entry._id === id);
   if (!entry) return alert("❌ Entry not found");
 
   // Prefill form fields
@@ -734,7 +734,7 @@ async function updateStatus(id, newStatus) {
   debug("Server response", data);
 
   if (res.ok) {
-    const index = entries.findIndex(e => e._id === id);
+    const index = entries.findIndex(e => entry._id === id);
     if (index !== -1) {
       entries[index] = data;
       renderEntries(); // Re-render the table with updated status
@@ -797,8 +797,8 @@ async function duplicateEntry(id) {
   debug("Looking for ID to duplicate:", id);
   await fetchEntries(); // ✅ ensure entries are available
 
-  debug("✅ All current entry IDs:", window.entries.map(e => e._id));
-  const entry = window.entries.find(e => e._id === id);
+  debug("✅ All current entry IDs:", window.entries.map(e => entry._id));
+  const entry = window.entries.find(e => entry._id === id);
   if (!entry) return alert("Entry not found");
 
   const copy = { ...entry };
@@ -928,7 +928,7 @@ function exportVisibleCardEntriesAsCSV() {
 
   const rows = Array.from(visibleCards).map(card => {
     const id = card.dataset.id;
-    const entry = entries.find(e => e._id === id);
+    const entry = entries.find(e => entry._id === id);
 
     return [
       entry?.date || '',
@@ -1006,7 +1006,7 @@ function renderBankBalanceForm() {
   debug("📊 renderBankBalanceForm called");
 const entries = window.entries || [];
   const container = document.getElementById('bankBalanceTableContainer');
-  const banks = [...new Set(entries.map(e => e.bank).filter(Boolean))];
+  const banks = [...new Set(entries.map(e => entry.bank).filter(Boolean))];
   const selectedMonths = Array.from(document.querySelectorAll('#monthOptions input[type="checkbox"]:checked')).map(cb => cb.value);
 
   debug("📦 Entries count:", entries.length);
@@ -1025,16 +1025,16 @@ const entries = window.entries || [];
   banks.forEach(bank => changes[bank] = 0);
 
   entries.forEach(e => {
-    const bank = e.bank;
+    const bank = entry.bank;
     const type = (e.type || '').trim().toLowerCase();
-    const amount = Math.abs(parseFloat(e.amount)) || 0;
-    const status = e.status || 'Open';
+    const amount = Math.abs(parseFloat(entry.amount)) || 0;
+    const status = entry.status || 'Open';
     const include = (
       statusFilter === 'All' ||
       (statusFilter === 'Paid' && status === 'Paid') ||
       (statusFilter === 'Open' && status === 'Open')
     );
-    const month = e.date?.slice(0, 7);
+    const month = entry.date?.slice(0, 7);
     const monthMatch = selectedMonths.length === 0 || selectedMonths.includes(month);
     if (include && monthMatch && bank in changes) {
       changes[bank] += type === 'income' ? amount : -amount;
@@ -1358,9 +1358,9 @@ function togglePersonDropdown() {
 
 function calculateCurrentBankBalance(bankName) {
   return entries
-    .filter(e => e.bank === bankName)
+    .filter(e => entry.bank === bankName)
     .reduce((sum, e) => {
-      const amount = parseFloat(e.amount) || 0;
+      const amount = parseFloat(entry.amount) || 0;
       return e.type === 'Income' ? sum + amount
            : e.type === 'Expense' ? sum - amount
            : sum;
