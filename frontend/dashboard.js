@@ -1425,6 +1425,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   renderCreditLimitTable();       // ✅ Safe to render limits
   renderEditableCreditCards();    // ✅ Show dynamic card inputs
+  }); 
 
   // 🛠️ Toggle edit/delete mode
 const editBtn = document.getElementById("toggleEditModeBtn");
