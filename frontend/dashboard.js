@@ -600,10 +600,8 @@ function renderEntries() {
           </div>
         </div>`;
 
-        card.addEventListener('click', (e) => {
-  // 🧠 Prevent click when clicking on action buttons (edit, delete, duplicate)
+card.addEventListener('click', (e) => {
   if (e.target.closest('.action-btn')) return;
-
   openEntryNoteModal(e); // 🪪 Call the modal with the entry data
 });
       container.appendChild(card);
