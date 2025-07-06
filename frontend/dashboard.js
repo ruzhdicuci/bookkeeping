@@ -2371,6 +2371,20 @@ function showCustomAlert(message) {
 }
 
 
+function toast(message, duration = 2000) {
+  const toastEl = document.getElementById('toast');
+  if (!toastEl) return alert(message); // fallback
+
+  toastEl.textContent = message;
+  toastEl.style.display = 'block';
+
+  setTimeout(() => {
+    toastEl.style.display = 'none';
+  }, duration);
+}
+
+
+
 document.addEventListener('DOMContentLoaded', () => {
   const toggleBtn = document.getElementById("sidebarToggleBtn");
   const sidebar = document.getElementById("customizeSidebar");
