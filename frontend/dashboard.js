@@ -2404,23 +2404,16 @@ document.getElementById('closeNoteModal').addEventListener('click', () => {
 document.getElementById('saveNoteBtn').addEventListener('click', async () => {
   const note = document.getElementById('entryNoteTextarea').value;
 
-  // Find entry and update locally
   const entry = window.entries.find(e => e._id === currentNoteEntryId);
   if (entry) {
     entry.note = note;
-
-    // Save to Dexie
     await db.entries.put(entry);
-
-    // Optionally sync to backend if needed (e.g. with PUT or PATCH)
-    // await syncEntryToCloud(entry);
-
+    renderEntries(); // ✅ Make triangle appear if note was added
     toast('💾 Note saved');
   }
 
   document.getElementById('entryNoteModal').classList.add('hidden');
 });
-
 
 window.sidebarToggleBtn = sidebarToggleBtn;
 window.customizeSidebar = customizeSidebar;
