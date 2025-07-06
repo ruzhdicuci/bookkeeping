@@ -2429,6 +2429,8 @@ window.addCreditCard = addCreditCard;
 window.renderEntries = renderEntries;
 window.showUserManagerModal = showUserManagerModal;
 window.deleteUser = deleteUser;
+window.openEntryNoteModal  = openEntryNoteModal;
+
 
 document.addEventListener('DOMContentLoaded', () => {
   const themeSelect = document.getElementById('dropbtn');
