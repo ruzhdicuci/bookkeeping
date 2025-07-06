@@ -2664,15 +2664,7 @@ body {
 
 
 .modal.hidden { display: none; }
-.modal {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-color: rgba(0,0,0,0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
+
 .modal-content {
   background: #222;
   padding: 20px;
@@ -2684,4 +2676,20 @@ body {
 .close {
   float: right;
   cursor: pointer;
+}
+
+
+.entry-card.has-note {
+  position: relative;
+}
+
+.entry-card.has-note::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-top: 16px solid black; /* size and color of triangle */
+  border-left: 16px solid transparent;
 }
