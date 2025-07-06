@@ -329,21 +329,25 @@ app.post('/api/limits', auth, async (req, res) => {
 });
 
 
-app.put('/api/entries/:id', auth, async (req, res) => {
+app.patch('/api/entries/:id', authenticate, async (req, res) => {
   try {
     const { note } = req.body;
+    const { id } = req.params;
+
     const updated = await Entry.findOneAndUpdate(
-      { _id: req.params.id, userId: req.user.userId },
-      { $set: { note } },
+      { _id: id, userId: req.user.userId },
+      { note, lastUpdated: Date.now(), synced: true },
       { new: true }
     );
-    res.json(updated);
+
+    if (!updated) return res.status(404).json({ error: 'Entry not found' });
+
+    res.json({ success: true, updated });
   } catch (err) {
     console.error('❌ Failed to update entry note:', err);
-    res.status(500).json({ error: 'Failed to update note' });
+    res.status(500).json({ error: 'Server error', details: err.message });
   }
 });
-
 
 // ✅ Global error fallback
 app.use((err, req, res, next) => {

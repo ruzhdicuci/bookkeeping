@@ -2279,6 +2279,17 @@ window.addEventListener('online', async () => {
   }
 });
 
+// entry notes
+await fetch(`${backend}/api/entries/${entry._id}`, {
+  method: 'PATCH',
+  headers: {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${localStorage.getItem('token')}`
+  },
+  body: JSON.stringify({ note })
+});
+
+
 function showCenteredMessage(msg, duration = 3000) {
   let el = document.getElementById('syncStatus');
   if (!el) {
@@ -2408,7 +2419,21 @@ document.getElementById('saveNoteBtn').addEventListener('click', async () => {
   if (entry) {
     entry.note = note;
     await db.entries.put(entry);
-    renderEntries(); // ✅ Make triangle appear if note was added
+
+    try {
+      await fetch(`${backend}/api/entries/${entry._id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ note })
+      });
+    } catch (err) {
+      console.warn('⚠️ Note not synced to cloud:', err);
+    }
+
+    renderEntries();
     toast('💾 Note saved');
   }
 
