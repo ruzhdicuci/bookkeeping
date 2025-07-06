@@ -601,9 +601,9 @@ if (e.note) card.classList.add('has-note');
           </div>
         </div>`;
 
-card.addEventListener('click', (e) => {
-  if (e.target.closest('.action-btn')) return;
-  openEntryNoteModal(entry); // 🪪 Call the modal with the entry data
+card.addEventListener('click', (event) => {
+  if (event.target.closest('.action-btn')) return;
+  openEntryNoteModal(e); // ✅ pass the correct entry object
 });
       container.appendChild(card);
       entriesRendered++;
