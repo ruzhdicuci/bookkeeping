@@ -603,7 +603,7 @@ if (e.note) card.classList.add('has-note');
 
 card.addEventListener('click', (e) => {
   if (e.target.closest('.action-btn')) return;
-  openEntryNoteModal(e); // 🪪 Call the modal with the entry data
+  openEntryNoteModal(entry); // 🪪 Call the modal with the entry data
 });
       container.appendChild(card);
       entriesRendered++;
