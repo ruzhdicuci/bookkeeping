@@ -305,6 +305,30 @@ app.post('/api/custom-limits', auth, async (req, res) => {
   }
 });
 
+// ✅ Save locked state only (for dynamic cards)
+app.post('/api/limits', auth, async (req, res) => {
+  const userId = req.user.userId;
+  const { locked } = req.body;
+
+  if (typeof locked !== 'boolean') {
+    return res.status(400).json({ error: 'locked must be boolean' });
+  }
+
+  try {
+    // Upsert the locked state (no need to touch limits object anymore)
+    await Limit.findOneAndUpdate(
+      { userId },
+      { locked },
+      { upsert: true, new: true }
+    );
+    res.json({ success: true });
+  } catch (err) {
+    console.error("❌ Failed to save lock state:", err);
+    res.status(500).json({ error: 'Failed to save lock state' });
+  }
+});
+
+
 // ✅ Global error fallback
 app.use((err, req, res, next) => {
   console.error("❌ Unexpected server error:", err);
