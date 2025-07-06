@@ -223,27 +223,7 @@ app.get('/api/balances', auth, async (req, res) => {
   res.json(doc?.balances || {});
 });
 
-// ✅ Credit limits
-app.get('/api/limits', auth, async (req, res) => {
-  const doc = await Limit.findOne({ userId: req.user.userId });
-  const defaultLimits = { ubs: 3000, corner: 9900, pfm: 1000, cembra: 10000 };
-  if (doc) {
-    const safeLimits = { ...defaultLimits, ...doc.limits };
-    res.json({ ...safeLimits, locked: doc.locked });
-  } else {
-    res.json({ ...defaultLimits, locked: true });
-  }
-});
 
-app.post('/api/limits', auth, async (req, res) => {
-  const { ubs, corner, pfm, cembra, locked } = req.body;
-  await Limit.findOneAndUpdate(
-    { userId: req.user.userId },
-    { limits: { ubs, corner, pfm, cembra }, locked },
-    { upsert: true }
-  );
-  res.json({ success: true });
-});
 
 // ✅ Notes
 app.get('/api/notes', auth, async (req, res) => {
