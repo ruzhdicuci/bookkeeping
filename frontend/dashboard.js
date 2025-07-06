@@ -2282,6 +2282,11 @@ window.addEventListener('online', async () => {
 // entry notes
 const note = document.getElementById('entryNoteTextarea').value;
 
+if (!currentNoteEntryId || currentNoteEntryId === "null") {
+  console.warn("❌ Skipping note update: Invalid or missing entry ID", currentNoteEntryId);
+  return;
+}
+
 await fetch(`${backend}/api/entries/${currentNoteEntryId}`, {
   method: 'PATCH',
   headers: {
@@ -2290,6 +2295,7 @@ await fetch(`${backend}/api/entries/${currentNoteEntryId}`, {
   },
   body: JSON.stringify({ note })
 });
+
 
 function showCenteredMessage(msg, duration = 3000) {
   let el = document.getElementById('syncStatus');
