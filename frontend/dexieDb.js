@@ -150,24 +150,28 @@ async function getUnsynced(type = "entries") {
 
 // ✅ Sync to MongoDB
 // ✅ Sync to MongoDB with cleaned _id
-async function syncCustomCardsToMongo() {
+function syncCustomCardsToMongo() {
   try {
     const token = localStorage.getItem('token');
 
-    // 🧼 Strip _id before sending to backend
-    const sanitizedCards = window.customCreditCards.map(({ _id, ...rest }) => rest);
+    // 🧹 Fully strip invalid _id fields (numbers, strings, etc.)
+    const sanitizedCards = window.customCreditCards.map(card => {
+      const cleanCard = { ...card };
+      delete cleanCard._id; // 🧹 Clean out _id completely
+      return cleanCard;
+    });
 
-    const res = await fetch(`${backend}/api/custom-limits`, {
+    return fetch(`${backend}/api/custom-limits`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`
       },
       body: JSON.stringify({ cards: sanitizedCards }),
+    }).then(res => {
+      if (!res.ok) throw new Error("Failed to sync custom cards to MongoDB");
+      console.log("✅ Synced custom cards to MongoDB");
     });
-
-    if (!res.ok) throw new Error("Failed to sync custom cards to MongoDB");
-    console.log("✅ Synced custom cards to MongoDB");
   } catch (err) {
     console.error("❌ Failed to sync custom cards to MongoDB:", err);
   }

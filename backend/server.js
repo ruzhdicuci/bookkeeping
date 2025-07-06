@@ -287,12 +287,15 @@ app.post('/api/custom-limits', auth, async (req, res) => {
     await CustomCard.deleteMany({ userId: req.user.userId });
 
     // Sanitize: remove _id from incoming cards to prevent ObjectId errors
-    const toInsert = cards.map(({ _id, ...rest }) => ({
-      ...rest,
-      userId: req.user.userId,
-      lastUpdated: Date.now(),
-      synced: true
-    }));
+ const toInsert = cards.map(card => {
+  const { _id, ...rest } = card;
+  return {
+    ...rest,
+    userId: req.user.userId,
+    lastUpdated: Date.now(),
+    synced: true
+  };
+});
 
     await CustomCard.insertMany(toInsert);
     res.json({ success: true });
