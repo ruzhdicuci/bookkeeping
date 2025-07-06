@@ -233,7 +233,7 @@ async function fetchEntries() {
     window.entries = Array.isArray(data) ? data.sort((a, b) => b.date.localeCompare(a.date)) : [];
 
     debug("📦 Entries:", window.entries);
-    window.persons = [...new Set(window.entries.map(e => entry.person).filter(Boolean))];
+    window.persons = [...new Set(window.entries.map(e => e.person).filter(Boolean))];
     debug("🧑‍🤝‍🧑 Found persons:", window.persons);
 
     renderEntries();
