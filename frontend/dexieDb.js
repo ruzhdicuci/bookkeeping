@@ -155,9 +155,8 @@ async function syncCustomCardsToMongo() {
     const token = localStorage.getItem('token');
 
     const sanitizedCards = window.customCreditCards.map(card => {
-      const cleanCard = { ...card };
-      delete cleanCard._id;
-      return cleanCard;
+      const { _id, ...rest } = card;
+      return rest; // ✅ this returns the cleaned card without _id
     });
 
     const res = await fetch(`${backend}/api/custom-limits`, {
@@ -170,7 +169,7 @@ async function syncCustomCardsToMongo() {
     });
 
     if (!res.ok) {
-      const errData = await res.json(); // ← grab backend details
+      const errData = await res.json();
       throw new Error(errData.details || errData.error || "Unknown error");
     }
 
