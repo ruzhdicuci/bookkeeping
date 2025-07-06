@@ -2326,6 +2326,7 @@ function openEntryNoteModal(entry) {
 
   // Show modal
   document.getElementById('entryNoteModal').classList.remove('hidden');
+  document.getElementById('saveNoteBtn').dataset.entryId = entry._id;
 }
 
 function showCustomAlert(message) {
@@ -2401,23 +2402,35 @@ document.getElementById('closeNoteModal').addEventListener('click', () => {
 });
 
 document.getElementById('saveNoteBtn').addEventListener('click', async () => {
-  const note = document.getElementById('entryNoteTextarea').value;
+  const noteText = document.getElementById('entryNoteTextarea').value;
+  const entryId = document.getElementById('saveNoteBtn').dataset.entryId;
 
-  // Find entry and update locally
-  const entry = window.entries.find(e => e._id === currentNoteEntryId);
+  const entry = window.entries.find(e => e._id === entryId);
   if (entry) {
-    entry.note = note;
+    entry.note = noteText;
 
-    // Save to Dexie
+    // Save locally
     await db.entries.put(entry);
 
-    // Optionally sync to backend if needed (e.g. with PUT or PATCH)
-    // await syncEntryToCloud(entry);
+    // Sync to backend
+    try {
+      const res = await fetch(`${apiBase}/api/entries/${entryId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(entry)
+      });
 
-    toast('💾 Note saved');
+      if (!res.ok) throw new Error('Failed to update entry on server');
+    } catch (err) {
+      console.warn("⚠️ Failed to sync note:", err);
+    }
+
+    document.getElementById('entryNoteModal').classList.add('hidden');
+    renderEntries(); // to update the icon
   }
-
-  document.getElementById('entryNoteModal').classList.add('hidden');
 });
 
 
