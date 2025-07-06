@@ -1423,52 +1423,36 @@ window.addEventListener('DOMContentLoaded', async () => {
   window.customCreditCards = await getCachedCustomCards(); // always use latest
   window.creditCards = window.customCreditCards; // ✅ assign globally here
 
-  renderCreditLimitTable(); // ✅ Now safe to render table
-  renderEditableCreditCards(); // ✅ Show custom card inputs
+  renderCreditLimitTable();       // ✅ Safe to render limits
+  renderEditableCreditCards();    // ✅ Show dynamic card inputs
 
   // 🛠️ Toggle edit/delete mode
-  document.getElementById("toggleEditModeBtn").addEventListener("click", () => {
-    window.editModeActive = !window.editModeActive;
-    renderEditableCreditCards();
-  });
+  const editBtn = document.getElementById("toggleEditModeBtn");
+  if (editBtn) {
+    editBtn.addEventListener("click", () => {
+      window.editModeActive = !window.editModeActive;
+      renderEditableCreditCards();
+    });
+  }
 });
 
-  // ✅ Status filter listener
-  document.getElementById('statusFilter')?.addEventListener('change', () => {
-    renderEntries();
-    renderBankBalanceForm();
-  });
-
-  // ✅ Input event listeners for credit limit fields
-  ['creditLimit-ubs', 'creditLimit-corner', 'creditLimit-pfm', 'creditLimit-cembra'].forEach(id => {
-    const input = document.getElementById(id);
-    if (input) input.addEventListener('input', renderCreditLimitTable);
-  });
+// ✅ Status filter listener
+document.getElementById('statusFilter')?.addEventListener('change', () => {
+  renderEntries();
+  renderBankBalanceForm();
 });
 
-// ✅ Lockable inputs
-const limitInputs = {
-  ubs: document.getElementById('creditLimit-ubs'),
-  corner: document.getElementById('creditLimit-corner'),
-  pfm: document.getElementById('creditLimit-pfm'),
-  cembra: document.getElementById('creditLimit-cembra'),
-};
-
+// ✅ Lock/unlock card input fields
 const lockBtn = document.getElementById('lockBtn');
 const unlockBtn = document.getElementById('unlockBtn');
 
 function setLockState(locked) {
-  // 🔐 Handle static inputs
-  Object.values(limitInputs).forEach(input => {
-    if (input) input.disabled = locked;
-  });
-
-  // 🔐 Handle custom card inputs (by class name)
+  // 🔐 Disable/enable dynamic custom card inputs
   document.querySelectorAll('.custom-card-limit').forEach(input => {
     input.disabled = locked;
   });
 
-  // 🔄 Toggle button visibility
+  // 🔄 Toggle visibility of lock/unlock buttons
   if (lockBtn) lockBtn.style.display = locked ? 'none' : 'inline-block';
   if (unlockBtn) unlockBtn.style.display = locked ? 'inline-block' : 'none';
 }
