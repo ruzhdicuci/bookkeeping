@@ -2410,12 +2410,15 @@ document.getElementById('closeNoteModal').addEventListener('click', () => {
 
 document.getElementById('saveNoteBtn').addEventListener('click', async () => {
   const note = document.getElementById('entryNoteTextarea').value;
-
   const entry = window.entries.find(e => e._id === currentNoteEntryId);
-  if (entry) {
-    entry.note = note;
-    await db.entries.put(entry);
 
+  if (entry && entry._id) {
+    entry.note = note;
+
+    await db.entries.put(entry); // Save locally
+    renderEntries(); // Show triangle if needed
+
+    // ✅ Sync to backend
     try {
       await fetch(`${backend}/api/entries/${entry._id}`, {
         method: 'PATCH',
@@ -2426,11 +2429,12 @@ document.getElementById('saveNoteBtn').addEventListener('click', async () => {
         body: JSON.stringify({ note })
       });
     } catch (err) {
-      console.warn('⚠️ Note not synced to cloud:', err);
+      console.warn('❌ Failed to sync note to backend:', err);
     }
 
-    renderEntries();
     toast('💾 Note saved');
+  } else {
+    console.warn('⚠️ entry or entry._id is missing:', entry);
   }
 
   document.getElementById('entryNoteModal').classList.add('hidden');
