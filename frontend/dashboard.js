@@ -2410,34 +2410,40 @@ document.getElementById('closeNoteModal').addEventListener('click', () => {
 
 document.getElementById('saveNoteBtn').addEventListener('click', async () => {
   const note = document.getElementById('entryNoteTextarea').value;
-  const entry = window.entries.find(e => e._id === currentNoteEntryId);
 
-  if (entry && entry._id) {
-    entry.note = note;
-
-    await db.entries.put(entry); // Save locally
-    renderEntries(); // Show triangle if needed
-
-    // ✅ Sync to backend
-    try {
-      await fetch(`${backend}/api/entries/${entry._id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({ note })
-      });
-    } catch (err) {
-      console.warn('❌ Failed to sync note to backend:', err);
-    }
-
-    toast('💾 Note saved');
-  } else {
-    console.warn('⚠️ entry or entry._id is missing:', entry);
+  if (!currentNoteEntryId) {
+    console.warn('⚠️ currentNoteEntryId is null!');
+    toast('⚠️ No entry selected');
+    return;
   }
 
+  const entry = window.entries.find(e => e._id === currentNoteEntryId);
+  if (!entry) {
+    console.warn('⚠️ No entry found for currentNoteEntryId:', currentNoteEntryId);
+    return;
+  }
+
+  entry.note = note;
+  await db.entries.put(entry);
+  renderEntries();
+
+  // ✅ Sync to backend
+  try {
+    await fetch(`${backend}/api/entries/${entry._id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      },
+      body: JSON.stringify({ note })
+    });
+  } catch (err) {
+    console.warn('❌ Failed to sync note to backend:', err);
+  }
+
+  toast('💾 Note saved');
   document.getElementById('entryNoteModal').classList.add('hidden');
+  currentNoteEntryId = null; // ✅ Clear it
 });
 
 window.sidebarToggleBtn = sidebarToggleBtn;
