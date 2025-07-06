@@ -286,9 +286,9 @@ app.post('/api/custom-limits', auth, async (req, res) => {
     // Delete old cards for this user
     await CustomCard.deleteMany({ userId: req.user.userId });
 
-    // Insert new cards (with userId injected)
-    const toInsert = cards.map(card => ({
-      ...card,
+    // Sanitize: remove _id from incoming cards to prevent ObjectId errors
+    const toInsert = cards.map(({ _id, ...rest }) => ({
+      ...rest,
       userId: req.user.userId,
       lastUpdated: Date.now(),
       synced: true
