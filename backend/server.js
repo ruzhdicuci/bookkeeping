@@ -126,7 +126,7 @@ const CustomCard = mongoose.model('CustomCard', new mongoose.Schema({
   limit: Number,
   synced: Boolean,
   lastUpdated: Number
-}));
+}, { versionKey: false }));
 
 // ✅ Auth routes
 app.post('/api/register', async (req, res) => {
@@ -281,11 +281,25 @@ app.get('/api/custom-limits', auth, async (req, res) => {
 });
 
 app.post('/api/custom-limits', auth, async (req, res) => {
-  const { cards } = req.body;
-  if (!Array.isArray(cards)) return res.status(400).json({ message: 'Invalid card data' });
-  await CustomCard.deleteMany({ userId: req.user.userId });
-  await CustomCard.insertMany(cards.map(c => ({ ...c, userId: req.user.userId })));
-  res.status(200).send("✅ Custom cards saved");
+  const cards = req.body.cards || [];
+  try {
+    // Delete old cards for this user
+    await CustomCard.deleteMany({ userId: req.user.userId });
+
+    // Insert new cards (with userId injected)
+    const toInsert = cards.map(card => ({
+      ...card,
+      userId: req.user.userId,
+      lastUpdated: Date.now(),
+      synced: true
+    }));
+
+    await CustomCard.insertMany(toInsert);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('❌ Failed to save custom cards:', err);
+    res.status(500).json({ error: 'Failed to save custom cards' });
+  }
 });
 
 // ✅ Global error fallback

@@ -152,7 +152,10 @@ async function getUnsynced(type = "entries") {
 // ✅ Sync to MongoDB with cleaned _id
 async function syncCustomCardsToMongo() {
   try {
-    const sanitizedCards = window.customCreditCards.map(({ _id, ...rest }) => rest); // 🧼 remove _id
+    const sanitizedCards = window.customCreditCards.map(card => {
+      const { _id, ...rest } = card;
+      return rest;
+    });
 
     await fetch(`${backend}/api/custom-limits`, {
       method: 'POST',
