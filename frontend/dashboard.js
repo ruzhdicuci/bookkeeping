@@ -557,7 +557,7 @@ function renderEntries() {
 
       const card = document.createElement('div');
     card.className = 'entry-card';
-
+if (e.note) card.classList.add('has-note');
       card.dataset.id = e._id;
 
       const isEditing = document.getElementById('entryForm')?.dataset.editId === e._id;

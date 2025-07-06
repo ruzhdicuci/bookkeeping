@@ -2666,17 +2666,35 @@ body {
 .modal.hidden { display: none; }
 
 .modal-content {
-  background: #222;
+  background: #ffffff;
   padding: 20px;
   border-radius: 10px;
   width: 90%;
   max-width: 500px;
-  color: white;
+  color: rgb(53, 51, 51);
 }
 .close {
   float: right;
   cursor: pointer;
 }
+.close:hover {
+background-color: rgb(249, 188, 188);
+}
+
+#entryNoteTextarea {
+  border: 1px solid rgb(238, 233, 233);
+}
+
+#saveNoteBtn {
+  border: none;
+  margin-top: 10px;
+  background-color: #00796b;
+  color: white;
+padding: 10px;
+border-radius: 6px;
+}
+  
+
 
 
 .entry-card.has-note {
