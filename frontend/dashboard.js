@@ -2331,13 +2331,8 @@ function showCenteredMessage(msg, duration = 3000) {
 function openEntryNoteModal(entry) {
   currentNoteEntryId = entry._id;
 
-  // Pre-fill note if it exists
-  const note = entry.note || '';
-  document.getElementById('entryNoteTextarea').value = note;
-
-  // Show modal
+  document.getElementById('entryNoteTextarea').value = entry.note || '';
   document.getElementById('entryNoteModal').classList.remove('hidden');
-  document.getElementById('saveNoteBtn').dataset.entryId = entry._id;
 }
 
 function showCustomAlert(message) {
