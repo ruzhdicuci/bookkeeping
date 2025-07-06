@@ -1751,22 +1751,15 @@ function renderEditableCreditCards() {
     }
   });
 }
-// ✅ Save cards
+// ✅ Save dynamic cards
 function saveCustomCreditCards() {
   saveAllCustomCards(window.customCreditCards); // ✅ Save to Dexie
   syncCustomCardsToMongo();                     // ✅ Sync to backend
 }
 
-
-
+// ✅ Save lock state only (for dynamic cards)
 function saveCreditLimits() {
-  const limits = {
-    ubs: parseFloat(limitInputs.ubs.value || 0),
-    corner: parseFloat(limitInputs.corner.value || 0),
-    pfm: parseFloat(limitInputs.pfm.value || 0),
-    cembra: parseFloat(limitInputs.cembra.value || 0),
-    locked: window.initialLocked ?? true
-  };
+  const locked = window.initialLocked ?? true;
 
   fetch(`${backend}/api/limits`, {
     method: 'POST',
@@ -1774,30 +1767,28 @@ function saveCreditLimits() {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`
     },
-    body: JSON.stringify(limits)
+    body: JSON.stringify({ locked }) // 🧹 Only send lock status
   })
     .then(res => {
-      if (!res.ok) throw new Error("Failed to save credit limits.");
-      showToast("✅ Kredit limits saved", true); // ✅ Replaced alert
-      renderCreditLimitTable();
+      if (!res.ok) throw new Error("Failed to save lock state.");
+      showToast("✅ Lock state saved", true);
+      renderCreditLimitTable(); // Refresh UI
     })
     .catch(err => {
-      console.error("❌ Failed to save limits:", err);
-      showToast("❌ Could not save limits", false); // ✅ Replaced alert
+      console.error("❌ Failed to save lock state:", err);
+      showToast("❌ Could not save lock state", false);
     });
 }
 
-// ✅ Hook up lock/unlock
+// ✅ Hook up lock/unlock for dynamic cards
 unlockBtn.addEventListener('click', () => {
-  setLockState(false); // just unlocks inputs
-  // Don't save yet
+  setLockState(false); // unlocks dynamic inputs
 });
+
 lockBtn.addEventListener('click', () => {
-  setLockState(true);
-  saveCreditLimits();
+  setLockState(true);  // locks inputs
+  saveCreditLimits();  // only saves lock state
 });
-
-
 window.addEventListener('entriesUpdated', renderCreditLimitTable);
 window.addEventListener('bankBalanceUpdated', renderCreditLimitTable);
 
