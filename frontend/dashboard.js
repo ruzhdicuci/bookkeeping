@@ -2313,6 +2313,20 @@ function showCenteredMessage(msg, duration = 3000) {
   }
 }
 
+
+let currentNoteEntryId = null;
+
+function openEntryNoteModal(entry) {
+  currentNoteEntryId = entry._id;
+
+  // Pre-fill note if it exists
+  const note = entry.note || '';
+  document.getElementById('entryNoteTextarea').value = note;
+
+  // Show modal
+  document.getElementById('entryNoteModal').classList.remove('hidden');
+}
+
 function showCustomAlert(message) {
   const modal = document.getElementById("customAlertModal");
   const messageEl = document.getElementById("customAlertMessage");
@@ -2377,6 +2391,32 @@ setupToggle('toggleMultiselect', 'multiselectSection');
 setupToggle('toggleFilters', 'filtersSection');
 setupToggle('toggleSearches', 'searchesSection');
 
+});
+
+
+document.getElementById('closeNoteModal').addEventListener('click', () => {
+  document.getElementById('entryNoteModal').classList.add('hidden');
+  currentNoteEntryId = null;
+});
+
+document.getElementById('saveNoteBtn').addEventListener('click', async () => {
+  const note = document.getElementById('entryNoteTextarea').value;
+
+  // Find entry and update locally
+  const entry = window.entries.find(e => e._id === currentNoteEntryId);
+  if (entry) {
+    entry.note = note;
+
+    // Save to Dexie
+    await db.entries.put(entry);
+
+    // Optionally sync to backend if needed (e.g. with PUT or PATCH)
+    // await syncEntryToCloud(entry);
+
+    toast('💾 Note saved');
+  }
+
+  document.getElementById('entryNoteModal').classList.add('hidden');
 });
 
 
