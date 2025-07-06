@@ -17,7 +17,7 @@ import {
 
 let entries = [];
 let persons = [];
-
+let currentNoteEntryId = null;
 let editModeActive = false;
 
 const apiBase = 'https://bookkeeping-i8e0.onrender.com';
@@ -2315,7 +2315,7 @@ function showCenteredMessage(msg, duration = 3000) {
 }
 
 
-let currentNoteEntryId = null;
+
 
 function openEntryNoteModal(entry) {
   currentNoteEntryId = entry._id;

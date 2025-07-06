@@ -9,8 +9,8 @@ const backend =
 export const db = new Dexie('bookkeeping-db');
 
 // Always keep the highest version here
-db.version(300).stores({
-  entries: '_id, date, amount, category, person, bank, synced, lastUpdated',
+db.version(301).stores({
+  entries: '_id, date, amount, category, person, bank, note, synced, lastUpdated',
   notes: '_id, title, content, done, synced, lastUpdated',
   balances: 'bank',
   customCards: '++id,name,limit,synced,lastUpdated'

@@ -2701,13 +2701,15 @@ border-radius: 6px;
   position: relative;
 }
 
-.entry-card.has-note::before {
+/* Triangle on top-right corner for entries with a note */
+.entry-card.has-note::after {
   content: '';
   position: absolute;
   top: 0;
   right: 0;
   width: 0;
   height: 0;
-  border-top: 16px solid black; /* size and color of triangle */
+  border-top: 16px solid black; /* triangle color */
   border-left: 16px solid transparent;
+  z-index: 2;
 }
