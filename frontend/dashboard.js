@@ -2280,6 +2280,8 @@ window.addEventListener('online', async () => {
 });
 
 // entry notes
+const note = document.getElementById('entryNoteTextarea').value;
+
 await fetch(`${backend}/api/entries/${currentNoteEntryId}`, {
   method: 'PATCH',
   headers: {
@@ -2288,7 +2290,6 @@ await fetch(`${backend}/api/entries/${currentNoteEntryId}`, {
   },
   body: JSON.stringify({ note })
 });
-
 
 function showCenteredMessage(msg, duration = 3000) {
   let el = document.getElementById('syncStatus');
