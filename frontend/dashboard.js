@@ -531,11 +531,11 @@ function renderEntries() {
   container.innerHTML = '';
 
   const groupedEntries = {};
-  filtered.forEach(e => {
-    const label = getDateLabel(entry.date);
-    if (!groupedEntries[label]) groupedEntries[label] = [];
-    groupedEntries[label].push(e);
-  });
+filtered.forEach(e => {
+  const label = getDateLabel(e.date);
+  if (!groupedEntries[label]) groupedEntries[label] = [];
+  groupedEntries[label].push(e);
+});
 
   const sortedLabels = Object.keys(groupedEntries).sort((a, b) => getLabelRank(a) - getLabelRank(b));
   let entriesRendered = 0;
