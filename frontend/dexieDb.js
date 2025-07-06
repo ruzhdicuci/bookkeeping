@@ -152,8 +152,8 @@ async function getUnsynced(type = "entries") {
 // ✅ Sync to MongoDB with cleaned _id
 async function syncCustomCardsToMongo() {
   try {
-    const sanitizedCards = window.customCreditCards.map(card => {
-      const { _id, ...rest } = card;
+    const cleanCards = window.customCreditCards.map(card => {
+      const { _id, ...rest } = card; // remove _id if exists
       return rest;
     });
 
@@ -163,7 +163,7 @@ async function syncCustomCardsToMongo() {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${localStorage.getItem('token')}`
       },
-      body: JSON.stringify({ cards: sanitizedCards }),
+      body: JSON.stringify({ cards: cleanCards }),
     });
   } catch (err) {
     console.error("❌ Failed to sync custom cards to MongoDB:", err);
