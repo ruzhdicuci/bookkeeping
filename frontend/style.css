@@ -2280,7 +2280,25 @@ margin-top: 20px;
   color: rgb(229, 144, 113);
 }
 
+#cancelEditModeBtn {
+  background-color: orangered;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font-weight: bold;
+  color: #fdf6de;
+  font-size: 0.8rem;
+  cursor: pointer;
+  width: 100%;
+margin-top: 20px;
+  height: 36px;
+ 
+  font-family: system-ui, sans-serif;
+}
 
+#cancelEditModeBtn:hover {
+  background-color: black;
+  color: rgb(229, 144, 113);
+}
 
 .card .credit-name {
   font-size: 0.6rem;
