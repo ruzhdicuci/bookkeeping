@@ -1,4 +1,4 @@
-const DEBUG_MODE = true; // set to true during dev
+const DEBUG_MODE = false; // set to true during dev
 const debug = (...args) => DEBUG_MODE && console.log(...args);
 
 import {

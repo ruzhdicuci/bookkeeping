@@ -2720,3 +2720,14 @@ border: none;
   z-index: 2;
   border-top-right-radius: 10px;
 }
+
+
+#inactivityOkBtn {
+  margin-top: 1em;
+  padding: 0.5em 1.5em;
+  background-color: #333;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
