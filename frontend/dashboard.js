@@ -265,14 +265,23 @@ function toggleChartPersonDropdown() {
   }
 }
 
-
 async function loadPersons() {
-  // Fetch or load persons here, example:
-  const response = await fetch('/api/persons');
-  const data = await response.json();
-  window.persons = data; // ✅ Make it globally available
-}
+  try {
+    const token = localStorage.getItem('token'); // Or however you're storing the token
 
+    const res = await fetch('/api/persons', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    const persons = await res.json();
+    window.persons = persons;
+    console.log("👤 Loaded persons:", persons);
+  } catch (err) {
+    console.error("❌ Failed to load persons:", err);
+  }
+}
 
 async function fetchEntries() {
   try {
