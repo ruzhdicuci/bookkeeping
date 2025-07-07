@@ -2609,7 +2609,9 @@ window.toggleAllChartPersons  = toggleAllChartPersons;
 window.toggleAllPersons = toggleAllPersons;
 window.toggleChartPersonDropdown = toggleChartPersonDropdown;
 window.drawCharts = drawCharts;
-
+window.updateYearlyBudgetBar = updateYearlyBudgetBar
+window.syncYearlyLimitsToMongo  =syncYearlyLimitsToMongo
+window.loadAndRenderYearlyLimit  = loadAndRenderYearlyLimit
 
 document.addEventListener('DOMContentLoaded', () => {
   const themeSelect = document.getElementById('dropbtn');
@@ -2688,3 +2690,67 @@ function redirectIfNotLoggedIn() {
 }
 
 
+function updateYearlyBudgetBar(limit) {
+  if (!limit) {
+    console.warn("⚠️ No yearly limit set.");
+    return;
+  }
+
+  const entries = window.entries || [];
+  const currentYear = new Date().toISOString().slice(0, 4);
+  const expensesThisYear = entries
+    .filter(e => e.type === 'Expense' && e.date?.startsWith(currentYear))
+    .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
+
+  const percent = Math.min((expensesThisYear / limit) * 100, 100);
+
+  document.getElementById('yearlySpentLabel').textContent = `Ausgegeben: CHF ${expensesThisYear.toLocaleString('de-CH', { minimumFractionDigits: 2 })}`;
+  document.getElementById('yearlyLimitLabel').textContent = `CHF ${limit.toLocaleString('de-CH', { minimumFractionDigits: 2 })}`;
+  document.getElementById('yearlyProgressFill').style.width = `${percent}%`;
+}
+
+async function syncYearlyLimitsToMongo() {
+  try {
+    const token = localStorage.getItem('token');
+    const unsynced = await getUnsyncedYearlyLimits();
+    if (!unsynced.length) return;
+
+    const res = await fetch(`${backend}/api/yearly-limit`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify(unsynced[0]) // you can batch send multiple if supported
+    });
+
+    if (!res.ok) throw new Error(await res.text());
+
+    await db.yearlyLimits.update([unsynced[0].userId, unsynced[0].year], { synced: true });
+    console.log("✅ Yearly limit synced to MongoDB");
+  } catch (err) {
+    console.error("❌ Failed to sync yearly limit:", err);
+  }
+}
+
+
+async function loadAndRenderYearlyLimit() {
+  const year = new Date().getFullYear();
+  const userId = localStorage.getItem('userId'); // Or however you store it
+
+  const localLimit = await getYearlyLimitFromCache(userId, year);
+
+  if (localLimit) {
+    document.getElementById('yearlyLimitInput').value = localLimit.limit;
+    updateYearlyBudgetBar(localLimit.limit);
+  } else {
+    const res = await fetch(`${backend}/api/yearly-limit?year=${year}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+    const data = await res.json();
+    await saveYearlyLimitLocally({ userId, year, limit: data.limit });
+    updateYearlyBudgetBar(data.limit);
+  }
+}

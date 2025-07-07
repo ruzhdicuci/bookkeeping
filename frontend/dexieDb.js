@@ -13,7 +13,8 @@ db.version(302).stores({
   entries: '_id, date, amount, category, person, bank, synced, lastUpdated, note',
   notes: '_id, title, content, done, synced, lastUpdated',
   balances: 'bank',
-  customCards: '_id,name,limit,synced,lastUpdated'
+  customCards: '_id,name,limit,synced,lastUpdated',
+  yearlyLimits: '[userId+year], year, limit, synced, lastUpdated'
 });
 
 
@@ -234,6 +235,39 @@ async function fetchAndCacheEntries() {
     console.log("✅ Synced entries from backend to Dexie:", entries.length);
   } catch (err) {
     console.error("❌ fetchAndCacheEntries failed:", err);
+  }
+}
+
+
+export async function saveYearlyLimitLocally({ userId, year, limit }) {
+  try {
+    await db.yearlyLimits.put({
+      userId,
+      year,
+      limit,
+      synced: navigator.onLine,
+      lastUpdated: Date.now()
+    });
+  } catch (err) {
+    console.error("❌ Failed to save yearly limit in Dexie:", err);
+  }
+}
+
+export async function getYearlyLimitFromCache(userId, year) {
+  try {
+    return await db.yearlyLimits.get([userId, year]);
+  } catch (err) {
+    console.error("❌ Failed to load yearly limit from Dexie:", err);
+    return null;
+  }
+}
+
+export async function getUnsyncedYearlyLimits() {
+  try {
+    return await db.yearlyLimits.where('synced').equals(false).toArray();
+  } catch (err) {
+    console.error("❌ Failed to get unsynced yearly limits:", err);
+    return [];
   }
 }
 
