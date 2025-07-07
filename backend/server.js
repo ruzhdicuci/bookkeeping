@@ -96,11 +96,14 @@ const Entry = mongoose.model('Entry', new mongoose.Schema({
   bank: String,
   category: String,
   currency: String,
+  note: String, // ✅ ADD THIS LINE
   status: {
     type: String,
     enum: ['Open', 'Paid'],
     default: 'Paid'
-  }
+  },
+  synced: Boolean,         // ✅ Optional for syncing
+  lastUpdated: Number      // ✅ Optional for offline logic
 }));
 
 const Note = mongoose.model('Note', new mongoose.Schema({
