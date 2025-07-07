@@ -40,11 +40,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderEntries(cached);
   }
 
-  // ✅ Keep your original logic
-  await fetchEntries();
-
-  // ✅ Add this line to sync latest into Dexie
-  await db.entries.bulkPut(window.entries);
+  await fetchEntries(); // populates window.entries
+  await db.entries.clear();              // 🧹 Clear old cache
+  await db.entries.bulkPut(window.entries); // 💾 Save fresh ones
+  renderEntries(window.entries);         // ✅ Render fresh ones
 
   await loadInitialBankBalances();
 
