@@ -226,17 +226,12 @@ app.post('/api/balances', auth, async (req, res) => {
 
 
 app.get('/api/persons', authMiddleware, async (req, res) => {
-  try {
-    const entries = await Entry.find({ userId: req.user.id });
-    const personsSet = new Set();
-    entries.forEach(entry => {
-      if (entry.person) personsSet.add(entry.person);
-    });
-    res.json([...personsSet]);
-  } catch (err) {
-    console.error('❌ Error loading persons:', err);
-    res.status(500).json({ error: 'Failed to load persons' });
-  }
+  const entries = await Entry.find({});
+  const personsSet = new Set();
+  entries.forEach(entry => {
+    if (entry.person) personsSet.add(entry.person);
+  });
+  res.json([...personsSet]);
 });
 
 app.get('/api/balances', auth, async (req, res) => {
