@@ -959,7 +959,7 @@ margin-right: -8px;
   display: none;
 }
 .modal-content {
-  background: #f3f2f1;
+  background: #000000;
   padding: 2rem;
   border-radius: 8px;
   max-width: 400px;
@@ -2681,13 +2681,14 @@ color: black;
     font-family: system-ui, sans-serif;
     font-weight: bold;
     font-size: 1rem;
+    padding: 10px;
 }
 
 #saveNoteBtn {
   border: none;
   margin-top: 1px;
-   margin-bottom: 1px;
-  background-color: #ffffff;
+   margin-bottom: -10px;
+  background-color: transparent;
   color:  #00796b;
 padding: 0px;
 border: none;
