@@ -40,9 +40,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderEntries(cached);
   }
 
-  // ✅ Cleaner fetch + Dexie sync
-  await fetchAndCacheEntries(); 
-  renderEntries(); 
+  await fetchEntries(); // populates window.entries
+  await db.entries.clear();              // 🧹 Clear old cache
+  await db.entries.bulkPut(window.entries); // 💾 Save fresh ones
+  renderEntries(window.entries);         // ✅ Render fresh ones
 
   await loadInitialBankBalances();
 
