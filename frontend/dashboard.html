@@ -1151,16 +1151,7 @@ function openTab(tabId, btn) {
 
 <div id="toast" class="toast"></div>
 
-<script>
- window.addEventListener('DOMContentLoaded', () => {
-  const persons = window.persons || []; // or however you load persons
-  if (persons.length > 0) {
-    populatePersonDropdownForCharts(persons);
-  } else {
-    console.warn("⚠️ No persons found to populate chart dropdown.");
-  }
-});
-</script>
+
 
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -1176,16 +1167,7 @@ function openTab(tabId, btn) {
       .catch(err => console.warn('❌ Service Worker registration failed:', err));
   }
 </script>
-<script>
-  window.addEventListener('DOMContentLoaded', () => {
-    const persons = window.persons || [];
-    if (persons.length > 0) {
-      populatePersonDropdownForCharts(persons); // ✅ only here
-    } else {
-      console.warn("⚠️ No persons found to populate chart dropdown.");
-    }
-  });
-</script>
+
 </body>
 </html>
 

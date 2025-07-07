@@ -265,6 +265,15 @@ function toggleChartPersonDropdown() {
   }
 }
 
+
+async function loadPersons() {
+  // Fetch or load persons here, example:
+  const response = await fetch('/api/persons');
+  const data = await response.json();
+  window.persons = data; // ✅ Make it globally available
+}
+
+
 async function fetchEntries() {
   try {
     const token = localStorage.getItem('token');
@@ -2609,9 +2618,10 @@ window.toggleAllChartPersons  = toggleAllChartPersons;
 window.toggleAllPersons = toggleAllPersons;
 window.toggleChartPersonDropdown = toggleChartPersonDropdown;
 window.drawCharts = drawCharts;
-window.updateYearlyBudgetBar = updateYearlyBudgetBar
-window.syncYearlyLimitsToMongo  =syncYearlyLimitsToMongo
-window.loadAndRenderYearlyLimit  = loadAndRenderYearlyLimit
+window.updateYearlyBudgetBar = updateYearlyBudgetBar;
+window.syncYearlyLimitsToMongo  =syncYearlyLimitsToMongo;
+window.loadAndRenderYearlyLimit  = loadAndRenderYearlyLimit;
+
 
 document.addEventListener('DOMContentLoaded', () => {
   const themeSelect = document.getElementById('dropbtn');
@@ -2759,3 +2769,20 @@ async function loadAndRenderYearlyLimit() {
     updateYearlyBudgetBar(data.limit);
   }
 }
+
+
+window.addEventListener('DOMContentLoaded', async () => {
+  if (!window.persons || window.persons.length === 0) {
+    await loadPersons();
+  }
+
+  if (window.persons?.length > 0) {
+    console.log("👤 Loaded persons:", window.persons);
+    populatePersonDropdownForCharts(window.persons);
+    drawCharts();
+  } else {
+    console.warn("⚠️ No persons found to populate chart dropdown.");
+  }
+});
+
+window.loadPersons = loadPersons;
