@@ -2382,6 +2382,52 @@ function openEntryNoteModal(entry) {
   document.getElementById('entryNoteModal').classList.remove('hidden');
 }
 
+
+document.getElementById('closeNoteModal').addEventListener('click', () => {
+  document.getElementById('entryNoteModal').classList.add('hidden');
+  currentNoteEntryId = null;
+});
+
+document.getElementById('saveNoteBtn').addEventListener('click', async () => {
+  const note = document.getElementById('entryNoteTextarea').value;
+
+  if (!currentNoteEntryId) {
+    console.warn('⚠️ currentNoteEntryId is null!');
+    toast('⚠️ No entry selected');
+    return;
+  }
+
+  const entry = window.entries.find(e => e._id === currentNoteEntryId);
+  if (!entry) {
+    console.warn('⚠️ No entry found for currentNoteEntryId:', currentNoteEntryId);
+    return;
+  }
+
+  entry.note = note;
+  await db.entries.put(entry);
+  renderEntries();
+
+  // ✅ Sync to backend
+  try {
+    await fetch(`${backend}/api/entries/${entry._id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      },
+      body: JSON.stringify({ note })
+    });
+  } catch (err) {
+    console.warn('❌ Failed to sync note to backend:', err);
+  }
+
+  toast('💾 Note saved');
+  document.getElementById('entryNoteModal').classList.add('hidden');
+  currentNoteEntryId = null; // ✅ Clear it
+});
+
+
+
 function showCustomAlert(message) {
   const modal = document.getElementById("customAlertModal");
   const messageEl = document.getElementById("customAlertMessage");
@@ -2463,48 +2509,6 @@ setupToggle('toggleSearches', 'searchesSection');
 });
 
 
-document.getElementById('closeNoteModal').addEventListener('click', () => {
-  document.getElementById('entryNoteModal').classList.add('hidden');
-  currentNoteEntryId = null;
-});
-
-document.getElementById('saveNoteBtn').addEventListener('click', async () => {
-  const note = document.getElementById('entryNoteTextarea').value;
-
-  if (!currentNoteEntryId) {
-    console.warn('⚠️ currentNoteEntryId is null!');
-    toast('⚠️ No entry selected');
-    return;
-  }
-
-  const entry = window.entries.find(e => e._id === currentNoteEntryId);
-  if (!entry) {
-    console.warn('⚠️ No entry found for currentNoteEntryId:', currentNoteEntryId);
-    return;
-  }
-
-  entry.note = note;
-  await db.entries.put(entry);
-  renderEntries();
-
-  // ✅ Sync to backend
-  try {
-    await fetch(`${backend}/api/entries/${entry._id}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      },
-      body: JSON.stringify({ note })
-    });
-  } catch (err) {
-    console.warn('❌ Failed to sync note to backend:', err);
-  }
-
-  toast('💾 Note saved');
-  document.getElementById('entryNoteModal').classList.add('hidden');
-  currentNoteEntryId = null; // ✅ Clear it
-});
 
 
 
