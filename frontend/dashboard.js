@@ -34,20 +34,22 @@ if (!token) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // Try loading cached entries first (safe)
   const cached = await getCachedEntries();
   if (cached.length) {
     debug("📦 Showing cached entries before server fetch");
-    renderEntries(cached); // This shows something while loading real data
+    renderEntries(cached);
   }
 
-  // Then fetch the real entries from server as usual
+  // ✅ Keep your original logic
   await fetchEntries();
-  await fetchEntriesAndSyncToDexie();
+
+  // ✅ Add this line to sync latest into Dexie
+  await db.entries.bulkPut(window.entries);
+
   await loadInitialBankBalances();
 
-  // Sync any pending entries (only if online)
   if (navigator.onLine) syncToCloud();
+});
 
   // Your flatpickr and other logic continues...
   const dateInput = document.getElementById('newDate');
