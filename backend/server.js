@@ -331,20 +331,35 @@ app.post('/api/limits', auth, async (req, res) => {
 
 app.patch('/api/entries/:id', auth, async (req, res) => {
   try {
-    const { note } = req.body;
     const { id } = req.params;
+
+    // ✅ Whitelist of fields that are allowed to be updated
+    const allowedFields = ['note', 'amount', 'category', 'person', 'bank', 'status', 'type', 'currency', 'description', 'date'];
+    const updates = {};
+
+    for (const field of allowedFields) {
+      if (req.body[field] !== undefined) {
+        updates[field] = req.body[field];
+      }
+    }
+
+    // ✅ Always update timestamp and sync flag
+    updates.lastUpdated = Date.now();
+    updates.synced = true;
 
     const updated = await Entry.findOneAndUpdate(
       { _id: id, userId: req.user.userId },
-      { note, lastUpdated: Date.now(), synced: true },
+      updates,
       { new: true }
     );
 
-    if (!updated) return res.status(404).json({ error: 'Entry not found' });
+    if (!updated) {
+      return res.status(404).json({ error: 'Entry not found' });
+    }
 
     res.json({ success: true, updated });
   } catch (err) {
-    console.error('❌ Failed to update entry note:', err);
+    console.error('❌ Failed to update entry:', err);
     res.status(500).json({ error: 'Server error', details: err.message });
   }
 });
