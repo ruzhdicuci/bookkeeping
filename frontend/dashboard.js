@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadInitialBankBalances();
 
   if (navigator.onLine) syncToCloud();
-});
+
 
   // Your flatpickr and other logic continues...
   const dateInput = document.getElementById('newDate');
