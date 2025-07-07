@@ -1,5 +1,5 @@
-const DEBUG_MODE = false; // set to true during dev
-const debug = (...args) => DEBUG_MODE && debug(...args);
+const DEBUG_MODE = true; // set to true during dev
+const debug = (...args) => DEBUG_MODE && console.log(...args);
 
 import {
   db,
@@ -565,7 +565,7 @@ if (e.note) {
   card.classList.add('has-note');
 }
  card.dataset.id = e._id;
- 
+
       const isEditing = document.getElementById('entryForm')?.dataset.editId === e._id;
       if (isEditing) card.classList.add('editing-row');
       if (e._id === window.highlightedEntryId) {
