@@ -2311,6 +2311,31 @@ async function saveNoteForEntry() {
 // ✅ Attach to button
 document.getElementById('saveNoteBtn').addEventListener('click', saveNoteForEntry);
 
+
+async function fetchEntriesAndSyncToDexie() {
+  try {
+    const res = await fetch(`${backend}/api/entries`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+
+    if (!res.ok) throw new Error('❌ Failed to fetch entries from backend');
+
+    const entries = await res.json();
+
+    await db.entries.bulkPut(entries); // ✅ store in Dexie
+    window.entries = entries;
+
+    console.log("✅ Synced entries from backend to Dexie:", entries.length);
+    renderEntries(entries);
+  } catch (err) {
+    console.error("❌ fetchEntriesAndSyncToDexie failed:", err);
+  }
+}
+
+
+
 function showCenteredMessage(msg, duration = 3000) {
   let el = document.getElementById('syncStatus');
   if (!el) {
@@ -2481,30 +2506,6 @@ document.getElementById('saveNoteBtn').addEventListener('click', async () => {
 });
 
 
-async function fetchEntriesAndSyncToDexie() {
-  try {
-    const res = await fetch(`${backend}/api/entries`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
-    });
-
-    if (!res.ok) throw new Error('❌ Failed to fetch entries from backend');
-
-    const entries = await res.json();
-
-    // 💾 Save into Dexie
-    await db.entries.bulkPut(entries);
-
-    // 🧠 Store in memory
-    window.entries = entries;
-
-    console.log("✅ Synced entries from backend:", entries.length);
-    renderEntries(entries); // 👈 immediately show fresh entries
-  } catch (err) {
-    console.error("❌ fetchEntriesAndSyncToDexie failed:", err);
-  }
-}
 
 window.sidebarToggleBtn = sidebarToggleBtn;
 window.customizeSidebar = customizeSidebar;
