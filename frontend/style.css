@@ -959,13 +959,13 @@ margin-right: -8px;
   display: none;
 }
 .modal-content {
-  background: #111010;
+  background: #ffffff;
   padding: 2rem;
   border-radius: 8px;
   max-width: 400px;
   width: 100%;
   box-shadow: 0 0 10px rgba(0,0,0,0.2);
-  color: rgb(255, 255, 255);
+  color: rgb(62, 60, 60);
 }
 
 .modal-content2 {
