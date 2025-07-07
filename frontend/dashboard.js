@@ -2691,22 +2691,27 @@ function redirectIfNotLoggedIn() {
 
 
 function updateYearlyBudgetBar(limit) {
-  if (!limit) {
+  if (!limit || isNaN(limit)) {
     console.warn("⚠️ No yearly limit set.");
     return;
   }
 
   const entries = window.entries || [];
-  const currentYear = new Date().toISOString().slice(0, 4);
+  const currentYear = new Date().getFullYear().toString();
+
   const expensesThisYear = entries
     .filter(e => e.type === 'Expense' && e.date?.startsWith(currentYear))
     .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
 
   const percent = Math.min((expensesThisYear / limit) * 100, 100);
 
-  document.getElementById('yearlySpentLabel').textContent = `Ausgegeben: CHF ${expensesThisYear.toLocaleString('de-CH', { minimumFractionDigits: 2 })}`;
-  document.getElementById('yearlyLimitLabel').textContent = `CHF ${limit.toLocaleString('de-CH', { minimumFractionDigits: 2 })}`;
+  document.getElementById('yearlySpentLabel').textContent =
+    ` ${expensesThisYear.toLocaleString('de-CH', { minimumFractionDigits: 2 })}`;
+  document.getElementById('yearlyLimitLabel').textContent =
+    limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   document.getElementById('yearlyProgressFill').style.width = `${percent}%`;
+  document.getElementById('yearlyLeftLabel').textContent =
+    ` ${(limit - expensesThisYear).toLocaleString('de-CH', { minimumFractionDigits: 2 })} `;
 }
 
 async function syncYearlyLimitsToMongo() {
