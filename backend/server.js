@@ -223,7 +223,7 @@ app.post('/api/balances', auth, async (req, res) => {
 });
 
 
-const Entry = require('./models/Entry'); // ✅ make sure this path is correct
+
 
 app.get('/api/persons', authMiddleware, async (req, res) => {
   try {
