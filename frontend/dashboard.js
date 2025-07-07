@@ -559,8 +559,11 @@ function renderEntries(entryList = window.entries || []) {
 
       const card = document.createElement('div');
     card.className = 'entry-card';
-if (e.note) card.classList.add('has-note');
-      card.dataset.id = e._id;
+
+if (e.note) {
+  console.log("📝 Entry with note:", e._id, e.note); // ✅ Debug line
+  card.classList.add('has-note');
+}
 
       const isEditing = document.getElementById('entryForm')?.dataset.editId === e._id;
       if (isEditing) card.classList.add('editing-row');
@@ -2501,7 +2504,7 @@ document.getElementById('saveNoteBtn').addEventListener('click', async () => {
     console.warn('❌ Failed to sync note to backend:', err);
   }
 
-  toast('💾 Note saved');
+  toast('Note saved');
   document.getElementById('entryNoteModal').classList.add('hidden');
   currentNoteEntryId = null; // ✅ Clear it
 });
