@@ -2676,25 +2676,31 @@ body {
 .close {
   float: right;
   cursor: pointer;
+  margin-top: -10px;
 }
 .close:hover {
-background-color: rgb(249, 188, 188);
+color: red;
 }
 
 #entryNoteTextarea {
-  border: 1px solid rgb(238, 233, 233);
+  border: 1px solid rgb(255, 255, 255);
 }
 
 #saveNoteBtn {
   border: none;
   margin-top: 10px;
-  background-color: #00796b;
-  color: white;
+  background-color: #ffffff;
+  color:  #00796b;
 padding: 10px;
 border-radius: 6px;
+  border: 1px solid rgb(238, 233, 233);
 }
   
-
+#saveNoteBtn:hover {
+  background-color: #00796b;
+  color:  white;
+}
+  
 
 
 .entry-card.has-note {

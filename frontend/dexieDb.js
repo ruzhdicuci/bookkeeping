@@ -211,6 +211,33 @@ async function markAsSynced(type, _id) {
   await db[type].update(_id, { synced: true });
 }
 
+
+
+async function fetchAndCacheEntries() {
+  try {
+    const res = await fetch(`${backend}/api/entries`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+
+    if (!res.ok) throw new Error('❌ Failed to fetch entries from backend');
+
+    const entries = await res.json();
+
+    // ✅ Save fresh entries into Dexie
+    await db.entries.bulkPut(entries);
+
+    // ✅ Update window.entries
+    window.entries = entries;
+
+    console.log("✅ Synced entries from backend to Dexie:", entries.length);
+  } catch (err) {
+    console.error("❌ fetchAndCacheEntries failed:", err);
+  }
+}
+
+
 // ✅ Export all at once
 export {
   saveNoteLocally,
@@ -227,7 +254,8 @@ export {
   syncCustomCardsToMongo,
   loadCustomCardsFromMongo,
   getUnsyncedCustomCards,
-  safeDexieWrite
+  safeDexieWrite,
+  fetchAndCacheEntries
 };
 
 window.db = db; // ✅ For debugging

@@ -43,6 +43,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Then fetch the real entries from server as usual
   await fetchEntries();
+  await fetchEntriesAndSyncToDexie();
   await loadInitialBankBalances();
 
   // Sync any pending entries (only if online)
@@ -2479,6 +2480,32 @@ document.getElementById('saveNoteBtn').addEventListener('click', async () => {
   currentNoteEntryId = null; // ✅ Clear it
 });
 
+
+async function fetchEntriesAndSyncToDexie() {
+  try {
+    const res = await fetch(`${backend}/api/entries`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+
+    if (!res.ok) throw new Error('❌ Failed to fetch entries from backend');
+
+    const entries = await res.json();
+
+    // 💾 Save into Dexie
+    await db.entries.bulkPut(entries);
+
+    // 🧠 Store in memory
+    window.entries = entries;
+
+    console.log("✅ Synced entries from backend:", entries.length);
+    renderEntries(entries); // 👈 immediately show fresh entries
+  } catch (err) {
+    console.error("❌ fetchEntriesAndSyncToDexie failed:", err);
+  }
+}
+
 window.sidebarToggleBtn = sidebarToggleBtn;
 window.customizeSidebar = customizeSidebar;
 window.showCustomAlert = showCustomAlert;
@@ -2529,6 +2556,7 @@ window.renderEntries = renderEntries;
 window.showUserManagerModal = showUserManagerModal;
 window.deleteUser = deleteUser;
 window.openEntryNoteModal  = openEntryNoteModal;
+window.fetchEntriesAndSyncToDexie  = fetchEntriesAndSyncToDexie;
 
 
 document.addEventListener('DOMContentLoaded', () => {
