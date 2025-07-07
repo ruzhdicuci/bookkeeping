@@ -34,6 +34,7 @@ if (!token) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+   redirectIfNotLoggedIn(); // 🔐 force redirect if no token
   const cached = await getCachedEntries();
   if (cached.length) {
     debug("📦 Showing cached entries before server fetch");
@@ -2578,3 +2579,35 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+
+
+let inactivityTimer;
+
+// 👣 Reset timer on activity
+function resetInactivityTimer() {
+  clearTimeout(inactivityTimer);
+  inactivityTimer = setTimeout(() => {
+    logoutDueToInactivity();
+  }, 60 * 1000); // 1 minute
+}
+
+// ⏱️ Watch for any user activity
+['click', 'mousemove', 'keydown', 'scroll', 'touchstart'].forEach(evt => {
+  document.addEventListener(evt, resetInactivityTimer, false);
+});
+
+// 🔐 Logout function
+function logoutDueToInactivity() {
+  localStorage.removeItem('token');
+  alert("⚠️ You were logged out due to inactivity.");
+  window.location.href = 'login.html';
+}
+
+// ✅ Start the timer initially
+resetInactivityTimer();
+
+function redirectIfNotLoggedIn() {
+  if (!localStorage.getItem('token')) {
+    window.location.href = 'login.html';
+  }
+}
