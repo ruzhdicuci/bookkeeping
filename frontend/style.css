@@ -2721,6 +2721,10 @@ border: none;
   border-top-right-radius: 10px;
 }
 
+.dark .entry-card.has-note::after {
+ border-top: 16px solid rgb(255, 255, 255); /* triangle color */
+  border-left: 16px solid transparent;
+  }
 
 #inactivityOkBtn {
   margin-top: 1em;
