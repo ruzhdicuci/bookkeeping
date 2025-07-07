@@ -1,4 +1,4 @@
-const authMiddleware = require('./middleware/authMiddleware');
+const authMiddleware = require('./authMiddleware');
 require('dotenv').config();
 const mongoose = require('mongoose');
 const express = require('express');
