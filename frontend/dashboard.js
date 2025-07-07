@@ -2603,9 +2603,9 @@ function resetInactivityTimer() {
 // 🚨 Custom modal with countdown
 function showInactivityModal() {
   countdown = 60;
-  const modal = document.getElementById('inactivityModal');
+  const modal3 = document.getElementById('inactivityModal');
   const countdownSpan = document.getElementById('countdown');
-  modal.classList.remove('hidden');
+  modal3.classList.remove('hidden');
   countdownSpan.textContent = countdown;
 
   logoutCountdownTimer = setInterval(() => {
