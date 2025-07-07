@@ -463,8 +463,8 @@ function getLabelRank(label) {
   return ranks[label] || 9999;
 }
 
-function renderEntries() {
-  const entries = window.entries || [];
+function renderEntries(entryList = window.entries || []) {
+  const entries = entryList;
   const dateSearch = document.getElementById('dateSearch')?.value.trim();
   const descSearch = document.getElementById('descSearch')?.value.trim();
   const amountSearch = document.getElementById('amountSearch')?.value.trim();
