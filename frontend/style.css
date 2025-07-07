@@ -2413,11 +2413,11 @@ margin-top: -20px;
   transform: translateX(-100%);
   position: absolute; /* or fixed */
   top: 50px; /* adjust based on your header height */
-  left: 0;
-  height: 320px;
+  left: 50px;
+  height: 300px;
   width: 130px;
-
-  background-color:   white;
+color: white;
+  background-color:   rgb(0, 0, 0);
  
   box-shadow: 1px 0 8px   #63ddf8;
   padding: 16px 20px;
@@ -2435,9 +2435,9 @@ border-radius: 8px;
   font-size: 16px;
   margin-bottom: 12px;
   margin-top: 6px;
-  color: black;
+  color: rgb(255, 255, 255);
   font-weight: 600;
-  border-bottom: 1px solid #ccc;
+     border-bottom: 1px solid #262525;
   padding-bottom: 4px;
 }
 
@@ -2448,17 +2448,17 @@ border-radius: 8px;
   gap: 10px;
   margin: 10px 0;
   font-size: 15px;
-  color: rgb(38, 36, 36);
+  color: rgb(255, 255, 255);
+   border-bottom: 1px solid #1f1c1c;
   cursor: pointer;
   position: relative;
 }
 
 .custom-checkbox:hover {
-  background-color: #eaebec;
-  border-radius: 6px;
-  margin-bottom: 10px;
-  margin-top: 2px;
-  margin-right: 6px;
+
+  color: #63ddf8;
+
+ 
 }
 
 /* Hide native checkbox */
@@ -2470,12 +2470,13 @@ border-radius: 8px;
 .custom-checkbox .checkmark {
   width: 14px;
   height: 14px;
-  background-color: transparent;
-  border: 2px solid #63ddf8;
+  background-color: #63ddf8;
+ accent-color: white;
   display: inline-block;
   position: relative;
   margin-top: 4px;
   margin-bottom: 4px;
+
 }
 
 /* Add white checkmark when checked */
@@ -2486,17 +2487,26 @@ border-radius: 8px;
   top: 0px;
   width: 5px;
   height: 10px;
- border: solid rgb(112, 110, 110);/* ← changed from white to black */
+ border: solid rgb(27, 26, 26);/* ← changed from white to black */
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
 }
 
 
 #sidebarToggleBtn {
-  margin-top: 10px;
+  margin-top: 7px;
   margin-left: 10px;
   border: 1px solid white;
- background-color: white;
+ background-color:white;
+ color: #63ddf8;
+border-radius: 4px;
+padding: 4px 6px;
+}
+
+#sidebarToggleBtn:hover {
+  color: white;
+ background-color: black;
+ cursor: pointer;
 }
 
 .sidebar {
