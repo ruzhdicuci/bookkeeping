@@ -2727,7 +2727,7 @@ body.dark .entry-card.has-note::after {
   }
 
 
-.modal3 {
+.modal {
   position: fixed;
   top: 0; left: 0;
   width: 100%; height: 100%;
@@ -2738,13 +2738,6 @@ body.dark .entry-card.has-note::after {
   z-index: 9999;
 }
 
-.modal-content3 {
-  background: white;
-  padding: 2em;
-  border-radius: 12px;
-  box-shadow: 0 0 20px rgba(0,0,0,0.3);
-  text-align: center;
-}
 
 #continueSessionBtn {
   margin-top: 1em;
