@@ -13,7 +13,7 @@ db.version(302).stores({
   entries: '_id, date, amount, category, person, bank, synced, lastUpdated, note',
   notes: '_id, title, content, done, synced, lastUpdated',
   balances: 'bank',
-  customCards: '++id,name,limit,synced,lastUpdated'
+  customCards: '_id,name,limit,synced,lastUpdated'
 });
 
 

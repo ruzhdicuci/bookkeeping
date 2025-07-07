@@ -1562,12 +1562,13 @@ function addCreditCard() {
       return;
     }
 
-    window.customCreditCards.push({
-      name,
-      limit,
-      synced: false,
-      lastUpdated: Date.now()
-    });
+window.customCreditCards.push({
+  _id: crypto.randomUUID(), // ✅ safe string ID
+  name,
+  limit,
+  synced: false,
+  lastUpdated: Date.now()
+});
 
     saveCustomCreditCards();
     renderEditableCreditCards();
