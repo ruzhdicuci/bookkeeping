@@ -222,6 +222,23 @@ app.post('/api/balances', auth, async (req, res) => {
   res.json({ success: true });
 });
 
+
+const Entry = require('./models/Entry'); // ✅ make sure this path is correct
+
+app.get('/api/persons', authMiddleware, async (req, res) => {
+  try {
+    const entries = await Entry.find({ userId: req.user.id });
+    const personsSet = new Set();
+    entries.forEach(entry => {
+      if (entry.person) personsSet.add(entry.person);
+    });
+    res.json([...personsSet]);
+  } catch (err) {
+    console.error('❌ Error loading persons:', err);
+    res.status(500).json({ error: 'Failed to load persons' });
+  }
+});
+
 app.get('/api/balances', auth, async (req, res) => {
   const doc = await Balance.findOne({ userId: req.user.userId });
   res.json(doc?.balances || {});
@@ -349,19 +366,6 @@ app.post('/api/yearly-limit', authMiddleware, async (req, res) => {
   res.json({ success: true });
 });
 
-app.get('/api/persons', authMiddleware, async (req, res) => {
-  try {
-    const entries = await Entry.find({ userId: req.user.id });
-    const personsSet = new Set();
-    entries.forEach(entry => {
-      if (entry.person) personsSet.add(entry.person);
-    });
-    res.json([...personsSet]);
-  } catch (err) {
-    console.error("❌ Failed to load persons:", err);
-    res.status(500).json({ error: 'Failed to load persons' });
-  }
-});
 
 
 app.patch('/api/entries/:id', auth, async (req, res) => {
