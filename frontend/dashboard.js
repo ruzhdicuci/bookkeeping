@@ -179,6 +179,7 @@ async function loadInitialBankBalances() {
   renderBankBalanceForm(initialBankBalances);
 }
 
+
  function populatePersonFilterForDashboard(persons) {
     const container = document.getElementById('personOptions');
     if (!container) {
@@ -205,22 +206,46 @@ async function loadInitialBankBalances() {
   }
 
 
+
+
 function populatePersonDropdownForCharts(persons) {
-  const select = document.getElementById('filterPerson');
-  if (!select) {
-    console.warn("⚠️ #filterPerson not found.");
-    return;
-  }
+  const container = document.getElementById('personChartOptions');
+  if (!container) return;
 
   const excluded = ['Transfer', 'Balance'];
   const filteredPersons = persons.filter(p => !excluded.includes(p));
 
-  select.innerHTML = `<option value="All">All</option>` +
-    filteredPersons.map(p => `<option value="${p}">${p}</option>`).join('');
+  const labels = filteredPersons.map(p => `
+    <div>
+      <label>
+        <input type="checkbox" class="chartPersonFilter" value="${p}" checked onchange="drawCharts()" />
+        ${p}
+      </label>
+    </div>
+  `).join('');
 
-  if (!select.dataset.listenerAttached) {
-    select.addEventListener('change', drawCharts);
-    select.dataset.listenerAttached = "true";
+  container.innerHTML = `
+    <div>
+      <label>
+        <input type="checkbox" value="All" onchange="toggleAllChartPersons(this)" checked />
+        <strong>All</strong>
+      </label>
+    </div>
+    <hr style="margin: 8px 0;">
+    ${labels}
+  `;
+}
+
+function toggleAllChartPersons(masterCheckbox) {
+  const checkboxes = document.querySelectorAll('#personChartOptions .chartPersonFilter');
+  checkboxes.forEach(cb => cb.checked = masterCheckbox.checked);
+  drawCharts();
+}
+
+function toggleChartPersonDropdown() {
+  const options = document.getElementById('personChartOptions');
+  if (options) {
+    options.style.display = options.style.display === 'none' ? 'block' : 'none';
   }
 }
 
@@ -2544,7 +2569,7 @@ window.saveEdit = saveEdit;
 window.updateStatus = updateStatus;
 window.editEntry = editEntry;
 window.populateBankDropdownFromBalances = populateBankDropdownFromBalances;
-window.toggleAllPersons = toggleAllPersons;
+
 window.populatePersonFilterForDashboard = populatePersonFilterForDashboard;
 window.showChangePassword = showChangePassword;
 window.showCenteredMessage = showCenteredMessage;
@@ -2564,7 +2589,9 @@ window.showUserManagerModal = showUserManagerModal;
 window.deleteUser = deleteUser;
 window.openEntryNoteModal  = openEntryNoteModal;
 window.fetchEntriesAndSyncToDexie  = fetchEntriesAndSyncToDexie;
-
+window.toggleAllChartPersons  = toggleAllChartPersons
+window.toggleAllPersons = toggleAllPersons
+window.toggleChartPersonDropdown = toggleChartPersonDropdown
 
 document.addEventListener('DOMContentLoaded', () => {
   const themeSelect = document.getElementById('dropbtn');

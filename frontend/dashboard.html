@@ -200,11 +200,10 @@ Kredit Limits
     <option value="line">Line</option>
   </select>
 
-  <select id="filterPerson">
-    <option value="All">All</option>
-  </select>
-
-
+<div id="personChartDropdownWrapper">
+  <button onclick="toggleChartPersonDropdown()">👤 Persons</button>
+  <div id="personChartOptions" style="display: none;"></div>
+</div>
 
 <div class="dropdown3">
   <button class="dropdown-toggle3" id="chartDropdownToggle">
@@ -226,7 +225,7 @@ Kredit Limits
 
 <canvas id="personChart" class="chart-canvas"></canvas>
 <canvas id="comparisonChart" class="chart-canvas"></canvas>
-<canvas id="pieChart" class="chart-canvas"></canvas>
+<canvas id="pieChart" class="chart-canvas2"></canvas>
   </div></div>  
 
 
@@ -615,6 +614,11 @@ if (averageChartInstance) averageChartInstance.destroy();
 const persons = window.persons || [];
   const categoryFilter = document.getElementById('categoryFilter')?.value || 'All';
   const selectedPerson = document.getElementById('filterPerson')?.value || 'All';
+ const selectedPersons = Array.from(document.querySelectorAll('#personChartOptions .chartPersonFilter'))
+  .filter(cb => cb.checked)
+  .map(cb => cb.value);
+
+const isAllSelected = selectedPersons.includes('All');
   const entries = window.entries || [];
 
   console.log("📦 Entries before filtering:", entries.length, entries);
@@ -629,10 +633,8 @@ const filteredEntries = entries.filter(e => {
   const person = (e.person || 'Unknown').trim();
   const category = (e.category || 'Uncategorized').trim();
 
-  const personMatch = (selectedPerson === 'All') || (person === selectedPerson);
+  const personMatch = isAllSelected || selectedPersons.includes(person);
   const categoryMatch = (categoryFilter === 'All') || (category === categoryFilter);
-
-  // ✅ Exclude unwanted persons
   const notExcluded = !excludedPersons.includes(person);
 
   return personMatch && categoryMatch && notExcluded;

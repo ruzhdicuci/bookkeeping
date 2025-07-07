@@ -2080,6 +2080,20 @@ body.dark .entry-card .entry-label {
 
 
 
+.chart-canvas2  {
+   width: 100% !important;
+  height: 1200px;
+  max-width: 100%;
+  max-height: 600px;
+  transition: all 0.3s ease;
+  display: block;
+   
+      margin: 0.5rem auto;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 1rem;
+}
 
 
 
@@ -2761,4 +2775,14 @@ body.dark .entry-card.has-note::after {
 
 .hidden {
   display: none;
+}
+
+#personChartOptions label {
+  display: block;
+  margin: 4px 0;
+  cursor: pointer;
+}
+
+#personChartOptions input[type="checkbox"] {
+  margin-right: 6px;
 }
