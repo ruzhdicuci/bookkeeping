@@ -2580,14 +2580,18 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-
 let inactivityTimer;
+let logoutCountdownTimer;
+let countdown = 10;
 
 // 👣 Reset timer on activity
 function resetInactivityTimer() {
   clearTimeout(inactivityTimer);
+  clearInterval(logoutCountdownTimer);
+  document.getElementById('inactivityModal')?.classList.add('hidden');
+
   inactivityTimer = setTimeout(() => {
-    logoutDueToInactivity();
+    showInactivityModal();
   }, 60 * 1000); // 1 minute
 }
 
@@ -2596,16 +2600,42 @@ function resetInactivityTimer() {
   document.addEventListener(evt, resetInactivityTimer, false);
 });
 
-// 🔐 Logout function
+// 🚨 Custom modal with countdown
+function showInactivityModal() {
+  countdown = 10;
+  const modal = document.getElementById('inactivityModal');
+  const countdownSpan = document.getElementById('countdown');
+  modal.classList.remove('hidden');
+  countdownSpan.textContent = countdown;
+
+  logoutCountdownTimer = setInterval(() => {
+    countdown--;
+    countdownSpan.textContent = countdown;
+
+    if (countdown <= 0) {
+      clearInterval(logoutCountdownTimer);
+      logoutDueToInactivity();
+    }
+  }, 1000);
+}
+
+// 🟢 User clicked Continue
+document.getElementById('continueSessionBtn')?.addEventListener('click', () => {
+  clearInterval(logoutCountdownTimer);
+  document.getElementById('inactivityModal')?.classList.add('hidden');
+  resetInactivityTimer();
+});
+
+// 🔐 Actual logout function
 function logoutDueToInactivity() {
   localStorage.removeItem('token');
-  alert("⚠️ You were logged out due to inactivity.");
   window.location.href = 'login.html';
 }
 
-// ✅ Start the timer initially
+// ✅ Start timer initially
 resetInactivityTimer();
 
+// 🧪 Optional: redirect if no token at page load
 function redirectIfNotLoggedIn() {
   if (!localStorage.getItem('token')) {
     window.location.href = 'login.html';

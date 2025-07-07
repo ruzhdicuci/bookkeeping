@@ -2721,14 +2721,15 @@ border: none;
   border-top-right-radius: 10px;
 }
 
-.dark .entry-card.has-note::after {
+body.dark .entry-card.has-note::after {
  border-top: 16px solid rgb(255, 255, 255); /* triangle color */
   border-left: 16px solid transparent;
   }
 
-#inactivityOkBtn {
+
+#continueSessionBtn {
   margin-top: 1em;
-  padding: 0.5em 1.5em;
+  padding: 0.5em 1.2em;
   background-color: #333;
   color: white;
   border: none;
