@@ -1,5 +1,5 @@
-const DEBUG_MODE = true; // set to true during dev
-const debug = (...args) => DEBUG_MODE && console.log(...args);
+const DEBUG_MODE = false; // set to true during dev
+const debug = (...args) => DEBUG_MODE && debug(...args);
 
 import {
   db,
@@ -463,8 +463,8 @@ function getLabelRank(label) {
   return ranks[label] || 9999;
 }
 
-function renderEntries(entryList = window.entries || []) {
-  const entries = entryList;
+function renderEntries() {
+  const entries = window.entries || [];
   const dateSearch = document.getElementById('dateSearch')?.value.trim();
   const descSearch = document.getElementById('descSearch')?.value.trim();
   const amountSearch = document.getElementById('amountSearch')?.value.trim();
@@ -559,12 +559,8 @@ function renderEntries(entryList = window.entries || []) {
 
       const card = document.createElement('div');
     card.className = 'entry-card';
-
-if (e.note) {
-  console.log("📝 Entry with note:", e._id, e.note); // ✅ Debug line
-  card.classList.add('has-note');
-}
- card.dataset.id = e._id;
+if (e.note) card.classList.add('has-note');
+      card.dataset.id = e._id;
 
       const isEditing = document.getElementById('entryForm')?.dataset.editId === e._id;
       if (isEditing) card.classList.add('editing-row');
@@ -2505,7 +2501,7 @@ document.getElementById('saveNoteBtn').addEventListener('click', async () => {
     console.warn('❌ Failed to sync note to backend:', err);
   }
 
-  toast('Note saved');
+  toast('💾 Note saved');
   document.getElementById('entryNoteModal').classList.add('hidden');
   currentNoteEntryId = null; // ✅ Clear it
 });
