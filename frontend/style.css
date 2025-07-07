@@ -2575,7 +2575,7 @@ padding: 4px 6px;
 
 @media (max-width: 600px) {
   #customizeSidebar {
-  height: 240px;
+  height: 270px;
     font-size: 14px;
   
   }
@@ -2777,12 +2777,23 @@ body.dark .entry-card.has-note::after {
   display: none;
 }
 
-#personChartOptions label {
-  display: block;
-  margin: 4px 0;
-  cursor: pointer;
+#personChartOptions {
+  display: flex;
+  flex-direction: column;
+  background: #3a3838;
+  color: white;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  border: 1px solid #3f3c3c;
+  padding: 10px;
+  z-index: 999;
+  min-width: 160px;
 }
 
-#personChartOptions input[type="checkbox"] {
-  margin-right: 6px;
+#personChartOptions div {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 0;
 }

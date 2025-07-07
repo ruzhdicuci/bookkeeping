@@ -1,4 +1,4 @@
-const DEBUG_MODE = false; // set to true during dev
+const DEBUG_MODE = true; // set to true during dev
 const debug = (...args) => DEBUG_MODE && console.log(...args);
 
 import {
@@ -206,34 +206,50 @@ async function loadInitialBankBalances() {
   }
 
 
-
-
+  
 function populatePersonDropdownForCharts(persons) {
   const container = document.getElementById('personChartOptions');
-  if (!container) return;
+  if (!container) {
+    console.warn("⚠️ #personChartOptions not found.");
+    return;
+  }
 
   const excluded = ['Transfer', 'Balance'];
   const filteredPersons = persons.filter(p => !excluded.includes(p));
 
-  const labels = filteredPersons.map(p => `
-    <div>
-      <label>
-        <input type="checkbox" class="chartPersonFilter" value="${p}" checked onchange="drawCharts()" />
-        ${p}
-      </label>
-    </div>
-  `).join('');
-
+  // Inject checkboxes
   container.innerHTML = `
     <div>
-      <label>
-        <input type="checkbox" value="All" onchange="toggleAllChartPersons(this)" checked />
-        <strong>All</strong>
-      </label>
+      <input type="checkbox" id="chartAll" value="All" checked />
+      <label for="chartAll"><strong>All</strong></label>
     </div>
-    <hr style="margin: 8px 0;">
-    ${labels}
+    <hr style="margin: 6px 0;">
+    ${filteredPersons.map((p, i) => `
+      <div>
+        <input type="checkbox" id="chartPerson_${i}" class="chartPersonFilter" value="${p}" checked />
+        <label for="chartPerson_${i}">${p}</label>
+      </div>
+    `).join('')}
   `;
+
+  // ✅ ADD THESE EVENT LISTENERS AFTER THE ELEMENTS EXIST:
+
+  const allCheckbox = document.getElementById('chartAll');
+  const personCheckboxes = container.querySelectorAll('.chartPersonFilter');
+
+  allCheckbox.addEventListener('change', () => {
+    const checked = allCheckbox.checked;
+    personCheckboxes.forEach(cb => cb.checked = checked);
+    drawCharts();
+  });
+
+  personCheckboxes.forEach(cb => {
+    cb.addEventListener('change', () => {
+      const allChecked = Array.from(personCheckboxes).every(cb => cb.checked);
+      allCheckbox.checked = allChecked;
+      drawCharts();
+    });
+  });
 }
 
 function toggleAllChartPersons(masterCheckbox) {
@@ -387,7 +403,7 @@ function populateFilters() {
 
   // ✅ Save persons for chart dropdown
   window.persons = persons;
-  populatePersonDropdownForCharts(window.persons);
+    //  populatePersonDropdownForCharts(window.persons);
 
   const filterPerson = document.getElementById('filterPerson');
   if (filterPerson && !filterPerson.dataset.listenerAttached) {
@@ -2589,9 +2605,11 @@ window.showUserManagerModal = showUserManagerModal;
 window.deleteUser = deleteUser;
 window.openEntryNoteModal  = openEntryNoteModal;
 window.fetchEntriesAndSyncToDexie  = fetchEntriesAndSyncToDexie;
-window.toggleAllChartPersons  = toggleAllChartPersons
-window.toggleAllPersons = toggleAllPersons
-window.toggleChartPersonDropdown = toggleChartPersonDropdown
+window.toggleAllChartPersons  = toggleAllChartPersons;
+window.toggleAllPersons = toggleAllPersons;
+window.toggleChartPersonDropdown = toggleChartPersonDropdown;
+window.drawCharts = drawCharts;
+
 
 document.addEventListener('DOMContentLoaded', () => {
   const themeSelect = document.getElementById('dropbtn');
@@ -2668,3 +2686,5 @@ function redirectIfNotLoggedIn() {
     window.location.href = 'login.html';
   }
 }
+
+

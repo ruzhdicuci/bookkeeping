@@ -200,8 +200,8 @@ Kredit Limits
     <option value="line">Line</option>
   </select>
 
-<div id="personChartDropdownWrapper">
-  <button onclick="toggleChartPersonDropdown()">👤 Persons</button>
+<div id="personChartDropdownWrapper" style="position: relative;">
+  <button onclick="toggleChartPersonDropdown()">Persons</button>
   <div id="personChartOptions" style="display: none;"></div>
 </div>
 
@@ -618,7 +618,8 @@ const persons = window.persons || [];
   .filter(cb => cb.checked)
   .map(cb => cb.value);
 
-const isAllSelected = selectedPersons.includes('All');
+const allCheckbox = document.getElementById('chartAll');
+const isAllSelected = allCheckbox?.checked;
   const entries = window.entries || [];
 
   console.log("📦 Entries before filtering:", entries.length, entries);
@@ -960,7 +961,7 @@ if (ctx4) {
     }
   });
 }
-populatePersonDropdownForCharts(persons);
+
 } // ←✅ THIS is the real end of drawCharts()
 
 
@@ -1134,6 +1135,17 @@ function openTab(tabId, btn) {
 
 
 <div id="toast" class="toast"></div>
+
+<script>
+ window.addEventListener('DOMContentLoaded', () => {
+  const persons = window.persons || []; // or however you load persons
+  if (persons.length > 0) {
+    populatePersonDropdownForCharts(persons);
+  } else {
+    console.warn("⚠️ No persons found to populate chart dropdown.");
+  }
+});
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
