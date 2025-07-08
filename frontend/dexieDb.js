@@ -276,9 +276,13 @@ export async function getYearlyLimitFromCache(userId, year) {
 
 export async function getUnsyncedYearlyLimits() {
   try {
-    const unsynced = await db.yearlyLimits.where('synced').equals(false).toArray();
-    console.log("📦 Unsynced yearly limits:", unsynced);
-    return unsynced;
+    const results = await db.yearlyLimits
+      .where('synced')
+      .equals(false)
+      .toArray();
+
+    console.log("📦 Unsynced yearly limits:", results);
+    return results;
   } catch (err) {
     console.error("❌ Failed to get unsynced yearly limits:", err);
     return [];
@@ -301,6 +305,9 @@ export {
   syncCustomCardsToMongo,
   loadCustomCardsFromMongo,
   getUnsyncedCustomCards,
+  getUnsyncedYearlyLimits,
+  saveYearlyLimitLocally,
+  getYearlyLimitFromCache,   // ✅ Add this
   safeDexieWrite,
   fetchAndCacheEntries
 };

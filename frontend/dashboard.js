@@ -13,6 +13,7 @@ import {
   syncCustomCardsToMongo,
   loadCustomCardsFromMongo,
   getUnsyncedCustomCards,    // ✅ Add this here too
+  getYearlyLimitFromCache,
   saveYearlyLimitLocally,
   getUnsyncedYearlyLimits // ✅ ADD THIS
 } from './dexieDb.js';
