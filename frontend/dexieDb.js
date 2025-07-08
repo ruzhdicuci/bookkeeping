@@ -276,13 +276,13 @@ export async function getYearlyLimitFromCache(userId, year) {
 
 export async function getUnsyncedYearlyLimits() {
   try {
-    const results = await db.yearlyLimits
-      .where('synced')
-      .equals(false)
-      .toArray();
+    const all = await db.yearlyLimits.toArray();
+    console.log("📦 All yearly limits:", all);
 
-    console.log("📦 Unsynced yearly limits:", results);
-    return results;
+    const unsynced = all.filter(item => item.synced === false);
+    console.log("📤 Unsynced yearly limits:", unsynced);
+
+    return unsynced;
   } catch (err) {
     console.error("❌ Failed to get unsynced yearly limits:", err);
     return [];
