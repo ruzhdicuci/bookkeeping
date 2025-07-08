@@ -2799,7 +2799,7 @@ body.dark .entry-card.has-note::after {
 }
 
 
-@media (max-width: 400px) {
+@media (max-width: 500px) {
   #yearlyBudgetContainer {
     font-size: 14px;
   }
