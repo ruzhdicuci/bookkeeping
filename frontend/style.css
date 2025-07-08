@@ -2612,6 +2612,9 @@ padding: 4px 6px;
      --primary-color: #e3e0db;
   --border-color:#e3e0db;
    --date-color:  #2b79cc;
+      --left-color: #d541c1;
+        --limit-color: #27a789;
+          --spent-color: blue;
  }
 
 .theme-ocean {
@@ -2622,7 +2625,9 @@ padding: 4px 6px;
   --link-color: white; /* ✅ Always white in default */
        --border-color: #00acc1;
          --date-color: #ffffff; /* white for dark backgrounds */
-
+      --left-color: white; 
+        --limit-color: white; 
+          --spent-color: white; 
 }
 
 .theme-sunset {
@@ -2632,7 +2637,9 @@ padding: 4px 6px;
  --link-color: white; /* ✅ Always white in default */
   --border-color: #ff7043;
   --date-color: #ffffff; /* white for dark backgrounds */
-
+ --left-color: white; 
+        --limit-color: white; 
+          --spent-color: white; 
 }
 
 .theme-forest {
@@ -2643,7 +2650,9 @@ padding: 4px 6px;
  --link-color: white; /* ✅ Always white in default */
    --border-color: #56c55c;
      --date-color: #ffffff; /* white for dark backgrounds */
-
+ --left-color: white; 
+        --limit-color: white; 
+          --spent-color: white; 
 }
 
 .theme-mono-dark {
@@ -2653,7 +2662,9 @@ padding: 4px 6px;
    --link-color: white; /* ✅ Always white in default */
  --border-color:  #444;
    --date-color: #ffffff; /* white for dark backgrounds */
-
+ --left-color: white; 
+        --limit-color: white; 
+          --spent-color: white; 
 }
 
 body {
@@ -2688,13 +2699,13 @@ body {
 
 
 #yearlyLeftLabel {
-  color: var(--date-color);
+  color: var(--left-color);
 }
 #yearlyLimitLabel {
-  color: var(--date-color);
+  color: var(--limit-color);
 }
 #yearlySpentLabel {
-  color: var(--date-color);
+  color: var(--spent-color);
 }
 
 .entry-date-label.special-label {

@@ -241,7 +241,7 @@ async function fetchAndCacheEntries() {
 }
 
 
-export async function saveYearlyLimitLocally({ userId, year, limit }) {
+async function saveYearlyLimitLocally({ userId, year, limit }) {
   if (!userId || !year) {
     console.warn("❗ Invalid userId or year:", userId, year);
     return;
@@ -265,7 +265,7 @@ export async function saveYearlyLimitLocally({ userId, year, limit }) {
   }
 }
 
-export async function getYearlyLimitFromCache(userId, year) {
+async function getYearlyLimitFromCache(userId, year) {
   try {
     return await db.yearlyLimits.get([userId, year]);
   } catch (err) {
@@ -274,7 +274,7 @@ export async function getYearlyLimitFromCache(userId, year) {
   }
 }
 
-export async function getUnsyncedYearlyLimits() {
+async function getUnsyncedYearlyLimits() {
   try {
     const all = await db.yearlyLimits.toArray();
     console.log("📦 All yearly limits:", all);
@@ -306,7 +306,10 @@ export {
   loadCustomCardsFromMongo,
   getUnsyncedCustomCards,
   safeDexieWrite,
-  fetchAndCacheEntries
+  fetchAndCacheEntries,
+    saveYearlyLimitLocally,
+  getYearlyLimitFromCache,
+  getUnsyncedYearlyLimits
 };
 
 window.db = db; // ✅ For debugging
