@@ -17,6 +17,8 @@ db.version(305).stores({
   yearlyLimits: '[userId+year], synced, year, limit, lastUpdated' // <- add 'synced' as an index
 });
 
+// 🧪 Add this right after defining the stores
+console.log("📚 yearlyLimits schema:", db.yearlyLimits.schema.primKey, db.yearlyLimits.schema.indexes);
 
 // ✅ Universal Dexie write fallback handler
 async function safeDexieWrite(fn, fallbackMessage = "⚠️ Offline cache issue. Reloading...") {
