@@ -2788,13 +2788,15 @@ async function syncYearlyLimitsToMongo() {
 
     if (!unsynced.length) return;
 
+    const { year, limit } = unsynced[0]; // 👈 Extract only what the backend expects
+
     const res = await fetch(`${backend}/api/yearly-limit`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`
       },
-      body: JSON.stringify(unsynced[0])
+      body: JSON.stringify({ year, limit }) // ✅ No userId here!
     });
 
     const result = await res.text();
@@ -2802,7 +2804,7 @@ async function syncYearlyLimitsToMongo() {
 
     if (!res.ok) throw new Error(result);
 
-    await db.yearlyLimits.update([unsynced[0].userId, unsynced[0].year], { synced: true });
+    await db.yearlyLimits.update([unsynced[0].userId, year], { synced: true });
     console.log("✅ Yearly limit synced to MongoDB");
   } catch (err) {
     console.error("❌ Failed to sync yearly limit:", err);
