@@ -14,7 +14,7 @@ db.version(303).stores({
   notes: '_id, title, content, done, synced, lastUpdated',
   balances: 'bank',
   customCards: '_id,name,limit,synced,lastUpdated',
-  yearlyLimits: '[userId+year], year, limit, synced, lastUpdated'
+  yearlyLimits: '[userId+year], userId, year, synced, lastUpdated'
 });
 
 
@@ -271,13 +271,15 @@ export async function getYearlyLimitFromCache(userId, year) {
 
 export async function getUnsyncedYearlyLimits() {
   try {
-    return await db.yearlyLimits.where('synced').equals(false).toArray();
+    return await db.yearlyLimits
+      .where('synced')
+      .equals(false)
+      .toArray();
   } catch (err) {
     console.error("❌ Failed to get unsynced yearly limits:", err);
     return [];
   }
 }
-
 
 // ✅ Export all at once
 export {
