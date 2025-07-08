@@ -438,7 +438,8 @@ totalsContainer.appendChild(summaryCard);
  
 <div id="yearlyBudgetContainer" style=" margin-top: 1px; margin-bottom: 5px;">
   <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
-    <button id="setbtn" onclick="updateYearlyBudgetBar(parseFloat(document.getElementById('yearlyLimitInput').value))">Set</button>
+   
+    <button id="setbtn" onclick="setYearlyLimit()">Set</button>
     <input type="number" id="yearlyLimitInput" value="10000" style="width: 90px;">
     <span id="yearlySpentLabel" style="color: red; font-weight: bold;">45'866.82</span>
     <span id="yearlyLeftLabel" style="margin: 0 auto; color: #4eb269; font-weight: bold;">54'133.18</span>

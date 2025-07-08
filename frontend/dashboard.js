@@ -2638,7 +2638,7 @@ window.drawCharts = drawCharts;
 window.updateYearlyBudgetBar = updateYearlyBudgetBar;
 window.syncYearlyLimitsToMongo  =syncYearlyLimitsToMongo;
 window.loadAndRenderYearlyLimit  = loadAndRenderYearlyLimit;
-
+window.setYearlyLimit = setYearlyLimit;
 
 document.addEventListener('DOMContentLoaded', () => {
   const themeSelect = document.getElementById('dropbtn');
@@ -2715,6 +2715,30 @@ function redirectIfNotLoggedIn() {
     window.location.href = 'login.html';
   }
 }
+
+
+async function setYearlyLimit() {
+  const limit = parseFloat(document.getElementById('yearlyLimitInput').value);
+  const year = new Date().getFullYear().toString();
+  const userId = localStorage.getItem('userId');
+
+  if (!limit || isNaN(limit)) {
+    alert("Invalid limit value");
+    return;
+  }
+
+  console.log("📤 Saving limit:", limit, "for year", year);
+
+  // Save locally to Dexie
+  await saveYearlyLimitLocally({ userId, year, limit, synced: false, lastUpdated: Date.now() });
+
+  // Update the progress bar UI
+  updateYearlyBudgetBar(limit);
+
+  // Try to sync to backend
+  await syncYearlyLimitsToMongo();
+}
+
 
 
 function updateYearlyBudgetBar(limit) {
