@@ -243,6 +243,7 @@ export async function saveYearlyLimitLocally({ userId, year, limit }) {
   try {
     if (!userId || !year) {
       console.warn("❗ Invalid userId or year:", userId, year);
+      return;
     }
 
     await db.yearlyLimits.put({
@@ -252,6 +253,8 @@ export async function saveYearlyLimitLocally({ userId, year, limit }) {
       synced: navigator.onLine,
       lastUpdated: Date.now()
     });
+
+    console.log("✅ Yearly limit saved:", { userId, year, limit });
   } catch (err) {
     console.error("❌ Failed to save yearly limit in Dexie:", err);
   }

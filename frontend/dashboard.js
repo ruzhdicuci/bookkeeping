@@ -2720,28 +2720,39 @@ function redirectIfNotLoggedIn() {
 }
 
 
+function getUserIdFromToken() {
+  try {
+    const token = localStorage.getItem('token');
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.id;
+  } catch (err) {
+    console.warn("⚠️ Failed to decode token:", err);
+    return null;
+  }
+}
+
 async function setYearlyLimit() {
   const limit = parseFloat(document.getElementById('yearlyLimitInput').value);
-  const year = new Date().getFullYear().toString();
-  const userId = localStorage.getItem('userId');
+  const year = new Date().getFullYear(); // ✅ use number
+  const userId = getUserIdFromToken();   // ✅ extract from token
 
-  if (!limit || isNaN(limit)) {
-    alert("Invalid limit value");
+  if (!userId || isNaN(limit)) {
+    alert("❌ Invalid user or limit");
+    console.warn("userId:", userId, "limit:", limit, "year:", year);
     return;
   }
 
-  console.log("📤 Saving limit:", limit, "for year", year);
+  console.log("📤 Saving limit:", limit, "for year", year, "userId:", userId);
 
-  // Save locally to Dexie
-  await saveYearlyLimitLocally({ userId, year, limit, synced: false, lastUpdated: Date.now() });
+  // ✅ Save to Dexie
+  await saveYearlyLimitLocally({ userId, year, limit });
 
-  // Update the progress bar UI
+  // ✅ Update UI
   updateYearlyBudgetBar(limit);
 
-  // Try to sync to backend
+  // ✅ Sync with backend
   await syncYearlyLimitsToMongo();
 }
-
 
 
 function updateYearlyBudgetBar(limit) {
