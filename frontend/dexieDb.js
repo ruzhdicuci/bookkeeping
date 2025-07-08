@@ -241,6 +241,10 @@ async function fetchAndCacheEntries() {
 
 export async function saveYearlyLimitLocally({ userId, year, limit }) {
   try {
+    if (!userId || !year) {
+      console.warn("❗ Invalid userId or year:", userId, year);
+    }
+
     await db.yearlyLimits.put({
       userId,
       year,
