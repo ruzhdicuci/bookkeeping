@@ -2427,7 +2427,7 @@ margin-top: -20px;
   transform: translateX(-100%);
   position: absolute; /* or fixed */
   top: 50px; /* adjust based on your header height */
-  left: 50px;
+
   height: 300px;
   width: 130px;
 color: white;
