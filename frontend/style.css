@@ -2676,6 +2676,26 @@ body {
    border: 1px solid  var( --border-color);
 }
 
+.body .dark #yearlySpentLabel {
+ color: white;
+}
+.body .dark #yearlyLeftLabel {
+ color: white;
+}
+.body .dark #yearlyLimitLabel {
+ color: white;
+}
+
+
+#yearlyLeftLabel {
+  color: var(--date-color);
+}
+#yearlyLimitLabel {
+  color: var(--date-color);
+}
+#yearlySpentLabel {
+  color: var(--date-color);
+}
 
 .entry-date-label.special-label {
   color: var(--date-color);
@@ -2804,7 +2824,7 @@ body.dark .entry-card.has-note::after {
  #yearlyBudgetContainer input {
 margin-bottom: -5px;
   border-radius: 6px;
-padding-top: 4px;
+padding-top: 6px;
 padding-bottom: 4px;
  font-size: 0.8rem;
   font-weight: bold;
