@@ -307,7 +307,6 @@ export {
   getUnsyncedCustomCards,
   getUnsyncedYearlyLimits,
   saveYearlyLimitLocally,
-  getYearlyLimitFromCache,   // ✅ Add this
   safeDexieWrite,
   fetchAndCacheEntries
 };
