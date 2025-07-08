@@ -2640,6 +2640,7 @@ window.syncYearlyLimitsToMongo  =syncYearlyLimitsToMongo;
 window.loadAndRenderYearlyLimit  = loadAndRenderYearlyLimit;
 window.setYearlyLimit = setYearlyLimit;
 
+
 document.addEventListener('DOMContentLoaded', () => {
   const themeSelect = document.getElementById('dropbtn');
   const saved = localStorage.getItem('theme') || 'theme-default';
