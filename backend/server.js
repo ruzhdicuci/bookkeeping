@@ -37,6 +37,12 @@ mongoose.connect(MONGO_URI, {
   console.error('❌ MongoDB initial connection error:', err);
 });
 
+let db;
+mongoose.connection.once('open', () => {
+  db = mongoose.connection.db;
+  console.log('📦 Raw MongoDB connection ready');
+});
+
 const app = express();
 const allowedOrigins = [
   'https://we-search.ch',
@@ -347,20 +353,22 @@ app.post('/api/limits', auth, async (req, res) => {
 
 app.get('/api/yearly-limit', authMiddleware, async (req, res) => {
   const year = req.query.year || new Date().getFullYear().toString();
-  const result = await db.collection('yearlyLimits').findOne({ userId: req.user.id, year });
+  const result = await db.collection('yearlyLimits').findOne({
+    userId: req.user.userId,
+    year
+  });
   res.json(result || { limit: 0 });
 });
 
 app.post('/api/yearly-limit', authMiddleware, async (req, res) => {
   const { year, limit } = req.body;
   await db.collection('yearlyLimits').updateOne(
-    { userId: req.user.id, year },
+    { userId: req.user.userId, year },
     { $set: { limit, lastUpdated: Date.now() } },
     { upsert: true }
   );
   res.json({ success: true });
 });
-
 
 
 app.patch('/api/entries/:id', auth, async (req, res) => {
