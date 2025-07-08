@@ -2666,7 +2666,7 @@ function resetInactivityTimer() {
 
   inactivityTimer = setTimeout(() => {
     showInactivityModal();
-  }, 600 * 1000); // 1 minute
+  }, 180 * 1000); // 1 minute
 }
 
 // ⏱️ Watch for any user activity
