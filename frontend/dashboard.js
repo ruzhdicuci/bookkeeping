@@ -2640,7 +2640,7 @@ window.drawCharts = drawCharts;
 window.updateYearlyBudgetBar = updateYearlyBudgetBar;
 window.syncYearlyLimitsToMongo  =syncYearlyLimitsToMongo;
 window.loadAndRenderYearlyLimit  = loadAndRenderYearlyLimit;
-window.setYearlyLimit = setYearlyLimit;
+
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -2753,7 +2753,7 @@ async function setYearlyLimit() {
   // ✅ Sync with backend
   await syncYearlyLimitsToMongo();
 }
-
+window.setYearlyLimit = setYearlyLimit;
 
 function updateYearlyBudgetBar(limit) {
   if (!limit || isNaN(limit)) {
