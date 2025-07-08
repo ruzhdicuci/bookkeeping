@@ -437,20 +437,24 @@ totalsContainer.appendChild(summaryCard);
  <div class="filter-grid">
  
 <div id="yearlyBudgetContainer" style=" margin-top: 1px; margin-bottom: 5px;">
-  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+  <div style="display: flex; align-items: center; gap: 10px; ">
    
-    <button id="setbtn" onclick="setYearlyLimit()">Set</button>
-    <input type="number" id="yearlyLimitInput" value="10000" style="width: 90px;">
+    
     <span id="yearlySpentLabel" style="color: #d541c1; font-weight: bold;">45'866.82</span>
     <span id="yearlyLeftLabel" style="margin: 0 auto; color: #27a789; font-weight: bold;">54'133.18</span>
     <span style="color: blue; font-weight: bold;"><span id="yearlyLimitLabel">100'000.00</span></span>
   </div>
 
-  <div style="position: relative; margin-top: 10px; background: #ffffff; height: 14px; border-radius: 7px; overflow: hidden;">
-    <div id="yearlyProgressFill" style="height: 100%; width: 0%; background: #27a789;"></div>
-  </div>
+  <div style="position: relative; margin-top: 10px; margin-bottom: 10px; background: #ffffff; height: 14px; border-radius: 7px; overflow: hidden;">
+    <div id="yearlyProgressFill" style="height: 100%; width: 0%; background: #27a789; "></div>
+  </div >
+  <button id="setbtn" onclick="setYearlyLimit()">Set Limit</button>
+    <input type="number" id="yearlyLimitInput" value="10000" style="width: 90px; ">
 </div>
+
 </div>
+
+   
 
  <div id="multiselectSection">
   <div class="tabs-wrapper" style="margin-top: -1px; margin-bottom: -3px;">
