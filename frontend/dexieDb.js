@@ -265,17 +265,22 @@ async function saveYearlyLimitLocally({ userId, year, limit }) {
   }
 }
 
+
+
 async function getYearlyLimitFromCache(userId, year) {
   try {
-    return await db.yearlyLimits.get([userId, year.toString()]); // ✅ Force to string
+    await db.open(); // ✅ Make sure DB is ready
+    return await db.yearlyLimits.get([userId, year.toString()]);
   } catch (err) {
     console.error("❌ Failed to load yearly limit from Dexie:", err);
     return null;
   }
 }
 
+
 async function getUnsyncedYearlyLimits() {
   try {
+    await db.open(); // ✅ Ensure DB is open before reading
     const all = await db.yearlyLimits.toArray();
     console.log("📦 All yearly limits:", all);
 

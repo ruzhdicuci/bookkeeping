@@ -2819,7 +2819,10 @@ async function syncYearlyLimitsToMongo() {
 
 
 async function loadAndRenderYearlyLimit() {
- const year = new Date().getFullYear().toString();
+  await db.open(); // ✅ Ensure Dexie is ready
+  await new Promise(r => setTimeout(r, 300)); // 🐢 Optional: give time to fully initialize
+
+  const year = new Date().getFullYear().toString(); // ✅ Already good
   const userId = getUserIdFromToken();
 
   console.log("🔄 Loading yearly limit for:", userId, year);
@@ -2830,30 +2833,29 @@ async function loadAndRenderYearlyLimit() {
   if (localLimit) {
     document.getElementById('yearlyLimitInput').value = localLimit.limit;
     updateYearlyBudgetBar(localLimit.limit);
-} else {
-  console.log("🌐 Fetching limit from server...");
-  try {
-    const res = await fetch(`${backend}/api/yearly-limit?year=${year}`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
-    });
+  } else {
+    console.log("🌐 Fetching limit from server...");
+    try {
+      const res = await fetch(`${backend}/api/yearly-limit?year=${year}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
 
-    if (!res.ok) throw new Error(await res.text());
+      if (!res.ok) throw new Error(await res.text());
 
-    const data = await res.json();
-    console.log("✅ Server responded with:", data);
+      const data = await res.json();
+      console.log("✅ Server responded with:", data);
 
-    await saveYearlyLimitLocally({ userId, year, limit: data.limit });
+      await saveYearlyLimitLocally({ userId, year, limit: data.limit });
 
-    // ✅ Add this line
-    document.getElementById('yearlyLimitInput').value = data.limit;
-
-    updateYearlyBudgetBar(data.limit);
-  } catch (err) {
-    console.error("❌ Error loading yearly limit from server:", err);
+      // ✅ Display the server-fetched limit immediately
+      document.getElementById('yearlyLimitInput').value = data.limit;
+      updateYearlyBudgetBar(data.limit);
+    } catch (err) {
+      console.error("❌ Error loading yearly limit from server:", err);
+    }
   }
-}
 }
 
 window.addEventListener('DOMContentLoaded', async () => {

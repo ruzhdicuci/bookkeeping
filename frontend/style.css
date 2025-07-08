@@ -2833,9 +2833,9 @@ body.dark .entry-card.has-note::after {
 
 
  #yearlyBudgetContainer input {
-margin-bottom: -5px;
+
   border-radius: 6px;
-padding-top: 6px;
+padding-top: 4px;
 padding-bottom: 4px;
  font-size: 0.8rem;
   font-weight: bold;
@@ -2844,13 +2844,12 @@ padding-bottom: 4px;
 
 #setbtn{
   background-color: #fdf6de;
-  border: 1px solid transparent;
+  border: none;
   border-radius: 6px;
-  
+  width: 100px;
   color: orangered;
-padding-top: 8px;
-padding-bottom: 6px;
-    margin-bottom: -5px;
+height:24px;
+
   font-size: 0.7rem;
   font-weight: bold;
  
