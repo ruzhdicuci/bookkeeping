@@ -242,21 +242,24 @@ async function fetchAndCacheEntries() {
 
 
 export async function saveYearlyLimitLocally({ userId, year, limit }) {
+  if (!userId || !year) {
+    console.warn("❗ Invalid userId or year:", userId, year);
+    return;
+  }
+
+  const item = {
+    userId,
+    year,
+    limit,
+    synced: false, // <- ✅ force false for testing
+    lastUpdated: Date.now()
+  };
+
+  console.log("💾 Saving to Dexie:", item);
+
   try {
-    if (!userId || !year) {
-      console.warn("❗ Invalid userId or year:", userId, year);
-      return;
-    }
-
-    await db.yearlyLimits.put({
-      userId,
-      year,
-      limit,
-      synced: navigator.onLine,
-      lastUpdated: Date.now()
-    });
-
-    console.log("✅ Yearly limit saved:", { userId, year, limit });
+    await db.yearlyLimits.put(item);
+    console.log("✅ Yearly limit saved:", item);
   } catch (err) {
     console.error("❌ Failed to save yearly limit in Dexie:", err);
   }
