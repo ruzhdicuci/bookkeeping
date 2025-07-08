@@ -270,11 +270,27 @@ export async function getYearlyLimitFromCache(userId, year) {
 }
 
 export async function getUnsyncedYearlyLimits() {
+  const token = localStorage.getItem('token');
+  if (!token) return [];
+
+  const payload = JSON.parse(atob(token.split('.')[1]));
+  const userId = payload.userId;
+  const year = new Date().getFullYear().toString();
+
+  if (!userId || !year) {
+    console.warn("❗ Invalid userId or year for Dexie query:", userId, year);
+    return [];
+  }
+
   try {
-    return await db.yearlyLimits
-      .where('synced')
-      .equals(false)
+    const limits = await db.yearlyLimits
+      .where('[userId+year]')
+      .equals([userId, year])
+      .and(limit => !limit.synced)
       .toArray();
+
+    console.log("📦 Unsynced yearly limits:", limits);
+    return limits;
   } catch (err) {
     console.error("❌ Failed to get unsynced yearly limits:", err);
     return [];
