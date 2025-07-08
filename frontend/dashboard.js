@@ -267,13 +267,21 @@ function toggleChartPersonDropdown() {
 
 async function loadPersons() {
   try {
-    const token = localStorage.getItem('token'); // Or however you're storing the token
+    const token = localStorage.getItem('token');
+    const API_BASE =
+      location.hostname === 'localhost'
+        ? 'http://localhost:3000'
+        : 'https://bookkeeping-i8e0.onrender.com'; // ✅ your actual backend
 
-    const res = await fetch('/api/persons', {
+    const res = await fetch(`${API_BASE}/api/persons`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
     });
+
+    if (!res.ok) {
+      throw new Error(`Server error: ${res.status}`);
+    }
 
     const persons = await res.json();
     window.persons = persons;
@@ -2658,7 +2666,7 @@ function resetInactivityTimer() {
 
   inactivityTimer = setTimeout(() => {
     showInactivityModal();
-  }, 60 * 1000); // 1 minute
+  }, 600 * 1000); // 1 minute
 }
 
 // ⏱️ Watch for any user activity
