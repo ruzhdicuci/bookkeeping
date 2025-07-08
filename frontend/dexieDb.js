@@ -20,6 +20,10 @@ db.version(306).stores({
 // 🧪 Add this right after defining the stores
 console.log("📚 yearlyLimits schema:", db.yearlyLimits.schema.primKey, db.yearlyLimits.schema.indexes);
 
+// ✅ OPEN and ensure ready
+await db.open(); // <-- ADD HERE
+await new Promise(r => setTimeout(r, 200)); // <-- AND HERE
+
 // ✅ Universal Dexie write fallback handler
 async function safeDexieWrite(fn, fallbackMessage = "⚠️ Offline cache issue. Reloading...") {
   try {

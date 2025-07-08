@@ -2819,10 +2819,7 @@ async function syncYearlyLimitsToMongo() {
 
 
 async function loadAndRenderYearlyLimit() {
-  await db.open(); // ✅ Ensure Dexie is ready
-  await new Promise(r => setTimeout(r, 300)); // 🐢 Optional: give time to fully initialize
-
-  const year = new Date().getFullYear().toString(); // ✅ Already good
+  const year = new Date().getFullYear().toString(); // ✅ Always string
   const userId = getUserIdFromToken();
 
   console.log("🔄 Loading yearly limit for:", userId, year);
@@ -2849,7 +2846,6 @@ async function loadAndRenderYearlyLimit() {
 
       await saveYearlyLimitLocally({ userId, year, limit: data.limit });
 
-      // ✅ Display the server-fetched limit immediately
       document.getElementById('yearlyLimitInput').value = data.limit;
       updateYearlyBudgetBar(data.limit);
     } catch (err) {
