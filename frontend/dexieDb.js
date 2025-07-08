@@ -305,7 +305,6 @@ export {
   syncCustomCardsToMongo,
   loadCustomCardsFromMongo,
   getUnsyncedCustomCards,
-  getUnsyncedYearlyLimits,
   safeDexieWrite,
   fetchAndCacheEntries
 };
