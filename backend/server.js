@@ -359,19 +359,34 @@ app.post('/api/limits', auth, async (req, res) => {
 // GET yearly limit
 app.get('/api/yearly-limit', auth, async (req, res) => {
   const year = req.query.year || new Date().getFullYear().toString();
-  const result = await YearlyLimit.findOne({ userId: req.user.userId, year });
-  res.json(result || { limit: 0 });
+  console.log(`📥 GET /api/yearly-limit for user ${req.user.userId}, year: ${year}`);
+  try {
+    const result = await YearlyLimit.findOne({ userId: req.user.userId, year });
+    console.log("📦 Found in DB:", result);
+    res.json(result || { limit: 0 });
+  } catch (err) {
+    console.error("❌ Error loading limit:", err);
+    res.status(500).json({ error: 'Server error loading yearly limit' });
+  }
 });
 
 // POST/Update yearly limit
 app.post('/api/yearly-limit', auth, async (req, res) => {
   const { year, limit } = req.body;
-  await YearlyLimit.findOneAndUpdate(
-    { userId: req.user.userId, year },
-    { $set: { limit, lastUpdated: Date.now() } },
-    { upsert: true }
-  );
-  res.json({ success: true });
+  console.log(`📥 POST /api/yearly-limit → user: ${req.user.userId}, year: ${year}, limit: ${limit}`);
+
+  try {
+    const result = await YearlyLimit.findOneAndUpdate(
+      { userId: req.user.userId, year },
+      { $set: { limit, lastUpdated: Date.now() } },
+      { upsert: true, new: true }
+    );
+    console.log("✅ Yearly limit saved:", result);
+    res.json({ success: true });
+  } catch (err) {
+    console.error("❌ Failed to save yearly limit:", err);
+    res.status(500).json({ error: 'Failed to save limit' });
+  }
 });
 
 

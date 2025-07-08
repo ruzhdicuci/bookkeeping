@@ -2745,6 +2745,9 @@ async function syncYearlyLimitsToMongo() {
   try {
     const token = localStorage.getItem('token');
     const unsynced = await getUnsyncedYearlyLimits();
+
+    console.log("📤 Trying to sync yearly limits:", unsynced);
+
     if (!unsynced.length) return;
 
     const res = await fetch(`${backend}/api/yearly-limit`, {
@@ -2753,10 +2756,13 @@ async function syncYearlyLimitsToMongo() {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`
       },
-      body: JSON.stringify(unsynced[0]) // you can batch send multiple if supported
+      body: JSON.stringify(unsynced[0])
     });
 
-    if (!res.ok) throw new Error(await res.text());
+    const result = await res.text();
+    console.log("🧾 Server responded:", result);
+
+    if (!res.ok) throw new Error(result);
 
     await db.yearlyLimits.update([unsynced[0].userId, unsynced[0].year], { synced: true });
     console.log("✅ Yearly limit synced to MongoDB");
@@ -2768,25 +2774,37 @@ async function syncYearlyLimitsToMongo() {
 
 async function loadAndRenderYearlyLimit() {
   const year = new Date().getFullYear();
-  const userId = localStorage.getItem('userId'); // Or however you store it
+  const userId = localStorage.getItem('userId');
+
+  console.log("🔄 Loading yearly limit for:", userId, year);
 
   const localLimit = await getYearlyLimitFromCache(userId, year);
+  console.log("💾 Local limit:", localLimit);
 
   if (localLimit) {
     document.getElementById('yearlyLimitInput').value = localLimit.limit;
     updateYearlyBudgetBar(localLimit.limit);
   } else {
-    const res = await fetch(`${backend}/api/yearly-limit?year=${year}`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
-    });
-    const data = await res.json();
-    await saveYearlyLimitLocally({ userId, year, limit: data.limit });
-    updateYearlyBudgetBar(data.limit);
+    console.log("🌐 Fetching limit from server...");
+    try {
+      const res = await fetch(`${backend}/api/yearly-limit?year=${year}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (!res.ok) throw new Error(await res.text());
+
+      const data = await res.json();
+      console.log("✅ Server responded with:", data);
+
+      await saveYearlyLimitLocally({ userId, year, limit: data.limit });
+      updateYearlyBudgetBar(data.limit);
+    } catch (err) {
+      console.error("❌ Error loading yearly limit from server:", err);
+    }
   }
 }
-
 
 window.addEventListener('DOMContentLoaded', async () => {
   if (!window.persons || window.persons.length === 0) {
