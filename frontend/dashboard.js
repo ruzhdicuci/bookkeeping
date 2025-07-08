@@ -2830,26 +2830,30 @@ async function loadAndRenderYearlyLimit() {
   if (localLimit) {
     document.getElementById('yearlyLimitInput').value = localLimit.limit;
     updateYearlyBudgetBar(localLimit.limit);
-  } else {
-    console.log("🌐 Fetching limit from server...");
-    try {
-      const res = await fetch(`${backend}/api/yearly-limit?year=${year}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
-      });
+} else {
+  console.log("🌐 Fetching limit from server...");
+  try {
+    const res = await fetch(`${backend}/api/yearly-limit?year=${year}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    });
 
-      if (!res.ok) throw new Error(await res.text());
+    if (!res.ok) throw new Error(await res.text());
 
-      const data = await res.json();
-      console.log("✅ Server responded with:", data);
+    const data = await res.json();
+    console.log("✅ Server responded with:", data);
 
-      await saveYearlyLimitLocally({ userId, year, limit: data.limit });
-      updateYearlyBudgetBar(data.limit);
-    } catch (err) {
-      console.error("❌ Error loading yearly limit from server:", err);
-    }
+    await saveYearlyLimitLocally({ userId, year, limit: data.limit });
+
+    // ✅ Add this line
+    document.getElementById('yearlyLimitInput').value = data.limit;
+
+    updateYearlyBudgetBar(data.limit);
+  } catch (err) {
+    console.error("❌ Error loading yearly limit from server:", err);
   }
+}
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
