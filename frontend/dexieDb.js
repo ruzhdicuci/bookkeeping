@@ -239,13 +239,18 @@ async function fetchAndCacheEntries() {
 }
 
 
-export async function saveYearlyLimitLocally(data) {
-  console.log("💾 Saving yearly limit to Dexie:", data);
-  await db.yearlyLimits.put({
-    ...data,
-    synced: false,
-    lastUpdated: Date.now()
-  });
+export async function saveYearlyLimitLocally({ userId, year, limit }) {
+  try {
+    await db.yearlyLimits.put({
+      userId,
+      year,
+      limit,
+      synced: navigator.onLine,
+      lastUpdated: Date.now()
+    });
+  } catch (err) {
+    console.error("❌ Failed to save yearly limit in Dexie:", err);
+  }
 }
 
 export async function getYearlyLimitFromCache(userId, year) {

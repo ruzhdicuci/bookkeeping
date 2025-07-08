@@ -12,7 +12,8 @@ import {
   getCachedCustomCards,
   syncCustomCardsToMongo,
   loadCustomCardsFromMongo,
-  getUnsyncedCustomCards    // ✅ Add this here too
+  getUnsyncedCustomCards,    // ✅ Add this here too
+  saveYearlyLimitLocally 
 } from './dexieDb.js';
 
 let entries = [];
