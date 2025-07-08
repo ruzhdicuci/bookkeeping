@@ -2819,7 +2819,7 @@ async function syncYearlyLimitsToMongo() {
 
 
 async function loadAndRenderYearlyLimit() {
-  const year = new Date().getFullYear();
+ const year = new Date().getFullYear().toString();
   const userId = getUserIdFromToken();
 
   console.log("🔄 Loading yearly limit for:", userId, year);

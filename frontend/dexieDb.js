@@ -249,9 +249,9 @@ async function saveYearlyLimitLocally({ userId, year, limit }) {
 
   const item = {
     userId,
-    year,
+    year: year.toString(), // ✅ Force to string
     limit,
-    synced: false, // <- ✅ force false for testing
+    synced: false,
     lastUpdated: Date.now()
   };
 
@@ -267,7 +267,7 @@ async function saveYearlyLimitLocally({ userId, year, limit }) {
 
 async function getYearlyLimitFromCache(userId, year) {
   try {
-    return await db.yearlyLimits.get([userId, year]);
+    return await db.yearlyLimits.get([userId, year.toString()]); // ✅ Force to string
   } catch (err) {
     console.error("❌ Failed to load yearly limit from Dexie:", err);
     return null;
