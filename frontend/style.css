@@ -2613,8 +2613,8 @@ padding: 4px 6px;
   --border-color:#e3e0db;
    --date-color:  #2b79cc;
       --spent-color: #d541c1;
-        --limit-color: #27a789;
-          --left-color: blue;
+        --left-color: #27a789;
+          --limit-color: blue;
  }
 
 .theme-ocean {
