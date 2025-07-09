@@ -2786,11 +2786,10 @@ function updateYearlyBudgetBar(limit) {
   const currentYear = new Date().getFullYear().toString();
 
   const expensesThisYear = entries
-    .filter(e =>
+.filter(e =>
   e.type === 'Expense' &&
   e.date?.startsWith(currentYear) &&
-  e.category !== 'Balance' &&
-  e.category !== 'Transfer'
+  !['balance', 'transfer'].includes((e.category || '').trim().toLowerCase())
 )
     .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
 
@@ -2881,11 +2880,10 @@ function updateFilteredBudgetBar(limit, filteredEntries) {
   const currentYear = new Date().getFullYear().toString();
 
   const filteredExpenses = filteredEntries
-   .filter(e =>
+.filter(e =>
   e.type === 'Expense' &&
   e.date?.startsWith(currentYear) &&
-  e.category !== 'Balance' &&
-  e.category !== 'Transfer'
+  !['balance', 'transfer'].includes((e.category || '').trim().toLowerCase())
 )
     .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
 
