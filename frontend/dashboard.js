@@ -2787,19 +2787,16 @@ function updateYearlyBudgetBar(limit) {
 
   const excluded = ['balance', 'transfer'];
 
-  const filteredExpenses = entries.filter(e => {
-    const category = (e.category || '').trim().toLowerCase();
-    const isExcluded = excluded.includes(category);
-    const isCurrentYear = e.date?.startsWith(currentYear);
-    const isExpense = (e.type || '').toLowerCase() === 'expense';
+const filteredExpenses = entries.filter(e => {
+  const type = (e.type || '').toLowerCase().trim();
+  const category = (e.category || '').toLowerCase().trim();
+  const isExcluded = ['balance', 'transfer'].includes(category);
+  const isCurrentYear = e.date?.startsWith(currentYear);
 
-    // 🧪 Debug each entry
-    if (isExpense && isCurrentYear) {
-      console.log(`🔍 [${category}] include=${!isExcluded}`, e);
-    }
+  console.log(`🔍 [${type}] [${category}] include=${!isExcluded && type === 'expense'}`, e);
 
-    return isExpense && isCurrentYear && !isExcluded;
-  });
+  return type === 'expense' && isCurrentYear && !isExcluded;
+});
 
   const total = filteredExpenses.reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
   const percent = Math.min((total / limit) * 100, 100);
@@ -2889,18 +2886,16 @@ function updateFilteredBudgetBar(limit, filteredEntries) {
   const currentYear = new Date().getFullYear().toString();
   const excluded = ['balance', 'transfer'];
 
-  const filteredExpenses = filteredEntries.filter(e => {
-    const category = (e.category || '').trim().toLowerCase();
-    const isExcluded = excluded.includes(category);
-    const isCurrentYear = e.date?.startsWith(currentYear);
-    const isExpense = (e.type || '').toLowerCase() === 'expense';
+const filteredExpenses = entries.filter(e => {
+  const type = (e.type || '').toLowerCase().trim();
+  const category = (e.category || '').toLowerCase().trim();
+  const isExcluded = ['balance', 'transfer'].includes(category);
+  const isCurrentYear = e.date?.startsWith(currentYear);
 
-    if (isExpense && isCurrentYear) {
-      console.log(`🔍 [filtered][${category}] include=${!isExcluded}`, e);
-    }
+  console.log(`🔍 [${type}] [${category}] include=${!isExcluded && type === 'expense'}`, e);
 
-    return isExpense && isCurrentYear && !isExcluded;
-  });
+  return type === 'expense' && isCurrentYear && !isExcluded;
+});
 
   const total = filteredExpenses.reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
   const percent = Math.min((total / limit) * 100, 100);
