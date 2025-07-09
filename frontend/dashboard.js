@@ -2795,7 +2795,7 @@ function updateFullYearBudgetBar(limit) {
       const isExcluded = excludedPersons.includes(person);
       const include = typeMatch && yearMatch && !isExcluded;
 
-      console.log('[YEARLY]', `[${e.type}]`, `[${person}]`, `include=${include}`, e);
+      debug('[YEARLY]', `[${e.type}]`, `[${person}]`, `include=${include}`, e);
 
       return include;
     })
@@ -2896,7 +2896,7 @@ function updateFilteredBudgetBar(limit, filteredEntries) {
       const isExcluded = excludedPersons.includes(person);
       const include = typeMatch && yearMatch && !isExcluded;
 
-      console.log('[FILTERED]', `[${e.type}]`, `[${person}]`, `include=${include}`, e);
+      debug('[FILTERED]', `[${e.type}]`, `[${person}]`, `include=${include}`, e);
 
       return include;
     })
