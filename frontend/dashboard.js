@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (selectAllBox) selectAllBox.disabled = disabled;
 
     if (!disabled) showToast("Person filters re-enabled");
-    renderEntries();
+    renderEntriesAndLimitBar();
   });
 
   // 4. Bank search input logic
@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     }
 
-    renderEntries();
+    renderEntriesAndLimitBar();
   });
 
   // ✅ Any other DOM-ready setup (scroll buttons, dropdowns, etc.) can go here
@@ -148,7 +148,7 @@ document.querySelectorAll('#monthOptions input[type="checkbox"]').forEach(cb => 
 // Person checkboxes
 document.addEventListener('change', (e) => {
   if (e.target.matches('#personOptions input[type="checkbox"]')) {
-    renderEntries();
+    renderEntriesAndLimitBar();
   }
 });
 window.entries = [];
@@ -190,6 +190,18 @@ async function loadInitialBankBalances() {
   renderBankBalanceForm(initialBankBalances);
 }
 
+function renderEntriesAndLimitBar() {
+  renderEntriesAndLimitBar();
+  refreshYearlyLimitBarFromInput();
+}
+
+function refreshYearlyLimitBarFromInput() {
+  const currentLimit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
+  if (!isNaN(currentLimit)) {
+    updateYearlyBudgetBar(currentLimit);
+  }
+}
+
 
  function populatePersonFilterForDashboard(persons) {
     const container = document.getElementById('personOptions');
@@ -213,7 +225,7 @@ async function loadInitialBankBalances() {
   function toggleAllPersons(masterCheckbox) {
     const checkboxes = document.querySelectorAll('#personOptions .personFilter');
     checkboxes.forEach(cb => cb.checked = masterCheckbox.checked);
-    renderEntries(); // Re-render dashboard entries
+    renderEntriesAndLimitBar(); // Re-render dashboard entries
   }
 
 
@@ -317,7 +329,7 @@ async function fetchEntries() {
     window.persons = [...new Set(window.entries.map(e => e.person).filter(Boolean))];
     debug("🧑‍🤝‍🧑 Found persons:", window.persons);
 
-    renderEntries();
+    renderEntriesAndLimitBar();
     populateNewEntryDropdowns();
     populateFilters();
     renderBankBalanceForm();
@@ -335,7 +347,7 @@ async function fetchEntries() {
       debug("📦 Loaded entries from IndexedDB:", window.entries);
       window.persons = [...new Set(window.entries.map(e => e.person).filter(Boolean))];
 
-      renderEntries();
+      renderEntriesAndLimitBar();
       populateNewEntryDropdowns();
       populateFilters();
       renderBankBalanceForm();
@@ -421,7 +433,7 @@ function populateFilters() {
     if (selectAllBox) {
       selectAllBox.addEventListener('change', function () {
         document.querySelectorAll('.personOption').forEach(cb => cb.checked = this.checked);
-        renderEntries();
+        renderEntriesAndLimitBar();
       });
 
       document.querySelectorAll('.personOption').forEach(cb => {
@@ -429,7 +441,7 @@ function populateFilters() {
           const all = document.querySelectorAll('.personOption');
           const checked = document.querySelectorAll('.personOption:checked');
           selectAllBox.checked = all.length === checked.length;
-          renderEntries();
+          renderEntriesAndLimitBar();
         });
       });
 
@@ -466,7 +478,7 @@ function populateFilters() {
     selectAllMonths.addEventListener('change', function () {
       const allChecked = this.checked;
       document.querySelectorAll('.monthOption').forEach(cb => cb.checked = allChecked);
-      renderEntries();
+      renderEntriesAndLimitBar();
       renderBankBalanceForm();
     });
 
@@ -475,7 +487,7 @@ function populateFilters() {
         const all = document.querySelectorAll('.monthOption');
         const checked = document.querySelectorAll('.monthOption:checked');
         selectAllMonths.checked = all.length === checked.length;
-        renderEntries();
+        renderEntriesAndLimitBar();
         renderBankBalanceForm();
       });
     });
@@ -697,7 +709,7 @@ card.addEventListener('click', (event) => {
     loadMoreBtn.className = 'load-more-btn';
     loadMoreBtn.onclick = () => {
       currentPage++;
-      renderEntries();
+      renderEntriesAndLimitBar();
     };
     container.appendChild(loadMoreBtn);
   }
@@ -747,10 +759,6 @@ card.addEventListener('click', (event) => {
   document.getElementById('totalIncome').textContent = incomeTotal.toFixed(2);
   document.getElementById('totalExpense').textContent = expenseTotal.toFixed(2);
   document.getElementById('totalBalance').textContent = (incomeTotal - expenseTotal).toFixed(2);
-// ✅ Now, finally add this:
-updateLimitSummary(filtered);
-} // ← this is now the real closing brace of renderEntries()
-
 
 
 
@@ -783,7 +791,7 @@ async function editEntry(id) {
   document.getElementById('cancelEditBtn')?.classList.remove('hidden');
   updateEntryButtonLabel();
 
-  renderEntries();
+  renderEntriesAndLimitBar();
 
   setTimeout(() => {
     const rows = document.querySelectorAll('#entryTableBody tr');
@@ -820,7 +828,7 @@ async function updateStatus(id, newStatus) {
     const index = entries.findIndex(e => e._id === id);
     if (index !== -1) {
       entries[index] = data;
-      renderEntries(); // Re-render the table with updated status
+      renderEntriesAndLimitBar(); // Re-render the table with updated status
     }
   } else {
     alert("❌ Failed to update status");
@@ -919,7 +927,7 @@ async function deleteEntry(id) {
   });
 
   await fetchEntries();             // Reload updated entries
-  renderEntries();                  // Refresh visible table
+  renderEntriesAndLimitBar();                  // Refresh visible table
   populateNewEntryDropdowns();     // Rebuild inputs with updated data
   populateFilters();               // Rebuild filters
   renderBankBalanceForm();         // ✅ Refresh bank balance table
@@ -1342,7 +1350,7 @@ async function saveBankBalancesToBackend() {
     body: JSON.stringify(initialBankBalances)
   });
     renderBankBalanceForm();
-  renderEntries();
+  renderEntriesAndLimitBar();
 }
 
 // Load from backend
@@ -1498,7 +1506,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   populateNewEntryDropdowns();
   populateFilters();
-  renderEntries();
+  renderEntriesAndLimitBar();
 
   // ✅ Load custom cards from MongoDB and Dexie
   try {
@@ -1535,7 +1543,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
 // ✅ Status filter listener
 document.getElementById('statusFilter')?.addEventListener('change', () => {
-  renderEntries();
+  renderEntriesAndLimitBar();
   renderBankBalanceForm();
 });
 
@@ -1904,7 +1912,7 @@ function clearSearch(id) {
   // ✅ Trigger the 'input' event to re-run any logic tied to input listeners
   el.dispatchEvent(new Event('input'));
 
-  renderEntries();
+  renderEntriesAndLimitBar();
 }
 
 
@@ -1982,7 +1990,7 @@ document.querySelectorAll('.personOption').forEach(cb => {
   if (selectAllMonths) selectAllMonths.checked = true;
 
   // Render and show correct toast
-  renderEntries();
+  renderEntriesAndLimitBar();
   showToast("All filters re-enabled");
 
   // Re-enable toast logic
@@ -2035,7 +2043,7 @@ function cancelEdit() {
 document.getElementById('cancelEditBtn')?.classList.add('hidden');
 updateEntryButtonLabel(); // revert Add/Save button
   showToast('✋ Edit cancelled');
-  renderEntries();
+  renderEntriesAndLimitBar();
 }
 
 
@@ -2113,7 +2121,7 @@ function clearField(id) {
     el.value = '';
     el.dispatchEvent(new Event('input'));
   }
-  renderEntries(); // update the view
+  renderEntriesAndLimitBar(); // update the view
 }
 
 
@@ -2186,7 +2194,7 @@ try {
   updateEntryButtonLabel();
   populateNewEntryDropdowns();
   populateFilters();
-  renderEntries();
+  renderEntriesAndLimitBar();
   renderBankBalanceForm();
 
   debug('✅ Entry synced to server.');
@@ -2313,7 +2321,7 @@ async function syncToCloud() {
     if (syncedCount > 0) {
   showCenteredMessage(`✅ Synced ${syncedCount} entr${syncedCount === 1 ? 'y' : 'ies'}`);
       await fetchEntries(); // re-fetch from cloud
-      renderEntries();
+      renderEntriesAndLimitBar();
       renderBankBalanceForm();
     }
   } catch (err) {
@@ -2353,7 +2361,7 @@ window.addEventListener('online', async () => {
     }
 
     await fetchEntries();
-    renderEntries();
+    renderEntriesAndLimitBar();
     renderBankBalanceForm();
 
     showCenteredMessage(`✅ Synced ${unsynced.length} entr${unsynced.length === 1 ? 'y' : 'ies'}`);
@@ -2486,7 +2494,7 @@ document.getElementById('saveNoteBtn').addEventListener('click', async () => {
 
   entry.note = note;
   await db.entries.put(entry);
-  renderEntries();
+  renderEntriesAndLimitBar();
 
   // ✅ Sync to backend
   try {
@@ -2651,7 +2659,7 @@ window.drawCharts = drawCharts;
 window.updateYearlyBudgetBar = updateYearlyBudgetBar;
 window.syncYearlyLimitsToMongo  =syncYearlyLimitsToMongo;
 window.loadAndRenderYearlyLimit  = loadAndRenderYearlyLimit;
-
+window.renderEntriesAndLimitBar = renderEntriesAndLimitBar
 
 
 document.addEventListener('DOMContentLoaded', () => {
