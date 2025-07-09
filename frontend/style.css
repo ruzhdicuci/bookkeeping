@@ -2708,6 +2708,15 @@ body {
  color: white;
 }
 
+ #filteredSpentLabel {
+ color: var(--left-color);
+}
+ #filteredLeftLabel {
+color: var(--limit-color);
+}
+ #filteredLimitLabel {
+ color: var(--spent-color);
+}
 
 
 
