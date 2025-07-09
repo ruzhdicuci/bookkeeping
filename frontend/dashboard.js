@@ -190,18 +190,6 @@ async function loadInitialBankBalances() {
   renderBankBalanceForm(initialBankBalances);
 }
 
-function renderEntriesAndLimitBar() {
-  renderEntries();
-  refreshYearlyLimitBarFromInput();
-}
-
-function refreshYearlyLimitBarFromInput() {
-  const currentLimit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
-  if (!isNaN(currentLimit)) {
-    updateYearlyBudgetBar(currentLimit);
-  }
-}
-
 
  function populatePersonFilterForDashboard(persons) {
     const container = document.getElementById('personOptions');
@@ -759,6 +747,10 @@ card.addEventListener('click', (event) => {
   document.getElementById('totalIncome').textContent = incomeTotal.toFixed(2);
   document.getElementById('totalExpense').textContent = expenseTotal.toFixed(2);
   document.getElementById('totalBalance').textContent = (incomeTotal - expenseTotal).toFixed(2);
+// ✅ Now, finally add this:
+updateLimitSummary(filtered);
+} // ← this is now the real closing brace of renderEntries()
+
 
 
 
@@ -2659,7 +2651,7 @@ window.drawCharts = drawCharts;
 window.updateYearlyBudgetBar = updateYearlyBudgetBar;
 window.syncYearlyLimitsToMongo  =syncYearlyLimitsToMongo;
 window.loadAndRenderYearlyLimit  = loadAndRenderYearlyLimit;
-window.renderEntriesAndLimitBar = renderEntriesAndLimitBar
+
 
 
 document.addEventListener('DOMContentLoaded', () => {
