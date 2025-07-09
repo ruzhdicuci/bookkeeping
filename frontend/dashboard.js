@@ -2785,12 +2785,20 @@ function updateFullYearBudgetBar(limit) {
   const entries = window.entries || [];
   const currentYear = new Date().getFullYear().toString();
 
+  const excludedCategories = ['balance', 'transfer'];
+
   const expensesThisYear = entries
-    .filter(e =>
-      e.type === 'Expense' &&
-      e.date?.startsWith(currentYear) &&
-      !['balance', 'transfer'].includes((e.category || '').trim().toLowerCase())
-    )
+    .filter(e => {
+      const typeMatch = e.type === 'Expense';
+      const yearMatch = e.date?.startsWith(currentYear);
+      const category = (e.category || '').trim().toLowerCase();
+      const excluded = excludedCategories.includes(category);
+      const include = typeMatch && yearMatch && !excluded;
+
+      console.log('[YEARLY]', `[${e.type}]`, `[${category}]`, `include=${include}`, e);
+
+      return include;
+    })
     .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
 
   const percent = Math.min((expensesThisYear / limit) * 100, 100);
