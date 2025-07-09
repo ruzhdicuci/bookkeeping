@@ -2785,15 +2785,15 @@ function updateYearlyBudgetBar(limit) {
   const entries = window.entries || [];
   const currentYear = new Date().getFullYear().toString();
 
-  const excluded = ['balance', 'transfer'];
+const excluded = ['balance', 'transfer'];
 
 const filteredExpenses = entries.filter(e => {
   const type = (e.type || '').toLowerCase().trim();
-  const category = (e.category || '').toLowerCase().trim();
-  const isExcluded = ['balance', 'transfer'].includes(category);
+  const category = (e.category || '').toLowerCase().trim(); // ← normalize!
+  const isExcluded = excluded.includes(category);
   const isCurrentYear = e.date?.startsWith(currentYear);
 
-  console.log(`🔍 [${type}] [${category}] include=${!isExcluded && type === 'expense'}`, e);
+  console.log(`[${type}] [${category}] include=${!isExcluded && type === 'expense'}`, e);
 
   return type === 'expense' && isCurrentYear && !isExcluded;
 });
@@ -2884,15 +2884,15 @@ function updateFilteredBudgetBar(limit, filteredEntries) {
   if (!filteredEntries || !Array.isArray(filteredEntries)) return;
 
   const currentYear = new Date().getFullYear().toString();
-  const excluded = ['balance', 'transfer'];
+const excluded = ['balance', 'transfer'];
 
 const filteredExpenses = entries.filter(e => {
   const type = (e.type || '').toLowerCase().trim();
-  const category = (e.category || '').toLowerCase().trim();
-  const isExcluded = ['balance', 'transfer'].includes(category);
+  const category = (e.category || '').toLowerCase().trim(); // ← normalize!
+  const isExcluded = excluded.includes(category);
   const isCurrentYear = e.date?.startsWith(currentYear);
 
-  console.log(`🔍 [${type}] [${category}] include=${!isExcluded && type === 'expense'}`, e);
+  console.log(`[${type}] [${category}] include=${!isExcluded && type === 'expense'}`, e);
 
   return type === 'expense' && isCurrentYear && !isExcluded;
 });
