@@ -2785,17 +2785,17 @@ function updateFullYearBudgetBar(limit) {
   const entries = window.entries || [];
   const currentYear = new Date().getFullYear().toString();
 
-  const excludedCategories = ['balance', 'transfer'];
+  const excludedPersons = ['balance', 'transfer'];
 
   const expensesThisYear = entries
     .filter(e => {
       const typeMatch = e.type === 'Expense';
       const yearMatch = e.date?.startsWith(currentYear);
-      const category = (e.category || '').trim().toLowerCase();
-      const excluded = excludedCategories.includes(category);
-      const include = typeMatch && yearMatch && !excluded;
+      const person = (e.person || '').trim().toLowerCase();
+      const isExcluded = excludedPersons.includes(person);
+      const include = typeMatch && yearMatch && !isExcluded;
 
-      console.log('[YEARLY]', `[${e.type}]`, `[${category}]`, `include=${include}`, e);
+      console.log('[YEARLY]', `[${e.type}]`, `[${person}]`, `include=${include}`, e);
 
       return include;
     })
@@ -2811,7 +2811,6 @@ function updateFullYearBudgetBar(limit) {
   document.getElementById('yearlyLeftLabel').textContent =
     ` ${(limit - expensesThisYear).toLocaleString('de-CH', { minimumFractionDigits: 2 })} `;
 }
-
 
 async function syncYearlyLimitsToMongo() {
   try {
@@ -2887,34 +2886,34 @@ function updateFilteredBudgetBar(limit, filteredEntries) {
   if (!filteredEntries || !Array.isArray(filteredEntries)) return;
 
   const currentYear = new Date().getFullYear().toString();
-  const excludedCategories = ['balance', 'transfer'];
+  const excludedPersons = ['balance', 'transfer'];
 
-  const filteredExpenses = filteredEntries.filter(e => {
-    const type = (e.type || '').toLowerCase().trim();
-    const category = (e.category || '').toLowerCase().trim();
-    const isExpense = type === 'expense';
-    const isCurrentYear = e.date?.startsWith(currentYear);
-    const isExcluded = excludedCategories.includes(category);
+  const filteredExpenses = filteredEntries
+    .filter(e => {
+      const typeMatch = e.type === 'Expense';
+      const yearMatch = e.date?.startsWith(currentYear);
+      const person = (e.person || '').trim().toLowerCase();
+      const isExcluded = excludedPersons.includes(person);
+      const include = typeMatch && yearMatch && !isExcluded;
 
-    const shouldInclude = isExpense && isCurrentYear && !isExcluded;
+      console.log('[FILTERED]', `[${e.type}]`, `[${person}]`, `include=${include}`, e);
 
-    // 🔍 DEBUG
-    console.log(`[FILTERED] [${type}] [${category}] include=${shouldInclude}`, e);
+      return include;
+    })
+    .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
 
-    return shouldInclude;
-  });
-
-  const total = filteredExpenses.reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
-  const percent = Math.min((total / limit) * 100, 100);
+  const percent = Math.min((filteredExpenses / limit) * 100, 100);
 
   document.getElementById('filteredSpentLabel').textContent =
-    total.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+    filteredExpenses.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   document.getElementById('filteredLimitLabel').textContent =
     limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   document.getElementById('filteredProgressFill').style.width = `${percent}%`;
   document.getElementById('filteredLeftLabel').textContent =
-    (limit - total).toLocaleString('de-CH', { minimumFractionDigits: 2 });
+    (limit - filteredExpenses).toLocaleString('de-CH', { minimumFractionDigits: 2 });
 }
+
+
 
 window.addEventListener('DOMContentLoaded', async () => {
   if (!window.persons || window.persons.length === 0) {
