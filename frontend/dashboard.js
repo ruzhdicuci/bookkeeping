@@ -294,7 +294,7 @@ async function loadPersons() {
     const API_BASE =
       location.hostname === 'localhost'
         ? 'http://localhost:3000'
-        : 'https://bookkeeping-i8e0.onrender.com'; // ✅ your actual backend
+        : 'https://bookkeeping-i8e0.onrender.com';
 
     const res = await fetch(`${API_BASE}/api/persons`, {
       headers: {
@@ -309,10 +309,17 @@ async function loadPersons() {
     const persons = await res.json();
     window.persons = persons;
     debug("👤 Loaded persons:", persons);
+
+    if (!persons.length) {
+      console.warn("⚠️ No persons found to populate chart dropdown.");
+    }
   } catch (err) {
     console.error("❌ Failed to load persons:", err);
   }
 }
+
+// ✅ Safe to assign after definition
+window.loadPersons = loadPersons;
 
 async function fetchEntries() {
   try {
@@ -2884,6 +2891,6 @@ window.addEventListener('DOMContentLoaded', async () => {
   } else {
     console.warn("⚠️ No persons found to populate chart dropdown.");
   }
+  
 });
-
-window.loadPersons = loadPersons;
+ }
