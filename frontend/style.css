@@ -2860,3 +2860,32 @@ height:24px;
   text-decoration: none;
 }
 
+
+
+.budget-bar {
+  margin-top: 10px;
+}
+
+.bar-labels {
+  font-size: 0.9em;
+  margin-bottom: 4px;
+}
+
+.bar {
+  width: 100%;
+  background-color: #eee;
+  height: 14px;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  width: 0%;
+  transition: width 0.5s ease;
+  background-color: #5cb85c; /* default green */
+}
+
+.filtered-bar {
+  background-color: #3498db; /* blue for filtered */
+}

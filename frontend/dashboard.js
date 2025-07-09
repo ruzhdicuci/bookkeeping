@@ -749,10 +749,11 @@ card.addEventListener('click', (event) => {
   document.getElementById('totalBalance').textContent = (incomeTotal - expenseTotal).toFixed(2);
 // ✅ Now, finally add this:
   // ✅ Update budget bar with filtered data
-  const currentLimit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
-  if (!isNaN(currentLimit)) {
-    updateYearlyBudgetBar(currentLimit);
-  }
+const currentLimit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
+if (!isNaN(currentLimit)) {
+  updateYearlyBudgetBar(currentLimit); // existing full-year bar
+  updateFilteredBudgetBar(currentLimit, filtered); // ✅ new filtered bar
+}
 }
 
 
@@ -2866,6 +2867,27 @@ async function loadAndRenderYearlyLimit() {
       console.error("❌ Error loading yearly limit from server:", err);
     }
   }
+}
+
+function updateFilteredBudgetBar(limit, filteredEntries) {
+  if (!limit || isNaN(limit)) return;
+  if (!filteredEntries || !Array.isArray(filteredEntries)) return;
+
+  const currentYear = new Date().getFullYear().toString();
+
+  const filteredExpenses = filteredEntries
+    .filter(e => e.type === 'Expense' && e.date?.startsWith(currentYear))
+    .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
+
+  const percent = Math.min((filteredExpenses / limit) * 100, 100);
+
+  document.getElementById('filteredSpentLabel').textContent =
+    filteredExpenses.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  document.getElementById('filteredLimitLabel').textContent =
+    limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  document.getElementById('filteredProgressFill').style.width = `${percent}%`;
+  document.getElementById('filteredLeftLabel').textContent =
+    (limit - filteredExpenses).toLocaleString('de-CH', { minimumFractionDigits: 2 });
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
