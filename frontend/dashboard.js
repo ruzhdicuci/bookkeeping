@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (selectAllBox) selectAllBox.disabled = disabled;
 
     if (!disabled) showToast("Person filters re-enabled");
-    renderEntriesAndLimitBar();
+    renderEntries();
   });
 
   // 4. Bank search input logic
@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     }
 
-    renderEntriesAndLimitBar();
+    renderEntries();
   });
 
   // ✅ Any other DOM-ready setup (scroll buttons, dropdowns, etc.) can go here
@@ -148,7 +148,7 @@ document.querySelectorAll('#monthOptions input[type="checkbox"]').forEach(cb => 
 // Person checkboxes
 document.addEventListener('change', (e) => {
   if (e.target.matches('#personOptions input[type="checkbox"]')) {
-    renderEntriesAndLimitBar();
+    renderEntries();
   }
 });
 window.entries = [];
@@ -191,7 +191,7 @@ async function loadInitialBankBalances() {
 }
 
 function renderEntriesAndLimitBar() {
-  renderEntriesAndLimitBar();
+  renderEntries();
   refreshYearlyLimitBarFromInput();
 }
 
@@ -225,7 +225,7 @@ function refreshYearlyLimitBarFromInput() {
   function toggleAllPersons(masterCheckbox) {
     const checkboxes = document.querySelectorAll('#personOptions .personFilter');
     checkboxes.forEach(cb => cb.checked = masterCheckbox.checked);
-    renderEntriesAndLimitBar(); // Re-render dashboard entries
+    renderEntries(); // Re-render dashboard entries
   }
 
 
@@ -294,7 +294,7 @@ async function loadPersons() {
     const API_BASE =
       location.hostname === 'localhost'
         ? 'http://localhost:3000'
-        : 'https://bookkeeping-i8e0.onrender.com';
+        : 'https://bookkeeping-i8e0.onrender.com'; // ✅ your actual backend
 
     const res = await fetch(`${API_BASE}/api/persons`, {
       headers: {
@@ -309,17 +309,10 @@ async function loadPersons() {
     const persons = await res.json();
     window.persons = persons;
     debug("👤 Loaded persons:", persons);
-
-    if (!persons.length) {
-      console.warn("⚠️ No persons found to populate chart dropdown.");
-    }
   } catch (err) {
     console.error("❌ Failed to load persons:", err);
   }
 }
-
-// ✅ Safe to assign after definition
-window.loadPersons = loadPersons;
 
 async function fetchEntries() {
   try {
@@ -336,7 +329,7 @@ async function fetchEntries() {
     window.persons = [...new Set(window.entries.map(e => e.person).filter(Boolean))];
     debug("🧑‍🤝‍🧑 Found persons:", window.persons);
 
-    renderEntriesAndLimitBar();
+    renderEntries();
     populateNewEntryDropdowns();
     populateFilters();
     renderBankBalanceForm();
@@ -354,7 +347,7 @@ async function fetchEntries() {
       debug("📦 Loaded entries from IndexedDB:", window.entries);
       window.persons = [...new Set(window.entries.map(e => e.person).filter(Boolean))];
 
-      renderEntriesAndLimitBar();
+      renderEntries();
       populateNewEntryDropdowns();
       populateFilters();
       renderBankBalanceForm();
@@ -440,7 +433,7 @@ function populateFilters() {
     if (selectAllBox) {
       selectAllBox.addEventListener('change', function () {
         document.querySelectorAll('.personOption').forEach(cb => cb.checked = this.checked);
-        renderEntriesAndLimitBar();
+        renderEntries();
       });
 
       document.querySelectorAll('.personOption').forEach(cb => {
@@ -448,7 +441,7 @@ function populateFilters() {
           const all = document.querySelectorAll('.personOption');
           const checked = document.querySelectorAll('.personOption:checked');
           selectAllBox.checked = all.length === checked.length;
-          renderEntriesAndLimitBar();
+          renderEntries();
         });
       });
 
@@ -485,7 +478,7 @@ function populateFilters() {
     selectAllMonths.addEventListener('change', function () {
       const allChecked = this.checked;
       document.querySelectorAll('.monthOption').forEach(cb => cb.checked = allChecked);
-      renderEntriesAndLimitBar();
+      renderEntries();
       renderBankBalanceForm();
     });
 
@@ -494,7 +487,7 @@ function populateFilters() {
         const all = document.querySelectorAll('.monthOption');
         const checked = document.querySelectorAll('.monthOption:checked');
         selectAllMonths.checked = all.length === checked.length;
-        renderEntriesAndLimitBar();
+        renderEntries();
         renderBankBalanceForm();
       });
     });
@@ -716,7 +709,7 @@ card.addEventListener('click', (event) => {
     loadMoreBtn.className = 'load-more-btn';
     loadMoreBtn.onclick = () => {
       currentPage++;
-      renderEntriesAndLimitBar();
+      renderEntries();
     };
     container.appendChild(loadMoreBtn);
   }
@@ -798,7 +791,7 @@ async function editEntry(id) {
   document.getElementById('cancelEditBtn')?.classList.remove('hidden');
   updateEntryButtonLabel();
 
-  renderEntriesAndLimitBar();
+  renderEntries();
 
   setTimeout(() => {
     const rows = document.querySelectorAll('#entryTableBody tr');
@@ -835,7 +828,7 @@ async function updateStatus(id, newStatus) {
     const index = entries.findIndex(e => e._id === id);
     if (index !== -1) {
       entries[index] = data;
-      renderEntriesAndLimitBar(); // Re-render the table with updated status
+      renderEntries(); // Re-render the table with updated status
     }
   } else {
     alert("❌ Failed to update status");
@@ -934,7 +927,7 @@ async function deleteEntry(id) {
   });
 
   await fetchEntries();             // Reload updated entries
-  renderEntriesAndLimitBar();                  // Refresh visible table
+  renderEntries();                  // Refresh visible table
   populateNewEntryDropdowns();     // Rebuild inputs with updated data
   populateFilters();               // Rebuild filters
   renderBankBalanceForm();         // ✅ Refresh bank balance table
@@ -1357,7 +1350,7 @@ async function saveBankBalancesToBackend() {
     body: JSON.stringify(initialBankBalances)
   });
     renderBankBalanceForm();
-  renderEntriesAndLimitBar();
+  renderEntries();
 }
 
 // Load from backend
@@ -1513,7 +1506,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   populateNewEntryDropdowns();
   populateFilters();
-  renderEntriesAndLimitBar();
+  renderEntries();
 
   // ✅ Load custom cards from MongoDB and Dexie
   try {
@@ -1550,7 +1543,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
 // ✅ Status filter listener
 document.getElementById('statusFilter')?.addEventListener('change', () => {
-  renderEntriesAndLimitBar();
+  renderEntries();
   renderBankBalanceForm();
 });
 
@@ -1919,7 +1912,7 @@ function clearSearch(id) {
   // ✅ Trigger the 'input' event to re-run any logic tied to input listeners
   el.dispatchEvent(new Event('input'));
 
-  renderEntriesAndLimitBar();
+  renderEntries();
 }
 
 
@@ -1997,7 +1990,7 @@ document.querySelectorAll('.personOption').forEach(cb => {
   if (selectAllMonths) selectAllMonths.checked = true;
 
   // Render and show correct toast
-  renderEntriesAndLimitBar();
+  renderEntries();
   showToast("All filters re-enabled");
 
   // Re-enable toast logic
@@ -2050,7 +2043,7 @@ function cancelEdit() {
 document.getElementById('cancelEditBtn')?.classList.add('hidden');
 updateEntryButtonLabel(); // revert Add/Save button
   showToast('✋ Edit cancelled');
-  renderEntriesAndLimitBar();
+  renderEntries();
 }
 
 
@@ -2128,7 +2121,7 @@ function clearField(id) {
     el.value = '';
     el.dispatchEvent(new Event('input'));
   }
-  renderEntriesAndLimitBar(); // update the view
+  renderEntries(); // update the view
 }
 
 
@@ -2201,7 +2194,7 @@ try {
   updateEntryButtonLabel();
   populateNewEntryDropdowns();
   populateFilters();
-  renderEntriesAndLimitBar();
+  renderEntries();
   renderBankBalanceForm();
 
   debug('✅ Entry synced to server.');
@@ -2328,7 +2321,7 @@ async function syncToCloud() {
     if (syncedCount > 0) {
   showCenteredMessage(`✅ Synced ${syncedCount} entr${syncedCount === 1 ? 'y' : 'ies'}`);
       await fetchEntries(); // re-fetch from cloud
-      renderEntriesAndLimitBar();
+      renderEntries();
       renderBankBalanceForm();
     }
   } catch (err) {
@@ -2368,7 +2361,7 @@ window.addEventListener('online', async () => {
     }
 
     await fetchEntries();
-    renderEntriesAndLimitBar();
+    renderEntries();
     renderBankBalanceForm();
 
     showCenteredMessage(`✅ Synced ${unsynced.length} entr${unsynced.length === 1 ? 'y' : 'ies'}`);
@@ -2501,7 +2494,7 @@ document.getElementById('saveNoteBtn').addEventListener('click', async () => {
 
   entry.note = note;
   await db.entries.put(entry);
-  renderEntriesAndLimitBar();
+  renderEntries();
 
   // ✅ Sync to backend
   try {
@@ -2891,6 +2884,6 @@ window.addEventListener('DOMContentLoaded', async () => {
   } else {
     console.warn("⚠️ No persons found to populate chart dropdown.");
   }
-  
 });
- }
+
+window.loadPersons = loadPersons;
