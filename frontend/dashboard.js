@@ -2784,19 +2784,22 @@ function updateYearlyBudgetBar(limit) {
 
   const entries = window.entries || [];
   const currentYear = new Date().getFullYear().toString();
+  const excludedCategories = ['balance', 'transfer'];
 
-const excluded = ['balance', 'transfer'];
+  const filteredExpenses = entries.filter(e => {
+    const type = (e.type || '').toLowerCase().trim();
+    const category = (e.category || '').toLowerCase().trim();
+    const isExpense = type === 'expense';
+    const isCurrentYear = e.date?.startsWith(currentYear);
+    const isExcluded = excludedCategories.includes(category);
 
-const filteredExpenses = entries.filter(e => {
-  const type = (e.type || '').toLowerCase().trim();
-  const category = (e.category || '').toLowerCase().trim(); // ← normalize!
-  const isExcluded = excluded.includes(category);
-  const isCurrentYear = e.date?.startsWith(currentYear);
+    const shouldInclude = isExpense && isCurrentYear && !isExcluded;
 
-  console.log(`[${type}] [${category}] include=${!isExcluded && type === 'expense'}`, e);
+    // 🔍 DEBUG
+    console.log(`[YEARLY] [${type}] [${category}] include=${shouldInclude}`, e);
 
-  return type === 'expense' && isCurrentYear && !isExcluded;
-});
+    return shouldInclude;
+  });
 
   const total = filteredExpenses.reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
   const percent = Math.min((total / limit) * 100, 100);
@@ -2884,18 +2887,22 @@ function updateFilteredBudgetBar(limit, filteredEntries) {
   if (!filteredEntries || !Array.isArray(filteredEntries)) return;
 
   const currentYear = new Date().getFullYear().toString();
-const excluded = ['balance', 'transfer'];
+  const excludedCategories = ['balance', 'transfer'];
 
-const filteredExpenses = entries.filter(e => {
-  const type = (e.type || '').toLowerCase().trim();
-  const category = (e.category || '').toLowerCase().trim(); // ← normalize!
-  const isExcluded = excluded.includes(category);
-  const isCurrentYear = e.date?.startsWith(currentYear);
+  const filteredExpenses = filteredEntries.filter(e => {
+    const type = (e.type || '').toLowerCase().trim();
+    const category = (e.category || '').toLowerCase().trim();
+    const isExpense = type === 'expense';
+    const isCurrentYear = e.date?.startsWith(currentYear);
+    const isExcluded = excludedCategories.includes(category);
 
-  console.log(`[${type}] [${category}] include=${!isExcluded && type === 'expense'}`, e);
+    const shouldInclude = isExpense && isCurrentYear && !isExcluded;
 
-  return type === 'expense' && isCurrentYear && !isExcluded;
-});
+    // 🔍 DEBUG
+    console.log(`[FILTERED] [${type}] [${category}] include=${shouldInclude}`, e);
+
+    return shouldInclude;
+  });
 
   const total = filteredExpenses.reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
   const percent = Math.min((total / limit) * 100, 100);
@@ -2908,7 +2915,6 @@ const filteredExpenses = entries.filter(e => {
   document.getElementById('filteredLeftLabel').textContent =
     (limit - total).toLocaleString('de-CH', { minimumFractionDigits: 2 });
 }
-
 
 window.addEventListener('DOMContentLoaded', async () => {
   if (!window.persons || window.persons.length === 0) {
