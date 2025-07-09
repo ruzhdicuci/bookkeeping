@@ -701,9 +701,6 @@ card.addEventListener('click', (event) => {
     };
     container.appendChild(loadMoreBtn);
   }
-    // ✅ ADD THIS — update limit view based on filtered data
-  updateLimitSummary(filtered);
-}
 
   // Highlight scroll
   setTimeout(() => {
@@ -750,7 +747,9 @@ card.addEventListener('click', (event) => {
   document.getElementById('totalIncome').textContent = incomeTotal.toFixed(2);
   document.getElementById('totalExpense').textContent = expenseTotal.toFixed(2);
   document.getElementById('totalBalance').textContent = (incomeTotal - expenseTotal).toFixed(2);
-}
+// ✅ Now, finally add this:
+updateLimitSummary(filtered);
+} // ← this is now the real closing brace of renderEntries()
 
 
 
