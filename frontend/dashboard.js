@@ -2785,23 +2785,32 @@ function updateYearlyBudgetBar(limit) {
   const entries = window.entries || [];
   const currentYear = new Date().getFullYear().toString();
 
-  const expensesThisYear = entries
-.filter(e =>
-  e.type === 'Expense' &&
-  e.date?.startsWith(currentYear) &&
-  !['balance', 'transfer'].includes((e.category || '').trim().toLowerCase())
-)
-    .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
+  const excluded = ['balance', 'transfer'];
 
-  const percent = Math.min((expensesThisYear / limit) * 100, 100);
+  const filteredExpenses = entries.filter(e => {
+    const category = (e.category || '').trim().toLowerCase();
+    const isExcluded = excluded.includes(category);
+    const isCurrentYear = e.date?.startsWith(currentYear);
+    const isExpense = (e.type || '').toLowerCase() === 'expense';
+
+    // 🧪 Debug each entry
+    if (isExpense && isCurrentYear) {
+      console.log(`🔍 [${category}] include=${!isExcluded}`, e);
+    }
+
+    return isExpense && isCurrentYear && !isExcluded;
+  });
+
+  const total = filteredExpenses.reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
+  const percent = Math.min((total / limit) * 100, 100);
 
   document.getElementById('yearlySpentLabel').textContent =
-    ` ${expensesThisYear.toLocaleString('de-CH', { minimumFractionDigits: 2 })}`;
+    ` ${total.toLocaleString('de-CH', { minimumFractionDigits: 2 })}`;
   document.getElementById('yearlyLimitLabel').textContent =
     limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   document.getElementById('yearlyProgressFill').style.width = `${percent}%`;
   document.getElementById('yearlyLeftLabel').textContent =
-    ` ${(limit - expensesThisYear).toLocaleString('de-CH', { minimumFractionDigits: 2 })} `;
+    ` ${(limit - total).toLocaleString('de-CH', { minimumFractionDigits: 2 })} `;
 }
 
 async function syncYearlyLimitsToMongo() {
@@ -2878,25 +2887,33 @@ function updateFilteredBudgetBar(limit, filteredEntries) {
   if (!filteredEntries || !Array.isArray(filteredEntries)) return;
 
   const currentYear = new Date().getFullYear().toString();
+  const excluded = ['balance', 'transfer'];
 
-  const filteredExpenses = filteredEntries
-.filter(e =>
-  e.type === 'Expense' &&
-  e.date?.startsWith(currentYear) &&
-  !['balance', 'transfer'].includes((e.category || '').trim().toLowerCase())
-)
-    .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
+  const filteredExpenses = filteredEntries.filter(e => {
+    const category = (e.category || '').trim().toLowerCase();
+    const isExcluded = excluded.includes(category);
+    const isCurrentYear = e.date?.startsWith(currentYear);
+    const isExpense = (e.type || '').toLowerCase() === 'expense';
 
-  const percent = Math.min((filteredExpenses / limit) * 100, 100);
+    if (isExpense && isCurrentYear) {
+      console.log(`🔍 [filtered][${category}] include=${!isExcluded}`, e);
+    }
+
+    return isExpense && isCurrentYear && !isExcluded;
+  });
+
+  const total = filteredExpenses.reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
+  const percent = Math.min((total / limit) * 100, 100);
 
   document.getElementById('filteredSpentLabel').textContent =
-    filteredExpenses.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+    total.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   document.getElementById('filteredLimitLabel').textContent =
     limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   document.getElementById('filteredProgressFill').style.width = `${percent}%`;
   document.getElementById('filteredLeftLabel').textContent =
-    (limit - filteredExpenses).toLocaleString('de-CH', { minimumFractionDigits: 2 });
+    (limit - total).toLocaleString('de-CH', { minimumFractionDigits: 2 });
 }
+
 
 window.addEventListener('DOMContentLoaded', async () => {
   if (!window.persons || window.persons.length === 0) {
