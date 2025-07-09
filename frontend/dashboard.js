@@ -1,4 +1,4 @@
-const DEBUG_MODE = true; // set to true during dev
+const DEBUG_MODE = false; // or true for development
 const debug = (...args) => DEBUG_MODE && console.log(...args);
 
 import {
@@ -296,7 +296,7 @@ async function loadPersons() {
 
     const persons = await res.json();
     window.persons = persons;
-    console.log("👤 Loaded persons:", persons);
+    debug("👤 Loaded persons:", persons);
   } catch (err) {
     console.error("❌ Failed to load persons:", err);
   }
@@ -2382,7 +2382,7 @@ async function saveNoteForEntry() {
     });
 
     if (!res.ok) throw new Error("Failed to update note");
-    console.log("✅ Note updated!");
+    debug("✅ Note updated!");
   } catch (err) {
     console.error("❌ Error updating note:", err);
   }
@@ -2407,7 +2407,7 @@ async function fetchEntriesAndSyncToDexie() {
     await db.entries.bulkPut(entries); // ✅ store in Dexie
     window.entries = entries;
 
-    console.log("✅ Synced entries from backend to Dexie:", entries.length);
+    debug("✅ Synced entries from backend to Dexie:", entries.length);
     renderEntries(entries);
   } catch (err) {
     console.error("❌ fetchEntriesAndSyncToDexie failed:", err);
@@ -2755,7 +2755,7 @@ async function setYearlyLimit() {
   const payload = JSON.parse(atob(token.split('.')[1]));
   const userId = payload.userId; // 👈 correctly extracted
 
-  console.log("📤 Saving limit:", limit, "for year", year, "userId:", userId);
+  debug("📤 Saving limit:", limit, "for year", year, "userId:", userId);
 
   // Save locally to Dexie
   await saveYearlyLimitLocally({ userId, year, limit, synced: false, lastUpdated: Date.now() });
@@ -2798,7 +2798,7 @@ async function syncYearlyLimitsToMongo() {
     const token = localStorage.getItem('token');
     const unsynced = await getUnsyncedYearlyLimits();
 
-    console.log("📤 Trying to sync yearly limits:", unsynced);
+    debug("📤 Trying to sync yearly limits:", unsynced);
 
     if (!unsynced.length) return;
 
@@ -2814,12 +2814,12 @@ async function syncYearlyLimitsToMongo() {
     });
 
     const result = await res.text();
-    console.log("🧾 Server responded:", result);
+    debug("🧾 Server responded:", result);
 
     if (!res.ok) throw new Error(result);
 
     await db.yearlyLimits.update([unsynced[0].userId, year], { synced: true });
-    console.log("✅ Yearly limit synced to MongoDB");
+    debug("✅ Yearly limit synced to MongoDB");
   } catch (err) {
     console.error("❌ Failed to sync yearly limit:", err);
   }
@@ -2830,16 +2830,16 @@ async function loadAndRenderYearlyLimit() {
   const year = new Date().getFullYear().toString(); // ✅ Always string
   const userId = getUserIdFromToken();
 
-  console.log("🔄 Loading yearly limit for:", userId, year);
+  debug("🔄 Loading yearly limit for:", userId, year);
 
   const localLimit = await getYearlyLimitFromCache(userId, year);
-  console.log("💾 Local limit:", localLimit);
+  debug("💾 Local limit:", localLimit);
 
   if (localLimit) {
     document.getElementById('yearlyLimitInput').value = localLimit.limit;
     updateYearlyBudgetBar(localLimit.limit);
   } else {
-    console.log("🌐 Fetching limit from server...");
+    debug("🌐 Fetching limit from server...");
     try {
       const res = await fetch(`${backend}/api/yearly-limit?year=${year}`, {
         headers: {
@@ -2850,7 +2850,7 @@ async function loadAndRenderYearlyLimit() {
       if (!res.ok) throw new Error(await res.text());
 
       const data = await res.json();
-      console.log("✅ Server responded with:", data);
+      debug("✅ Server responded with:", data);
 
       await saveYearlyLimitLocally({ userId, year, limit: data.limit });
 
@@ -2868,7 +2868,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 
   if (window.persons?.length > 0) {
-    console.log("👤 Loaded persons:", window.persons);
+    debug("👤 Loaded persons:", window.persons);
     populatePersonDropdownForCharts(window.persons);
     drawCharts();
   } else {

@@ -1,3 +1,6 @@
+const DEBUG_MODE = false; // or true for development
+const debug = (...args) => DEBUG_MODE && console.log(...args);
+
 const authMiddleware = require('./authMiddleware');
 require('dotenv').config();
 const mongoose = require('mongoose');
@@ -32,7 +35,7 @@ mongoose.connect(MONGO_URI, {
   useUnifiedTopology: true,
   socketTimeoutMS: 45000
 }).then(() => {
-  console.log('✅ MongoDB connected');
+  debug('✅ MongoDB connected');
 }).catch(err => {
   console.error('❌ MongoDB initial connection error:', err);
 });
@@ -62,7 +65,7 @@ app.options('*', cors());
 app.use(express.json());
 
 app.use((req, res, next) => {
-  console.log(`🔍 ${req.method} ${req.url}`);
+  debug(`🔍 ${req.method} ${req.url}`);
   next();
 });
 
@@ -359,10 +362,10 @@ app.post('/api/limits', auth, async (req, res) => {
 // GET yearly limit
 app.get('/api/yearly-limit', auth, async (req, res) => {
   const year = req.query.year || new Date().getFullYear().toString();
-  console.log(`📥 GET /api/yearly-limit for user ${req.user.userId}, year: ${year}`);
+  debug(`📥 GET /api/yearly-limit for user ${req.user.userId}, year: ${year}`);
   try {
     const result = await YearlyLimit.findOne({ userId: req.user.userId, year });
-    console.log("📦 Found in DB:", result);
+    debug("📦 Found in DB:", result);
     res.json(result || { limit: 0 });
   } catch (err) {
     console.error("❌ Error loading limit:", err);
@@ -373,7 +376,7 @@ app.get('/api/yearly-limit', auth, async (req, res) => {
 // POST/Update yearly limit
 app.post('/api/yearly-limit', auth, async (req, res) => {
   const { year, limit } = req.body;
-  console.log(`📥 POST /api/yearly-limit → user: ${req.user.userId}, year: ${year}, limit: ${limit}`);
+  debug(`📥 POST /api/yearly-limit → user: ${req.user.userId}, year: ${year}, limit: ${limit}`);
 
   try {
     const result = await YearlyLimit.findOneAndUpdate(
@@ -381,7 +384,7 @@ app.post('/api/yearly-limit', auth, async (req, res) => {
       { $set: { limit, lastUpdated: Date.now() } },
       { upsert: true, new: true }
     );
-    console.log("✅ Yearly limit saved:", result);
+    debug("✅ Yearly limit saved:", result);
     res.json({ success: true });
   } catch (err) {
     console.error("❌ Failed to save yearly limit:", err);
@@ -434,5 +437,5 @@ app.use((err, req, res, next) => {
 // ✅ Start server
 const PORT = process.env.PORT || 3210;
 app.listen(PORT, () => {
-  console.log(`✅ API running on port ${PORT}`);
+  debug(`✅ API running on port ${PORT}`);
 });

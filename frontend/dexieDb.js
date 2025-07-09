@@ -1,3 +1,7 @@
+const DEBUG_MODE = false; // or true for development
+const debug = (...args) => DEBUG_MODE && console.log(...args);
+
+
 import Dexie from 'https://cdn.jsdelivr.net/npm/dexie@3.2.4/dist/dexie.mjs';
 
 // ✅ Set backend base URL
@@ -18,13 +22,13 @@ db.version(306).stores({
 });
 
 // 🧪 Add this right after defining the stores
-console.log("📚 yearlyLimits schema:", db.yearlyLimits.schema.primKey, db.yearlyLimits.schema.indexes);
+debug("📚 yearlyLimits schema:", db.yearlyLimits.schema.primKey, db.yearlyLimits.schema.indexes);
 
 // dexieDb.js (at the bottom)
 export async function initDexie() {
   try {
     await db.open();
-    console.log("🚀 Dexie DB opened");
+    debug("🚀 Dexie DB opened");
   } catch (err) {
     console.error("❌ Failed to open Dexie DB:", err);
   }
@@ -147,13 +151,13 @@ async function getUnsynced(type = "entries") {
       return [];
     }
     const all = await table.toArray();
-    console.log(`📋 All ${type} loaded from Dexie:`, all);
+    debug(`📋 All ${type} loaded from Dexie:`, all);
     const filtered = all.filter(item =>
       item.synced === false &&
       item._id &&
       typeof item._id === 'string'
     );
-    console.log(`📦 Unsynced ${type} entries: ${filtered.length}`, filtered);
+    debug(`📦 Unsynced ${type} entries: ${filtered.length}`, filtered);
     return filtered;
   } catch (err) {
     console.error(`❌ Dexie getUnsynced(${type}) failed:`, err);
@@ -186,7 +190,7 @@ async function syncCustomCardsToMongo() {
       throw new Error(errData.details || errData.error || "Unknown error");
     }
 
-    console.log("✅ Synced custom cards to MongoDB");
+    debug("✅ Synced custom cards to MongoDB");
   } catch (err) {
     console.error("❌ Failed to sync custom cards to MongoDB:", err.message || err);
   }
@@ -244,7 +248,7 @@ async function fetchAndCacheEntries() {
     // ✅ Update window.entries
     window.entries = entries;
 
-    console.log("✅ Synced entries from backend to Dexie:", entries.length);
+    debug("✅ Synced entries from backend to Dexie:", entries.length);
   } catch (err) {
     console.error("❌ fetchAndCacheEntries failed:", err);
   }
@@ -265,11 +269,11 @@ async function saveYearlyLimitLocally({ userId, year, limit }) {
     lastUpdated: Date.now()
   };
 
-  console.log("💾 Saving to Dexie:", item);
+  debug("💾 Saving to Dexie:", item);
 
   try {
     await db.yearlyLimits.put(item);
-    console.log("✅ Yearly limit saved:", item);
+    debug("✅ Yearly limit saved:", item);
   } catch (err) {
     console.error("❌ Failed to save yearly limit in Dexie:", err);
   }
@@ -292,10 +296,10 @@ async function getUnsyncedYearlyLimits() {
   try {
     await db.open(); // ✅ Ensure DB is open before reading
     const all = await db.yearlyLimits.toArray();
-    console.log("📦 All yearly limits:", all);
+    debug("📦 All yearly limits:", all);
 
     const unsynced = all.filter(item => item.synced === false);
-    console.log("📤 Unsynced yearly limits:", unsynced);
+    debug("📤 Unsynced yearly limits:", unsynced);
 
     return unsynced;
   } catch (err) {
