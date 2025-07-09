@@ -751,8 +751,8 @@ card.addEventListener('click', (event) => {
   // ✅ Update budget bar with filtered data
 const currentLimit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
 if (!isNaN(currentLimit)) {
-  updateYearlyBudgetBar(currentLimit); // existing full-year bar
-  updateFilteredBudgetBar(currentLimit, filtered); // ✅ new filtered bar
+  updateFullYearBudgetBar(currentLimit);         // ✅ shows the full-year bar (green)
+  updateFilteredBudgetBar(currentLimit, filtered); // ✅ shows the filtered bar (blue)
 }
 }
 
@@ -2768,7 +2768,7 @@ async function setYearlyLimit() {
   await saveYearlyLimitLocally({ userId, year, limit, synced: false, lastUpdated: Date.now() });
 
   // Update the progress bar UI
-  updateYearlyBudgetBar(limit);
+updateFullYearBudgetBar(limit);
 
   // Try to sync to backend
   await syncYearlyLimitsToMongo();
@@ -2776,7 +2776,7 @@ async function setYearlyLimit() {
 
 window.setYearlyLimit = setYearlyLimit;
 
-function updateYearlyBudgetBar(limit) {
+function updateFullYearBudgetBar(limit) {
   if (!limit || isNaN(limit)) {
     console.warn("⚠️ No yearly limit set.");
     return;
@@ -2784,34 +2784,26 @@ function updateYearlyBudgetBar(limit) {
 
   const entries = window.entries || [];
   const currentYear = new Date().getFullYear().toString();
-  const excludedCategories = ['balance', 'transfer'];
 
-  const filteredExpenses = entries.filter(e => {
-    const type = (e.type || '').toLowerCase().trim();
-    const category = (e.category || '').toLowerCase().trim();
-    const isExpense = type === 'expense';
-    const isCurrentYear = e.date?.startsWith(currentYear);
-    const isExcluded = excludedCategories.includes(category);
+  const expensesThisYear = entries
+    .filter(e =>
+      e.type === 'Expense' &&
+      e.date?.startsWith(currentYear) &&
+      !['balance', 'transfer'].includes((e.category || '').trim().toLowerCase())
+    )
+    .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
 
-    const shouldInclude = isExpense && isCurrentYear && !isExcluded;
-
-    // 🔍 DEBUG
-    console.log(`[YEARLY] [${type}] [${category}] include=${shouldInclude}`, e);
-
-    return shouldInclude;
-  });
-
-  const total = filteredExpenses.reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
-  const percent = Math.min((total / limit) * 100, 100);
+  const percent = Math.min((expensesThisYear / limit) * 100, 100);
 
   document.getElementById('yearlySpentLabel').textContent =
-    ` ${total.toLocaleString('de-CH', { minimumFractionDigits: 2 })}`;
+    ` ${expensesThisYear.toLocaleString('de-CH', { minimumFractionDigits: 2 })}`;
   document.getElementById('yearlyLimitLabel').textContent =
     limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   document.getElementById('yearlyProgressFill').style.width = `${percent}%`;
   document.getElementById('yearlyLeftLabel').textContent =
-    ` ${(limit - total).toLocaleString('de-CH', { minimumFractionDigits: 2 })} `;
+    ` ${(limit - expensesThisYear).toLocaleString('de-CH', { minimumFractionDigits: 2 })} `;
 }
+
 
 async function syncYearlyLimitsToMongo() {
   try {
