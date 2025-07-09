@@ -2698,6 +2698,19 @@ body {
 }
 
 
+.body .dark #filteredSpentLabel {
+ color: white;
+}
+.body .dark #filteredLeftLabel {
+ color: white;
+}
+.body .dark #filteredLimitLabel {
+ color: white;
+}
+
+
+
+
 #yearlyLeftLabel {
   color: var(--left-color);
 }
@@ -2863,17 +2876,17 @@ height:24px;
 
 
 .budget-bar {
-  margin-top: 10px;
+  margin-top: 1px;
 }
 
 .bar-labels {
   font-size: 0.9em;
-  margin-bottom: 4px;
+  margin-bottom: 0px;
 }
 
 .bar {
   width: 100%;
-  background-color: #eee;
+  background-color: #ffffff;
   height: 14px;
   border-radius: 6px;
   overflow: hidden;
@@ -2883,9 +2896,9 @@ height:24px;
   height: 100%;
   width: 0%;
   transition: width 0.5s ease;
-  background-color: #5cb85c; /* default green */
+  background-color: #157815; /* default green */
 }
 
 .filtered-bar {
-  background-color: #3498db; /* blue for filtered */
+  background-color: #06b2eb; /* blue for filtered */
 }
