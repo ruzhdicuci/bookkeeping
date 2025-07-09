@@ -701,6 +701,9 @@ card.addEventListener('click', (event) => {
     };
     container.appendChild(loadMoreBtn);
   }
+    // ✅ ADD THIS — update limit view based on filtered data
+  updateLimitSummary(filtered);
+}
 
   // Highlight scroll
   setTimeout(() => {
