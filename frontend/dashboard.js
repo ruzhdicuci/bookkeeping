@@ -18,6 +18,14 @@ import {
   getUnsyncedYearlyLimits // ✅ ADD THIS
 } from './dexieDb.js';
 
+import { initDexie } from './dexieDb.js';
+
+(async () => {
+  await initDexie();
+  await loadAndRenderYearlyLimit();
+  // ✅ Any other startup functions here...
+})();
+
 let entries = [];
 let persons = [];
 let currentNoteEntryId = null;
