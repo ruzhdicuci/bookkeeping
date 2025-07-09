@@ -454,19 +454,25 @@ totalsContainer.appendChild(summaryCard);
 
 </div>
 
-
-<div id="filteredBudgetBar" class="budget-bar">
-  <div class="bar-labels">
-    <span>Filtered Expenses:</span>
-    <span id="filteredSpentLabel"></span> /
-    <span id="filteredLimitLabel"></span> (Remaining:
-    <span id="filteredLeftLabel"></span>)
+ <div class="filter-grid">
+<div id="filteredBudgetBar" style="margin-top: 10px; margin-bottom: 10px;">
+  <div style="display: flex; align-items: center; gap: 10px;">
+    <span style="font-size: 1.1rem; font-weight: bold; color: #8e44ad;">
+      <span id="filteredSpentLabel">0.00</span>
+    </span>
+    <span style="margin: 0 auto; font-size: 1.1rem; font-weight: bold; color: #27ae60;">
+      <span id="filteredLeftLabel">0.00</span>
+    </span>
+    <span style="font-size: 1.1rem; font-weight: bold; color: #2962ff;">
+      <span id="filteredLimitLabel">0.00</span>
+    </span>
   </div>
-  <div class="bar">
-    <div id="filteredProgressFill" class="bar-fill filtered-bar"></div>
+
+  <div style="position: relative; margin-top: 10px; background: #ffffff; height: 14px; border-radius: 7px; overflow: hidden;">
+    <div id="filteredProgressFill" style="height: 100%; width: 0%; background: #3498db;"></div>
   </div>
 </div>
-
+</div>
 
  <div id="multiselectSection">
   <div class="tabs-wrapper" style="margin-top: -1px; margin-bottom: -3px;">

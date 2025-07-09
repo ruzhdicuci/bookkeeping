@@ -2786,7 +2786,12 @@ function updateYearlyBudgetBar(limit) {
   const currentYear = new Date().getFullYear().toString();
 
   const expensesThisYear = entries
-    .filter(e => e.type === 'Expense' && e.date?.startsWith(currentYear))
+    .filter(e =>
+  e.type === 'Expense' &&
+  e.date?.startsWith(currentYear) &&
+  e.category !== 'Balance' &&
+  e.category !== 'Transfer'
+)
     .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
 
   const percent = Math.min((expensesThisYear / limit) * 100, 100);
@@ -2876,7 +2881,12 @@ function updateFilteredBudgetBar(limit, filteredEntries) {
   const currentYear = new Date().getFullYear().toString();
 
   const filteredExpenses = filteredEntries
-    .filter(e => e.type === 'Expense' && e.date?.startsWith(currentYear))
+   .filter(e =>
+  e.type === 'Expense' &&
+  e.date?.startsWith(currentYear) &&
+  e.category !== 'Balance' &&
+  e.category !== 'Transfer'
+)
     .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
 
   const percent = Math.min((filteredExpenses / limit) * 100, 100);
