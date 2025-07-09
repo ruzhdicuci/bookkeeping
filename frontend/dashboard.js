@@ -2653,7 +2653,7 @@ window.toggleAllChartPersons  = toggleAllChartPersons;
 window.toggleAllPersons = toggleAllPersons;
 window.toggleChartPersonDropdown = toggleChartPersonDropdown;
 window.drawCharts = drawCharts;
-window.updateYearlyBudgetBar = updateYearlyBudgetBar;
+window.updateFullYearBudgetBar = updateFullYearBudgetBar;
 window.syncYearlyLimitsToMongo  =syncYearlyLimitsToMongo;
 window.loadAndRenderYearlyLimit  = loadAndRenderYearlyLimit;
 
@@ -2867,7 +2867,7 @@ async function loadAndRenderYearlyLimit() {
       await saveYearlyLimitLocally({ userId, year, limit: data.limit });
 
       document.getElementById('yearlyLimitInput').value = data.limit;
-      updateYearlyBudgetBar(data.limit);
+      updateFullYearBudgetBar(data.limit);
     } catch (err) {
       console.error("❌ Error loading yearly limit from server:", err);
     }
