@@ -748,8 +748,12 @@ card.addEventListener('click', (event) => {
   document.getElementById('totalExpense').textContent = expenseTotal.toFixed(2);
   document.getElementById('totalBalance').textContent = (incomeTotal - expenseTotal).toFixed(2);
 // ✅ Now, finally add this:
-updateLimitSummary(filtered);
-} // ← this is now the real closing brace of renderEntries()
+  // ✅ Update budget bar with filtered data
+  const currentLimit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
+  if (!isNaN(currentLimit)) {
+    updateYearlyBudgetBar(currentLimit);
+  }
+}
 
 
 
