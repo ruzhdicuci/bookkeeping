@@ -2849,7 +2849,7 @@ async function loadAndRenderYearlyLimit() {
 
   if (localLimit) {
     document.getElementById('yearlyLimitInput').value = localLimit.limit;
-    updateFullYearBudgetBar(limit);(localLimit.limit);
+    updateFullYearBudgetBar(localLimit.limit);
   } else {
     debug("🌐 Fetching limit from server...");
     try {
