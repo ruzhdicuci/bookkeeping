@@ -2776,19 +2776,27 @@ updateFullYearBudgetBar(limit);
 
 window.setYearlyLimit = setYearlyLimit;
 
-function updateFullYearBudgetBar(limit, entries = window.entries) {
+function updateFullYearBudgetBar(limit) {
   if (!limit || isNaN(limit)) {
     console.warn("⚠️ No yearly limit set.");
     return;
   }
 
-  const totalPlus = entries
-    .filter(e => e.amount > 0)
-    .reduce((sum, e) => sum + e.amount, 0);
-  const totalMinus = entries
-    .filter(e => e.amount < 0)
-    .reduce((sum, e) => sum + Math.abs(e.amount), 0);
-  const diff = totalPlus - totalMinus;
+  // Correctly calculate income and expense from all entries
+  const entries = window.entries || [];
+
+  let income = 0;
+  let expense = 0;
+
+  for (const entry of entries) {
+    if (entry.type === 'plus') {
+      income += parseFloat(entry.amount || 0);
+    } else if (entry.type === 'minus') {
+      expense += parseFloat(entry.amount || 0);
+    }
+  }
+
+  const diff = income - expense;
 
   if (isNaN(diff)) {
     console.warn("⚠️ Missing or invalid Difference value for budget bar.");
@@ -2797,12 +2805,14 @@ function updateFullYearBudgetBar(limit, entries = window.entries) {
 
   const percent = Math.min((diff / limit) * 100, 100);
 
-  document.getElementById('yearlySpentLabel').textContent = diff.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  document.getElementById('yearlyLimitLabel').textContent = limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  document.getElementById('yearlySpentLabel').textContent =
+    income.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  document.getElementById('yearlyLimitLabel').textContent =
+    limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   document.getElementById('yearlyProgressFill').style.width = `${percent}%`;
-  document.getElementById('yearlyLeftLabel').textContent = (limit - diff).toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  document.getElementById('yearlyLeftLabel').textContent =
+    (limit - diff).toLocaleString('de-CH', { minimumFractionDigits: 2 });
 }
-
 async function syncYearlyLimitsToMongo() {
   try {
     const token = localStorage.getItem('token');
