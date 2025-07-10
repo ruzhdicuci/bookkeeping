@@ -752,13 +752,14 @@ card.addEventListener('click', (event) => {
 
 
 // ✅ Update budget bar with correct data
-const limit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
-if (!isNaN(limit)) {
-  updateFullYearBudgetBar(limit, window.entries);            // ✅ full bar (green)
-  updateFilteredBudgetBar(limit, window.filteredEntries);    // ✅ filtered bar (blue)
-}
-}
-
+// At the end of renderEntries():
+setTimeout(() => {
+  const limit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
+  if (!isNaN(limit)) {
+    updateFullYearBudgetBar(limit, window.entries);
+    updateFilteredBudgetBar(limit, window.filteredEntries);
+  }
+}, 0); // slight delay ensures DOM is painted + difference is rendered
 
 
 
