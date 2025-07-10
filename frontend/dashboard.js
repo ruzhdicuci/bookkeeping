@@ -74,14 +74,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-function getCurrentTotalBalance() {
+
+  function getCurrentTotalBalance() {
   const plus = parseFloat(document.getElementById('totalPlusAmount')?.textContent?.replace(/[^\d.-]/g, ''));
   const minus = parseFloat(document.getElementById('totalMinusAmount')?.textContent?.replace(/[^\d.-]/g, ''));
   const diff = plus - minus;
   return isNaN(diff) ? 0 : diff;
 }
-window.getCurrentTotalBalance = getCurrentTotalBalance;
-
+windows.getCurrentTotalBalance = getCurrentTotalBalance
 
   // 3. Person search input logic
   document.getElementById('personSearch')?.addEventListener('input', () => {
@@ -759,7 +759,7 @@ card.addEventListener('click', (event) => {
   // ✅ Update budget bar with filtered data
 const currentLimit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
 if (!isNaN(currentLimit)) {
-  setTimeout(() => updateFullYearBudgetBar(currentLimit), 100);
+  updateFullYearBudgetBar(currentLimit);         // ✅ shows the full-year bar (green)
   updateFilteredBudgetBar(currentLimit, filtered); // ✅ shows the filtered bar (blue)
 }
 }
@@ -2758,45 +2758,31 @@ function getUserIdFromToken() {
 window.getUserIdFromToken  = getUserIdFromToken;
 
 async function setYearlyLimit() {
-  const limitInput = parseFloat(document.getElementById('yearlyLimitInput')?.value);
+  const limit = parseFloat(document.getElementById('yearlyLimitInput').value);
   const year = new Date().getFullYear().toString();
 
-  // ✅ Always use global Balance value from UI (Difference)
-  const diffText = document.getElementById('totalDifferenceAmount')?.textContent?.replace(/[^\d.-]/g, '');
-  const balance = parseFloat(diffText);
-
-  if (!limitInput || isNaN(limitInput)) {
-    alert("Invalid limit input.");
-    return;
-  }
-
-  if (isNaN(balance)) {
-    alert("Could not read the Balance (Difference) value.");
+  if (!limit || isNaN(limit)) {
+    alert("Invalid limit value");
     return;
   }
 
   const token = localStorage.getItem('token');
   const payload = JSON.parse(atob(token.split('.')[1]));
-  const userId = payload.userId;
+  const userId = payload.userId; // 👈 correctly extracted
 
-  debug("📤 Saving limit:", balance, "for year", year, "userId:", userId);
+  debug("📤 Saving limit:", limit, "for year", year, "userId:", userId);
 
-  await saveYearlyLimitLocally({
-    userId,
-    year,
-    limit: balance,
-    synced: false,
-    lastUpdated: Date.now()
-  });
+  // Save locally to Dexie
+  await saveYearlyLimitLocally({ userId, year, limit, synced: false, lastUpdated: Date.now() });
 
-  updateFullYearBudgetBar(balance); // ✅ Recalculate using true balance
+  // Update the progress bar UI
+updateFullYearBudgetBar(limit);
+
+  // Try to sync to backend
   await syncYearlyLimitsToMongo();
 }
 
 window.setYearlyLimit = setYearlyLimit;
-
-
-
 
 function updateFullYearBudgetBar(limit) {
   if (!limit || isNaN(limit)) {
@@ -2804,7 +2790,8 @@ function updateFullYearBudgetBar(limit) {
     return;
   }
 
-  const balance = getCurrentTotalBalance(); // 👈 Pull difference directly from DOM
+  const balance = getCurrentTotalBalance(); // ✅ pulls directly from visible Total Plus/Minus
+
   if (isNaN(balance)) {
     console.warn("⚠️ Missing or invalid Difference value for budget bar.");
     return;
