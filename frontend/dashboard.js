@@ -2782,31 +2782,24 @@ function updateFullYearBudgetBar(limit) {
     return;
   }
 
-  const entries = window.entries || [];
-  const currentYear = new Date().getFullYear().toString();
+  // Grab the Difference from the DOM instead of recalculating
+  const diffText = document.querySelector('#totalDiffAmount')?.textContent || '';
+  const diff = parseFloat(diffText.replace(/[^\d.-]/g, ''));
 
-  let income = 0;
-  let expense = 0;
+  if (isNaN(diff)) {
+    console.warn("⚠️ Missing or invalid Difference value for budget bar.");
+    return;
+  }
 
-  entries.forEach(e => {
-    const yearMatch = e.date?.startsWith(currentYear);
-    if (!yearMatch) return;
-
-    const amount = parseFloat(e.amount || 0);
-    if (e.type === 'Income') income += amount;
-    else if (e.type === 'Expense') expense += amount;
-  });
-
-  const balance = income - expense;
-  const percent = Math.min((balance / limit) * 100, 100);
+  const percent = Math.min((diff / limit) * 100, 100);
 
   document.getElementById('yearlySpentLabel').textContent =
-    balance.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+    diff.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   document.getElementById('yearlyLimitLabel').textContent =
     limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   document.getElementById('yearlyProgressFill').style.width = `${percent}%`;
   document.getElementById('yearlyLeftLabel').textContent =
-    (limit - balance).toLocaleString('de-CH', { minimumFractionDigits: 2 });
+    (limit - diff).toLocaleString('de-CH', { minimumFractionDigits: 2 });
 }
 
 async function syncYearlyLimitsToMongo() {
