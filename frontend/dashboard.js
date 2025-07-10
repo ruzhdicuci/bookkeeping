@@ -57,19 +57,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   await db.entries.clear();              // 🧹 Clear old cache
   await db.entries.bulkPut(window.entries); // 💾 Save fresh ones
   renderEntries(window.entries);         // ✅ Render fresh ones
-
-  // ✅ call updateFullYearBudgetBar here with raw full data - added new,
-const limitInput = document.getElementById('yearlyLimitInput');
-if (limitInput) {
-  const limit = parseFloat(limitInput.value);
-  if (!isNaN(limit)) {
-    // Green bar = all entries
-    updateFullYearBudgetBar(limit, window.entries);
-
-    // Blue bar = filtered view
-    updateFilteredBudgetBar(limit, window.filteredEntries || []);
-  }
-}
+});
 
   await loadInitialBankBalances();
 
@@ -2803,24 +2791,26 @@ function updateFullYearBudgetBar(limit, allEntries = window.entries) {
   for (const entry of allEntries) {
     const type = (entry.type || '').toLowerCase();
     const amount = parseFloat(entry.amount) || 0;
-    if (type === 'income') netTotal += amount;
-    else if (type === 'expense') netTotal -= amount;
+    if (type === 'plus') netTotal += amount;
+    else if (type === 'minus') netTotal -= amount;
   }
 
-  const remaining = limit - netTotal;
-  const percentUsed = Math.min(Math.abs(netTotal) / limit * 100, 100);
+  const left = netTotal - limit;
+  const percent = Math.min((Math.abs(netTotal) / limit) * 100, 100);
 
   document.getElementById('yearlySpentLabel').textContent =
     netTotal.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+
   document.getElementById('yearlyLeftLabel').textContent =
-    (remaining < 0 ? '-' : '') + Math.abs(remaining).toLocaleString('de-CH', { minimumFractionDigits: 2 });
+    (left < 0 ? '-' : '') + Math.abs(left).toLocaleString('de-CH', { minimumFractionDigits: 2 });
+
   document.getElementById('yearlyLimitLabel').textContent =
     limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
   const bar = document.getElementById('yearlyProgressFill');
   if (bar) {
-    bar.style.width = `${percentUsed}%`;
-    bar.style.backgroundColor = remaining < 0 ? 'red' : '#27a789';
+    bar.style.width = `${percent}%`;
+    bar.style.backgroundColor = left < 0 ? 'red' : '#27a789';
   }
 }
 
@@ -2897,34 +2887,35 @@ async function loadAndRenderYearlyLimit() {
 
 
 
-function updateFilteredBudgetBar(limit, filtered = window.filteredEntries || []) {
-  if (!Array.isArray(filtered)) return;
+function updateFilteredBudgetBar(limit, filtered = window.filteredEntries) {
+  if (!Array.isArray(filtered) || isNaN(limit)) return;
 
   let netTotal = 0;
   for (const entry of filtered) {
     const type = (entry.type || '').toLowerCase();
     const amount = parseFloat(entry.amount) || 0;
-    if (type === 'income') netTotal += amount;
-    else if (type === 'expense') netTotal -= amount;
+    if (type === 'plus') netTotal += amount;
+    else if (type === 'minus') netTotal -= amount;
   }
 
-  const remaining = limit - netTotal;
-  const percentUsed = Math.min(Math.abs(netTotal) / limit * 100, 100);
+  const left = netTotal - limit;
+  const percent = Math.min((Math.abs(netTotal) / limit) * 100, 100);
 
   document.getElementById('filteredSpentLabel').textContent =
     netTotal.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+
   document.getElementById('filteredLeftLabel').textContent =
-    (remaining < 0 ? '-' : '') + Math.abs(remaining).toLocaleString('de-CH', { minimumFractionDigits: 2 });
+    (left < 0 ? '-' : '') + Math.abs(left).toLocaleString('de-CH', { minimumFractionDigits: 2 });
+
   document.getElementById('filteredLimitLabel').textContent =
     limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
   const bar = document.getElementById('filteredProgressFill');
   if (bar) {
-    bar.style.width = `${percentUsed}%`;
-    bar.style.backgroundColor = remaining < 0 ? 'red' : '#06b2eb';
+    bar.style.width = `${percent}%`;
+    bar.style.backgroundColor = left < 0 ? 'red' : '#06b2eb';
   }
 }
-
 
 window.addEventListener('DOMContentLoaded', async () => {
   if (!window.persons || window.persons.length === 0) {
