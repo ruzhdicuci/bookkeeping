@@ -191,6 +191,12 @@ async function loadInitialBankBalances() {
 }
 
 
+function parseSwissNumber(str) {
+  if (!str) return NaN;
+  return parseFloat(str.replace(/'/g, '').replace(/[^\d.-]/g, ''));
+}
+
+
  function populatePersonFilterForDashboard(persons) {
     const container = document.getElementById('personOptions');
     if (!container) {
@@ -2753,33 +2759,35 @@ window.getUserIdFromToken  = getUserIdFromToken;
 
 
 async function setYearlyLimit() {
+  const limit = parseSwissNumber(document.getElementById('yearlyLimitInput')?.value);
   const startFrom = document.getElementById('startFromInput').value;
   const year = new Date().getFullYear().toString();
 
-const diffText = document.getElementById('totalDifferenceAmount')?.textContent?.replace(/[^\d.-]/g, '');
-const limit = parseFloat(diffText);
+  const plus = parseSwissNumber(document.getElementById('totalPlusAmount')?.textContent);
+  const minus = parseSwissNumber(document.getElementById('totalMinusAmount')?.textContent);
+  const difference = plus - minus;
 
-if (isNaN(limit)) {
-  alert("Invalid or missing 'Difference' value.");
-  return;
-}
+  if (!limit || isNaN(limit) || isNaN(difference)) {
+    alert("Invalid or missing 'Difference' value.");
+    return;
+  }
 
   const token = localStorage.getItem('token');
   const payload = JSON.parse(atob(token.split('.')[1]));
   const userId = payload.userId;
 
-  debug("📤 Saving limit:", limit, "for year", year, "userId:", userId, "startFrom:", startFrom);
+  debug("📤 Saving limit:", difference, "for year", year, "userId:", userId, "startFrom:", startFrom);
 
   await saveYearlyLimitLocally({
     userId,
     year,
-    limit,
+    limit: difference,
     startFrom: startFrom || new Date().toISOString(),
     synced: false,
     lastUpdated: Date.now()
   });
 
-  updateFullYearBudgetBar(limit, startFrom); // ✅ Recalculate bar
+  updateFullYearBudgetBar(difference, startFrom); // ✅ Recalculate both bars
   await syncYearlyLimitsToMongo();
 }
 
