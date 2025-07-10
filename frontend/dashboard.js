@@ -2941,3 +2941,5 @@ window.addEventListener('DOMContentLoaded', async () => {
 });
 
 window.loadPersons = loadPersons;
+window.loadAndRenderYearlyLimit = loadAndRenderYearlyLimit;
+window.redirectIfNotLoggedIn = redirectIfNotLoggedIn;
