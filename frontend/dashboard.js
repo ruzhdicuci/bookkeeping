@@ -2897,38 +2897,45 @@ async function loadAndRenderYearlyLimit() {
   }
 }
 
-function updateFilteredBudgetBar(limit, filteredEntries) {
-  if (!limit || isNaN(limit)) return;
-  if (!filteredEntries || !Array.isArray(filteredEntries)) return;
+function updateFullYearBudgetBar(limit, startFrom = null) {
+  if (!limit || isNaN(limit)) {
+    console.warn("⚠️ No yearly limit set.");
+    return;
+  }
 
-  const currentYear = new Date().getFullYear().toString();
+  const entries = window.entries || [];
   const excludedPersons = ['balance', 'transfer'];
+  const startDate = new Date(startFrom || '2000-01-01');
 
-  const filteredExpenses = filteredEntries
-    .filter(e => {
-      const typeMatch = e.type === 'Expense';
-      const yearMatch = e.date?.startsWith(currentYear);
-      const person = (e.person || '').trim().toLowerCase();
-      const isExcluded = excludedPersons.includes(person);
-      const include = typeMatch && yearMatch && !isExcluded;
+  let income = 0;
+  let expense = 0;
 
-      debug('[FILTERED]', `[${e.type}]`, `[${person}]`, `include=${include}`, e);
+  entries.forEach(e => {
+    const entryDate = new Date(e.date);
+    if (entryDate < startDate) return;
 
-      return include;
-    })
-    .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
+    const person = (e.person || '').trim().toLowerCase();
+    if (excludedPersons.includes(person)) return;
 
-  const percent = Math.min((filteredExpenses / limit) * 100, 100);
+    const amount = parseFloat(e.amount || 0);
 
-  document.getElementById('filteredSpentLabel').textContent =
-    filteredExpenses.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  document.getElementById('filteredLimitLabel').textContent =
+    if (e.type === 'Income') income += amount;
+    else if (e.type === 'Expense') expense += amount;
+  });
+
+  const difference = income - expense; // 💰 how much you've saved so far
+  const remaining = limit - difference; // 📉 how far off you are from the goal
+
+  const percent = Math.min((difference / limit) * 100, 100);
+
+  document.getElementById('yearlySpentLabel').textContent =
+    `${difference.toLocaleString('de-CH', { minimumFractionDigits: 2 })}`;
+  document.getElementById('yearlyLimitLabel').textContent =
     limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  document.getElementById('filteredProgressFill').style.width = `${percent}%`;
-  document.getElementById('filteredLeftLabel').textContent =
-    (limit - filteredExpenses).toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  document.getElementById('yearlyProgressFill').style.width = `${percent}%`;
+  document.getElementById('yearlyLeftLabel').textContent =
+    `${remaining.toLocaleString('de-CH', { minimumFractionDigits: 2 })}`;
 }
-
 
 
 window.addEventListener('DOMContentLoaded', async () => {
