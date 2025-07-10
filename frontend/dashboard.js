@@ -2795,14 +2795,19 @@ function updateFullYearBudgetBar(limit, allEntries = window.entries) {
   if (!Array.isArray(allEntries)) return;
 
   let spent = 0;
+
   for (const entry of allEntries) {
-    if ((entry.type || '').toLowerCase() !== 'income') {
-      spent += parseFloat(entry.amount) || 0;
-    }
+    const amount = parseFloat(entry.amount);
+    if (isNaN(amount)) continue; // ❌ Skip invalid amounts
+
+    const type = (entry.type || '').toLowerCase();
+    if (type !== 'minus') continue; // ✅ Only count expenses etc.
+
+    spent += amount;
   }
 
   const left = limit - spent;
-  const percentUsed = Math.min((spent / limit) * 100, 100);
+  const percentUsed = Math.min(Math.abs(spent / limit) * 100, 100);
 
   const spentEl = document.getElementById("yearlySpentLabel");
   const leftEl = document.getElementById("yearlyLeftLabel");
