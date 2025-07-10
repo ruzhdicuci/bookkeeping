@@ -756,18 +756,20 @@ card.addEventListener('click', (event) => {
   document.getElementById('totalIncome').textContent = incomeTotal.toFixed(2);
   document.getElementById('totalExpense').textContent = expenseTotal.toFixed(2);
   document.getElementById('totalBalance').textContent = (incomeTotal - expenseTotal).toFixed(2);
-  const difference = incomeTotal - expenseTotal;
+ 
 // ✅ Now, finally add this:
   // ✅ Final part — add this at the end of the function
 window.filteredEntries = filtered;
 
+const difference = incomeTotal - expenseTotal;
+
 setTimeout(() => {
   const limit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
- if (!isNaN(limit) && typeof difference === 'number' && !isNaN(difference)) {
-  updateFullYearBudgetBar(limit, window.entries);
-} else {
-  console.warn("⛔ Not updating bar — limit or difference invalid", limit, difference);
-}
+  if (!isNaN(limit) && typeof difference === 'number' && !isNaN(difference)) {
+    updateFullYearBudgetBar(limit, difference);
+  } else {
+    console.warn("⛔ Not updating bar — limit or difference invalid", limit, difference);
+  }
 }, 0);
 } // ← ends the function
 
