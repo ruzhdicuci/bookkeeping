@@ -60,10 +60,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ✅ call updateFullYearBudgetBar here with raw full data - added new,
 const limitInput = document.getElementById('yearlyLimitInput');
 if (limitInput) {
-  const limit = parseFloat(limitInput.value);
-  if (!isNaN(limit)) {
-    updateFullYearBudgetBar(limit);
-  }
+const limit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
+if (!isNaN(limit)) {
+  updateFilteredBudgetBar(limit, filtered); // <== pass filtered!
+}
 
 }
 
@@ -2913,10 +2913,10 @@ function getFilteredEntriesIncludingBalanceAndTransfer(filteredEntries) {
 }
 
 
-function updateFilteredBudgetBar(limit) {
+function updateFilteredBudgetBar(limit, filtered) {
   if (!limit || isNaN(limit)) return;
 
-  const entries = window.filteredEntries || [];
+  const entries = filtered || [];
 
   let totalExpense = 0;
   for (const entry of entries) {
@@ -2929,7 +2929,6 @@ function updateFilteredBudgetBar(limit) {
   const barFillValue = totalExpense;
   const percent = Math.min((barFillValue / limit) * 100, 100);
 
-  // Set visual values
   document.getElementById('filteredSpentLabel').textContent =
     barFillValue.toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
@@ -2939,10 +2938,9 @@ function updateFilteredBudgetBar(limit) {
   document.getElementById('filteredLeftLabel').textContent =
     overSpent.toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
-  // Adjust bar
   const bar = document.getElementById('filteredProgressFill');
-  bar.style.width = `${Math.min((barFillValue / limit) * 100, 100)}%`;
-  bar.style.backgroundColor = overSpent > 0 ? 'red' : ''; // Optional: red if over
+  bar.style.width = `${percent}%`;
+  bar.style.backgroundColor = overSpent > 0 ? 'red' : '';
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
