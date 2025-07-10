@@ -2859,7 +2859,7 @@ async function syncYearlyLimitsToMongo() {
 
 
 async function loadAndRenderYearlyLimit() {
-  const year = new Date().getFullYear().toString(); // ✅ Always string
+  const year = new Date().getFullYear().toString();
   const userId = getUserIdFromToken();
 
   debug("🔄 Loading yearly limit for:", userId, year);
@@ -2867,9 +2867,17 @@ async function loadAndRenderYearlyLimit() {
   const localLimit = await getYearlyLimitFromCache(userId, year);
   debug("💾 Local limit:", localLimit);
 
+  const entries = window.entries || []; // fallback
+
+  const totalPlus = entries.filter(e => (e.type || '').toLowerCase() === 'plus')
+                           .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+  const totalMinus = entries.filter(e => (e.type || '').toLowerCase() === 'minus')
+                            .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+  const difference = totalPlus - totalMinus;
+
   if (localLimit) {
     document.getElementById('yearlyLimitInput').value = localLimit.limit;
-    updateFullYearBudgetBar(localLimit.limit);
+    updateFullYearBudgetBar(localLimit.limit, difference);
   } else {
     debug("🌐 Fetching limit from server...");
     try {
@@ -2887,7 +2895,7 @@ async function loadAndRenderYearlyLimit() {
       await saveYearlyLimitLocally({ userId, year, limit: data.limit });
 
       document.getElementById('yearlyLimitInput').value = data.limit;
-      updateFullYearBudgetBar(data.limit);
+      updateFullYearBudgetBar(data.limit, difference);
     } catch (err) {
       console.error("❌ Error loading yearly limit from server:", err);
     }
