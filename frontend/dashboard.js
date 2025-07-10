@@ -2794,15 +2794,14 @@ updateFilteredBudgetBar(limit, filteredEntries); // ✅ make sure filteredEntrie
 
 window.setYearlyLimit = setYearlyLimit;
 
-
 function updateFullYearBudgetBar(limit, allEntries = window.entries) {
   if (!Array.isArray(allEntries)) return;
 
   let spent = 0;
   for (const entry of allEntries) {
-    if ((entry.type || '').toLowerCase() === 'minus') {
-      spent += parseFloat(entry.amount) || 0;
-    }
+    const type = (entry.type || '').toLowerCase();
+    const amount = parseFloat(entry.amount) || 0;
+    if (type === 'expense') spent += amount;
   }
 
   const left = limit - spent;
@@ -2896,15 +2895,12 @@ async function loadAndRenderYearlyLimit() {
 function updateFilteredBudgetBar(limit, filtered) {
   if (!limit || isNaN(limit)) return;
 
-  console.log("🔍 Filtered entries (sample):", filtered.slice(0, 5));
-  console.log("🔍 Types:", filtered.map(e => e.type));
-
   let netTotal = 0;
   for (const entry of filtered) {
     const type = (entry.type || '').toLowerCase();
     const amount = parseFloat(entry.amount) || 0;
-    if (type === 'plus') netTotal += amount;
-    else if (type === 'minus') netTotal -= amount;
+    if (type === 'income') netTotal += amount;
+    else if (type === 'expense') netTotal -= amount;
   }
 
   const left = netTotal - limit;
@@ -2923,6 +2919,7 @@ function updateFilteredBudgetBar(limit, filtered) {
   bar.style.width = `${percent}%`;
   bar.style.backgroundColor = left < 0 ? 'red' : '#06b2eb';
 }
+
 
 
 window.addEventListener('DOMContentLoaded', async () => {
