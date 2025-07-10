@@ -2753,12 +2753,18 @@ window.getUserIdFromToken  = getUserIdFromToken;
 
 
 async function setYearlyLimit() {
-  const limit = parseFloat(document.getElementById('yearlyLimitInput').value);
   const startFrom = document.getElementById('startFromInput').value;
   const year = new Date().getFullYear().toString();
 
-  if (!limit || isNaN(limit)) {
-    alert("Invalid limit value");
+  // ✅ Use actual totals from UI
+  const plusRaw = document.getElementById('totalPlusAmount')?.textContent;
+  const minusRaw = document.getElementById('totalMinusAmount')?.textContent;
+  const plus = parseFloat(plusRaw?.replace(/[^\d.-]/g, '')) || 0;
+  const minus = parseFloat(minusRaw?.replace(/[^\d.-]/g, '')) || 0;
+  const difference = plus - minus;
+
+  if (isNaN(difference) || difference <= 0) {
+    alert("Invalid or missing totals to calculate limit.");
     return;
   }
 
@@ -2766,40 +2772,52 @@ async function setYearlyLimit() {
   const payload = JSON.parse(atob(token.split('.')[1]));
   const userId = payload.userId;
 
-  debug("📤 Saving limit:", limit, "for year", year, "userId:", userId, "startFrom:", startFrom);
+  debug("📤 Saving limit (from balance):", difference, "for year", year, "userId:", userId, "startFrom:", startFrom);
 
   await saveYearlyLimitLocally({
     userId,
     year,
-    limit,
+    limit: difference,
     startFrom: startFrom || new Date().toISOString(),
     synced: false,
     lastUpdated: Date.now()
   });
 
-  updateFullYearBudgetBar(limit, startFrom); // ✅ Recalculate both bars
+  updateFullYearBudgetBar(difference, startFrom);
   await syncYearlyLimitsToMongo();
 }
 
 window.setYearlyLimit = setYearlyLimit;
 
+
+
 function updateFullYearBudgetBar(_ignoredLimit, _startFrom = null) {
-  // 🔢 Grab values directly from UI (same as the second bar)
-  const plus = parseFloat(document.getElementById('totalPlusAmount')?.textContent?.replace(/[^\d.-]/g, '')) || 0;
-  const minus = parseFloat(document.getElementById('totalMinusAmount')?.textContent?.replace(/[^\d.-]/g, '')) || 0;
+  const plusRaw = document.getElementById('totalPlusAmount')?.textContent;
+  const minusRaw = document.getElementById('totalMinusAmount')?.textContent;
+
+  if (!plusRaw || !minusRaw) {
+    console.warn("⏳ Totals not ready yet for budget bar.");
+    return;
+  }
+
+  const plus = parseFloat(plusRaw.replace(/[^\d.-]/g, '')) || 0;
+  const minus = parseFloat(minusRaw.replace(/[^\d.-]/g, '')) || 0;
   const difference = plus - minus;
 
-  const percent = Math.min((difference / difference) * 100, 100); // always 100%
-  
-  // Show values in first bar
+  const used = minus;
+  const limit = difference;
+  const remaining = limit - used;
+  const percent = Math.min((used / limit) * 100, 100);
+
   document.getElementById('yearlySpentLabel').textContent =
-    ` ${minus.toLocaleString('de-CH', { minimumFractionDigits: 2 })}`;
+    used.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   document.getElementById('yearlyLimitLabel').textContent =
-    difference.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  document.getElementById('yearlyProgressFill').style.width = `${percent}%`;
+    limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   document.getElementById('yearlyLeftLabel').textContent =
-    (difference - minus).toLocaleString('de-CH', { minimumFractionDigits: 2 });
+    remaining.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  document.getElementById('yearlyProgressFill').style.width = `${percent}%`;
 }
+
 
 async function syncYearlyLimitsToMongo() {
   try {
