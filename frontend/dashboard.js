@@ -764,7 +764,7 @@ window.filteredEntries = filtered;
 setTimeout(() => {
   const limit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
  if (!isNaN(limit) && typeof difference === 'number' && !isNaN(difference)) {
-  updateFullYearBudgetBar(limit, difference);
+  updateFullYearBudgetBar(limit, window.entries);
 } else {
   console.warn("⛔ Not updating bar — limit or difference invalid", limit, difference);
 }
@@ -2803,7 +2803,7 @@ async function setYearlyLimit() {
 
   // ✅ Only update bars — no re-rendering!
 const diff = calculateYearlyDifference(window.entries); // use your own function if needed
-updateFullYearBudgetBar(limit, difference);
+updateFullYearBudgetBar(limit, window.entries);
 
   // Sync
   await syncYearlyLimitsToMongo();
