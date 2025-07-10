@@ -2786,16 +2786,22 @@ async function setYearlyLimit() {
 
 window.setYearlyLimit = setYearlyLimit;
 
+
+
+
 function updateFullYearBudgetBar(limit, entries = window.entries) {
-  const diffEl = document.getElementById('summaryDifference');
-  if (!diffEl) return;
+  if (!entries || !entries.length || isNaN(limit)) return;
 
-  // Extract and parse the displayed difference (e.g., "10'828.01")
-  const rawText = diffEl.textContent.replace(/’/g, '').replace(/,/g, '').trim();
-  const difference = parseFloat(rawText);
+  let totalIncome = 0;
+  let totalExpense = 0;
 
-  if (isNaN(difference) || isNaN(limit)) return;
+  entries.forEach(e => {
+    const amount = parseFloat(e.amount) || 0;
+    if ((e.type || '').toLowerCase() === 'income') totalIncome += amount;
+    else totalExpense += amount;
+  });
 
+  const difference = totalIncome - totalExpense;
   const left = difference;
   const percent = Math.min((Math.abs(difference) / limit) * 100, 100);
 
@@ -2814,7 +2820,7 @@ function updateFullYearBudgetBar(limit, entries = window.entries) {
   const bar = document.getElementById('yearlyProgressFill');
   if (bar) {
     bar.style.width = `${percent}%`;
-    bar.style.backgroundColor = left < 0 ? 'red' : '#27a789'; // You can adjust this color
+    bar.style.backgroundColor = left < 0 ? 'red' : '#27a789'; // Adjust as needed
   }
 }
 
@@ -2891,13 +2897,18 @@ async function loadAndRenderYearlyLimit() {
 
 
 function updateFilteredBudgetBar(limit, filtered = window.filteredEntries) {
-  const diffEl = document.getElementById('summaryDifference');
-  if (!diffEl) return;
+  if (!filtered || !filtered.length || isNaN(limit)) return;
 
-  // Parse the displayed difference as a number (handle thousand separators)
-  const rawText = diffEl.textContent.replace(/’/g, '').replace(/,/g, '').trim();
-  const difference = parseFloat(rawText);
+  let totalIncome = 0;
+  let totalExpense = 0;
 
+  filtered.forEach(e => {
+    const amount = parseFloat(e.amount) || 0;
+    if ((e.type || '').toLowerCase() === 'income') totalIncome += amount;
+    else totalExpense += amount;
+  });
+
+  const difference = totalIncome - totalExpense;
   const left = difference;
   const percent = Math.min((Math.abs(difference) / limit) * 100, 100);
 
@@ -2916,7 +2927,6 @@ function updateFilteredBudgetBar(limit, filtered = window.filteredEntries) {
     bar.style.backgroundColor = left < 0 ? 'red' : '#06b2eb';
   }
 }
-
 
 window.addEventListener('DOMContentLoaded', async () => {
   if (!window.persons || window.persons.length === 0) {
