@@ -2897,33 +2897,36 @@ async function loadAndRenderYearlyLimit() {
 function updateFilteredBudgetBar(limit, filtered) {
   if (!limit || isNaN(limit)) return;
 
-  const income = (filtered || []).reduce((sum, entry) => {
-    return entry.type === 'plus' ? sum + parseFloat(entry.amount || 0) : sum;
-  }, 0);
+  let netTotal = 0;
+  for (const entry of filtered) {
+    const amount = parseFloat(entry.amount) || 0;
+    if (entry.type === 'plus') {
+      netTotal += amount;
+    } else if (entry.type === 'minus') {
+      netTotal -= amount;
+    }
+  }
 
-  const expenses = (filtered || []).reduce((sum, entry) => {
-    return entry.type === 'minus' ? sum + parseFloat(entry.amount || 0) : sum;
-  }, 0);
+  const difference = netTotal - limit;
+  const percent = Math.min(Math.abs(netTotal / limit) * 100, 100);
 
-  const actualDifference = income - expenses;
-  const left = actualDifference - limit;
-  const percent = Math.min(Math.abs(actualDifference / limit) * 100, 100);
-
-  // Set text content
   document.getElementById('filteredSpentLabel').textContent =
-    actualDifference.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+    netTotal.toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
   document.getElementById('filteredLeftLabel').textContent =
-    (left < 0 ? `-${Math.abs(left).toLocaleString('de-CH', { minimumFractionDigits: 2 })}` : left.toLocaleString('de-CH', { minimumFractionDigits: 2 }));
+    (difference < 0
+      ? `-${Math.abs(difference).toLocaleString('de-CH', { minimumFractionDigits: 2 })}`
+      : difference.toLocaleString('de-CH', { minimumFractionDigits: 2 }));
 
   document.getElementById('filteredLimitLabel').textContent =
     limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
-  // Set bar color
   const progressFill = document.getElementById('filteredProgressFill');
   progressFill.style.width = `${percent}%`;
-  progressFill.style.backgroundColor = left < 0 ? 'red' : '#00bfff';
+  progressFill.style.backgroundColor = difference < 0 ? 'red' : '#00bfff';
 }
+
+
 
 window.addEventListener('DOMContentLoaded', async () => {
   if (!window.persons || window.persons.length === 0) {
