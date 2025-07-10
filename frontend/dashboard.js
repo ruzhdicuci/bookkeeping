@@ -752,7 +752,7 @@ card.addEventListener('click', (event) => {
 const currentLimit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
 if (!isNaN(currentLimit)) {
   updateFullYearBudgetBar(currentLimit);           // Green bar: uses ALL entries
-  updateFilteredBudgetBar(currentLimit);           // Blue bar: uses visible Balance
+ setTimeout(() => updateFilteredBudgetBar(currentLimit), 100);          // Blue bar: uses visible Balance
 }
 }
 
