@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const diff = plus - minus;
   return isNaN(diff) ? 0 : diff;
 }
-
+window.getCurrentTotalBalance = getCurrentTotalBalance;
 
   // 3. Person search input logic
   document.getElementById('personSearch')?.addEventListener('input', () => {
@@ -2923,6 +2923,4 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
-
-windows.getCurrentTotalBalance = getCurrentTotalBalance
 window.loadPersons = loadPersons;
