@@ -74,28 +74,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-function getCurrentTotalBalance() {
-  const plusEl = document.getElementById('totalPlusAmount');
-  const minusEl = document.getElementById('totalMinusAmount');
-
-  if (!plusEl || !minusEl) {
-    console.warn("⚠️ Balance elements not found.");
-    return NaN;
-  }
-
-  const plus = parseFloat(plusEl.textContent.replace(/[^\d.-]/g, ''));
-  const minus = parseFloat(minusEl.textContent.replace(/[^\d.-]/g, ''));
-  const diff = plus - minus;
-
-  if (isNaN(diff)) {
-    console.warn("⚠️ Balance values invalid:", plus, minus);
-  }
-
-  return diff;
-}
-
-window.getCurrentTotalBalance = getCurrentTotalBalance;
-
 
   // 3. Person search input logic
   document.getElementById('personSearch')?.addEventListener('input', () => {
@@ -2772,45 +2750,31 @@ function getUserIdFromToken() {
 window.getUserIdFromToken  = getUserIdFromToken;
 
 async function setYearlyLimit() {
-  const limitInput = parseFloat(document.getElementById('yearlyLimitInput')?.value);
+  const limit = parseFloat(document.getElementById('yearlyLimitInput').value);
   const year = new Date().getFullYear().toString();
 
-  // ✅ Always use global Balance value from UI (Difference)
-  const diffText = document.getElementById('totalDifferenceAmount')?.textContent?.replace(/[^\d.-]/g, '');
-  const balance = parseFloat(diffText);
-
-  if (!limitInput || isNaN(limitInput)) {
-    alert("Invalid limit input.");
-    return;
-  }
-
-  if (isNaN(balance)) {
-    alert("Could not read the Balance (Difference) value.");
+  if (!limit || isNaN(limit)) {
+    alert("Invalid limit value");
     return;
   }
 
   const token = localStorage.getItem('token');
   const payload = JSON.parse(atob(token.split('.')[1]));
-  const userId = payload.userId;
+  const userId = payload.userId; // 👈 correctly extracted
 
-  debug("📤 Saving limit:", balance, "for year", year, "userId:", userId);
+  debug("📤 Saving limit:", limit, "for year", year, "userId:", userId);
 
-  await saveYearlyLimitLocally({
-    userId,
-    year,
-    limit: balance,
-    synced: false,
-    lastUpdated: Date.now()
-  });
+  // Save locally to Dexie
+  await saveYearlyLimitLocally({ userId, year, limit, synced: false, lastUpdated: Date.now() });
 
-  updateFullYearBudgetBar(balance); // ✅ Recalculate using true balance
+  // Update the progress bar UI
+updateFullYearBudgetBar(limit);
+
+  // Try to sync to backend
   await syncYearlyLimitsToMongo();
 }
 
 window.setYearlyLimit = setYearlyLimit;
-
-
-
 
 function updateFullYearBudgetBar(limit) {
   if (!limit || isNaN(limit)) {
@@ -2818,22 +2782,31 @@ function updateFullYearBudgetBar(limit) {
     return;
   }
 
-  const difference = getCurrentTotalBalance();
+  const entries = window.entries || [];
+  const currentYear = new Date().getFullYear().toString();
 
-  if (isNaN(difference)) {
-    console.warn("⚠️ Missing or invalid Difference value for budget bar.");
-    return;
-  }
+  let income = 0;
+  let expense = 0;
 
-  const percent = Math.min((difference / limit) * 100, 100);
+  entries.forEach(e => {
+    const yearMatch = e.date?.startsWith(currentYear);
+    if (!yearMatch) return;
+
+    const amount = parseFloat(e.amount || 0);
+    if (e.type === 'Income') income += amount;
+    else if (e.type === 'Expense') expense += amount;
+  });
+
+  const balance = income - expense;
+  const percent = Math.min((balance / limit) * 100, 100);
 
   document.getElementById('yearlySpentLabel').textContent =
-    difference.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+    balance.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   document.getElementById('yearlyLimitLabel').textContent =
     limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   document.getElementById('yearlyProgressFill').style.width = `${percent}%`;
   document.getElementById('yearlyLeftLabel').textContent =
-    (limit - difference).toLocaleString('de-CH', { minimumFractionDigits: 2 });
+    (limit - balance).toLocaleString('de-CH', { minimumFractionDigits: 2 });
 }
 
 async function syncYearlyLimitsToMongo() {
