@@ -1,4 +1,4 @@
-const DEBUG_MODE = false; // or true for development
+const DEBUG_MODE = true; // or true for development
 const debug = (...args) => DEBUG_MODE && console.log(...args);
 
 import {
@@ -2657,7 +2657,7 @@ window.drawCharts = drawCharts;
 window.updateFullYearBudgetBar = updateFullYearBudgetBar;
 window.syncYearlyLimitsToMongo  =syncYearlyLimitsToMongo;
 window.loadAndRenderYearlyLimit  = loadAndRenderYearlyLimit;
-window.updateSummaryTotals = updateSummaryTotals
+
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -2756,15 +2756,13 @@ async function setYearlyLimit() {
   const startFrom = document.getElementById('startFromInput').value;
   const year = new Date().getFullYear().toString();
 
-  const plus = parseFloat(document.getElementById('totalPlusAmount')?.textContent?.replace(/[^\d.-]/g, ''));
-  const minus = parseFloat(document.getElementById('totalMinusAmount')?.textContent?.replace(/[^\d.-]/g, ''));
+const diffText = document.getElementById('totalDifferenceAmount')?.textContent?.replace(/[^\d.-]/g, '');
+const limit = parseFloat(diffText);
 
-  if (isNaN(plus) || isNaN(minus)) {
-    alert("Invalid or missing totals to calculate limit.");
-    return;
-  }
-
-  const limit = plus - minus;
+if (isNaN(limit)) {
+  alert("Invalid or missing 'Difference' value.");
+  return;
+}
 
   const token = localStorage.getItem('token');
   const payload = JSON.parse(atob(token.split('.')[1]));
@@ -2787,27 +2785,6 @@ async function setYearlyLimit() {
 
 window.setYearlyLimit = setYearlyLimit;
 
-function updateSummaryTotals() {
-  const entries = window.entries || [];
-
-  let income = 0;
-  let expense = 0;
-
-  entries.forEach(e => {
-    const amount = parseFloat(e.amount || 0);
-    if (e.type === 'Income') income += amount;
-    else if (e.type === 'Expense') expense += amount;
-  });
-
-  const balance = income - expense;
-
-  document.getElementById('totalPlusAmount').textContent =
-    `+${income.toLocaleString('de-CH', { minimumFractionDigits: 2 })}`;
-  document.getElementById('totalMinusAmount').textContent =
-    `-${expense.toLocaleString('de-CH', { minimumFractionDigits: 2 })}`;
-  document.getElementById('totalDifferenceAmount').textContent =
-    balance.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-}
 
 
 function updateFullYearBudgetBar(_ignoredLimit, startFrom = null) {
@@ -2824,9 +2801,13 @@ function updateFullYearBudgetBar(_ignoredLimit, startFrom = null) {
     .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
 
   // ✅ Use actual totals from UI (Difference)
-  const plus = parseFloat(document.getElementById('totalPlusAmount')?.textContent?.replace(/[^\d.-]/g, '')) || 0;
-  const minus = parseFloat(document.getElementById('totalMinusAmount')?.textContent?.replace(/[^\d.-]/g, '')) || 0;
-  const difference = plus - minus;
+const diffText = document.getElementById('totalDifferenceAmount')?.textContent?.replace(/[^\d.-]/g, '');
+const difference = parseFloat(diffText);
+
+if (isNaN(difference)) {
+  console.warn("❌ Missing or invalid Difference value for budget bar.");
+  return;
+}
 
   const percent = Math.min((expenses / difference) * 100, 100);
 
