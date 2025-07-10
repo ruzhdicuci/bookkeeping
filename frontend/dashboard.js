@@ -2788,28 +2788,36 @@ function updateFullYearBudgetBar(_ignoredLimit, startFrom = null) {
   const entries = window.entries || [];
   const startDate = new Date(startFrom || '2000-01-01');
 
-  const expenses = entries
-    .filter(e => {
-      const isExpense = e.type === 'Expense';
-      const entryDate = new Date(e.date);
-      return isExpense && entryDate >= startDate;
-    })
-    .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
+  let income = 0;
+  let expense = 0;
 
-  const plus = parseFloat(document.getElementById('totalPlusAmount')?.textContent?.replace(/[^\d.-]/g, '')) || 0;
-  const minus = parseFloat(document.getElementById('totalMinusAmount')?.textContent?.replace(/[^\d.-]/g, '')) || 0;
-  const difference = plus - minus;
+  for (const e of entries) {
+    const entryDate = new Date(e.date);
+    if (entryDate < startDate) continue;
 
-  const percent = Math.min((expenses / difference) * 100, 100);
+    const amount = parseFloat(e.amount || 0);
+    if (e.type === 'Income') income += amount;
+    else if (e.type === 'Expense') expense += amount;
+  }
 
+  const difference = income - expense;
+  const remaining = difference < 0 ? 0 : difference;
+  const percent = Math.min((difference / (difference || 1)) * 100, 100); // avoid NaN
+
+  // Update UI elements
   document.getElementById('yearlySpentLabel').textContent =
-    ` ${expenses.toLocaleString('de-CH', { minimumFractionDigits: 2 })}`;
+    difference.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+
   document.getElementById('yearlyLimitLabel').textContent =
     difference.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+
   document.getElementById('yearlyProgressFill').style.width = `${percent}%`;
+
   document.getElementById('yearlyLeftLabel').textContent =
-    ` ${(difference - expenses).toLocaleString('de-CH', { minimumFractionDigits: 2 })} `;
+    (0).toLocaleString('de-CH', { minimumFractionDigits: 2 }); // Always show 0 left (target met)
 }
+
+
 
 async function syncYearlyLimitsToMongo() {
   try {
