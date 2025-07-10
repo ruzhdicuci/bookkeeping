@@ -2750,7 +2750,9 @@ function getUserIdFromToken() {
 
 window.getUserIdFromToken  = getUserIdFromToken;
 
-
+document.addEventListener('DOMContentLoaded', () => {
+  renderEntries(); // ✅ Ensure this is called on page load
+});
 
 async function setYearlyLimit() {
   const limit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
@@ -2767,7 +2769,7 @@ async function setYearlyLimit() {
 
   debug("📤 Saving limit:", limit, "for year", year, "userId:", userId);
 
-  // Save locally to Dexie
+  // ✅ Save locally
   await saveYearlyLimitLocally({
     userId,
     year,
@@ -2776,14 +2778,18 @@ async function setYearlyLimit() {
     lastUpdated: Date.now()
   });
 
-  // ✅ Only update the bars — filtered entries are already available
-  updateFullYearBudgetBar(limit, window.entries);
-  updateFilteredBudgetBar(limit, window.filteredEntries);
+  // ✅ Re-render entries to refresh window.filteredEntries
+  renderEntries();
 
-  // Optional: Sync to backend
+  // ⏳ Delay bar update slightly after render
+  setTimeout(() => {
+    updateFullYearBudgetBar(limit, window.entries);
+    updateFilteredBudgetBar(limit, window.filteredEntries);
+  }, 50);
+
+  // ☁️ Sync to backend
   await syncYearlyLimitsToMongo();
 }
-
 window.setYearlyLimit = setYearlyLimit;
 
 
