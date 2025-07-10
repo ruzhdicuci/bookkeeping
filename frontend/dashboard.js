@@ -57,6 +57,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   await db.entries.bulkPut(window.entries); // 💾 Save fresh ones
   renderEntries(window.entries);         // ✅ Render fresh ones
 
+  // ✅ call updateFullYearBudgetBar here with raw full data - added new,
+const limit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
+if (!isNaN(limit)) {
+  updateFullYearBudgetBar(limit);
+}
+
   await loadInitialBankBalances();
 
   if (navigator.onLine) syncToCloud();
@@ -2782,7 +2788,6 @@ function updateFullYearBudgetBar(limit) {
     return;
   }
 
-  // Correctly calculate income and expense from all entries
   const entries = window.entries || [];
 
   let income = 0;
@@ -2803,16 +2808,28 @@ function updateFullYearBudgetBar(limit) {
     return;
   }
 
-  const percent = Math.min((diff / limit) * 100, 100);
+  const percent = Math.min(Math.abs(diff / limit) * 100, 100);
+  const left = limit - diff;
 
   document.getElementById('yearlySpentLabel').textContent =
     income.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   document.getElementById('yearlyLimitLabel').textContent =
     limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  document.getElementById('yearlyProgressFill').style.width = `${percent}%`;
   document.getElementById('yearlyLeftLabel').textContent =
-    (limit - diff).toLocaleString('de-CH', { minimumFractionDigits: 2 });
+    left.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+
+  const fill = document.getElementById('yearlyProgressFill');
+  fill.style.width = `${percent}%`;
+
+  // 🔴 Optionally turn the bar red if over budget
+  if (left < 0) {
+    fill.style.backgroundColor = 'red';
+  } else {
+    fill.style.backgroundColor = ''; // Reset if under budget
+  }
 }
+
+
 async function syncYearlyLimitsToMongo() {
   try {
     const token = localStorage.getItem('token');
