@@ -1,4 +1,4 @@
-const DEBUG_MODE = true; // or true for development
+const DEBUG_MODE = false; // or true for development
 const debug = (...args) => DEBUG_MODE && console.log(...args);
 
 import {
@@ -60,15 +60,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadInitialBankBalances();
 
   if (navigator.onLine) syncToCloud();
-
-
-
-function parseSwissNumber(str) {
-  if (!str) return NaN;
-  return parseFloat(str.replace(/'/g, '').replace(/[^\d.-]/g, ''));
-}
-window.parseSwissNumber = parseSwissNumber;
-
 
 
   // Your flatpickr and other logic continues...
@@ -198,8 +189,6 @@ async function loadInitialBankBalances() {
   // ✅ Render bank balances from whatever was loaded
   renderBankBalanceForm(initialBankBalances);
 }
-
-
 
 
  function populatePersonFilterForDashboard(persons) {
@@ -763,8 +752,7 @@ card.addEventListener('click', (event) => {
 const currentLimit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
 if (!isNaN(currentLimit)) {
   updateFullYearBudgetBar(currentLimit);         // ✅ shows the full-year bar (green)
- const currentStart = document.getElementById('yearlyStartInput')?.value || null;
-updateFilteredBudgetBar(currentLimit, filtered, currentStart);
+  updateFilteredBudgetBar(currentLimit, filtered); // ✅ shows the filtered bar (blue)
 }
 }
 
@@ -2761,76 +2749,67 @@ function getUserIdFromToken() {
 
 window.getUserIdFromToken  = getUserIdFromToken;
 
-
-
 async function setYearlyLimit() {
-  const limit = parseSwissNumber(document.getElementById('yearlyLimitInput')?.value);
-  const startFrom = document.getElementById('startFromInput').value;
+  const limit = parseFloat(document.getElementById('yearlyLimitInput').value);
   const year = new Date().getFullYear().toString();
 
-  const plus = parseSwissNumber(document.getElementById('totalPlusAmount')?.textContent);
-  const minus = parseSwissNumber(document.getElementById('totalMinusAmount')?.textContent);
-  const difference = plus - minus;
-
-  if (!limit || isNaN(limit) || isNaN(difference)) {
-    alert("Invalid or missing 'Difference' value.");
+  if (!limit || isNaN(limit)) {
+    alert("Invalid limit value");
     return;
   }
 
   const token = localStorage.getItem('token');
   const payload = JSON.parse(atob(token.split('.')[1]));
-  const userId = payload.userId;
+  const userId = payload.userId; // 👈 correctly extracted
 
-  debug("📤 Saving limit:", difference, "for year", year, "userId:", userId, "startFrom:", startFrom);
+  debug("📤 Saving limit:", limit, "for year", year, "userId:", userId);
 
-  await saveYearlyLimitLocally({
-    userId,
-    year,
-    limit: difference,
-    startFrom: startFrom || new Date().toISOString(),
-    synced: false,
-    lastUpdated: Date.now()
-  });
+  // Save locally to Dexie
+  await saveYearlyLimitLocally({ userId, year, limit, synced: false, lastUpdated: Date.now() });
 
-  updateFullYearBudgetBar(difference, startFrom); // ✅ Recalculate both bars
+  // Update the progress bar UI
+updateFullYearBudgetBar(limit);
+
+  // Try to sync to backend
   await syncYearlyLimitsToMongo();
 }
 
 window.setYearlyLimit = setYearlyLimit;
 
+function updateFullYearBudgetBar(limit) {
+  if (!limit || isNaN(limit)) {
+    console.warn("⚠️ No yearly limit set.");
+    return;
+  }
 
-
-function updateFullYearBudgetBar(_ignoredLimit, startFrom = null) {
   const entries = window.entries || [];
-  const startDate = new Date(startFrom || '2000-01-01');
+  const currentYear = new Date().getFullYear().toString();
 
-  // ✅ Use all expenses (including Balance/Transfer if present)
-  const expenses = entries
+  const excludedPersons = ['balance', 'transfer'];
+
+  const expensesThisYear = entries
     .filter(e => {
-      const isExpense = e.type === 'Expense';
-      const entryDate = new Date(e.date);
-      return isExpense && entryDate >= startDate;
+      const typeMatch = e.type === 'Expense';
+      const yearMatch = e.date?.startsWith(currentYear);
+      const person = (e.person || '').trim().toLowerCase();
+      const isExcluded = excludedPersons.includes(person);
+      const include = typeMatch && yearMatch && !isExcluded;
+
+      debug('[YEARLY]', `[${e.type}]`, `[${person}]`, `include=${include}`, e);
+
+      return include;
     })
     .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
 
-  // ✅ Use actual totals from UI (Difference)
-const diffText = document.getElementById('totalDifferenceAmount')?.textContent;
-const difference = parseSwissNumber(diffText);
-
-if (isNaN(difference)) {
-  console.warn("❌ Missing or invalid Difference value for budget bar.");
-  return;
-}
-
-  const percent = Math.min((expenses / difference) * 100, 100);
+  const percent = Math.min((expensesThisYear / limit) * 100, 100);
 
   document.getElementById('yearlySpentLabel').textContent =
-    ` ${expenses.toLocaleString('de-CH', { minimumFractionDigits: 2 })}`;
+    ` ${expensesThisYear.toLocaleString('de-CH', { minimumFractionDigits: 2 })}`;
   document.getElementById('yearlyLimitLabel').textContent =
-    difference.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+    limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   document.getElementById('yearlyProgressFill').style.width = `${percent}%`;
   document.getElementById('yearlyLeftLabel').textContent =
-    ` ${(difference - expenses).toLocaleString('de-CH', { minimumFractionDigits: 2 })} `;
+    ` ${(limit - expensesThisYear).toLocaleString('de-CH', { minimumFractionDigits: 2 })} `;
 }
 
 async function syncYearlyLimitsToMongo() {
@@ -2867,7 +2846,7 @@ async function syncYearlyLimitsToMongo() {
 
 
 async function loadAndRenderYearlyLimit() {
-  const year = new Date().getFullYear().toString();
+  const year = new Date().getFullYear().toString(); // ✅ Always string
   const userId = getUserIdFromToken();
 
   debug("🔄 Loading yearly limit for:", userId, year);
@@ -2877,15 +2856,14 @@ async function loadAndRenderYearlyLimit() {
 
   if (localLimit) {
     document.getElementById('yearlyLimitInput').value = localLimit.limit;
-    if (localLimit.startFrom) {
-      document.getElementById('startFromInput').value = localLimit.startFrom.slice(0, 10);
-    }
-    updateFullYearBudgetBar(localLimit.limit, localLimit.startFrom);
+    updateFullYearBudgetBar(localLimit.limit);
   } else {
     debug("🌐 Fetching limit from server...");
     try {
       const res = await fetch(`${backend}/api/yearly-limit?year=${year}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
       });
 
       if (!res.ok) throw new Error(await res.text());
@@ -2903,38 +2881,38 @@ async function loadAndRenderYearlyLimit() {
   }
 }
 
-
-
-function updateFilteredBudgetBar(limit, filteredEntries, startFrom = null) {
+function updateFilteredBudgetBar(limit, filteredEntries) {
   if (!limit || isNaN(limit)) return;
   if (!filteredEntries || !Array.isArray(filteredEntries)) return;
 
-  const startDate = new Date(startFrom || '2000-01-01');
+  const currentYear = new Date().getFullYear().toString();
+  const excludedPersons = ['balance', 'transfer'];
 
-  let income = 0;
-  let expense = 0;
+  const filteredExpenses = filteredEntries
+    .filter(e => {
+      const typeMatch = e.type === 'Expense';
+      const yearMatch = e.date?.startsWith(currentYear);
+      const person = (e.person || '').trim().toLowerCase();
+      const isExcluded = excludedPersons.includes(person);
+      const include = typeMatch && yearMatch && !isExcluded;
 
-  filteredEntries.forEach(e => {
-    const entryDate = new Date(e.date);
-    if (entryDate < startDate) return;
+      debug('[FILTERED]', `[${e.type}]`, `[${person}]`, `include=${include}`, e);
 
-    const amount = parseFloat(e.amount || 0);
-    if (e.type === 'Income') income += amount;
-    else if (e.type === 'Expense') expense += amount;
-  });
+      return include;
+    })
+    .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
 
-  const difference = income - expense;
-  const remaining = limit - difference;
-  const percent = Math.min((difference / limit) * 100, 100);
+  const percent = Math.min((filteredExpenses / limit) * 100, 100);
 
   document.getElementById('filteredSpentLabel').textContent =
-    difference.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+    filteredExpenses.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   document.getElementById('filteredLimitLabel').textContent =
     limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   document.getElementById('filteredProgressFill').style.width = `${percent}%`;
   document.getElementById('filteredLeftLabel').textContent =
-    remaining.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+    (limit - filteredExpenses).toLocaleString('de-CH', { minimumFractionDigits: 2 });
 }
+
 
 
 window.addEventListener('DOMContentLoaded', async () => {
