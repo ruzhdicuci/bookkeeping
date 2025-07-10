@@ -2916,32 +2916,33 @@ function getFilteredEntriesIncludingBalanceAndTransfer(filteredEntries) {
 function updateFilteredBudgetBar(limit, filtered) {
   if (!limit || isNaN(limit)) return;
 
-  const entries = filtered || [];
-
-  let totalExpense = 0;
-  for (const entry of entries) {
+  const totalFilteredExpenses = (filtered || []).reduce((sum, entry) => {
     if (entry.type === 'minus') {
-      totalExpense += parseFloat(entry.amount || 0);
+      return sum + parseFloat(entry.amount || 0);
     }
-  }
+    return sum;
+  }, 0);
 
-  const overSpent = Math.max(0, totalExpense - limit);
-  const barFillValue = totalExpense;
-  const percent = Math.min((barFillValue / limit) * 100, 100);
+  const spent = limit + totalFilteredExpenses; // Show what has been "used"
+  const left = limit - totalFilteredExpenses;
+  const percent = Math.min(Math.abs(totalFilteredExpenses / limit) * 100, 100);
 
   document.getElementById('filteredSpentLabel').textContent =
-    barFillValue.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+    spent.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+
+  document.getElementById('filteredLeftLabel').textContent =
+    (left < 0 ? `-${Math.abs(left).toLocaleString('de-CH', { minimumFractionDigits: 2 })}` : left.toLocaleString('de-CH', { minimumFractionDigits: 2 }));
 
   document.getElementById('filteredLimitLabel').textContent =
     limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
-  document.getElementById('filteredLeftLabel').textContent =
-    overSpent.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-
-  const bar = document.getElementById('filteredProgressFill');
-  bar.style.width = `${percent}%`;
-  bar.style.backgroundColor = overSpent > 0 ? 'red' : '';
+  // Set bar fill color if over limit
+  const progressFill = document.getElementById('filteredProgressFill');
+  progressFill.style.width = `${percent}%`;
+  progressFill.style.backgroundColor = left < 0 ? 'red' : '#00bfff'; // red if over, blue otherwise
 }
+
+
 
 window.addEventListener('DOMContentLoaded', async () => {
   if (!window.persons || window.persons.length === 0) {
