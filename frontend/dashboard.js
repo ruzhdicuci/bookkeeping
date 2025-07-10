@@ -2811,7 +2811,6 @@ updateFullYearBudgetBar(limit, difference);
   await syncYearlyLimitsToMongo();
 }
 window.setYearlyLimit = setYearlyLimit;
-
 function updateFullYearBudgetBar(limit, difference) {
   if (
     typeof difference !== 'number' ||
@@ -2821,7 +2820,6 @@ function updateFullYearBudgetBar(limit, difference) {
     console.warn("❌ Skipping updateFullYearBudgetBar — invalid difference:", difference);
     return;
   }
-
 
   const bar = document.getElementById('yearlyProgressFill');
   const plusLabel = document.getElementById('yearlyLeftLabel');
@@ -2834,21 +2832,12 @@ function updateFullYearBudgetBar(limit, difference) {
     return;
   }
 
-  // 🧮 Totals
-  const totalPlus = entries
-    .filter(e => e.type === 'plus')
-    .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
-
-  const totalMinus = entries
-    .filter(e => e.type === 'minus')
-    .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
-
-  const difference = totalPlus - totalMinus;
-
   // 🏷️ Labels
   totalLabel.textContent = limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   plusLabel.textContent = difference.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  spentLabel.textContent = (difference >= 0 ? '-' : '+') + Math.abs(limit - difference).toLocaleString('de-CH', { minimumFractionDigits: 2 });
+
+  const used = limit - difference;
+  spentLabel.textContent = (used >= 0 ? '-' : '+') + Math.abs(used).toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
   // 📊 Bar logic
   const percentage = Math.min(Math.abs(difference) / limit, 1) * 100;
