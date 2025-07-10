@@ -2805,7 +2805,7 @@ async function setYearlyLimit() {
 
   // ✅ Only update bars — no re-rendering!
 const diff = calculateYearlyDifference(window.entries); // use your own function if needed
-updateFullYearBudgetBar(limit, window.entries);
+updateFullYearBudgetBar(limit, difference);
 
   // Sync
   await syncYearlyLimitsToMongo();
