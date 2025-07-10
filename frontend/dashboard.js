@@ -765,8 +765,8 @@ card.addEventListener('click', (event) => {
 // ✅ Update budget bar with correct data
 const limit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
 if (!isNaN(limit)) {
-  updateFullYearBudgetBar(limit, window.entries);       // ✅ Green bar = ALL entries
-  updateFilteredBudgetBar(limit, filteredEntries);       // ✅ Blue bar = FILTERED entries
+  updateFullYearBudgetBar(limit, window.entries);      // ✅ full data = green bar
+  updateFilteredBudgetBar(limit, filtered);            // ✅ filtered data = blue bar
 }
 }
 
@@ -2792,26 +2792,26 @@ updateFilteredBudgetBar(limit, filteredEntries); // ✅ make sure filteredEntrie
 window.setYearlyLimit = setYearlyLimit;
 
 function updateFullYearBudgetBar(limit, allEntries = window.entries) {
-  let spent = 0;
+  if (!Array.isArray(allEntries)) return;
 
+  let spent = 0;
   for (const entry of allEntries) {
-    const amount = parseFloat(entry.amount) || 0;
     if ((entry.type || '').toLowerCase() !== 'income') {
-      spent += amount;
+      spent += parseFloat(entry.amount) || 0;
     }
   }
 
   const left = limit - spent;
   const percentUsed = Math.min((spent / limit) * 100, 100);
 
-  const spentEl = document.getElementById("fullSpentLabel");
-  const leftEl = document.getElementById("fullLeftLabel");
-  const limitEl = document.getElementById("fullLimitLabel");
-  const barEl = document.getElementById("fullBudgetProgress");
+  const spentEl = document.getElementById("yearlySpentLabel");
+  const leftEl = document.getElementById("yearlyLeftLabel");
+  const limitEl = document.getElementById("yearlyLimitLabel");
+  const barEl = document.getElementById("yearlyProgressFill");
 
-  if (spentEl) spentEl.textContent = spent.toFixed(2);
-  if (leftEl) leftEl.textContent = left.toFixed(2);
-  if (limitEl) limitEl.textContent = limit.toFixed(2);
+  if (spentEl) spentEl.textContent = spent.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  if (leftEl) leftEl.textContent = left.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  if (limitEl) limitEl.textContent = limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   if (barEl) barEl.style.width = `${percentUsed}%`;
 }
 
