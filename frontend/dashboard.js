@@ -58,9 +58,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderEntries(window.entries);         // ✅ Render fresh ones
 
   // ✅ call updateFullYearBudgetBar here with raw full data - added new,
-const limit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
-if (!isNaN(limit)) {
-  updateFullYearBudgetBar(limit);
+const limitInput = document.getElementById('yearlyLimitInput');
+if (limitInput) {
+  const limit = parseFloat(limitInput.value);
+  if (!isNaN(limit)) {
+    updateFullYearBudgetBar(limit);
+  }
+
 }
 
   await loadInitialBankBalances();
@@ -2789,7 +2793,6 @@ function updateFullYearBudgetBar(limit) {
   }
 
   const entries = window.entries || [];
-
   let income = 0;
   let expense = 0;
 
@@ -2801,32 +2804,27 @@ function updateFullYearBudgetBar(limit) {
     }
   }
 
-  const diff = income - expense;
+  const diff = income - expense; // final "Balance"
+  const overspent = Math.max(expense - limit, 0); // how much over the limit
+  const percent = Math.min((expense / limit) * 100, 100);
 
-  if (isNaN(diff)) {
-    console.warn("⚠️ Missing or invalid Difference value for budget bar.");
-    return;
-  }
-
-  const percent = Math.min(Math.abs(diff / limit) * 100, 100);
-  const left = limit - diff;
-
-document.getElementById('yearlySpentLabel').textContent =
-  diff.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  // Labels
+  document.getElementById('yearlySpentLabel').textContent =
+    expense.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   document.getElementById('yearlyLimitLabel').textContent =
     limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  document.getElementById('yearlyLeftLabel').textContent =
-    left.toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
+  const leftValue = Math.max(expense, limit);
+  const diffLabel = (limit - expense).toLocaleString('de-CH', {
+    minimumFractionDigits: 2
+  });
+
+  // Adjust fill and label depending on overspending
   const fill = document.getElementById('yearlyProgressFill');
-  fill.style.width = `${percent}%`;
+  fill.style.width = `${Math.min((expense / limit) * 100, 100)}%`;
+  fill.style.backgroundColor = overspent > 0 ? 'red' : '#00bcd4';
 
-  // 🔴 Optionally turn the bar red if over budget
-  if (left < 0) {
-    fill.style.backgroundColor = 'red';
-  } else {
-    fill.style.backgroundColor = ''; // Reset if under budget
-  }
+  document.getElementById('yearlyLeftLabel').textContent = diffLabel;
 }
 
 
