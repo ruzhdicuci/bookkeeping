@@ -30,6 +30,7 @@ let entries = [];
 let persons = [];
 let currentNoteEntryId = null;
 let editModeActive = false;
+let filteredEntries = [];
 
 const apiBase = 'https://bookkeeping-i8e0.onrender.com';
 const token = localStorage.getItem('token');
@@ -759,10 +760,10 @@ card.addEventListener('click', (event) => {
   document.getElementById('totalBalance').textContent = (incomeTotal - expenseTotal).toFixed(2);
 // ✅ Now, finally add this:
   // ✅ Update budget bar with filtered data
-const limit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
-if (!isNaN(limit)) {
-  updateFullYearBudgetBar(limit);       // Green bar: all data
-  updateFilteredBudgetBar(limit, filtered); // Blue bar: filtered data (use declared `filtered`)
+  const limit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
+  if (!isNaN(limit)) {
+    updateFullYearBudgetBar(limit);                 // Green bar = ALL
+    updateFilteredBudgetBar(limit, filteredEntries); // Blue bar = filtered
 }
 }
 
@@ -2779,6 +2780,7 @@ async function setYearlyLimit() {
 
   // Update the progress bar UI
 updateFullYearBudgetBar(limit);
+updateFilteredBudgetBar(limit, filteredEntries); // ✅ make sure filteredEntries is declared globally
 
   // Try to sync to backend
   await syncYearlyLimitsToMongo();
