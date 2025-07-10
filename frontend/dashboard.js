@@ -57,12 +57,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   await db.entries.clear();              // 🧹 Clear old cache
   await db.entries.bulkPut(window.entries); // 💾 Save fresh ones
   renderEntries(window.entries);         // ✅ Render fresh ones
-});
 
   await loadInitialBankBalances();
 
   if (navigator.onLine) syncToCloud();
-
+});
 
   // Your flatpickr and other logic continues...
   const dateInput = document.getElementById('newDate');
@@ -107,8 +106,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderEntries();
   });
 
-  // ✅ Any other DOM-ready setup (scroll buttons, dropdowns, etc.) can go here
-});
+
 const entryTableBody = document.getElementById('entryTableBody');
 
 const catgorySelect = document.getElementById('categorySelect');
