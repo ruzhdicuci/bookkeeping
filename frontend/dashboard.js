@@ -2803,6 +2803,11 @@ function updateFullYearBudgetBar(limit, fullDifference) {
   const leftLabel = document.getElementById('yearLeft');
   const totalLabel = document.getElementById('yearLimit');
 
+  if (!bar || !plusLabel || !leftLabel || !totalLabel) {
+    console.warn("❌ Budget bar elements not found in DOM");
+    return;
+  }
+
   const left = fullDifference;
   const overOrUnder = limit - left;
 
