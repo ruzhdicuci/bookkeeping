@@ -2786,21 +2786,16 @@ window.setYearlyLimit = setYearlyLimit;
 
 function updateFullYearBudgetBar(_ignoredLimit, startFrom = null) {
   const entries = window.entries || [];
-  const excludedPersons = ['balance', 'transfer'];
   const startDate = new Date(startFrom || '2000-01-01');
 
-  // ⬇️ Filter and sum expenses since startFrom, excluding balance/transfer
   const expenses = entries
     .filter(e => {
       const isExpense = e.type === 'Expense';
       const entryDate = new Date(e.date);
-      const person = (e.person || '').trim().toLowerCase();
-      const isExcluded = excludedPersons.includes(person);
-      return isExpense && entryDate >= startDate && !isExcluded;
+      return isExpense && entryDate >= startDate;
     })
     .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
 
-  // ⬇️ Get the target "Difference" = Total Plus - Total Minus from the UI
   const plus = parseFloat(document.getElementById('totalPlusAmount')?.textContent?.replace(/[^\d.-]/g, '')) || 0;
   const minus = parseFloat(document.getElementById('totalMinusAmount')?.textContent?.replace(/[^\d.-]/g, '')) || 0;
   const difference = plus - minus;
@@ -2815,7 +2810,6 @@ function updateFullYearBudgetBar(_ignoredLimit, startFrom = null) {
   document.getElementById('yearlyLeftLabel').textContent =
     ` ${(difference - expenses).toLocaleString('de-CH', { minimumFractionDigits: 2 })} `;
 }
-
 
 async function syncYearlyLimitsToMongo() {
   try {
@@ -2902,7 +2896,7 @@ function updateFilteredBudgetBar(limit, filteredEntries, startFrom = null) {
     if (entryDate < startDate) return;
 
     const person = (e.person || '').trim().toLowerCase();
-    if (excludedPersons.includes(person)) return;
+    // if (excludedPersons.includes(person)) return;
 
     const amount = parseFloat(e.amount || 0);
     if (e.type === 'Income') income += amount;
