@@ -701,6 +701,18 @@ card.addEventListener('click', (event) => {
     };
     container.appendChild(loadMoreBtn);
   }
+    // ✅ Final part — add this at the end of the function
+  window.filteredEntries = filtered;
+
+  setTimeout(() => {
+    const limit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
+    if (!isNaN(limit)) {
+      updateFullYearBudgetBar(limit, window.entries);
+      updateFilteredBudgetBar(limit, window.filteredEntries);
+    }
+  }, 0);
+} // ← ends the function
+
 
   // Highlight scroll
   setTimeout(() => {
@@ -2750,7 +2762,7 @@ function getUserIdFromToken() {
 window.getUserIdFromToken  = getUserIdFromToken;
 
 async function setYearlyLimit() {
-  const limit = parseFloat(document.getElementById('yearlyLimitInput').value);
+  const limit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
   const year = new Date().getFullYear().toString();
 
   if (!limit || isNaN(limit)) {
@@ -2760,20 +2772,26 @@ async function setYearlyLimit() {
 
   const token = localStorage.getItem('token');
   const payload = JSON.parse(atob(token.split('.')[1]));
-  const userId = payload.userId; // 👈 correctly extracted
+  const userId = payload.userId;
 
   debug("📤 Saving limit:", limit, "for year", year, "userId:", userId);
 
-  // Save locally to Dexie
-  await saveYearlyLimitLocally({ userId, year, limit, synced: false, lastUpdated: Date.now() });
+  // Save locally
+  await saveYearlyLimitLocally({
+    userId,
+    year,
+    limit,
+    synced: false,
+    lastUpdated: Date.now()
+  });
 
-  // Update the progress bar UI
-updateFullYearBudgetBar(limit);
+  // ✅ Only update bars — no re-rendering!
+  updateFullYearBudgetBar(limit, window.entries);
+  updateFilteredBudgetBar(limit, window.filteredEntries);
 
-  // Try to sync to backend
+  // Sync
   await syncYearlyLimitsToMongo();
 }
-
 window.setYearlyLimit = setYearlyLimit;
 
 function updateFullYearBudgetBar(limit) {
