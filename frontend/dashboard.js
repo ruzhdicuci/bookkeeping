@@ -751,9 +751,8 @@ card.addEventListener('click', (event) => {
   // ✅ Update budget bar with filtered data
 const currentLimit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
 if (!isNaN(currentLimit)) {
-  updateFullYearBudgetBar(currentLimit);         // ✅ shows the full-year bar (green)
- const filteredWithBalance = getFilteredEntriesIncludingBalanceAndTransfer(filtered);
-updateFilteredBudgetBar(currentLimit, filteredWithBalance); // ✅ Right
+  updateFullYearBudgetBar(currentLimit);           // Green bar: uses ALL entries
+  updateFilteredBudgetBar(currentLimit);           // Blue bar: uses visible Balance
 }
 }
 
@@ -2888,34 +2887,17 @@ function getFilteredEntriesIncludingBalanceAndTransfer(filteredEntries) {
 }
 
 
-function updateFilteredBudgetBar(limit, filteredEntries) {
+function updateFilteredBudgetBar(limit) {
   if (!limit || isNaN(limit)) return;
-  if (!filteredEntries || !Array.isArray(filteredEntries)) return;
 
-  const currentYear = new Date().getFullYear().toString();
+  const balanceText = document.getElementById('totalBalance')?.textContent;
+  const balance = parseFloat(balanceText?.replace(/[^\d.-]/g, ''));
 
-  // 🔁 Include Balance and Transfer rows in totals even if not shown
-  const effectiveEntries = window.entries.filter(e => {
-    const isCurrentYear = e.date?.startsWith(currentYear);
-    if (!isCurrentYear) return false;
+  if (isNaN(balance)) {
+    console.warn("⚠️ Missing or invalid Difference value for budget bar.");
+    return;
+  }
 
-    // Either included in filtered list, or it's a Balance/Transfer
-    const isInFiltered = filteredEntries.includes(e);
-    const isAlwaysIncluded = e.person === 'Balance' || e.person === 'Transfer';
-
-    return isInFiltered || isAlwaysIncluded;
-  });
-
-  let income = 0;
-  let expense = 0;
-
-  effectiveEntries.forEach(e => {
-    const amount = parseFloat(e.amount || 0);
-    if (e.type === 'Income') income += amount;
-    else if (e.type === 'Expense') expense += amount;
-  });
-
-  const balance = income - expense;
   const percent = Math.min((balance / limit) * 100, 100);
 
   document.getElementById('filteredSpentLabel').textContent =
@@ -2926,7 +2908,6 @@ function updateFilteredBudgetBar(limit, filteredEntries) {
   document.getElementById('filteredLeftLabel').textContent =
     (limit - balance).toLocaleString('de-CH', { minimumFractionDigits: 2 });
 }
-
 
 
 window.addEventListener('DOMContentLoaded', async () => {
