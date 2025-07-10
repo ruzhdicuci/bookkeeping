@@ -2877,13 +2877,22 @@ function updateFilteredBudgetBar(limit, filteredEntries) {
 
   const currentYear = new Date().getFullYear().toString();
 
+  // 🔁 Include Balance and Transfer rows in totals even if not shown
+  const effectiveEntries = window.entries.filter(e => {
+    const isCurrentYear = e.date?.startsWith(currentYear);
+    if (!isCurrentYear) return false;
+
+    // Either included in filtered list, or it's a Balance/Transfer
+    const isInFiltered = filteredEntries.includes(e);
+    const isAlwaysIncluded = e.person === 'Balance' || e.person === 'Transfer';
+
+    return isInFiltered || isAlwaysIncluded;
+  });
+
   let income = 0;
   let expense = 0;
 
-  filteredEntries.forEach(e => {
-    const yearMatch = e.date?.startsWith(currentYear);
-    if (!yearMatch) return;
-
+  effectiveEntries.forEach(e => {
     const amount = parseFloat(e.amount || 0);
     if (e.type === 'Income') income += amount;
     else if (e.type === 'Expense') expense += amount;
