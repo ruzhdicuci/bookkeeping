@@ -30,7 +30,6 @@ let entries = [];
 let persons = [];
 let currentNoteEntryId = null;
 let editModeActive = false;
-let filteredEntries = [];
 
 const apiBase = 'https://bookkeeping-i8e0.onrender.com';
 const token = localStorage.getItem('token');
@@ -61,7 +60,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadInitialBankBalances();
 
   if (navigator.onLine) syncToCloud();
-});
+
 
   // Your flatpickr and other logic continues...
   const dateInput = document.getElementById('newDate');
@@ -106,7 +105,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderEntries();
   });
 
-
+  // ✅ Any other DOM-ready setup (scroll buttons, dropdowns, etc.) can go here
+});
 const entryTableBody = document.getElementById('entryTableBody');
 
 const catgorySelect = document.getElementById('categorySelect');
@@ -747,17 +747,16 @@ card.addEventListener('click', (event) => {
   document.getElementById('totalIncome').textContent = incomeTotal.toFixed(2);
   document.getElementById('totalExpense').textContent = expenseTotal.toFixed(2);
   document.getElementById('totalBalance').textContent = (incomeTotal - expenseTotal).toFixed(2);
+// ✅ Now, finally add this:
+  // ✅ Update budget bar with filtered data
+const currentLimit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
+if (!isNaN(currentLimit)) {
+  updateFullYearBudgetBar(currentLimit);         // ✅ shows the full-year bar (green)
+  updateFilteredBudgetBar(currentLimit, filtered); // ✅ shows the filtered bar (blue)
+}
+}
 
-window.filteredEntries = filtered;
 
-setTimeout(() => {
-  const limit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
-  if (!isNaN(limit)) {
-    updateFullYearBudgetBar(limit, window.entries);
-    updateFilteredBudgetBar(limit, window.filteredEntries);
-  }
-}, 0);
-} // ← closing the renderEntries() function here
 
 
 async function editEntry(id) {
@@ -2750,12 +2749,8 @@ function getUserIdFromToken() {
 
 window.getUserIdFromToken  = getUserIdFromToken;
 
-document.addEventListener('DOMContentLoaded', () => {
-  renderEntries(); // ✅ Ensure this is called on page load
-});
-
 async function setYearlyLimit() {
-  const limit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
+  const limit = parseFloat(document.getElementById('yearlyLimitInput').value);
   const year = new Date().getFullYear().toString();
 
   if (!limit || isNaN(limit)) {
@@ -2765,61 +2760,54 @@ async function setYearlyLimit() {
 
   const token = localStorage.getItem('token');
   const payload = JSON.parse(atob(token.split('.')[1]));
-  const userId = payload.userId;
+  const userId = payload.userId; // 👈 correctly extracted
 
   debug("📤 Saving limit:", limit, "for year", year, "userId:", userId);
 
-  // Save locally
-  await saveYearlyLimitLocally({
-    userId,
-    year,
-    limit,
-    synced: false,
-    lastUpdated: Date.now()
-  });
+  // Save locally to Dexie
+  await saveYearlyLimitLocally({ userId, year, limit, synced: false, lastUpdated: Date.now() });
 
-  // Refresh entries (re-renders, and sets window.entries + window.filteredEntries)
-  await renderEntries();
+  // Update the progress bar UI
+updateFullYearBudgetBar(limit);
 
-  // Grab correct data again AFTER rendering
-  const all = window.entries || [];
-  const filtered = window.filteredEntries || [];
-
-  console.log("✅ Limit:", limit);
-  console.log("📦 Full entries:", all);
-  console.log("🔵 Filtered entries:", filtered);
-
-  // Update both bars with current data
-updateFullYearBudgetBar(limit); // ✅ no need for entries
-updateFilteredBudgetBar(limit, window.filteredEntries);
-
-  // Sync to backend
+  // Try to sync to backend
   await syncYearlyLimitsToMongo();
 }
+
 window.setYearlyLimit = setYearlyLimit;
 
-
-
 function updateFullYearBudgetBar(limit) {
-  const bar = document.getElementById('fullBudgetBar');
-  const usedLabel = document.getElementById('fullBudgetUsed');
-  const leftLabel = document.getElementById('fullBudgetLeft');
+  if (!limit || isNaN(limit)) {
+    console.warn("⚠️ No yearly limit set.");
+    return;
+  }
 
-  if (!bar || !usedLabel || !leftLabel) return;
+  const entries = window.entries || [];
+  const currentYear = new Date().getFullYear().toString();
 
-  // 🧮 Use the visible "Difference" value directly
-  const diffText = document.querySelector('#totalDifference')?.textContent || '0';
-  const used = parseFloat(diffText.replace(/[^\d.-]/g, '')) || 0;
+  let income = 0;
+  let expense = 0;
 
-  const percentage = Math.min((used / limit) * 100, 100);
-  const remaining = limit - used;
+  entries.forEach(e => {
+    const yearMatch = e.date?.startsWith(currentYear);
+    if (!yearMatch) return;
 
-  // 💡 Update bar width and label
-  bar.style.background = `linear-gradient(to right, #4CAF50 ${percentage}%, #ccc ${percentage}%)`;
-  usedLabel.textContent = used.toFixed(2);
-  leftLabel.textContent = remaining.toFixed(2);
+    const amount = parseFloat(e.amount || 0);
+    if (e.type === 'Income') income += amount;
+    else if (e.type === 'Expense') expense += amount;
+  });
+
+  const balance = income - expense;
+  const percent = Math.min((balance / limit) * 100, 100);
+
+  document.getElementById('yearlySpentLabel').textContent =
+    balance.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  document.getElementById('yearlyLimitLabel').textContent =
+    limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  document.getElementById('yearlyProgressFill').style.width = `${percent}%`;
+  document.getElementById('yearlyLeftLabel').textContent =
+    (limit - balance).toLocaleString('de-CH', { minimumFractionDigits: 2 });
 }
-
 
 async function syncYearlyLimitsToMongo() {
   try {
@@ -2890,37 +2878,36 @@ async function loadAndRenderYearlyLimit() {
   }
 }
 
+function updateFilteredBudgetBar(limit, filteredEntries) {
+  if (!limit || isNaN(limit)) return;
+  if (!filteredEntries || !Array.isArray(filteredEntries)) return;
 
-function updateFilteredBudgetBar(limit) {
-    console.log("✅ updateFullYearBudgetBar: limit =", limit, "entries =", entries);
+  const currentYear = new Date().getFullYear().toString();
 
-  const diffEl = document.getElementById('summaryDifference');
-  if (!diffEl) return;
+  let income = 0;
+  let expense = 0;
 
-  // ✅ Reuse the visible "Difference" value (already based on full entries)
-  const rawText = diffEl.textContent.replace(/’/g, '').replace(/,/g, '').trim();
-  const difference = parseFloat(rawText);
+  filteredEntries.forEach(e => {
+    const yearMatch = e.date?.startsWith(currentYear);
+    if (!yearMatch) return;
 
-  if (isNaN(difference) || isNaN(limit)) return;
+    const amount = parseFloat(e.amount || 0);
+    if (e.type === 'Income') income += amount;
+    else if (e.type === 'Expense') expense += amount;
+  });
 
-  const left = difference;
-  const percent = Math.min((Math.abs(difference) / limit) * 100, 100);
+  const balance = income - expense;
+  const percent = Math.min((balance / limit) * 100, 100);
 
-  const spentEl = document.getElementById('filteredSpentLabel');
-  if (spentEl) spentEl.textContent = (difference + limit).toLocaleString('de-CH', { minimumFractionDigits: 2 });
-
-  const leftEl = document.getElementById('filteredLeftLabel');
-  if (leftEl) leftEl.textContent = (left < 0 ? '-' : '') + Math.abs(left).toLocaleString('de-CH', { minimumFractionDigits: 2 });
-
-  const limitEl = document.getElementById('filteredLimitLabel');
-  if (limitEl) limitEl.textContent = limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-
-  const bar = document.getElementById('filteredProgressFill');
-  if (bar) {
-    bar.style.width = `${percent}%`;
-    bar.style.backgroundColor = left < 0 ? 'red' : '#06b2eb';
-  }
+  document.getElementById('filteredSpentLabel').textContent =
+    balance.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  document.getElementById('filteredLimitLabel').textContent =
+    limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  document.getElementById('filteredProgressFill').style.width = `${percent}%`;
+  document.getElementById('filteredLeftLabel').textContent =
+    (limit - balance).toLocaleString('de-CH', { minimumFractionDigits: 2 });
 }
+
 
 
 window.addEventListener('DOMContentLoaded', async () => {
