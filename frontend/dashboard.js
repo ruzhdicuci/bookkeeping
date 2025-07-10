@@ -759,14 +759,14 @@ card.addEventListener('click', (event) => {
   document.getElementById('totalExpense').textContent = expenseTotal.toFixed(2);
   document.getElementById('totalBalance').textContent = (incomeTotal - expenseTotal).toFixed(2);
 
-  filteredEntries = filtered;
+ window.filteredEntries = filtered;
 
 
 // ✅ Update budget bar with correct data
 const limit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
 if (!isNaN(limit)) {
-  updateFullYearBudgetBar(limit, window.entries);      // ✅ full data = green bar
-  updateFilteredBudgetBar(limit, filtered);            // ✅ filtered data = blue bar
+  updateFullYearBudgetBar(limit, window.entries);            // ✅ full bar (green)
+  updateFilteredBudgetBar(limit, window.filteredEntries || []);  // ✅ filtered bar (blue)
 }
 }
 
