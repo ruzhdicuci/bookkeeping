@@ -771,6 +771,8 @@ setTimeout(() => {
 } // ← ends the function
 
 function calculateYearlyDifference(entries) {
+  if (!Array.isArray(entries) || entries.length === 0) return undefined;
+
   return entries.reduce((sum, e) => {
     if (e.type === 'plus') return sum + e.amount;
     if (e.type === 'minus') return sum - e.amount;
