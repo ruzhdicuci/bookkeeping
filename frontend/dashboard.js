@@ -2753,14 +2753,19 @@ function getUserIdFromToken() {
 
 window.getUserIdFromToken  = getUserIdFromToken;
 
-async function setYearlyLimit() {
-  const limit = parseFloat(document.getElementById('yearlyLimitInput').value);
-  const year = new Date().getFullYear().toString();
+function setYearlyLimit() {
+  const limitInput = document.getElementById('yearlyLimitInput');
+  const limit = parseFloat(limitInput?.value);
+  if (isNaN(limit)) return;
 
-  if (!limit || isNaN(limit)) {
-    alert("Invalid limit value");
-    return;
-  }
+  saveYearlyLimitLocally(limit); // or whatever storage function you use
+
+  // Force bar update after setting limit
+  setTimeout(() => {
+    updateFullYearBudgetBar(limit, window.entries);
+    updateFilteredBudgetBar(limit, window.filteredEntries);
+  }, 0);
+}
 
   const token = localStorage.getItem('token');
   const payload = JSON.parse(atob(token.split('.')[1]));
