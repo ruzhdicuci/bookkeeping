@@ -2786,9 +2786,14 @@ async function setYearlyLimit() {
     lastUpdated: Date.now()
   });
 
+  // ✅ Compute difference manually
+  const difference = (window.entries || []).reduce((sum, e) => {
+    const amount = parseFloat(e.amount) || 0;
+    return (e.type || '').toLowerCase() === 'income' ? sum + amount : sum - amount;
+  }, 0);
+
   // ✅ Only update bars — no re-rendering!
-  updateFullYearBudgetBar(limit, window.entries);
-  
+  updateFullYearBudgetBar(limit, difference);
 
   // Sync
   await syncYearlyLimitsToMongo();
@@ -2821,8 +2826,11 @@ function updateFullYearBudgetBar(limit, difference) {
   plusLabel.textContent = left.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   spentLabel.textContent = (used >= 0 ? '-' : '+') + Math.abs(used).toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
-  const percentage = Math.min(Math.abs(left) / limit, 1) * 100;
+  const percentage = Math.min(Math.abs(difference) / limit, 1) * 100;
   bar.style.width = percentage + '%';
+
+  // ✅ Set bar color: green when within budget, red when over
+  bar.style.backgroundColor = difference >= 0 ? '#27a789' : '#ff4d4d';
 }
 
 async function syncYearlyLimitsToMongo() {
