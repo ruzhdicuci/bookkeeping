@@ -2784,32 +2784,32 @@ function updateFullYearBudgetBar(limit) {
 
   const entries = window.entries || [];
   const currentYear = new Date().getFullYear().toString();
-
   const excludedPersons = ['balance', 'transfer'];
 
-  const expensesThisYear = entries
-    .filter(e => {
-      const typeMatch = e.type === 'Expense';
-      const yearMatch = e.date?.startsWith(currentYear);
-      const person = (e.person || '').trim().toLowerCase();
-      const isExcluded = excludedPersons.includes(person);
-      const include = typeMatch && yearMatch && !isExcluded;
+  let income = 0;
+  let expense = 0;
 
-      debug('[YEARLY]', `[${e.type}]`, `[${person}]`, `include=${include}`, e);
+  entries.forEach(e => {
+    const yearMatch = e.date?.startsWith(currentYear);
+    const person = (e.person || '').trim().toLowerCase();
+    const isExcluded = excludedPersons.includes(person);
+    if (!yearMatch || isExcluded) return;
 
-      return include;
-    })
-    .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
+    const amount = parseFloat(e.amount || 0);
+    if (e.type === 'Income') income += amount;
+    else if (e.type === 'Expense') expense += amount;
+  });
 
-  const percent = Math.min((expensesThisYear / limit) * 100, 100);
+  const balance = income - expense;
+  const percent = Math.min((balance / limit) * 100, 100);
 
   document.getElementById('yearlySpentLabel').textContent =
-    ` ${expensesThisYear.toLocaleString('de-CH', { minimumFractionDigits: 2 })}`;
+    balance.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   document.getElementById('yearlyLimitLabel').textContent =
     limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   document.getElementById('yearlyProgressFill').style.width = `${percent}%`;
   document.getElementById('yearlyLeftLabel').textContent =
-    ` ${(limit - expensesThisYear).toLocaleString('de-CH', { minimumFractionDigits: 2 })} `;
+    (limit - balance).toLocaleString('de-CH', { minimumFractionDigits: 2 });
 }
 
 async function syncYearlyLimitsToMongo() {
