@@ -2897,20 +2897,17 @@ async function loadAndRenderYearlyLimit() {
   }
 }
 
-function updateFullYearBudgetBar(limit, startFrom = null) {
-  if (!limit || isNaN(limit)) {
-    console.warn("⚠️ No yearly limit set.");
-    return;
-  }
+function updateFilteredBudgetBar(limit, filteredEntries, startFrom = null) {
+  if (!limit || isNaN(limit)) return;
+  if (!filteredEntries || !Array.isArray(filteredEntries)) return;
 
-  const entries = window.entries || [];
-  const excludedPersons = ['balance', 'transfer'];
   const startDate = new Date(startFrom || '2000-01-01');
+  const excludedPersons = ['balance', 'transfer'];
 
   let income = 0;
   let expense = 0;
 
-  entries.forEach(e => {
+  filteredEntries.forEach(e => {
     const entryDate = new Date(e.date);
     if (entryDate < startDate) return;
 
@@ -2918,23 +2915,21 @@ function updateFullYearBudgetBar(limit, startFrom = null) {
     if (excludedPersons.includes(person)) return;
 
     const amount = parseFloat(e.amount || 0);
-
     if (e.type === 'Income') income += amount;
     else if (e.type === 'Expense') expense += amount;
   });
 
-  const difference = income - expense; // 💰 how much you've saved so far
-  const remaining = limit - difference; // 📉 how far off you are from the goal
-
+  const difference = income - expense;
+  const remaining = limit - difference;
   const percent = Math.min((difference / limit) * 100, 100);
 
-  document.getElementById('yearlySpentLabel').textContent =
-    `${difference.toLocaleString('de-CH', { minimumFractionDigits: 2 })}`;
-  document.getElementById('yearlyLimitLabel').textContent =
+  document.getElementById('filteredSpentLabel').textContent =
+    difference.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  document.getElementById('filteredLimitLabel').textContent =
     limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  document.getElementById('yearlyProgressFill').style.width = `${percent}%`;
-  document.getElementById('yearlyLeftLabel').textContent =
-    `${remaining.toLocaleString('de-CH', { minimumFractionDigits: 2 })}`;
+  document.getElementById('filteredProgressFill').style.width = `${percent}%`;
+  document.getElementById('filteredLeftLabel').textContent =
+    remaining.toLocaleString('de-CH', { minimumFractionDigits: 2 });
 }
 
 
