@@ -69,6 +69,8 @@ function parseSwissNumber(str) {
 }
 window.parseSwissNumber = parseSwissNumber;
 
+
+
   // Your flatpickr and other logic continues...
   const dateInput = document.getElementById('newDate');
   if (dateInput) {
