@@ -763,9 +763,10 @@ window.filteredEntries = filtered;
 
 setTimeout(() => {
   const limit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
-  const difference = calculateYearlyDifference(window.entries);
-  if (!isNaN(limit) && typeof difference === 'number') {
-    updateFullYearBudgetBar(limit, difference);
+  if (!isNaN(limit) && Array.isArray(window.entries) && window.entries.length > 0) {
+    updateFullYearBudgetBar(limit, window.entries); // ✅ correct
+  } else {
+    console.warn("⛔ Not updating bar — limit or entries invalid", limit, window.entries);
   }
 }, 0);
 } // ← ends the function
