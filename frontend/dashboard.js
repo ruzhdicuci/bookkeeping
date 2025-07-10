@@ -2898,8 +2898,9 @@ function updateFilteredBudgetBar(limit) {
 
   for (const entry of window.entries) {
     const amount = parseFloat(entry.amount) || 0;
-    if ((entry.type || '').toLowerCase() === 'plus') totalPlus += amount;
-    else if ((entry.type || '').toLowerCase() === 'minus') totalMinus += amount;
+    const type = (entry.type || '').toLowerCase();
+    if (type === 'income') totalPlus += amount;
+    else if (type === 'expense') totalMinus += amount;
   }
 
   const difference = totalPlus - totalMinus;
