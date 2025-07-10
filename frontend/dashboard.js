@@ -765,7 +765,7 @@ setTimeout(() => {
   const limit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
   if (!isNaN(limit)) {
     updateFullYearBudgetBar(limit, fullDifference);
-    updateFilteredBudgetBar(limit, difference);
+   
   }
 }, 0);
 } // ← ends the function
@@ -2788,7 +2788,7 @@ async function setYearlyLimit() {
 
   // ✅ Only update bars — no re-rendering!
   updateFullYearBudgetBar(limit, window.entries);
-  updateFilteredBudgetBar(limit, window.filteredEntries);
+  
 
   // Sync
   await syncYearlyLimitsToMongo();
@@ -2888,29 +2888,7 @@ async function loadAndRenderYearlyLimit() {
   }
 }
 
-function updateFilteredBudgetBar(limit, filteredDifference) {
-  console.log("✅ updateFilteredBudgetBar: limit =", limit, "difference =", filteredDifference);
 
-  const bar = document.getElementById('filteredProgressFill');
-  const plusLabel = document.getElementById('filteredLeftLabel'); // ✅ your DOM id
-  const spentLabel = document.getElementById('filteredSpentLabel'); // ✅ your DOM id
-  const totalLabel = document.getElementById('filteredLimitLabel'); // ✅ your DOM id
-
-  if (!bar || !plusLabel || !spentLabel || !totalLabel) {
-    console.warn("❌ Filtered budget bar elements not found in DOM");
-    return;
-  }
-
-  const left = filteredDifference;
-  const used = limit - left;
-
-  totalLabel.textContent = limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  plusLabel.textContent = left.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  spentLabel.textContent = (used >= 0 ? '-' : '+') + Math.abs(used).toLocaleString('de-CH', { minimumFractionDigits: 2 });
-
-  const percentage = Math.min(Math.abs(left) / limit, 1) * 100;
-  bar.style.width = percentage + '%';
-}
 
 window.addEventListener('DOMContentLoaded', async () => {
   if (!window.persons || window.persons.length === 0) {
