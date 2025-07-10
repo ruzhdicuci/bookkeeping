@@ -748,7 +748,16 @@ card.addEventListener('click', (event) => {
   document.getElementById('totalExpense').textContent = expenseTotal.toFixed(2);
   document.getElementById('totalBalance').textContent = (incomeTotal - expenseTotal).toFixed(2);
 
+window.filteredEntries = filtered;
 
+setTimeout(() => {
+  const limit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
+  if (!isNaN(limit)) {
+    updateFullYearBudgetBar(limit, window.entries);
+    updateFilteredBudgetBar(limit, window.filteredEntries);
+  }
+}, 0);
+} // ← closing the renderEntries() function here
 
 
 async function editEntry(id) {
@@ -2740,6 +2749,9 @@ function getUserIdFromToken() {
 }
 
 window.getUserIdFromToken  = getUserIdFromToken;
+
+
+
 async function setYearlyLimit() {
   const limit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
   const year = new Date().getFullYear().toString();
@@ -2764,14 +2776,11 @@ async function setYearlyLimit() {
     lastUpdated: Date.now()
   });
 
-  // ✅ Re-read filtered entries from global state
-  const filtered = window.filteredEntries || [];
-
-  // ✅ Update the progress bar UI
+  // ✅ Only update the bars — filtered entries are already available
   updateFullYearBudgetBar(limit, window.entries);
-  updateFilteredBudgetBar(limit, filtered);
+  updateFilteredBudgetBar(limit, window.filteredEntries);
 
-  // ✅ Try to sync to backend
+  // Optional: Sync to backend
   await syncYearlyLimitsToMongo();
 }
 
@@ -2914,17 +2923,6 @@ function updateFilteredBudgetBar(limit) {
   }
 }
 
-window.filteredEntries = filtered;
-
-setTimeout(() => {
-  const limit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
-  if (!isNaN(limit)) {
-    updateFullYearBudgetBar(limit, window.entries);
-    updateFilteredBudgetBar(limit, window.filteredEntries);
-  }
-}, 0);
-} // ← closing the renderEntries() function here
-
 
 window.addEventListener('DOMContentLoaded', async () => {
   if (!window.persons || window.persons.length === 0) {
@@ -2941,5 +2939,3 @@ window.addEventListener('DOMContentLoaded', async () => {
 });
 
 window.loadPersons = loadPersons;
-window.loadAndRenderYearlyLimit = loadAndRenderYearlyLimit;
-window.redirectIfNotLoggedIn = redirectIfNotLoggedIn;
