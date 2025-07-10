@@ -761,8 +761,7 @@ card.addEventListener('click', (event) => {
 
   filteredEntries = filtered;
 
-// ✅ Now, finally add this:
-  // ✅ Update budget bar with filtered data
+
 // ✅ Update budget bar with correct data
 const limit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
 if (!isNaN(limit)) {
@@ -2803,13 +2802,17 @@ function updateFullYearBudgetBar(limit, allEntries = window.entries) {
   }
 
   const left = limit - spent;
-
-  document.getElementById("fullSpentLabel").textContent = spent.toFixed(2);
-  document.getElementById("fullLeftLabel").textContent = left.toFixed(2);
-  document.getElementById("fullLimitLabel").textContent = limit.toFixed(2);
-
   const percentUsed = Math.min((spent / limit) * 100, 100);
-  document.getElementById("fullBudgetProgress").style.width = `${percentUsed}%`;
+
+  const spentEl = document.getElementById("fullSpentLabel");
+  const leftEl = document.getElementById("fullLeftLabel");
+  const limitEl = document.getElementById("fullLimitLabel");
+  const barEl = document.getElementById("fullBudgetProgress");
+
+  if (spentEl) spentEl.textContent = spent.toFixed(2);
+  if (leftEl) leftEl.textContent = left.toFixed(2);
+  if (limitEl) limitEl.textContent = limit.toFixed(2);
+  if (barEl) barEl.style.width = `${percentUsed}%`;
 }
 
 async function syncYearlyLimitsToMongo() {
@@ -2882,20 +2885,6 @@ async function loadAndRenderYearlyLimit() {
 }
 
 
-function getFilteredEntriesIncludingBalanceAndTransfer(filteredEntries) {
-  const allEntries = window.entries || [];
-
-  const specialPersons = ['Balance', 'Transfer'];
-  const alwaysIncluded = allEntries.filter(e => 
-    specialPersons.includes(e.person) &&
-    e.date?.startsWith(new Date().getFullYear().toString())
-  );
-
-  const combined = [...filteredEntries, ...alwaysIncluded.filter(e => !filteredEntries.includes(e))];
-
-  return combined;
-}
-
 
 function updateFilteredBudgetBar(limit, filtered) {
   if (!limit || isNaN(limit)) return;
@@ -2907,25 +2896,32 @@ function updateFilteredBudgetBar(limit, filtered) {
     return sum;
   }, 0);
 
-  const spent = limit + totalFilteredExpenses; // Show what has been "used"
+  const spent = limit + totalFilteredExpenses;
   const left = limit - totalFilteredExpenses;
   const percent = Math.min(Math.abs(totalFilteredExpenses / limit) * 100, 100);
 
-  document.getElementById('filteredSpentLabel').textContent =
-    spent.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-
-  document.getElementById('filteredLeftLabel').textContent =
-    (left < 0 ? `-${Math.abs(left).toLocaleString('de-CH', { minimumFractionDigits: 2 })}` : left.toLocaleString('de-CH', { minimumFractionDigits: 2 }));
-
-  document.getElementById('filteredLimitLabel').textContent =
-    limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-
-  // Set bar fill color if over limit
+  const spentLabel = document.getElementById('filteredSpentLabel');
+  const leftLabel = document.getElementById('filteredLeftLabel');
+  const limitLabel = document.getElementById('filteredLimitLabel');
   const progressFill = document.getElementById('filteredProgressFill');
-  progressFill.style.width = `${percent}%`;
-  progressFill.style.backgroundColor = left < 0 ? 'red' : '#00bfff'; // red if over, blue otherwise
-}
 
+  if (spentLabel)
+    spentLabel.textContent = spent.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+
+  if (leftLabel)
+    leftLabel.textContent =
+      left < 0
+        ? `-${Math.abs(left).toLocaleString('de-CH', { minimumFractionDigits: 2 })}`
+        : left.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+
+  if (limitLabel)
+    limitLabel.textContent = limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+
+  if (progressFill) {
+    progressFill.style.width = `${percent}%`;
+    progressFill.style.backgroundColor = left < 0 ? 'red' : '#00bfff';
+  }
+}
 
 
 window.addEventListener('DOMContentLoaded', async () => {
