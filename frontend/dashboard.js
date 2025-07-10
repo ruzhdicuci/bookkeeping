@@ -2769,7 +2769,7 @@ async function setYearlyLimit() {
 
   debug("📤 Saving limit:", limit, "for year", year, "userId:", userId);
 
-  // ✅ Save locally
+  // Save locally
   await saveYearlyLimitLocally({
     userId,
     year,
@@ -2778,20 +2778,22 @@ async function setYearlyLimit() {
     lastUpdated: Date.now()
   });
 
-  // ✅ Re-render entries to refresh window.filteredEntries
-  renderEntries();
+  // Refresh entries (re-renders, and sets window.entries + window.filteredEntries)
+  await renderEntries();
 
-  // ⏳ Delay bar update slightly after render
-setTimeout(() => {
-  console.log("🔍 Limit:", limit);
-  console.log("🟩 Full entries:", window.entries);
-  console.log("🟦 Filtered entries:", window.filteredEntries);
+  // Grab correct data again AFTER rendering
+  const all = window.entries || [];
+  const filtered = window.filteredEntries || [];
 
-  updateFullYearBudgetBar(limit, window.entries);
-  updateFilteredBudgetBar(limit, window.filteredEntries);
-}, 50);
+  console.log("✅ Limit:", limit);
+  console.log("📦 Full entries:", all);
+  console.log("🔵 Filtered entries:", filtered);
 
-  // ☁️ Sync to backend
+  // Update both bars with current data
+  updateFullYearBudgetBar(limit, all);
+  updateFilteredBudgetBar(limit, filtered);
+
+  // Sync to backend
   await syncYearlyLimitsToMongo();
 }
 window.setYearlyLimit = setYearlyLimit;
