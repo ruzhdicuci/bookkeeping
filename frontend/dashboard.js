@@ -2798,10 +2798,10 @@ window.setYearlyLimit = setYearlyLimit;
 function updateFullYearBudgetBar(limit, fullDifference) {
   console.log("✅ updateFullYearBudgetBar: Limit =", limit, "Difference =", fullDifference);
 
-  const bar = document.getElementById('yearBarFill');
-  const plusLabel = document.getElementById('yearPlus');
-  const leftLabel = document.getElementById('yearLeft');
-  const totalLabel = document.getElementById('yearLimit');
+  const bar = document.getElementById('yearlyProgressFill');
+  const plusLabel = document.getElementById('yearlySpentLabel');
+  const leftLabel = document.getElementById('yearlyLeftLabel');
+  const totalLabel = document.getElementById('yearlyLimitLabel');
 
   if (!bar || !plusLabel || !leftLabel || !totalLabel) {
     console.warn("❌ Budget bar elements not found in DOM");
@@ -2888,25 +2888,29 @@ async function loadAndRenderYearlyLimit() {
   }
 }
 
-function updateFilteredBudgetBar(limit, difference) {
-  console.log("✅ updateFilteredBudgetBar: limit =", limit, "difference =", difference);
+function updateFilteredBudgetBar(limit, filteredDifference) {
+  console.log("✅ updateFilteredBudgetBar: limit =", limit, "difference =", filteredDifference);
 
-  const bar = document.getElementById('filteredBarFill');
-  const plusLabel = document.getElementById('filteredPlus');
-  const leftLabel = document.getElementById('filteredLeft');
-  const totalLabel = document.getElementById('filteredLimit');
+  const bar = document.getElementById('filteredProgressFill');
+  const plusLabel = document.getElementById('filteredLeftLabel'); // ✅ your DOM id
+  const spentLabel = document.getElementById('filteredSpentLabel'); // ✅ your DOM id
+  const totalLabel = document.getElementById('filteredLimitLabel'); // ✅ your DOM id
 
-  const left = difference;
-  const overOrUnder = limit - left;
+  if (!bar || !plusLabel || !spentLabel || !totalLabel) {
+    console.warn("❌ Filtered budget bar elements not found in DOM");
+    return;
+  }
+
+  const left = filteredDifference;
+  const used = limit - left;
 
   totalLabel.textContent = limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   plusLabel.textContent = left.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  leftLabel.textContent = (overOrUnder >= 0 ? '-' : '+') + Math.abs(overOrUnder).toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  spentLabel.textContent = (used >= 0 ? '-' : '+') + Math.abs(used).toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
   const percentage = Math.min(Math.abs(left) / limit, 1) * 100;
   bar.style.width = percentage + '%';
 }
-
 
 window.addEventListener('DOMContentLoaded', async () => {
   if (!window.persons || window.persons.length === 0) {
