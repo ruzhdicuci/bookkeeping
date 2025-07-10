@@ -2811,7 +2811,7 @@ updateFullYearBudgetBar(limit, difference);
   await syncYearlyLimitsToMongo();
 }
 window.setYearlyLimit = setYearlyLimit;
-function updateFullYearBudgetBar(limit, difference) {
+function updateFullYearBudgetBar(limit) {
   if (
     typeof difference !== 'number' ||
     isNaN(difference) ||
