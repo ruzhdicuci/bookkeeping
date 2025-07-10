@@ -2916,27 +2916,39 @@ function getFilteredEntriesIncludingBalanceAndTransfer(filteredEntries) {
 function updateFilteredBudgetBar(limit) {
   if (!limit || isNaN(limit)) return;
 
-  const balanceText = document.getElementById('totalBalance')?.textContent;
-  const balance = parseFloat(balanceText?.replace(/[^\d.-]/g, ''));
+  const entries = filteredEntries || window.entries || [];
+  let totalExpense = 0;
 
-  if (isNaN(balance)) {
-    console.warn("⚠️ Missing or invalid Difference value for budget bar.");
-    return;
+  for (const entry of entries) {
+    if (entry.type === 'minus') {
+      totalExpense += parseFloat(entry.amount || 0);
+    }
   }
 
-const percent = Math.min(Math.abs(balance / limit) * 100, 100);
-document.getElementById('filteredSpentLabel').textContent =
-  balance.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-document.getElementById('filteredLimitLabel').textContent =
-  limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-document.getElementById('filteredLeftLabel').textContent =
-  (limit - balance).toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  // Show full limit as 'spent' and 'limit' visually
+  document.getElementById('filteredSpentLabel').textContent =
+    limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
-const fill = document.getElementById('filteredProgressFill');
-fill.style.width = `${percent}%`;
-fill.style.backgroundColor = (balance > limit) ? 'red' : ''; // or green, or your default
+  document.getElementById('filteredLimitLabel').textContent =
+    limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+
+  // Extra spending after budget
+  const extra = totalExpense - limit;
+  document.getElementById('filteredLeftLabel').textContent =
+    extra.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+
+  // Progress fill logic: how much over or within budget
+  const percent = Math.min(Math.abs(totalExpense / limit) * 100, 100);
+  document.getElementById('filteredProgressFill').style.width = `${percent}%`;
+
+  // Optional: Red bar if exceeded
+  const bar = document.getElementById('filteredProgressFill');
+  if (totalExpense > limit) {
+    bar.style.backgroundColor = 'red';
+  } else {
+    bar.style.backgroundColor = ''; // use default blue or CSS class
+  }
 }
-
 
 window.addEventListener('DOMContentLoaded', async () => {
   if (!window.persons || window.persons.length === 0) {
