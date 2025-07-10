@@ -2797,30 +2797,30 @@ window.setYearlyLimit = setYearlyLimit;
 function updateFullYearBudgetBar(limit, allEntries = window.entries) {
   if (!Array.isArray(allEntries)) return;
 
-  let spent = 0;
+  let netTotal = 0;
   for (const entry of allEntries) {
     const type = (entry.type || '').toLowerCase();
     const amount = parseFloat(entry.amount) || 0;
-    if (type === 'expense') spent += amount;
+    if (type === 'plus') netTotal += amount;
+    else if (type === 'minus') netTotal -= amount;
   }
 
-  const left = limit - spent;
-  const percentUsed = Math.min((spent / limit) * 100, 100);
+  const left = netTotal - limit;
+  const percent = Math.min(Math.abs(netTotal) / limit * 100, 100);
 
-  const spentEl = document.getElementById("yearlySpentLabel");
-  const leftEl = document.getElementById("yearlyLeftLabel");
-  const limitEl = document.getElementById("yearlyLimitLabel");
-  const barEl = document.getElementById("yearlyProgressFill");
+  document.getElementById('yearlySpentLabel').textContent =
+    netTotal.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  document.getElementById('yearlyLeftLabel').textContent =
+    (left < 0 ? '-' : '') + Math.abs(left).toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  document.getElementById('yearlyLimitLabel').textContent =
+    limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
-  if (spentEl) spentEl.textContent = spent.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  if (leftEl) leftEl.textContent = (left < 0 ? '-' : '') + Math.abs(left).toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  if (limitEl) limitEl.textContent = limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  if (barEl) {
-    barEl.style.width = `${percentUsed}%`;
-    barEl.style.backgroundColor = left < 0 ? 'red' : '#27a789';
+  const bar = document.getElementById('yearlyProgressFill');
+  if (bar) {
+    bar.style.width = `${percent}%`;
+    bar.style.backgroundColor = left < 0 ? 'red' : '#27a789'; // green
   }
 }
-
 
 async function syncYearlyLimitsToMongo() {
   try {
@@ -2892,34 +2892,33 @@ async function loadAndRenderYearlyLimit() {
 }
 
 
-function updateFilteredBudgetBar(limit, filtered) {
+function updateFilteredBudgetBar(limit, filtered = window.filteredEntries || []) {
   if (!limit || isNaN(limit)) return;
 
   let netTotal = 0;
   for (const entry of filtered) {
     const type = (entry.type || '').toLowerCase();
     const amount = parseFloat(entry.amount) || 0;
-    if (type === 'income') netTotal += amount;
-    else if (type === 'expense') netTotal -= amount;
+    if (type === 'plus') netTotal += amount;
+    else if (type === 'minus') netTotal -= amount;
   }
 
   const left = netTotal - limit;
-  const percent = Math.min((Math.abs(netTotal) / limit) * 100, 100);
+  const percent = Math.min(Math.abs(netTotal) / limit * 100, 100);
 
   document.getElementById('filteredSpentLabel').textContent =
     netTotal.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-
   document.getElementById('filteredLeftLabel').textContent =
     (left < 0 ? '-' : '') + Math.abs(left).toLocaleString('de-CH', { minimumFractionDigits: 2 });
-
   document.getElementById('filteredLimitLabel').textContent =
     limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
   const bar = document.getElementById('filteredProgressFill');
-  bar.style.width = `${percent}%`;
-  bar.style.backgroundColor = left < 0 ? 'red' : '#06b2eb';
+  if (bar) {
+    bar.style.width = `${percent}%`;
+    bar.style.backgroundColor = left < 0 ? 'red' : '#06b2eb'; // blue
+  }
 }
-
 
 
 window.addEventListener('DOMContentLoaded', async () => {
