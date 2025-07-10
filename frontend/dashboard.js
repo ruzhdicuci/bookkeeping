@@ -2811,8 +2811,8 @@ function updateFullYearBudgetBar(limit) {
   const percent = Math.min(Math.abs(diff / limit) * 100, 100);
   const left = limit - diff;
 
-  document.getElementById('yearlySpentLabel').textContent =
-    income.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+document.getElementById('yearlySpentLabel').textContent =
+  diff.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   document.getElementById('yearlyLimitLabel').textContent =
     limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   document.getElementById('yearlyLeftLabel').textContent =
@@ -2926,15 +2926,17 @@ function updateFilteredBudgetBar(limit) {
     return;
   }
 
-  const percent = Math.min((balance / limit) * 100, 100);
+const percent = Math.min(Math.abs(balance / limit) * 100, 100);
+document.getElementById('filteredSpentLabel').textContent =
+  balance.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+document.getElementById('filteredLimitLabel').textContent =
+  limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+document.getElementById('filteredLeftLabel').textContent =
+  (limit - balance).toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
-  document.getElementById('filteredSpentLabel').textContent =
-    balance.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  document.getElementById('filteredLimitLabel').textContent =
-    limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  document.getElementById('filteredProgressFill').style.width = `${percent}%`;
-  document.getElementById('filteredLeftLabel').textContent =
-    (limit - balance).toLocaleString('de-CH', { minimumFractionDigits: 2 });
+const fill = document.getElementById('filteredProgressFill');
+fill.style.width = `${percent}%`;
+fill.style.backgroundColor = (balance > limit) ? 'red' : ''; // or green, or your default
 }
 
 
