@@ -2799,7 +2799,6 @@ function updateFullYearBudgetBar(limit, allEntries = window.entries) {
   if (!Array.isArray(allEntries)) return;
 
   let spent = 0;
-
   for (const entry of allEntries) {
     if ((entry.type || '').toLowerCase() === 'minus') {
       spent += parseFloat(entry.amount) || 0;
@@ -2822,6 +2821,7 @@ function updateFullYearBudgetBar(limit, allEntries = window.entries) {
     barEl.style.backgroundColor = left < 0 ? 'red' : '#27a789';
   }
 }
+
 
 async function syncYearlyLimitsToMongo() {
   try {
@@ -2896,36 +2896,32 @@ async function loadAndRenderYearlyLimit() {
 function updateFilteredBudgetBar(limit, filtered) {
   if (!limit || isNaN(limit)) return;
 
-  console.log("🧪 BudgetBar filtered entries:", filtered.slice(0, 5)); // Debug first 5
-  console.log("🧪 First type:", filtered[0]?.type);
+  console.log("🔍 Filtered entries (sample):", filtered.slice(0, 5));
+  console.log("🔍 Types:", filtered.map(e => e.type));
 
   let netTotal = 0;
   for (const entry of filtered) {
+    const type = (entry.type || '').toLowerCase();
     const amount = parseFloat(entry.amount) || 0;
-    if (entry.type === 'plus') {
-      netTotal += amount;
-    } else if (entry.type === 'minus') {
-      netTotal -= amount;
-    }
+    if (type === 'plus') netTotal += amount;
+    else if (type === 'minus') netTotal -= amount;
   }
 
-  const difference = netTotal - limit;
-  const percent = Math.min(Math.abs(netTotal / limit) * 100, 100);
+  const left = netTotal - limit;
+  const percent = Math.min((Math.abs(netTotal) / limit) * 100, 100);
 
   document.getElementById('filteredSpentLabel').textContent =
     netTotal.toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
   document.getElementById('filteredLeftLabel').textContent =
-    (difference < 0
-      ? `-${Math.abs(difference).toLocaleString('de-CH', { minimumFractionDigits: 2 })}`
-      : difference.toLocaleString('de-CH', { minimumFractionDigits: 2 }));
+    (left < 0 ? '-' : '') + Math.abs(left).toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
   document.getElementById('filteredLimitLabel').textContent =
     limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
-  const progressFill = document.getElementById('filteredProgressFill');
-  progressFill.style.width = `${percent}%`;
-  progressFill.style.backgroundColor = difference < 0 ? 'red' : '#00bfff';
+  const bar = document.getElementById('filteredProgressFill');
+  bar.style.width = `${percent}%`;
+  bar.style.backgroundColor = left < 0 ? 'red' : '#06b2eb';
 }
 
 
