@@ -760,13 +760,14 @@ card.addEventListener('click', (event) => {
   document.getElementById('totalBalance').textContent = (incomeTotal - expenseTotal).toFixed(2);
 
   filteredEntries = filtered;
-  
+
 // ✅ Now, finally add this:
   // ✅ Update budget bar with filtered data
-  const limit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
-  if (!isNaN(limit)) {
-    updateFullYearBudgetBar(limit); // All data
-    updateFilteredBudgetBar(limit, filteredEntries); // ✅ filtered only
+// ✅ Update budget bar with correct data
+const limit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
+if (!isNaN(limit)) {
+  updateFullYearBudgetBar(limit, window.entries);       // ✅ Green bar = ALL entries
+  updateFilteredBudgetBar(limit, filteredEntries);       // ✅ Blue bar = FILTERED entries
 }
 }
 
@@ -2791,47 +2792,25 @@ updateFilteredBudgetBar(limit, filteredEntries); // ✅ make sure filteredEntrie
 
 window.setYearlyLimit = setYearlyLimit;
 
-function updateFullYearBudgetBar(limit) {
-  if (!limit || isNaN(limit)) {
-    console.warn("⚠️ No yearly limit set.");
-    return;
-  }
+function updateFullYearBudgetBar(limit, allEntries = window.entries) {
+  let spent = 0;
 
-  const entries = window.entries || [];
-  let income = 0;
-  let expense = 0;
-
-  for (const entry of entries) {
-    if (entry.type === 'plus') {
-      income += parseFloat(entry.amount || 0);
-    } else if (entry.type === 'minus') {
-      expense += parseFloat(entry.amount || 0);
+  for (const entry of allEntries) {
+    const amount = parseFloat(entry.amount) || 0;
+    if ((entry.type || '').toLowerCase() !== 'income') {
+      spent += amount;
     }
   }
 
-  const diff = income - expense; // final "Balance"
-  const overspent = Math.max(expense - limit, 0); // how much over the limit
-  const percent = Math.min((expense / limit) * 100, 100);
+  const left = limit - spent;
 
-  // Labels
-  document.getElementById('yearlySpentLabel').textContent =
-    expense.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  document.getElementById('yearlyLimitLabel').textContent =
-    limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  document.getElementById("fullSpentLabel").textContent = spent.toFixed(2);
+  document.getElementById("fullLeftLabel").textContent = left.toFixed(2);
+  document.getElementById("fullLimitLabel").textContent = limit.toFixed(2);
 
-  const leftValue = Math.max(expense, limit);
-  const diffLabel = (limit - expense).toLocaleString('de-CH', {
-    minimumFractionDigits: 2
-  });
-
-  // Adjust fill and label depending on overspending
-  const fill = document.getElementById('yearlyProgressFill');
-  fill.style.width = `${Math.min((expense / limit) * 100, 100)}%`;
-  fill.style.backgroundColor = overspent > 0 ? 'red' : '#00bcd4';
-
-  document.getElementById('yearlyLeftLabel').textContent = diffLabel;
+  const percentUsed = Math.min((spent / limit) * 100, 100);
+  document.getElementById("fullBudgetProgress").style.width = `${percentUsed}%`;
 }
-
 
 async function syncYearlyLimitsToMongo() {
   try {
