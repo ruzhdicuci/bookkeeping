@@ -2657,7 +2657,7 @@ window.drawCharts = drawCharts;
 window.updateFullYearBudgetBar = updateFullYearBudgetBar;
 window.syncYearlyLimitsToMongo  =syncYearlyLimitsToMongo;
 window.loadAndRenderYearlyLimit  = loadAndRenderYearlyLimit;
-
+window.updateSummaryTotals = updateSummaryTotals
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -2756,39 +2756,58 @@ async function setYearlyLimit() {
   const startFrom = document.getElementById('startFromInput').value;
   const year = new Date().getFullYear().toString();
 
-  // ✅ Use actual totals from UI
-  const plusRaw = document.getElementById('totalPlusAmount')?.textContent;
-  const minusRaw = document.getElementById('totalMinusAmount')?.textContent;
-  const plus = parseFloat(plusRaw?.replace(/[^\d.-]/g, '')) || 0;
-  const minus = parseFloat(minusRaw?.replace(/[^\d.-]/g, '')) || 0;
-  const difference = plus - minus;
+  const plus = parseFloat(document.getElementById('totalPlusAmount')?.textContent?.replace(/[^\d.-]/g, ''));
+  const minus = parseFloat(document.getElementById('totalMinusAmount')?.textContent?.replace(/[^\d.-]/g, ''));
 
-  if (isNaN(difference) || difference <= 0) {
+  if (isNaN(plus) || isNaN(minus)) {
     alert("Invalid or missing totals to calculate limit.");
     return;
   }
+
+  const limit = plus - minus;
 
   const token = localStorage.getItem('token');
   const payload = JSON.parse(atob(token.split('.')[1]));
   const userId = payload.userId;
 
-  debug("📤 Saving limit (from balance):", difference, "for year", year, "userId:", userId, "startFrom:", startFrom);
+  debug("📤 Saving limit:", limit, "for year", year, "userId:", userId, "startFrom:", startFrom);
 
   await saveYearlyLimitLocally({
     userId,
     year,
-    limit: difference,
+    limit,
     startFrom: startFrom || new Date().toISOString(),
     synced: false,
     lastUpdated: Date.now()
   });
 
-  updateFullYearBudgetBar(difference, startFrom);
+  updateFullYearBudgetBar(limit, startFrom); // ✅ Recalculate bar
   await syncYearlyLimitsToMongo();
 }
 
 window.setYearlyLimit = setYearlyLimit;
 
+function updateSummaryTotals() {
+  const entries = window.entries || [];
+
+  let income = 0;
+  let expense = 0;
+
+  entries.forEach(e => {
+    const amount = parseFloat(e.amount || 0);
+    if (e.type === 'Income') income += amount;
+    else if (e.type === 'Expense') expense += amount;
+  });
+
+  const balance = income - expense;
+
+  document.getElementById('totalPlusAmount').textContent =
+    `+${income.toLocaleString('de-CH', { minimumFractionDigits: 2 })}`;
+  document.getElementById('totalMinusAmount').textContent =
+    `-${expense.toLocaleString('de-CH', { minimumFractionDigits: 2 })}`;
+  document.getElementById('totalDifferenceAmount').textContent =
+    balance.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+}
 
 
 function updateFullYearBudgetBar(_ignoredLimit, startFrom = null) {
