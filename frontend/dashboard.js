@@ -2813,7 +2813,7 @@ window.setYearlyLimit = setYearlyLimit;
 function updateFullYearBudgetBar(limit, entries) {
   console.log("✅ updateFullYearBudgetBar: Limit =", limit);
 
-  if (!Array.isArray(entries)) {
+  if (!Array.isArray(entries) || entries.length === 0) {
     console.warn("❌ Skipping updateFullYearBudgetBar — invalid entries:", entries);
     return;
   }
@@ -2829,26 +2829,33 @@ function updateFullYearBudgetBar(limit, entries) {
     return;
   }
 
-  const totalUsed = entries
+  // 🧮 Totals
+  const totalPlus = entries
+    .filter(e => e.type === 'plus')
+    .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
+
+  const totalMinus = entries
     .filter(e => e.type === 'minus')
     .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
 
-  const difference = limit - totalUsed;
+  const difference = totalPlus - totalMinus;
 
-  // 🧮 Labels
+  // 🏷️ Labels
   totalLabel.textContent = limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   plusLabel.textContent = difference.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  spentLabel.textContent = '-' + totalUsed.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  spentLabel.textContent = (difference >= 0 ? '-' : '+') + Math.abs(limit - difference).toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
-  // 📊 Bar fill logic
-  const percentage = Math.min(totalUsed / limit, 1) * 100;
+  // 📊 Bar logic
+  const percentage = Math.min(Math.abs(difference) / limit, 1) * 100;
   bar.style.width = percentage + '%';
   bar.style.backgroundColor = difference >= 0 ? '#27a789' : '#ff4d4d';
 
-  // ⚠️ Show warning if over budget
+  // ⚠️ Show warning
   if (warning) {
     warning.style.display = difference < 0 ? 'inline' : 'none';
   }
+
+  console.log("📊 Budget bar updated. Diff:", difference, "Percent:", percentage);
 }
 
 async function syncYearlyLimitsToMongo() {
