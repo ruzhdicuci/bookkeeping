@@ -2889,40 +2889,39 @@ async function loadAndRenderYearlyLimit() {
 }
 
 
-function updateFilteredBudgetBar(limit, filtered = window.filteredEntries) {
-  if (!Array.isArray(filtered) || isNaN(limit)) return;
+function updateFullYearBudgetBar(limit, entries = window.entries) {
+  if (!Array.isArray(entries) || isNaN(limit)) return;
 
-  let totalPlus = 0;
-  let totalMinus = 0;
-
-  for (const entry of filtered) {
+  let netTotal = 0;
+  for (const entry of entries) {
     const type = (entry.type || '').toLowerCase();
     const amount = parseFloat(entry.amount) || 0;
-
-    if (['plus', 'income'].includes(type)) {
-      totalPlus += amount;
-    } else if (['minus', 'expense'].includes(type)) {
-      totalMinus += amount;
-    }
+    if (type === 'plus') netTotal += amount;
+    else if (type === 'minus') netTotal -= amount;
   }
 
-  const netTotal = totalPlus - totalMinus;
   const left = netTotal - limit;
   const percent = Math.min((Math.abs(netTotal) / limit) * 100, 100);
 
-  document.getElementById('filteredSpentLabel').textContent =
-    netTotal.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  const spentEl = document.getElementById('yearlySpentLabel');
+  if (spentEl) {
+    spentEl.textContent = netTotal.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  }
 
-  document.getElementById('filteredLeftLabel').textContent =
-    (left < 0 ? '-' : '') + Math.abs(left).toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  const leftEl = document.getElementById('yearlyLeftLabel');
+  if (leftEl) {
+    leftEl.textContent = (left < 0 ? '-' : '') + Math.abs(left).toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  }
 
-  document.getElementById('filteredLimitLabel').textContent =
-    limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  const limitEl = document.getElementById('yearlyLimitLabel');
+  if (limitEl) {
+    limitEl.textContent = limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  }
 
-  const bar = document.getElementById('filteredProgressFill');
+  const bar = document.getElementById('yearlyProgressFill');
   if (bar) {
     bar.style.width = `${percent}%`;
-    bar.style.backgroundColor = left < 0 ? 'red' : '#06b2eb';
+    bar.style.backgroundColor = left < 0 ? 'red' : '#27a789';
   }
 }
 
