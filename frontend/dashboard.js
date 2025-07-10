@@ -2782,10 +2782,14 @@ async function setYearlyLimit() {
   renderEntries();
 
   // ⏳ Delay bar update slightly after render
-  setTimeout(() => {
-    updateFullYearBudgetBar(limit, window.entries);
-    updateFilteredBudgetBar(limit, window.filteredEntries);
-  }, 50);
+setTimeout(() => {
+  console.log("🔍 Limit:", limit);
+  console.log("🟩 Full entries:", window.entries);
+  console.log("🟦 Filtered entries:", window.filteredEntries);
+
+  updateFullYearBudgetBar(limit, window.entries);
+  updateFilteredBudgetBar(limit, window.filteredEntries);
+}, 50);
 
   // ☁️ Sync to backend
   await syncYearlyLimitsToMongo();
@@ -2795,6 +2799,8 @@ window.setYearlyLimit = setYearlyLimit;
 
 
 function updateFullYearBudgetBar(limit) {
+    console.log("✅ updateFullYearBudgetBar: limit =", limit, "entries =", entries);
+
   const diffEl = document.getElementById('summaryDifference');
   if (!diffEl) return;
 
@@ -2901,6 +2907,8 @@ async function loadAndRenderYearlyLimit() {
 
 
 function updateFilteredBudgetBar(limit) {
+    console.log("✅ updateFullYearBudgetBar: limit =", limit, "entries =", entries);
+
   const diffEl = document.getElementById('summaryDifference');
   if (!diffEl) return;
 
