@@ -2825,13 +2825,16 @@ function updateFullYearBudgetBar(limit, difference) {
   plusLabel.textContent = left.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   spentLabel.textContent = (used >= 0 ? '-' : '+') + Math.abs(used).toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
-  const percentage = (Math.abs(difference) / limit) * 100; // no cap at 100%
+  const percentage = (Math.abs(difference) / limit) * 100;
   bar.style.width = percentage + '%';
-
-  // 🔴 Red if overspent, 🟢 Green if under or on target
   bar.style.backgroundColor = difference >= 0 ? '#27a789' : '#ff4d4d';
-}
 
+  // ✅ Show warning icon if over budget
+  const warning = document.getElementById('budgetWarning');
+  if (warning) {
+    warning.style.display = difference < 0 ? 'inline' : 'none';
+  }
+}
 
 async function syncYearlyLimitsToMongo() {
   try {

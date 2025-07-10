@@ -445,9 +445,16 @@ totalsContainer.appendChild(summaryCard);
     <span style="font-size: 1.1rem; font-weight: bold;"><span id="yearlyLimitLabel">100'000.00</span></span>
   </div>
 
-  <div style="position: relative; margin-top: 10px; margin-bottom: 10px; background: #ffffff; height: 14px; border-radius: 7px; overflow: hidden;">
-    <div id="yearlyProgressFill" style="height: 100%; width: 0%; background: #27a789; "></div>
-  </div >
+ <!-- Bar container -->
+<div style="position: relative; margin-top: 10px; margin-bottom: 10px; background: #ffffff; height: 14px; border-radius: 7px; overflow: visible;">
+  <div id="yearlyProgressFill" style="height: 100%; width: 0%; background: #27a789;"></div>
+</div>
+
+<!-- Warning icon -->
+<div>
+  <span id="budgetWarning" style="display: none; color: red; font-weight: bold;">⚠️ Over budget!</span>
+</div>
+
 <button id="setbtn" onclick="setYearlyLimit()">Set Limit</button>
 <input type="number" id="yearlyLimitInput" value="10000" style="width: 100px; height:24px;">
 <input type="date" id="startFromInput" style="width: 150px; height:24px;">

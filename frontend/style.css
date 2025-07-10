@@ -2883,31 +2883,6 @@ padding-top: 3px;
 }
 
 
-
-.budget-bar {
-  margin-top: 1px;
-}
-
-.bar-labels {
-  font-size: 0.9em;
-  margin-bottom: 0px;
-}
-
-.bar {
-  width: 100%;
-  background-color: #ffffff;
-  height: 14px;
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-.bar-fill {
-  height: 100%;
-  width: 0%;
-  transition: width 0.5s ease;
-  background-color: #157815; /* default green */
-}
-
-.filtered-bar {
-  background-color: #06b2eb; /* blue for filtered */
+#yearlyProgressFill {
+  transition: width 0.6s ease-in-out, background-color 0.3s ease-in-out;
 }
