@@ -451,6 +451,7 @@ totalsContainer.appendChild(summaryCard);
 <button id="setbtn" onclick="setYearlyLimit()">Set Limit</button>
 <input type="number" id="yearlyLimitInput" value="10000" style="width: 100px; height:24px;">
 <input type="date" id="startFromInput" style="width: 150px; height:24px;">
+<button onclick="document.getElementById('startFromInput').value = new Date().toISOString().slice(0,10)">📅 Today</button>
 </div>
 
 </div>

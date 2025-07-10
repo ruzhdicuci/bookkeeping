@@ -752,7 +752,8 @@ card.addEventListener('click', (event) => {
 const currentLimit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
 if (!isNaN(currentLimit)) {
   updateFullYearBudgetBar(currentLimit);         // ✅ shows the full-year bar (green)
-  updateFilteredBudgetBar(currentLimit, filtered); // ✅ shows the filtered bar (blue)
+ const currentStart = document.getElementById('yearlyStartInput')?.value || null;
+updateFilteredBudgetBar(currentLimit, filtered, currentStart);
 }
 }
 
@@ -2753,7 +2754,8 @@ window.getUserIdFromToken  = getUserIdFromToken;
 
 async function setYearlyLimit() {
   const limit = parseFloat(document.getElementById('yearlyLimitInput').value);
-  const startFrom = document.getElementById('startFromInput').value;
+  const startFromRaw = document.getElementById('startFromInput').value; // e.g. "2025-07-10"
+  const startFrom = startFromRaw ? new Date(startFromRaw).toISOString() : new Date().toISOString();
   const year = new Date().getFullYear().toString();
 
   if (!limit || isNaN(limit)) {
@@ -2771,7 +2773,7 @@ async function setYearlyLimit() {
     userId,
     year,
     limit,
-    startFrom: startFrom || new Date().toISOString(), // fallback if user didn't choose
+    startFrom,
     synced: false,
     lastUpdated: Date.now()
   });
@@ -2779,8 +2781,6 @@ async function setYearlyLimit() {
   updateFullYearBudgetBar(limit, startFrom);
   await syncYearlyLimitsToMongo();
 }
-
-
 
 window.setYearlyLimit = setYearlyLimit;
 
@@ -2859,7 +2859,7 @@ async function syncYearlyLimitsToMongo() {
 
 
 async function loadAndRenderYearlyLimit() {
-  const year = new Date().getFullYear().toString(); // ✅ Always string
+  const year = new Date().getFullYear().toString();
   const userId = getUserIdFromToken();
 
   debug("🔄 Loading yearly limit for:", userId, year);
@@ -2867,12 +2867,16 @@ async function loadAndRenderYearlyLimit() {
   const localLimit = await getYearlyLimitFromCache(userId, year);
   debug("💾 Local limit:", localLimit);
 
- if (localLimit) {
-  document.getElementById('yearlyLimitInput').value = localLimit.limit;
-  if (localLimit.startFrom) {
-    document.getElementById('startFromInput').value = localLimit.startFrom.slice(0, 10); // only date part
-  }
-  updateFullYearBudgetBar(localLimit.limit, localLimit.startFrom);
+  if (localLimit) {
+    document.getElementById('yearlyLimitInput').value = localLimit.limit;
+
+    if (localLimit.startFrom) {
+      document.getElementById('startFromInput').value = localLimit.startFrom.slice(0, 10); // Only date part
+    } else {
+      document.getElementById('startFromInput').value = ''; // Reset if missing
+    }
+
+    updateFullYearBudgetBar(localLimit.limit, localLimit.startFrom);
   } else {
     debug("🌐 Fetching limit from server...");
     try {
@@ -2887,15 +2891,22 @@ async function loadAndRenderYearlyLimit() {
       const data = await res.json();
       debug("✅ Server responded with:", data);
 
-      await saveYearlyLimitLocally({ userId, year, limit: data.limit });
+      await saveYearlyLimitLocally({
+        userId,
+        year,
+        limit: data.limit,
+        startFrom: data.startFrom || new Date().toISOString()
+      });
 
       document.getElementById('yearlyLimitInput').value = data.limit;
-      updateFullYearBudgetBar(data.limit);
+      document.getElementById('startFromInput').value = (data.startFrom || '').slice(0, 10);
+      updateFullYearBudgetBar(data.limit, data.startFrom);
     } catch (err) {
       console.error("❌ Error loading yearly limit from server:", err);
     }
   }
 }
+
 
 function updateFilteredBudgetBar(limit, filteredEntries, startFrom = null) {
   if (!limit || isNaN(limit)) return;
