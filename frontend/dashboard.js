@@ -2791,33 +2791,34 @@ window.setYearlyLimit = setYearlyLimit;
 
 
 
-function updateFullYearBudgetBar(_ignoredLimit, _startFrom = null) {
-  const plusRaw = document.getElementById('totalPlusAmount')?.textContent;
-  const minusRaw = document.getElementById('totalMinusAmount')?.textContent;
+function updateFullYearBudgetBar(_ignoredLimit, startFrom = null) {
+  const entries = window.entries || [];
+  const startDate = new Date(startFrom || '2000-01-01');
 
-  if (!plusRaw || !minusRaw) {
-    console.warn("⏳ Totals not ready yet for budget bar.");
-    return;
-  }
+  // ✅ Use all expenses (including Balance/Transfer if present)
+  const expenses = entries
+    .filter(e => {
+      const isExpense = e.type === 'Expense';
+      const entryDate = new Date(e.date);
+      return isExpense && entryDate >= startDate;
+    })
+    .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
 
-  const plus = parseFloat(plusRaw.replace(/[^\d.-]/g, '')) || 0;
-  const minus = parseFloat(minusRaw.replace(/[^\d.-]/g, '')) || 0;
+  // ✅ Use actual totals from UI (Difference)
+  const plus = parseFloat(document.getElementById('totalPlusAmount')?.textContent?.replace(/[^\d.-]/g, '')) || 0;
+  const minus = parseFloat(document.getElementById('totalMinusAmount')?.textContent?.replace(/[^\d.-]/g, '')) || 0;
   const difference = plus - minus;
 
-  const used = minus;
-  const limit = difference;
-  const remaining = limit - used;
-  const percent = Math.min((used / limit) * 100, 100);
+  const percent = Math.min((expenses / difference) * 100, 100);
 
   document.getElementById('yearlySpentLabel').textContent =
-    used.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+    ` ${expenses.toLocaleString('de-CH', { minimumFractionDigits: 2 })}`;
   document.getElementById('yearlyLimitLabel').textContent =
-    limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  document.getElementById('yearlyLeftLabel').textContent =
-    remaining.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+    difference.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   document.getElementById('yearlyProgressFill').style.width = `${percent}%`;
+  document.getElementById('yearlyLeftLabel').textContent =
+    ` ${(difference - expenses).toLocaleString('de-CH', { minimumFractionDigits: 2 })} `;
 }
-
 
 async function syncYearlyLimitsToMongo() {
   try {
