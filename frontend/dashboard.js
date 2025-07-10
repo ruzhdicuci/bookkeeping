@@ -701,17 +701,7 @@ card.addEventListener('click', (event) => {
     };
     container.appendChild(loadMoreBtn);
   }
-    // ✅ Final part — add this at the end of the function
-  window.filteredEntries = filtered;
-
-  setTimeout(() => {
-    const limit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
-    if (!isNaN(limit)) {
-      updateFullYearBudgetBar(limit, window.entries);
-      updateFilteredBudgetBar(limit, window.filteredEntries);
-    }
-  }, 0);
-} // ← ends the function
+  
 
 
   // Highlight scroll
@@ -760,14 +750,17 @@ card.addEventListener('click', (event) => {
   document.getElementById('totalExpense').textContent = expenseTotal.toFixed(2);
   document.getElementById('totalBalance').textContent = (incomeTotal - expenseTotal).toFixed(2);
 // ✅ Now, finally add this:
-  // ✅ Update budget bar with filtered data
-const currentLimit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
-if (!isNaN(currentLimit)) {
-  updateFullYearBudgetBar(currentLimit);         // ✅ shows the full-year bar (green)
-  updateFilteredBudgetBar(currentLimit, filtered); // ✅ shows the filtered bar (blue)
-}
-}
+  // ✅ Final part — add this at the end of the function
+  window.filteredEntries = filtered;
 
+  setTimeout(() => {
+    const limit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
+    if (!isNaN(limit)) {
+      updateFullYearBudgetBar(limit, window.entries);
+      updateFilteredBudgetBar(limit, window.filteredEntries);
+    }
+  }, 0);
+} // ← ends the function
 
 
 
