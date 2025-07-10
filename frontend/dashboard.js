@@ -347,7 +347,7 @@ async function fetchEntries() {
 }
 
 function populateNewEntryDropdowns() {
-  const entries = window.entries || [];
+ const entries = filteredEntries || window.entries || [];
 
   const persons = [...new Set(entries.map(e => e.person?.trim()).filter(Boolean))];
   const banks = [...new Set(entries.map(e => e.bank?.trim()).filter(Boolean))];
@@ -2776,7 +2776,7 @@ updateFullYearBudgetBar(limit);
 
 window.setYearlyLimit = setYearlyLimit;
 
-function updateFullYearBudgetBar(limit) {
+function updateFullYearBudgetBar(limit, filteredEntries) {
   if (!limit || isNaN(limit)) {
     console.warn("⚠️ No yearly limit set.");
     return;
