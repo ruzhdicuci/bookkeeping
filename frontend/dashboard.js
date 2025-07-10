@@ -2893,9 +2893,11 @@ async function loadAndRenderYearlyLimit() {
 }
 
 
-
 function updateFilteredBudgetBar(limit, filtered) {
   if (!limit || isNaN(limit)) return;
+
+  console.log("🧪 BudgetBar filtered entries:", filtered.slice(0, 5)); // Debug first 5
+  console.log("🧪 First type:", filtered[0]?.type);
 
   let netTotal = 0;
   for (const entry of filtered) {
@@ -2925,7 +2927,6 @@ function updateFilteredBudgetBar(limit, filtered) {
   progressFill.style.width = `${percent}%`;
   progressFill.style.backgroundColor = difference < 0 ? 'red' : '#00bfff';
 }
-
 
 
 window.addEventListener('DOMContentLoaded', async () => {
