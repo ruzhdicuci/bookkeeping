@@ -2790,8 +2790,8 @@ async function setYearlyLimit() {
   console.log("🔵 Filtered entries:", filtered);
 
   // Update both bars with current data
-  updateFullYearBudgetBar(limit, all);
-  updateFilteredBudgetBar(limit, filtered);
+updateFullYearBudgetBar(limit); // ✅ no need for entries
+updateFilteredBudgetBar(limit, window.filteredEntries);
 
   // Sync to backend
   await syncYearlyLimitsToMongo();
