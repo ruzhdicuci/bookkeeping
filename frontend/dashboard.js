@@ -2776,22 +2776,19 @@ updateFullYearBudgetBar(limit);
 
 window.setYearlyLimit = setYearlyLimit;
 
-function updateFullYearBudgetBar(limit, filteredEntries) {
+function updateFullYearBudgetBar(limit, entries = window.entries) {
   if (!limit || isNaN(limit)) {
     console.warn("⚠️ No yearly limit set.");
     return;
   }
 
-  // Grab the Difference from the DOM instead of recalculating
- const income = window.entries
-  .filter(e => e.type === 'plus')
-  .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
-
-const expense = window.entries
-  .filter(e => e.type === 'minus')
-  .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
-
-const diff = income - expense;
+  const totalPlus = entries
+    .filter(e => e.amount > 0)
+    .reduce((sum, e) => sum + e.amount, 0);
+  const totalMinus = entries
+    .filter(e => e.amount < 0)
+    .reduce((sum, e) => sum + Math.abs(e.amount), 0);
+  const diff = totalPlus - totalMinus;
 
   if (isNaN(diff)) {
     console.warn("⚠️ Missing or invalid Difference value for budget bar.");
@@ -2800,13 +2797,10 @@ const diff = income - expense;
 
   const percent = Math.min((diff / limit) * 100, 100);
 
-  document.getElementById('yearlySpentLabel').textContent =
-    diff.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  document.getElementById('yearlyLimitLabel').textContent =
-    limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  document.getElementById('yearlySpentLabel').textContent = diff.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  document.getElementById('yearlyLimitLabel').textContent = limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   document.getElementById('yearlyProgressFill').style.width = `${percent}%`;
-  document.getElementById('yearlyLeftLabel').textContent =
-    (limit - diff).toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  document.getElementById('yearlyLeftLabel').textContent = (limit - diff).toLocaleString('de-CH', { minimumFractionDigits: 2 });
 }
 
 async function syncYearlyLimitsToMongo() {
