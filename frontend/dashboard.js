@@ -2781,34 +2781,34 @@ updateFilteredBudgetBar(limit, filteredEntries); // ✅ make sure filteredEntrie
 window.setYearlyLimit = setYearlyLimit;
 
 
-
-function updateFullYearBudgetBar(limit, allEntries = window.entries) {
-  if (!Array.isArray(allEntries)) return;
+function updateFullYearBudgetBar(limit, entries = window.entries) {
+  if (!Array.isArray(entries) || isNaN(limit)) return;
 
   let netTotal = 0;
-  for (const entry of allEntries) {
+  for (const entry of entries) {
     const type = (entry.type || '').toLowerCase();
     const amount = parseFloat(entry.amount) || 0;
-    if (type === 'plus') netTotal += amount;
-    else if (type === 'minus') netTotal -= amount;
+
+    if (type === 'income') netTotal += amount;
+    else if (type === 'expense') netTotal -= amount;
   }
 
   const left = netTotal - limit;
   const percent = Math.min((Math.abs(netTotal) / limit) * 100, 100);
 
-  document.getElementById('yearlySpentLabel').textContent =
+  document.getElementById('fullSpentLabel').textContent =
     netTotal.toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
-  document.getElementById('yearlyLeftLabel').textContent =
+  document.getElementById('fullLeftLabel').textContent =
     (left < 0 ? '-' : '') + Math.abs(left).toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
-  document.getElementById('yearlyLimitLabel').textContent =
+  document.getElementById('fullLimitLabel').textContent =
     limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
-  const bar = document.getElementById('yearlyProgressFill');
+  const bar = document.getElementById('fullProgressFill');
   if (bar) {
     bar.style.width = `${percent}%`;
-    bar.style.backgroundColor = left < 0 ? 'red' : '#27a789';
+    bar.style.backgroundColor = left < 0 ? 'red' : 'mediumseagreen'; // red if over budget
   }
 }
 
@@ -2884,7 +2884,6 @@ async function loadAndRenderYearlyLimit() {
 }
 
 
-
 function updateFilteredBudgetBar(limit, filtered = window.filteredEntries) {
   if (!Array.isArray(filtered) || isNaN(limit)) return;
 
@@ -2892,8 +2891,9 @@ function updateFilteredBudgetBar(limit, filtered = window.filteredEntries) {
   for (const entry of filtered) {
     const type = (entry.type || '').toLowerCase();
     const amount = parseFloat(entry.amount) || 0;
-    if (type === 'plus') netTotal += amount;
-    else if (type === 'minus') netTotal -= amount;
+
+    if (type === 'income') netTotal += amount;
+    else if (type === 'expense') netTotal -= amount;
   }
 
   const left = netTotal - limit;
@@ -2911,9 +2911,10 @@ function updateFilteredBudgetBar(limit, filtered = window.filteredEntries) {
   const bar = document.getElementById('filteredProgressFill');
   if (bar) {
     bar.style.width = `${percent}%`;
-    bar.style.backgroundColor = left < 0 ? 'red' : '#06b2eb';
+    bar.style.backgroundColor = left < 0 ? 'red' : '#06b2eb'; // red if over budget
   }
 }
+
 
 window.addEventListener('DOMContentLoaded', async () => {
   if (!window.persons || window.persons.length === 0) {
