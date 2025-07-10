@@ -2794,6 +2794,8 @@ updateFilteredBudgetBar(limit, filteredEntries); // ✅ make sure filteredEntrie
 
 window.setYearlyLimit = setYearlyLimit;
 
+
+
 function updateFullYearBudgetBar(limit, allEntries = window.entries) {
   if (!Array.isArray(allEntries)) return;
 
@@ -2801,11 +2803,11 @@ function updateFullYearBudgetBar(limit, allEntries = window.entries) {
   for (const entry of allEntries) {
     const type = (entry.type || '').toLowerCase();
     const amount = parseFloat(entry.amount) || 0;
-    if (type === 'plus') netTotal += amount;
-    else if (type === 'minus') netTotal -= amount;
+    if (type === 'income') netTotal += amount;
+    else if (type === 'expense') netTotal -= amount;
   }
 
-  const remaining = limit - netTotal; // positive = under budget
+  const remaining = limit - netTotal;
   const percentUsed = Math.min(Math.abs(netTotal) / limit * 100, 100);
 
   document.getElementById('yearlySpentLabel').textContent =
@@ -2894,15 +2896,16 @@ async function loadAndRenderYearlyLimit() {
 }
 
 
+
 function updateFilteredBudgetBar(limit, filtered = window.filteredEntries || []) {
-  if (!limit || isNaN(limit)) return;
+  if (!Array.isArray(filtered)) return;
 
   let netTotal = 0;
   for (const entry of filtered) {
     const type = (entry.type || '').toLowerCase();
     const amount = parseFloat(entry.amount) || 0;
-    if (type === 'plus') netTotal += amount;
-    else if (type === 'minus') netTotal -= amount;
+    if (type === 'income') netTotal += amount;
+    else if (type === 'expense') netTotal -= amount;
   }
 
   const remaining = limit - netTotal;
