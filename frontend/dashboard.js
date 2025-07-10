@@ -2795,25 +2795,31 @@ async function setYearlyLimit() {
 }
 window.setYearlyLimit = setYearlyLimit;
 
-function updateFullYearBudgetBar(limit, fullDifference) {
-  console.log("✅ updateFullYearBudgetBar: Limit =", limit, "Difference =", fullDifference);
+function updateFullYearBudgetBar(limit, difference) {
+  console.log("✅ updateFullYearBudgetBar: Limit =", limit, "Difference =", difference);
+
+  // 🛡️ Prevent crash if difference is undefined or not a number
+  if (typeof difference !== 'number' || isNaN(difference)) {
+    console.warn("❌ Skipping updateFullYearBudgetBar — invalid difference:", difference);
+    return;
+  }
 
   const bar = document.getElementById('yearlyProgressFill');
-  const plusLabel = document.getElementById('yearlySpentLabel');
-  const leftLabel = document.getElementById('yearlyLeftLabel');
+  const plusLabel = document.getElementById('yearlyLeftLabel');
+  const spentLabel = document.getElementById('yearlySpentLabel');
   const totalLabel = document.getElementById('yearlyLimitLabel');
 
-  if (!bar || !plusLabel || !leftLabel || !totalLabel) {
+  if (!bar || !plusLabel || !spentLabel || !totalLabel) {
     console.warn("❌ Budget bar elements not found in DOM");
     return;
   }
 
-  const left = fullDifference;
-  const overOrUnder = limit - left;
+  const left = difference;
+  const used = limit - left;
 
   totalLabel.textContent = limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   plusLabel.textContent = left.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  leftLabel.textContent = (overOrUnder >= 0 ? '-' : '+') + Math.abs(overOrUnder).toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  spentLabel.textContent = (used >= 0 ? '-' : '+') + Math.abs(used).toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
   const percentage = Math.min(Math.abs(left) / limit, 1) * 100;
   bar.style.width = percentage + '%';
