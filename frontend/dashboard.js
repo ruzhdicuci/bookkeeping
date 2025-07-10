@@ -347,7 +347,7 @@ async function fetchEntries() {
 }
 
 function populateNewEntryDropdowns() {
- const entries = filteredEntries || window.entries || [];
+  const entries = window.entries || [];
 
   const persons = [...new Set(entries.map(e => e.person?.trim()).filter(Boolean))];
   const banks = [...new Set(entries.map(e => e.bank?.trim()).filter(Boolean))];
