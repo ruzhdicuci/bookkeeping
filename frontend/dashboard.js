@@ -60,11 +60,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ✅ call updateFullYearBudgetBar here with raw full data - added new,
 const limitInput = document.getElementById('yearlyLimitInput');
 if (limitInput) {
-const limit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
-if (!isNaN(limit)) {
-  updateFilteredBudgetBar(limit, filtered); // <== pass filtered!
-}
-
+  const limit = parseFloat(limitInput.value);
+  if (!isNaN(limit)) {
+    const filtered = window.entries || []; // fallback to all entries
+    updateFilteredBudgetBar(limit, filtered);
+  }
 }
 
   await loadInitialBankBalances();
@@ -759,10 +759,10 @@ card.addEventListener('click', (event) => {
   document.getElementById('totalBalance').textContent = (incomeTotal - expenseTotal).toFixed(2);
 // ✅ Now, finally add this:
   // ✅ Update budget bar with filtered data
-const currentLimit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
-if (!isNaN(currentLimit)) {
-  updateFullYearBudgetBar(currentLimit);           // Green bar: uses ALL entries
- setTimeout(() => updateFilteredBudgetBar(currentLimit), 100);          // Blue bar: uses visible Balance
+const limit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
+if (!isNaN(limit)) {
+  updateFullYearBudgetBar(limit);       // Green bar: all data
+  updateFilteredBudgetBar(limit, filtered); // Blue bar: filtered data (use declared `filtered`)
 }
 }
 
