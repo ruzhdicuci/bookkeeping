@@ -2803,7 +2803,6 @@ window.setYearlyLimit = setYearlyLimit;
 function updateFullYearBudgetBar(limit, difference) {
   console.log("✅ updateFullYearBudgetBar: Limit =", limit, "Difference =", difference);
 
-  // 🛡️ Prevent crash if difference is undefined or not a number
   if (typeof difference !== 'number' || isNaN(difference)) {
     console.warn("❌ Skipping updateFullYearBudgetBar — invalid difference:", difference);
     return;
@@ -2826,12 +2825,13 @@ function updateFullYearBudgetBar(limit, difference) {
   plusLabel.textContent = left.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   spentLabel.textContent = (used >= 0 ? '-' : '+') + Math.abs(used).toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
-  const percentage = Math.min(Math.abs(difference) / limit, 1) * 100;
+  const percentage = (Math.abs(difference) / limit) * 100; // no cap at 100%
   bar.style.width = percentage + '%';
 
-  // ✅ Set bar color: green when within budget, red when over
+  // 🔴 Red if overspent, 🟢 Green if under or on target
   bar.style.backgroundColor = difference >= 0 ? '#27a789' : '#ff4d4d';
 }
+
 
 async function syncYearlyLimitsToMongo() {
   try {
