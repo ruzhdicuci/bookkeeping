@@ -766,7 +766,7 @@ card.addEventListener('click', (event) => {
 const limit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
 if (!isNaN(limit)) {
   updateFullYearBudgetBar(limit, window.entries);            // ✅ full bar (green)
-  updateFilteredBudgetBar(limit, window.filteredEntries || []);  // ✅ filtered bar (blue)
+  updateFilteredBudgetBar(limit); // now calculates from bank balance (income - expenses)
 }
 }
 
@@ -2891,43 +2891,36 @@ async function loadAndRenderYearlyLimit() {
 
 
 
-function updateFilteredBudgetBar(limit, filtered) {
-  if (!limit || isNaN(limit)) return;
+function updateFilteredBudgetBar(limit) {
+  if (!window.entries || !Array.isArray(window.entries)) return;
 
-  const totalFilteredExpenses = (filtered || []).reduce((sum, entry) => {
-    if (entry.type === 'minus') {
-      return sum + parseFloat(entry.amount || 0);
-    }
-    return sum;
-  }, 0);
+  let totalPlus = 0, totalMinus = 0;
 
-  const spent = limit + totalFilteredExpenses;
-  const left = limit - totalFilteredExpenses;
-  const percent = Math.min(Math.abs(totalFilteredExpenses / limit) * 100, 100);
+  for (const entry of window.entries) {
+    const amount = parseFloat(entry.amount) || 0;
+    if ((entry.type || '').toLowerCase() === 'plus') totalPlus += amount;
+    else if ((entry.type || '').toLowerCase() === 'minus') totalMinus += amount;
+  }
 
-  const spentLabel = document.getElementById('filteredSpentLabel');
-  const leftLabel = document.getElementById('filteredLeftLabel');
-  const limitLabel = document.getElementById('filteredLimitLabel');
+  const difference = totalPlus - totalMinus;
+  const left = difference - limit;
+  const percent = Math.min(Math.abs(difference / limit) * 100, 100);
+
+  document.getElementById('filteredSpentLabel').textContent =
+    difference.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+
+  document.getElementById('filteredLeftLabel').textContent =
+    (left < 0 ? `-${Math.abs(left).toLocaleString('de-CH', { minimumFractionDigits: 2 })}` : left.toLocaleString('de-CH', { minimumFractionDigits: 2 }));
+
+  document.getElementById('filteredLimitLabel').textContent =
+    limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+
   const progressFill = document.getElementById('filteredProgressFill');
-
-  if (spentLabel)
-    spentLabel.textContent = spent.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-
-  if (leftLabel)
-    leftLabel.textContent =
-      left < 0
-        ? `-${Math.abs(left).toLocaleString('de-CH', { minimumFractionDigits: 2 })}`
-        : left.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-
-  if (limitLabel)
-    limitLabel.textContent = limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-
   if (progressFill) {
     progressFill.style.width = `${percent}%`;
     progressFill.style.backgroundColor = left < 0 ? 'red' : '#00bfff';
   }
 }
-
 
 window.addEventListener('DOMContentLoaded', async () => {
   if (!window.persons || window.persons.length === 0) {
