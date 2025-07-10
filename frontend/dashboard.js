@@ -763,14 +763,20 @@ window.filteredEntries = filtered;
 
 setTimeout(() => {
   const limit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
-  if (!isNaN(limit)) {
-    updateFullYearBudgetBar(limit, fullDifference);
-   
+  const difference = calculateYearlyDifference(window.entries);
+  if (!isNaN(limit) && typeof difference === 'number') {
+    updateFullYearBudgetBar(limit, difference);
   }
 }, 0);
 } // ← ends the function
 
-
+function calculateYearlyDifference(entries) {
+  return entries.reduce((sum, e) => {
+    if (e.type === 'plus') return sum + e.amount;
+    if (e.type === 'minus') return sum - e.amount;
+    return sum;
+  }, 0);
+}
 
 async function editEntry(id) {
   // Ensure entries are loaded
@@ -2793,55 +2799,52 @@ async function setYearlyLimit() {
   }, 0);
 
   // ✅ Only update bars — no re-rendering!
-  updateFullYearBudgetBar(limit, difference);
+const diff = calculateYearlyDifference(window.entries); // use your own function if needed
+updateFullYearBudgetBar(limit, difference);
 
   // Sync
   await syncYearlyLimitsToMongo();
 }
 window.setYearlyLimit = setYearlyLimit;
 
-function updateFullYearBudgetBar(limit, difference) {
-  console.log("✅ updateFullYearBudgetBar: Limit =", limit, "Difference =", difference);
+function updateFullYearBudgetBar(limit, entries) {
+  console.log("✅ updateFullYearBudgetBar: Limit =", limit);
 
-  if (typeof difference !== 'number' || isNaN(difference)) {
-    console.warn("❌ Skipping updateFullYearBudgetBar — invalid difference:", difference);
+  if (!Array.isArray(entries)) {
+    console.warn("❌ Skipping updateFullYearBudgetBar — invalid entries:", entries);
     return;
   }
 
   const bar = document.getElementById('yearlyProgressFill');
-  const plusLabel = document.getElementById('yearlyLeftLabel');     // ✅ remaining
-  const spentLabel = document.getElementById('yearlySpentLabel');   // ❌ spent
-  const totalLabel = document.getElementById('yearlyLimitLabel');   // 💙 total
+  const plusLabel = document.getElementById('yearlyLeftLabel');
+  const spentLabel = document.getElementById('yearlySpentLabel');
+  const totalLabel = document.getElementById('yearlyLimitLabel');
+  const warning = document.getElementById('budgetWarning');
 
   if (!bar || !plusLabel || !spentLabel || !totalLabel) {
     console.warn("❌ Budget bar elements not found in DOM");
     return;
   }
 
-  const left = difference;
-  const used = limit - left;
+  const totalUsed = entries
+    .filter(e => e.type === 'minus')
+    .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
 
-  // ✅ Correct assignment
+  const difference = limit - totalUsed;
+
+  // 🧮 Labels
   totalLabel.textContent = limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  plusLabel.textContent = left.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  spentLabel.textContent = used.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  plusLabel.textContent = difference.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  spentLabel.textContent = '-' + totalUsed.toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
-  const percentage = (Math.abs(used) / limit) * 100; // overflow allowed
+  // 📊 Bar fill logic
+  const percentage = Math.min(totalUsed / limit, 1) * 100;
   bar.style.width = percentage + '%';
-
-  // 🔴 Red if over budget, 🟢 Green if under
-  bar.style.backgroundColor = left >= 0 ? '#27a789' : '#ff4d4d';
+  bar.style.backgroundColor = difference >= 0 ? '#27a789' : '#ff4d4d';
 
   // ⚠️ Show warning if over budget
-  const warning = document.getElementById('budgetWarning');
   if (warning) {
-    if (left < 0) {
-      warning.style.display = 'inline';
-      warning.classList.add('blink'); // optional CSS animation
-    } else {
-      warning.style.display = 'none';
-      warning.classList.remove('blink');
-    }
+    warning.style.display = difference < 0 ? 'inline' : 'none';
   }
 }
 

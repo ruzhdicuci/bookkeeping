@@ -436,31 +436,41 @@ totalsContainer.appendChild(summaryCard);
 
  <div class="filter-grid">
  
-<div id="yearlyBudgetContainer" style=" margin-top: 1px; margin-bottom: 1px;">
-  <div style="display: flex; align-items: center; gap: 10px; ">
-   
+<div id="yearlyBudgetContainer" style="margin-top: 1px; margin-bottom: 1px;">
+  <!-- Labels Row -->
+  <div style="display: flex; align-items: center; gap: 10px;">
     
-    <span style="font-size: 1.1rem; font-weight: bold;"><span id="yearlySpentLabel" >45'866.82</span></span>
-    <span style="margin: 0 auto; font-size: 1.1rem; font-weight: bold;"><span id="yearlyLeftLabel" >54'133.18</span></span>
-    <span style="font-size: 1.1rem; font-weight: bold;"><span id="yearlyLimitLabel">100'000.00</span></span>
+    <!-- 🟣 Spent -->
+    <span style="font-size: 1.1rem; font-weight: bold; color: mediumvioletred;">
+      <span id="yearlySpentLabel">0.00</span>
+    </span>
+
+    <!-- 🟢 Left (center aligned) -->
+    <span style="margin: 0 auto; font-size: 1.1rem; font-weight: bold; color: seagreen;">
+      <span id="yearlyLeftLabel">0.00</span>
+    </span>
+
+    <!-- 🔵 Limit -->
+    <span style="font-size: 1.1rem; font-weight: bold; color: royalblue;">
+      <span id="yearlyLimitLabel">0.00</span>
+    </span>
   </div>
 
- <!-- Bar container -->
-<div style="position: relative; margin-top: 10px; margin-bottom: 10px; background: #ffffff; height: 14px; border-radius: 7px; overflow: visible;">
-  <div id="yearlyProgressFill" style="height: 100%; width: 0%; background: #27a789;"></div>
+  <!-- Progress Bar -->
+  <div style="position: relative; margin-top: 10px; margin-bottom: 10px; background: #ffffff; height: 14px; border-radius: 7px; overflow: visible;">
+    <div id="yearlyProgressFill" style="height: 100%; width: 0%; background: #27a789; transition: width 0.5s ease;"></div>
+  </div>
+
+  <!-- Warning icon -->
+  <div>
+    <span id="budgetWarning" style="display: none; color: red; font-weight: bold;">⚠️ Over budget!</span>
+  </div>
+
+  <!-- Inputs -->
+  <button id="setbtn" onclick="setYearlyLimit()">Set Limit</button>
+  <input type="number" id="yearlyLimitInput" value="10000" style="width: 100px; height: 24px;">
+  <input type="date" id="startFromInput" style="width: 150px; height: 24px;">
 </div>
-
-<!-- Warning icon -->
-<div>
-  <span id="budgetWarning" style="display: none; color: red; font-weight: bold;">⚠️ Over budget!</span>
-</div>
-
-<button id="setbtn" onclick="setYearlyLimit()">Set Limit</button>
-<input type="number" id="yearlyLimitInput" value="10000" style="width: 100px; height:24px;">
-<input type="date" id="startFromInput" style="width: 150px; height:24px;">
-
-</div>
-
 </div>
 
 
