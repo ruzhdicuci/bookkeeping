@@ -2785,44 +2785,37 @@ async function setYearlyLimit() {
 window.setYearlyLimit = setYearlyLimit;
 
 
-
-function updateFullYearBudgetBar(limit, startFrom = null) {
-  if (!limit || isNaN(limit)) {
-    console.warn("⚠️ No yearly limit set.");
-    return;
-  }
-
+function updateFullYearBudgetBar(_ignoredLimit, startFrom = null) {
   const entries = window.entries || [];
-  const currentYear = new Date().getFullYear().toString();
   const excludedPersons = ['balance', 'transfer'];
+  const startDate = new Date(startFrom || '2000-01-01');
 
-  const expensesThisYear = entries
+  // ⬇️ Filter and sum expenses since startFrom, excluding balance/transfer
+  const expenses = entries
     .filter(e => {
-      const typeMatch = e.type === 'Expense';
-      const yearMatch = e.date?.startsWith(currentYear);
+      const isExpense = e.type === 'Expense';
+      const entryDate = new Date(e.date);
       const person = (e.person || '').trim().toLowerCase();
       const isExcluded = excludedPersons.includes(person);
-
-      if (startFrom && new Date(e.date) < new Date(startFrom)) return false;
-
-      const include = typeMatch && yearMatch && !isExcluded;
-
-      debug('[YEARLY]', `[${e.type}]`, `[${person}]`, `include=${include}`, e);
-      return include;
+      return isExpense && entryDate >= startDate && !isExcluded;
     })
     .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
 
-  const percent = Math.min((expensesThisYear / limit) * 100, 100);
+  // ⬇️ Get the target "Difference" = Total Plus - Total Minus from the UI
+  const plus = parseFloat(document.getElementById('totalPlusAmount')?.textContent?.replace(/[^\d.-]/g, '')) || 0;
+  const minus = parseFloat(document.getElementById('totalMinusAmount')?.textContent?.replace(/[^\d.-]/g, '')) || 0;
+  const difference = plus - minus;
+
+  const percent = Math.min((expenses / difference) * 100, 100);
 
   document.getElementById('yearlySpentLabel').textContent =
-    ` ${expensesThisYear.toLocaleString('de-CH', { minimumFractionDigits: 2 })}`;
+    ` ${expenses.toLocaleString('de-CH', { minimumFractionDigits: 2 })}`;
   document.getElementById('yearlyLimitLabel').textContent =
-    limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+    difference.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   document.getElementById('yearlyProgressFill').style.width = `${percent}%`;
   document.getElementById('yearlyLeftLabel').textContent =
-    ` ${(limit - expensesThisYear).toLocaleString('de-CH', { minimumFractionDigits: 2 })} `;
+    ` ${(difference - expenses).toLocaleString('de-CH', { minimumFractionDigits: 2 })} `;
 }
-
 
 
 async function syncYearlyLimitsToMongo() {
