@@ -2784,16 +2784,13 @@ function updateFullYearBudgetBar(limit) {
 
   const entries = window.entries || [];
   const currentYear = new Date().getFullYear().toString();
-  const excludedPersons = ['balance', 'transfer'];
 
   let income = 0;
   let expense = 0;
 
   entries.forEach(e => {
     const yearMatch = e.date?.startsWith(currentYear);
-    const person = (e.person || '').trim().toLowerCase();
-    const isExcluded = excludedPersons.includes(person);
-    if (!yearMatch || isExcluded) return;
+    if (!yearMatch) return;
 
     const amount = parseFloat(e.amount || 0);
     if (e.type === 'Income') income += amount;
@@ -2886,31 +2883,29 @@ function updateFilteredBudgetBar(limit, filteredEntries) {
   if (!filteredEntries || !Array.isArray(filteredEntries)) return;
 
   const currentYear = new Date().getFullYear().toString();
-  const excludedPersons = ['balance', 'transfer'];
 
-  const filteredExpenses = filteredEntries
-    .filter(e => {
-      const typeMatch = e.type === 'Expense';
-      const yearMatch = e.date?.startsWith(currentYear);
-      const person = (e.person || '').trim().toLowerCase();
-      const isExcluded = excludedPersons.includes(person);
-      const include = typeMatch && yearMatch && !isExcluded;
+  let income = 0;
+  let expense = 0;
 
-      debug('[FILTERED]', `[${e.type}]`, `[${person}]`, `include=${include}`, e);
+  filteredEntries.forEach(e => {
+    const yearMatch = e.date?.startsWith(currentYear);
+    if (!yearMatch) return;
 
-      return include;
-    })
-    .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
+    const amount = parseFloat(e.amount || 0);
+    if (e.type === 'Income') income += amount;
+    else if (e.type === 'Expense') expense += amount;
+  });
 
-  const percent = Math.min((filteredExpenses / limit) * 100, 100);
+  const balance = income - expense;
+  const percent = Math.min((balance / limit) * 100, 100);
 
   document.getElementById('filteredSpentLabel').textContent =
-    filteredExpenses.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+    balance.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   document.getElementById('filteredLimitLabel').textContent =
     limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   document.getElementById('filteredProgressFill').style.width = `${percent}%`;
   document.getElementById('filteredLeftLabel').textContent =
-    (limit - filteredExpenses).toLocaleString('de-CH', { minimumFractionDigits: 2 });
+    (limit - balance).toLocaleString('de-CH', { minimumFractionDigits: 2 });
 }
 
 
