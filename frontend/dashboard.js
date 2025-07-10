@@ -2753,23 +2753,15 @@ function getUserIdFromToken() {
 
 window.getUserIdFromToken  = getUserIdFromToken;
 
-function setYearlyLimit() {
+async function setYearlyLimit() {
   const limitInput = document.getElementById('yearlyLimitInput');
   const limit = parseFloat(limitInput?.value);
   if (isNaN(limit)) return;
 
-  saveYearlyLimitLocally(limit); // or whatever storage function you use
-
-  // Force bar update after setting limit
-  setTimeout(() => {
-    updateFullYearBudgetBar(limit, window.entries);
-    updateFilteredBudgetBar(limit, window.filteredEntries);
-  }, 0);
-
-
   const token = localStorage.getItem('token');
   const payload = JSON.parse(atob(token.split('.')[1]));
-  const userId = payload.userId; // 👈 correctly extracted
+  const userId = payload.userId;
+  const year = new Date().getFullYear().toString(); // Ensure year is a string
 
   debug("📤 Saving limit:", limit, "for year", year, "userId:", userId);
 
@@ -2777,8 +2769,8 @@ function setYearlyLimit() {
   await saveYearlyLimitLocally({ userId, year, limit, synced: false, lastUpdated: Date.now() });
 
   // Update the progress bar UI
-updateFullYearBudgetBar(limit);
-updateFilteredBudgetBar(limit, filteredEntries); // ✅ make sure filteredEntries is declared globally
+  updateFullYearBudgetBar(limit, window.entries);
+  updateFilteredBudgetBar(limit, window.filteredEntries);
 
   // Try to sync to backend
   await syncYearlyLimitsToMongo();
