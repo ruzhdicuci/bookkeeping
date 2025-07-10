@@ -2903,23 +2903,26 @@ function updateFilteredBudgetBar(limit) {
     else if (type === 'expense') totalMinus += amount;
   }
 
-  const difference = totalPlus - totalMinus;
-  const left = difference - limit;
-  const percent = Math.min(Math.abs(difference / limit) * 100, 100);
+  const actual = totalPlus - totalMinus;      // 🟢 Your current standing
+  const target = limit;                       // 🔵 Your set yearly target
+  const difference = actual - target;         // 🟣 How far above/below target
+  const percent = Math.min(Math.abs(actual / target) * 100, 100);
 
   document.getElementById('filteredSpentLabel').textContent =
-    difference.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+    actual.toLocaleString('de-CH', { minimumFractionDigits: 2 });   // 🟢 actual progress
 
   document.getElementById('filteredLeftLabel').textContent =
-    (left < 0 ? `-${Math.abs(left).toLocaleString('de-CH', { minimumFractionDigits: 2 })}` : left.toLocaleString('de-CH', { minimumFractionDigits: 2 }));
+    (difference < 0
+      ? `-${Math.abs(difference).toLocaleString('de-CH', { minimumFractionDigits: 2 })}`
+      : difference.toLocaleString('de-CH', { minimumFractionDigits: 2 }));  // 🟣 ahead/behind
 
   document.getElementById('filteredLimitLabel').textContent =
-    limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+    target.toLocaleString('de-CH', { minimumFractionDigits: 2 });  // 🔵 target
 
   const progressFill = document.getElementById('filteredProgressFill');
   if (progressFill) {
     progressFill.style.width = `${percent}%`;
-    progressFill.style.backgroundColor = left < 0 ? 'red' : '#00bfff';
+    progressFill.style.backgroundColor = difference < 0 ? 'red' : '#00bfff';
   }
 }
 
