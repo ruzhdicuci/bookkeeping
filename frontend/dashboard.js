@@ -758,12 +758,15 @@ card.addEventListener('click', (event) => {
   document.getElementById('totalIncome').textContent = incomeTotal.toFixed(2);
   document.getElementById('totalExpense').textContent = expenseTotal.toFixed(2);
   document.getElementById('totalBalance').textContent = (incomeTotal - expenseTotal).toFixed(2);
+
+  filteredEntries = filtered;
+  
 // ✅ Now, finally add this:
   // ✅ Update budget bar with filtered data
   const limit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
   if (!isNaN(limit)) {
-    updateFullYearBudgetBar(limit);                 // Green bar = ALL
-    updateFilteredBudgetBar(limit, filteredEntries); // Blue bar = filtered
+    updateFullYearBudgetBar(limit); // All data
+    updateFilteredBudgetBar(limit, filteredEntries); // ✅ filtered only
 }
 }
 
