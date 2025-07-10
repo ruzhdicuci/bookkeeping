@@ -75,14 +75,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
 
-  function getCurrentTotalBalance() {
-  const plus = parseFloat(document.getElementById('totalPlusAmount')?.textContent?.replace(/[^\d.-]/g, ''));
-  const minus = parseFloat(document.getElementById('totalMinusAmount')?.textContent?.replace(/[^\d.-]/g, ''));
-  const diff = plus - minus;
-  return isNaN(diff) ? 0 : diff;
-}
-window.getCurrentTotalBalance = getCurrentTotalBalance;
-
   // 3. Person search input logic
   document.getElementById('personSearch')?.addEventListener('input', () => {
     const value = document.getElementById('personSearch').value.trim();
@@ -2790,13 +2782,22 @@ function updateFullYearBudgetBar(limit) {
     return;
   }
 
-  const balance = getCurrentTotalBalance(); // ✅ pulls directly from visible Total Plus/Minus
+  const entries = window.entries || [];
+  const currentYear = new Date().getFullYear().toString();
 
-  if (isNaN(balance)) {
-    console.warn("⚠️ Missing or invalid Difference value for budget bar.");
-    return;
-  }
+  let income = 0;
+  let expense = 0;
 
+  entries.forEach(e => {
+    const yearMatch = e.date?.startsWith(currentYear);
+    if (!yearMatch) return;
+
+    const amount = parseFloat(e.amount || 0);
+    if (e.type === 'Income') income += amount;
+    else if (e.type === 'Expense') expense += amount;
+  });
+
+  const balance = income - expense;
   const percent = Math.min((balance / limit) * 100, 100);
 
   document.getElementById('yearlySpentLabel').textContent =
