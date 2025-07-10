@@ -2760,17 +2760,23 @@ async function setYearlyLimit() {
 
   const token = localStorage.getItem('token');
   const payload = JSON.parse(atob(token.split('.')[1]));
-  const userId = payload.userId; // 👈 correctly extracted
+  const userId = payload.userId;
 
-  debug("📤 Saving limit:", limit, "for year", year, "userId:", userId);
+  const startDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
 
-  // Save locally to Dexie
-  await saveYearlyLimitLocally({ userId, year, limit, synced: false, lastUpdated: Date.now() });
+  const limitObj = {
+    userId,
+    year,
+    limit,
+    startFrom: startDate, // ✅ add this
+    synced: false,
+    lastUpdated: Date.now()
+  };
 
-  // Update the progress bar UI
-updateFullYearBudgetBar(limit);
+  debug("📤 Saving limit with start date:", limitObj);
 
-  // Try to sync to backend
+  await saveYearlyLimitLocally(limitObj);
+  updateGoalBasedBudgetBar(limit, startDate); // ✅ use new function
   await syncYearlyLimitsToMongo();
 }
 
@@ -2854,9 +2860,9 @@ async function loadAndRenderYearlyLimit() {
   const localLimit = await getYearlyLimitFromCache(userId, year);
   debug("💾 Local limit:", localLimit);
 
-  if (localLimit) {
-    document.getElementById('yearlyLimitInput').value = localLimit.limit;
-    updateFullYearBudgetBar(localLimit.limit);
+if (localLimit) {
+  document.getElementById('yearlyLimitInput').value = localLimit.limit;
+  updateGoalBasedBudgetBar(localLimit.limit, localLimit.startFrom); // ✅
   } else {
     debug("🌐 Fetching limit from server...");
     try {
@@ -2913,6 +2919,28 @@ function updateFilteredBudgetBar(limit, filteredEntries) {
     (limit - filteredExpenses).toLocaleString('de-CH', { minimumFractionDigits: 2 });
 }
 
+
+
+function updateGoalBasedBudgetBar(limit, startFromDate) {
+  const entries = window.entries || [];
+
+  const expenses = entries.filter(e =>
+    e.type === 'Expense' &&
+    e.date >= startFromDate &&
+    !['balance', 'transfer'].includes((e.person || '').toLowerCase())
+  );
+
+  const total = expenses.reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
+  const percent = Math.min((total / limit) * 100, 100);
+
+  document.getElementById('yearlySpentLabel').textContent =
+    total.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  document.getElementById('yearlyLimitLabel').textContent =
+    limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  document.getElementById('yearlyLeftLabel').textContent =
+    (limit - total).toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  document.getElementById('yearlyProgressFill').style.width = `${percent}%`;
+}
 
 
 window.addEventListener('DOMContentLoaded', async () => {
