@@ -2780,42 +2780,38 @@ updateFilteredBudgetBar(limit, filteredEntries); // ✅ make sure filteredEntrie
 
 window.setYearlyLimit = setYearlyLimit;
 
-
 function updateFullYearBudgetBar(limit, entries = window.entries) {
-  if (!Array.isArray(entries) || isNaN(limit)) return;
+  const diffEl = document.getElementById('summaryDifference');
+  if (!diffEl) return;
 
-  let netTotal = 0;
-  for (const entry of entries) {
-    const type = (entry.type || '').toLowerCase();
-    const amount = parseFloat(entry.amount) || 0;
-    if (type === 'plus') netTotal += amount;
-    else if (type === 'minus') netTotal -= amount;
-  }
+  // Extract and parse the displayed difference (e.g., "10'828.01")
+  const rawText = diffEl.textContent.replace(/’/g, '').replace(/,/g, '').trim();
+  const difference = parseFloat(rawText);
 
-  const left = netTotal - limit;
-  const percent = Math.min((Math.abs(netTotal) / limit) * 100, 100);
+  if (isNaN(difference) || isNaN(limit)) return;
+
+  const left = difference;
+  const percent = Math.min((Math.abs(difference) / limit) * 100, 100);
 
   const spentEl = document.getElementById('yearlySpentLabel');
-  if (spentEl) {
-    spentEl.textContent = netTotal.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  }
+  if (spentEl)
+    spentEl.textContent = (difference + limit).toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
   const leftEl = document.getElementById('yearlyLeftLabel');
-  if (leftEl) {
+  if (leftEl)
     leftEl.textContent = (left < 0 ? '-' : '') + Math.abs(left).toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  }
 
   const limitEl = document.getElementById('yearlyLimitLabel');
-  if (limitEl) {
+  if (limitEl)
     limitEl.textContent = limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  }
 
   const bar = document.getElementById('yearlyProgressFill');
   if (bar) {
     bar.style.width = `${percent}%`;
-    bar.style.backgroundColor = left < 0 ? 'red' : '#27a789';
+    bar.style.backgroundColor = left < 0 ? 'red' : '#27a789'; // You can adjust this color
   }
 }
+
 
 
 async function syncYearlyLimitsToMongo() {
@@ -2889,34 +2885,24 @@ async function loadAndRenderYearlyLimit() {
 
 
 function updateFilteredBudgetBar(limit, filtered = window.filteredEntries) {
-  if (!Array.isArray(filtered) || isNaN(limit)) return;
+  const diffEl = document.getElementById('summaryDifference');
+  if (!diffEl) return;
 
-  let totalPlus = 0;
-  let totalMinus = 0;
+  // Parse the displayed difference as a number (handle thousand separators)
+  const rawText = diffEl.textContent.replace(/’/g, '').replace(/,/g, '').trim();
+  const difference = parseFloat(rawText);
 
-  for (const entry of filtered) {
-    const type = (entry.type || '').toLowerCase();
-    const amount = parseFloat(entry.amount) || 0;
+  const left = difference;
+  const percent = Math.min((Math.abs(difference) / limit) * 100, 100);
 
-    if (['plus', 'income'].includes(type)) {
-      totalPlus += amount;
-    } else if (['minus', 'expense'].includes(type)) {
-      totalMinus += amount;
-    }
-  }
+  const spentEl = document.getElementById('filteredSpentLabel');
+  if (spentEl) spentEl.textContent = (difference + limit).toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
-  const netTotal = totalPlus - totalMinus;
-  const left = netTotal - limit;
-  const percent = Math.min((Math.abs(netTotal) / limit) * 100, 100);
+  const leftEl = document.getElementById('filteredLeftLabel');
+  if (leftEl) leftEl.textContent = (left < 0 ? '-' : '') + Math.abs(left).toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
-  document.getElementById('filteredSpentLabel').textContent =
-    netTotal.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-
-  document.getElementById('filteredLeftLabel').textContent =
-    (left < 0 ? '-' : '') + Math.abs(left).toLocaleString('de-CH', { minimumFractionDigits: 2 });
-
-  document.getElementById('filteredLimitLabel').textContent =
-    limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  const limitEl = document.getElementById('filteredLimitLabel');
+  if (limitEl) limitEl.textContent = limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
   const bar = document.getElementById('filteredProgressFill');
   if (bar) {
