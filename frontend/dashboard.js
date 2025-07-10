@@ -2765,7 +2765,7 @@ function setYearlyLimit() {
     updateFullYearBudgetBar(limit, window.entries);
     updateFilteredBudgetBar(limit, window.filteredEntries);
   }, 0);
-}
+
 
   const token = localStorage.getItem('token');
   const payload = JSON.parse(atob(token.split('.')[1]));
