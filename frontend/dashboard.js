@@ -75,6 +75,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
 
+  function getCurrentTotalBalance() {
+  const plus = parseFloat(document.getElementById('totalPlusAmount')?.textContent?.replace(/[^\d.-]/g, ''));
+  const minus = parseFloat(document.getElementById('totalMinusAmount')?.textContent?.replace(/[^\d.-]/g, ''));
+  const diff = plus - minus;
+  return isNaN(diff) ? 0 : diff;
+}
+
+
+
   // 3. Person search input logic
   document.getElementById('personSearch')?.addEventListener('input', () => {
     const value = document.getElementById('personSearch').value.trim();
