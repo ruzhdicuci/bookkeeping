@@ -62,6 +62,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (navigator.onLine) syncToCloud();
 
 
+
+  function parseSwissNumber(str) {
+  if (!str) return NaN;
+  return parseFloat(str.replace(/'/g, '').replace(/[^\d.-]/g, ''));
+}
+
+
   // Your flatpickr and other logic continues...
   const dateInput = document.getElementById('newDate');
   if (dateInput) {
@@ -191,10 +198,6 @@ async function loadInitialBankBalances() {
 }
 
 
-function parseSwissNumber(str) {
-  if (!str) return NaN;
-  return parseFloat(str.replace(/'/g, '').replace(/[^\d.-]/g, ''));
-}
 
 
  function populatePersonFilterForDashboard(persons) {
@@ -2809,8 +2812,8 @@ function updateFullYearBudgetBar(_ignoredLimit, startFrom = null) {
     .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
 
   // ✅ Use actual totals from UI (Difference)
-const diffText = document.getElementById('totalDifferenceAmount')?.textContent?.replace(/[^\d.-]/g, '');
-const difference = parseFloat(diffText);
+const diffText = document.getElementById('totalDifferenceAmount')?.textContent;
+const difference = parseSwissNumber(diffText);
 
 if (isNaN(difference)) {
   console.warn("❌ Missing or invalid Difference value for budget bar.");
