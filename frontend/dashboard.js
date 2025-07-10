@@ -2783,8 +2783,15 @@ function updateFullYearBudgetBar(limit, filteredEntries) {
   }
 
   // Grab the Difference from the DOM instead of recalculating
-  const diffText = document.querySelector('#totalDiffAmount')?.textContent || '';
-  const diff = parseFloat(diffText.replace(/[^\d.-]/g, ''));
+ const income = window.entries
+  .filter(e => e.type === 'plus')
+  .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
+
+const expense = window.entries
+  .filter(e => e.type === 'minus')
+  .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
+
+const diff = income - expense;
 
   if (isNaN(diff)) {
     console.warn("⚠️ Missing or invalid Difference value for budget bar.");
