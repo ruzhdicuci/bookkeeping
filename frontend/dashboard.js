@@ -2781,40 +2781,39 @@ updateFilteredBudgetBar(limit, filteredEntries); // ✅ make sure filteredEntrie
 window.setYearlyLimit = setYearlyLimit;
 
 
-function updateFullYearBudgetBar(limit, allEntries = window.entries) {
-  if (!Array.isArray(allEntries) || isNaN(limit)) return;
+function updateFullYearBudgetBar(limit, entries = window.entries) {
+  if (!Array.isArray(entries) || isNaN(limit)) return;
 
-  let totalPlus = 0;
-  let totalMinus = 0;
-
-  for (const entry of allEntries) {
+  let netTotal = 0;
+  for (const entry of entries) {
     const type = (entry.type || '').toLowerCase();
     const amount = parseFloat(entry.amount) || 0;
-
-    if (['plus', 'income'].includes(type)) {
-      totalPlus += amount;
-    } else if (['minus', 'expense'].includes(type)) {
-      totalMinus += amount;
-    }
+    if (type === 'plus') netTotal += amount;
+    else if (type === 'minus') netTotal -= amount;
   }
 
-  const netTotal = totalPlus - totalMinus;
   const left = netTotal - limit;
   const percent = Math.min((Math.abs(netTotal) / limit) * 100, 100);
 
-  document.getElementById('totalSpentLabel').textContent =
-    netTotal.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  const spentEl = document.getElementById('yearlySpentLabel');
+  if (spentEl) {
+    spentEl.textContent = netTotal.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  }
 
-  document.getElementById('totalLeftLabel').textContent =
-    (left < 0 ? '-' : '') + Math.abs(left).toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  const leftEl = document.getElementById('yearlyLeftLabel');
+  if (leftEl) {
+    leftEl.textContent = (left < 0 ? '-' : '') + Math.abs(left).toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  }
 
-  document.getElementById('totalLimitLabel').textContent =
-    limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  const limitEl = document.getElementById('yearlyLimitLabel');
+  if (limitEl) {
+    limitEl.textContent = limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  }
 
-  const bar = document.getElementById('totalProgressFill');
+  const bar = document.getElementById('yearlyProgressFill');
   if (bar) {
     bar.style.width = `${percent}%`;
-    bar.style.backgroundColor = left < 0 ? 'red' : 'mediumorchid'; // 💜 or any color you prefer
+    bar.style.backgroundColor = left < 0 ? 'red' : '#27a789';
   }
 }
 
@@ -2889,39 +2888,40 @@ async function loadAndRenderYearlyLimit() {
 }
 
 
-function updateFullYearBudgetBar(limit, entries = window.entries) {
-  if (!Array.isArray(entries) || isNaN(limit)) return;
+function updateFilteredBudgetBar(limit, filtered = window.filteredEntries) {
+  if (!Array.isArray(filtered) || isNaN(limit)) return;
 
-  let netTotal = 0;
-  for (const entry of entries) {
+  let totalPlus = 0;
+  let totalMinus = 0;
+
+  for (const entry of filtered) {
     const type = (entry.type || '').toLowerCase();
     const amount = parseFloat(entry.amount) || 0;
-    if (type === 'plus') netTotal += amount;
-    else if (type === 'minus') netTotal -= amount;
+
+    if (['plus', 'income'].includes(type)) {
+      totalPlus += amount;
+    } else if (['minus', 'expense'].includes(type)) {
+      totalMinus += amount;
+    }
   }
 
+  const netTotal = totalPlus - totalMinus;
   const left = netTotal - limit;
   const percent = Math.min((Math.abs(netTotal) / limit) * 100, 100);
 
-  const spentEl = document.getElementById('yearlySpentLabel');
-  if (spentEl) {
-    spentEl.textContent = netTotal.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  }
+  document.getElementById('filteredSpentLabel').textContent =
+    netTotal.toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
-  const leftEl = document.getElementById('yearlyLeftLabel');
-  if (leftEl) {
-    leftEl.textContent = (left < 0 ? '-' : '') + Math.abs(left).toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  }
+  document.getElementById('filteredLeftLabel').textContent =
+    (left < 0 ? '-' : '') + Math.abs(left).toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
-  const limitEl = document.getElementById('yearlyLimitLabel');
-  if (limitEl) {
-    limitEl.textContent = limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  }
+  document.getElementById('filteredLimitLabel').textContent =
+    limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
-  const bar = document.getElementById('yearlyProgressFill');
+  const bar = document.getElementById('filteredProgressFill');
   if (bar) {
     bar.style.width = `${percent}%`;
-    bar.style.backgroundColor = left < 0 ? 'red' : '#27a789';
+    bar.style.backgroundColor = left < 0 ? 'red' : '#06b2eb';
   }
 }
 
