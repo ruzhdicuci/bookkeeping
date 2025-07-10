@@ -2925,29 +2925,24 @@ function updateFilteredBudgetBar(limit) {
     }
   }
 
-  // Show limit as full bar
+  const overSpent = Math.max(0, totalExpense - limit);
+  const barFillValue = totalExpense;
+  const percent = Math.min((barFillValue / limit) * 100, 100);
+
+  // Set visual values
   document.getElementById('filteredSpentLabel').textContent =
-    limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+    barFillValue.toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
   document.getElementById('filteredLimitLabel').textContent =
     limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
-  // Show overspending (can be negative or positive)
-  const extra = totalExpense - limit;
   document.getElementById('filteredLeftLabel').textContent =
-    extra.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+    overSpent.toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
-  // Update progress bar fill
-  const percent = Math.min(Math.abs(totalExpense / limit) * 100, 100);
+  // Adjust bar
   const bar = document.getElementById('filteredProgressFill');
-  bar.style.width = `${percent}%`;
-
-  // Optional: red if over limit
-  if (extra > 0) {
-    bar.style.backgroundColor = 'red';
-  } else {
-    bar.style.backgroundColor = ''; // reset to default
-  }
+  bar.style.width = `${Math.min((barFillValue / limit) * 100, 100)}%`;
+  bar.style.backgroundColor = overSpent > 0 ? 'red' : ''; // Optional: red if over
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
