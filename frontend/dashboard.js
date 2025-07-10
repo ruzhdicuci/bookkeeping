@@ -2800,11 +2800,11 @@ async function setYearlyLimit() {
 }
 window.setYearlyLimit = setYearlyLimit;
 
-function updateFullYearBudgetBar(limit, difference) {
-  console.log("✅ updateFullYearBudgetBar: Limit =", limit, "Difference =", difference);
+function updateFullYearBudgetBar(limit, entries) {
+  console.log("✅ updateFullYearBudgetBar: Limit =", limit);
 
-  if (typeof difference !== 'number' || isNaN(difference)) {
-    console.warn("❌ Skipping updateFullYearBudgetBar — invalid difference:", difference);
+  if (!Array.isArray(entries)) {
+    console.warn("❌ Skipping updateFullYearBudgetBar — invalid entries:", entries);
     return;
   }
 
@@ -2812,25 +2812,30 @@ function updateFullYearBudgetBar(limit, difference) {
   const plusLabel = document.getElementById('yearlyLeftLabel');
   const spentLabel = document.getElementById('yearlySpentLabel');
   const totalLabel = document.getElementById('yearlyLimitLabel');
+  const warning = document.getElementById('budgetWarning');
 
   if (!bar || !plusLabel || !spentLabel || !totalLabel) {
     console.warn("❌ Budget bar elements not found in DOM");
     return;
   }
 
-  const left = difference;
-  const used = limit - left;
+  const totalUsed = entries
+    .filter(e => e.type === 'minus')
+    .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
 
+  const difference = limit - totalUsed;
+
+  // 🧮 Labels
   totalLabel.textContent = limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  plusLabel.textContent = left.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  spentLabel.textContent = (used >= 0 ? '-' : '+') + Math.abs(used).toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  plusLabel.textContent = difference.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  spentLabel.textContent = '-' + totalUsed.toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
-  const percentage = (Math.abs(difference) / limit) * 100;
+  // 📊 Bar fill logic
+  const percentage = Math.min(totalUsed / limit, 1) * 100;
   bar.style.width = percentage + '%';
   bar.style.backgroundColor = difference >= 0 ? '#27a789' : '#ff4d4d';
 
-  // ✅ Show warning icon if over budget
-  const warning = document.getElementById('budgetWarning');
+  // ⚠️ Show warning if over budget
   if (warning) {
     warning.style.display = difference < 0 ? 'inline' : 'none';
   }
