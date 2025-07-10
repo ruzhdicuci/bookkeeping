@@ -2810,13 +2810,16 @@ updateFullYearBudgetBar(limit, window.entries);
 }
 window.setYearlyLimit = setYearlyLimit;
 
-function updateFullYearBudgetBar(limit, entries) {
-  console.log("✅ updateFullYearBudgetBar: Limit =", limit);
-
-  if (!Array.isArray(entries) || entries.length === 0) {
-    console.warn("❌ Skipping updateFullYearBudgetBar — invalid entries:", entries);
+function updateFullYearBudgetBar(limit, difference) {
+  if (
+    typeof difference !== 'number' ||
+    isNaN(difference) ||
+    Array.isArray(difference)
+  ) {
+    console.warn("❌ Skipping updateFullYearBudgetBar — invalid difference:", difference);
     return;
   }
+
 
   const bar = document.getElementById('yearlyProgressFill');
   const plusLabel = document.getElementById('yearlyLeftLabel');
