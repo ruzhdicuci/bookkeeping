@@ -74,14 +74,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+function getCurrentTotalBalance() {
+  const plusEl = document.getElementById('totalPlusAmount');
+  const minusEl = document.getElementById('totalMinusAmount');
 
-  function getCurrentTotalBalance() {
-  const plus = parseFloat(document.getElementById('totalPlusAmount')?.textContent?.replace(/[^\d.-]/g, ''));
-  const minus = parseFloat(document.getElementById('totalMinusAmount')?.textContent?.replace(/[^\d.-]/g, ''));
+  if (!plusEl || !minusEl) {
+    console.warn("⚠️ Balance elements not found.");
+    return NaN;
+  }
+
+  const plus = parseFloat(plusEl.textContent.replace(/[^\d.-]/g, ''));
+  const minus = parseFloat(minusEl.textContent.replace(/[^\d.-]/g, ''));
   const diff = plus - minus;
-  return isNaN(diff) ? 0 : diff;
+
+  if (isNaN(diff)) {
+    console.warn("⚠️ Balance values invalid:", plus, minus);
+  }
+
+  return diff;
 }
 
+window.getCurrentTotalBalance = getCurrentTotalBalance;
 
 
   // 3. Person search input logic
@@ -2805,24 +2818,22 @@ function updateFullYearBudgetBar(limit) {
     return;
   }
 
-  // ✅ Use totalDifferenceAmount instead of recalculating income - expenses
-  const diffText = document.getElementById('totalDifferenceAmount')?.textContent?.replace(/[^\d.-]/g, '');
-  const balance = parseFloat(diffText);
+  const difference = getCurrentTotalBalance();
 
-  if (isNaN(balance)) {
-    console.warn("❌ Missing or invalid Difference value for budget bar.");
+  if (isNaN(difference)) {
+    console.warn("⚠️ Missing or invalid Difference value for budget bar.");
     return;
   }
 
-  const percent = Math.min((balance / limit) * 100, 100);
+  const percent = Math.min((difference / limit) * 100, 100);
 
   document.getElementById('yearlySpentLabel').textContent =
-    balance.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+    difference.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   document.getElementById('yearlyLimitLabel').textContent =
     limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   document.getElementById('yearlyProgressFill').style.width = `${percent}%`;
   document.getElementById('yearlyLeftLabel').textContent =
-    (limit - balance).toLocaleString('de-CH', { minimumFractionDigits: 2 });
+    (limit - difference).toLocaleString('de-CH', { minimumFractionDigits: 2 });
 }
 
 async function syncYearlyLimitsToMongo() {
