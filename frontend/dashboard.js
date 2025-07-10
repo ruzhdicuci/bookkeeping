@@ -63,11 +63,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
 
-  function parseSwissNumber(str) {
+function parseSwissNumber(str) {
   if (!str) return NaN;
   return parseFloat(str.replace(/'/g, '').replace(/[^\d.-]/g, ''));
 }
-
 
   // Your flatpickr and other logic continues...
   const dateInput = document.getElementById('newDate');
