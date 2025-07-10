@@ -2783,40 +2783,34 @@ async function setYearlyLimit() {
 
 window.setYearlyLimit = setYearlyLimit;
 
-
 function updateFullYearBudgetBar(_ignoredLimit, startFrom = null) {
   const entries = window.entries || [];
   const startDate = new Date(startFrom || '2000-01-01');
 
-  let income = 0;
-  let expense = 0;
-
-  for (const e of entries) {
+  // 🔢 Filter all entries from start date forward
+  const relevant = entries.filter(e => {
+    const isExpense = e.type === 'Expense';
     const entryDate = new Date(e.date);
-    if (entryDate < startDate) continue;
+    return isExpense && entryDate >= startDate;
+  });
 
-    const amount = parseFloat(e.amount || 0);
-    if (e.type === 'Income') income += amount;
-    else if (e.type === 'Expense') expense += amount;
-  }
+  const expenses = relevant.reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
 
-  const difference = income - expense;
-  const remaining = difference < 0 ? 0 : difference;
-  const percent = Math.min((difference / (difference || 1)) * 100, 100); // avoid NaN
+  // ⬇️ Grab actual Difference from the UI
+  const plus = parseFloat(document.getElementById('totalPlusAmount')?.textContent?.replace(/[^\d.-]/g, '')) || 0;
+  const minus = parseFloat(document.getElementById('totalMinusAmount')?.textContent?.replace(/[^\d.-]/g, '')) || 0;
+  const difference = plus - minus;
 
-  // Update UI elements
+  const percent = Math.min((expenses / difference) * 100, 100);
+
   document.getElementById('yearlySpentLabel').textContent =
-    difference.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-
+    ` ${expenses.toLocaleString('de-CH', { minimumFractionDigits: 2 })}`;
   document.getElementById('yearlyLimitLabel').textContent =
     difference.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-
   document.getElementById('yearlyProgressFill').style.width = `${percent}%`;
-
   document.getElementById('yearlyLeftLabel').textContent =
-    (0).toLocaleString('de-CH', { minimumFractionDigits: 2 }); // Always show 0 left (target met)
+    ` ${(difference - expenses).toLocaleString('de-CH', { minimumFractionDigits: 2 })} `;
 }
-
 
 
 async function syncYearlyLimitsToMongo() {
@@ -2889,12 +2883,13 @@ async function loadAndRenderYearlyLimit() {
   }
 }
 
+
+
 function updateFilteredBudgetBar(limit, filteredEntries, startFrom = null) {
   if (!limit || isNaN(limit)) return;
   if (!filteredEntries || !Array.isArray(filteredEntries)) return;
 
   const startDate = new Date(startFrom || '2000-01-01');
-  const excludedPersons = ['balance', 'transfer'];
 
   let income = 0;
   let expense = 0;
@@ -2902,9 +2897,6 @@ function updateFilteredBudgetBar(limit, filteredEntries, startFrom = null) {
   filteredEntries.forEach(e => {
     const entryDate = new Date(e.date);
     if (entryDate < startDate) return;
-
-    const person = (e.person || '').trim().toLowerCase();
-    // if (excludedPersons.includes(person)) return;
 
     const amount = parseFloat(e.amount || 0);
     if (e.type === 'Income') income += amount;
