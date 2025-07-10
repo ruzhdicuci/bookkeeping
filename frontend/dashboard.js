@@ -2749,8 +2749,11 @@ function getUserIdFromToken() {
 
 window.getUserIdFromToken  = getUserIdFromToken;
 
+
+
 async function setYearlyLimit() {
   const limit = parseFloat(document.getElementById('yearlyLimitInput').value);
+  const startFrom = document.getElementById('startFromInput').value;
   const year = new Date().getFullYear().toString();
 
   if (!limit || isNaN(limit)) {
@@ -2762,27 +2765,28 @@ async function setYearlyLimit() {
   const payload = JSON.parse(atob(token.split('.')[1]));
   const userId = payload.userId;
 
-  const startDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+  debug("📤 Saving limit:", limit, "for year", year, "userId:", userId, "startFrom:", startFrom);
 
-  const limitObj = {
+  await saveYearlyLimitLocally({
     userId,
     year,
     limit,
-    startFrom: startDate, // ✅ add this
+    startFrom: startFrom || new Date().toISOString(), // fallback if user didn't choose
     synced: false,
     lastUpdated: Date.now()
-  };
+  });
 
-  debug("📤 Saving limit with start date:", limitObj);
-
-  await saveYearlyLimitLocally(limitObj);
-  updateGoalBasedBudgetBar(limit, startDate); // ✅ use new function
+  updateFullYearBudgetBar(limit, startFrom);
   await syncYearlyLimitsToMongo();
 }
 
+
+
 window.setYearlyLimit = setYearlyLimit;
 
-function updateFullYearBudgetBar(limit) {
+
+
+function updateFullYearBudgetBar(limit, startFrom = null) {
   if (!limit || isNaN(limit)) {
     console.warn("⚠️ No yearly limit set.");
     return;
@@ -2790,7 +2794,6 @@ function updateFullYearBudgetBar(limit) {
 
   const entries = window.entries || [];
   const currentYear = new Date().getFullYear().toString();
-
   const excludedPersons = ['balance', 'transfer'];
 
   const expensesThisYear = entries
@@ -2799,10 +2802,12 @@ function updateFullYearBudgetBar(limit) {
       const yearMatch = e.date?.startsWith(currentYear);
       const person = (e.person || '').trim().toLowerCase();
       const isExcluded = excludedPersons.includes(person);
+
+      if (startFrom && new Date(e.date) < new Date(startFrom)) return false;
+
       const include = typeMatch && yearMatch && !isExcluded;
 
       debug('[YEARLY]', `[${e.type}]`, `[${person}]`, `include=${include}`, e);
-
       return include;
     })
     .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
@@ -2817,6 +2822,8 @@ function updateFullYearBudgetBar(limit) {
   document.getElementById('yearlyLeftLabel').textContent =
     ` ${(limit - expensesThisYear).toLocaleString('de-CH', { minimumFractionDigits: 2 })} `;
 }
+
+
 
 async function syncYearlyLimitsToMongo() {
   try {
@@ -2860,9 +2867,12 @@ async function loadAndRenderYearlyLimit() {
   const localLimit = await getYearlyLimitFromCache(userId, year);
   debug("💾 Local limit:", localLimit);
 
-if (localLimit) {
+ if (localLimit) {
   document.getElementById('yearlyLimitInput').value = localLimit.limit;
-  updateGoalBasedBudgetBar(localLimit.limit, localLimit.startFrom); // ✅
+  if (localLimit.startFrom) {
+    document.getElementById('startFromInput').value = localLimit.startFrom.slice(0, 10); // only date part
+  }
+  updateFullYearBudgetBar(localLimit.limit, localLimit.startFrom);
   } else {
     debug("🌐 Fetching limit from server...");
     try {
@@ -2919,28 +2929,6 @@ function updateFilteredBudgetBar(limit, filteredEntries) {
     (limit - filteredExpenses).toLocaleString('de-CH', { minimumFractionDigits: 2 });
 }
 
-
-
-function updateGoalBasedBudgetBar(limit, startFromDate) {
-  const entries = window.entries || [];
-
-  const expenses = entries.filter(e =>
-    e.type === 'Expense' &&
-    e.date >= startFromDate &&
-    !['balance', 'transfer'].includes((e.person || '').toLowerCase())
-  );
-
-  const total = expenses.reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
-  const percent = Math.min((total / limit) * 100, 100);
-
-  document.getElementById('yearlySpentLabel').textContent =
-    total.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  document.getElementById('yearlyLimitLabel').textContent =
-    limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  document.getElementById('yearlyLeftLabel').textContent =
-    (limit - total).toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  document.getElementById('yearlyProgressFill').style.width = `${percent}%`;
-}
 
 
 window.addEventListener('DOMContentLoaded', async () => {
