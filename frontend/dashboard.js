@@ -2805,22 +2805,24 @@ function updateFullYearBudgetBar(limit, allEntries = window.entries) {
     else if (type === 'minus') netTotal -= amount;
   }
 
-  const left = netTotal - limit;
-  const percent = Math.min(Math.abs(netTotal) / limit * 100, 100);
+  const remaining = limit - netTotal; // positive = under budget
+  const percentUsed = Math.min(Math.abs(netTotal) / limit * 100, 100);
 
   document.getElementById('yearlySpentLabel').textContent =
     netTotal.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   document.getElementById('yearlyLeftLabel').textContent =
-    (left < 0 ? '-' : '') + Math.abs(left).toLocaleString('de-CH', { minimumFractionDigits: 2 });
+    (remaining < 0 ? '-' : '') + Math.abs(remaining).toLocaleString('de-CH', { minimumFractionDigits: 2 });
   document.getElementById('yearlyLimitLabel').textContent =
     limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
   const bar = document.getElementById('yearlyProgressFill');
   if (bar) {
-    bar.style.width = `${percent}%`;
-    bar.style.backgroundColor = left < 0 ? 'red' : '#27a789'; // green
+    bar.style.width = `${percentUsed}%`;
+    bar.style.backgroundColor = remaining < 0 ? 'red' : '#27a789';
   }
 }
+
+
 
 async function syncYearlyLimitsToMongo() {
   try {
@@ -2903,20 +2905,20 @@ function updateFilteredBudgetBar(limit, filtered = window.filteredEntries || [])
     else if (type === 'minus') netTotal -= amount;
   }
 
-  const left = netTotal - limit;
-  const percent = Math.min(Math.abs(netTotal) / limit * 100, 100);
+  const remaining = limit - netTotal;
+  const percentUsed = Math.min(Math.abs(netTotal) / limit * 100, 100);
 
   document.getElementById('filteredSpentLabel').textContent =
     netTotal.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   document.getElementById('filteredLeftLabel').textContent =
-    (left < 0 ? '-' : '') + Math.abs(left).toLocaleString('de-CH', { minimumFractionDigits: 2 });
+    (remaining < 0 ? '-' : '') + Math.abs(remaining).toLocaleString('de-CH', { minimumFractionDigits: 2 });
   document.getElementById('filteredLimitLabel').textContent =
     limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
   const bar = document.getElementById('filteredProgressFill');
   if (bar) {
-    bar.style.width = `${percent}%`;
-    bar.style.backgroundColor = left < 0 ? 'red' : '#06b2eb'; // blue
+    bar.style.width = `${percentUsed}%`;
+    bar.style.backgroundColor = remaining < 0 ? 'red' : '#06b2eb';
   }
 }
 
