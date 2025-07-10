@@ -2801,40 +2801,23 @@ window.setYearlyLimit = setYearlyLimit;
 
 
 function updateFullYearBudgetBar(limit) {
-    console.log("✅ updateFullYearBudgetBar: limit =", limit, "entries =", entries);
+  const bar = document.getElementById('fullBudgetBar');
+  const usedLabel = document.getElementById('fullBudgetUsed');
+  const leftLabel = document.getElementById('fullBudgetLeft');
 
-  const diffEl = document.getElementById('summaryDifference');
-  if (!diffEl) return;
+  if (!bar || !usedLabel || !leftLabel) return;
 
-  // ✅ Extract plain number from DOM (e.g., "10'828.01" → 10828.01)
-  const rawText = diffEl.textContent.replace(/'/g, '').replace(/,/g, '').trim();
-  const difference = parseFloat(rawText);
+  // 🧮 Use the visible "Difference" value directly
+  const diffText = document.querySelector('#totalDifference')?.textContent || '0';
+  const used = parseFloat(diffText.replace(/[^\d.-]/g, '')) || 0;
 
-  if (isNaN(difference) || isNaN(limit)) return;
+  const percentage = Math.min((used / limit) * 100, 100);
+  const remaining = limit - used;
 
-  const left = difference;
-  const spent = limit + difference;
-  const percent = Math.min((Math.abs(difference) / limit) * 100, 100);
-
-  // 🟢 Update labels
-  const spentEl = document.getElementById('yearlySpentLabel');
-  if (spentEl)
-    spentEl.textContent = spent.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-
-  const leftEl = document.getElementById('yearlyLeftLabel');
-  if (leftEl)
-    leftEl.textContent = (left < 0 ? '-' : '') + Math.abs(left).toLocaleString('de-CH', { minimumFractionDigits: 2 });
-
-  const limitEl = document.getElementById('yearlyLimitLabel');
-  if (limitEl)
-    limitEl.textContent = limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-
-  // 🔵 Update progress bar
-  const bar = document.getElementById('yearlyProgressFill');
-  if (bar) {
-    bar.style.width = `${percent}%`;
-    bar.style.backgroundColor = left < 0 ? 'red' : '#27a789';
-  }
+  // 💡 Update bar width and label
+  bar.style.background = `linear-gradient(to right, #4CAF50 ${percentage}%, #ccc ${percentage}%)`;
+  usedLabel.textContent = used.toFixed(2);
+  leftLabel.textContent = remaining.toFixed(2);
 }
 
 
