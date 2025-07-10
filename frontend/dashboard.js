@@ -2809,9 +2809,9 @@ function updateFullYearBudgetBar(limit, difference) {
   }
 
   const bar = document.getElementById('yearlyProgressFill');
-  const plusLabel = document.getElementById('yearlyLeftLabel');
-  const spentLabel = document.getElementById('yearlySpentLabel');
-  const totalLabel = document.getElementById('yearlyLimitLabel');
+  const plusLabel = document.getElementById('yearlyLeftLabel');     // ✅ remaining
+  const spentLabel = document.getElementById('yearlySpentLabel');   // ❌ spent
+  const totalLabel = document.getElementById('yearlyLimitLabel');   // 💙 total
 
   if (!bar || !plusLabel || !spentLabel || !totalLabel) {
     console.warn("❌ Budget bar elements not found in DOM");
@@ -2821,18 +2821,27 @@ function updateFullYearBudgetBar(limit, difference) {
   const left = difference;
   const used = limit - left;
 
+  // ✅ Correct assignment
   totalLabel.textContent = limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   plusLabel.textContent = left.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  spentLabel.textContent = (used >= 0 ? '-' : '+') + Math.abs(used).toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  spentLabel.textContent = used.toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
-  const percentage = (Math.abs(difference) / limit) * 100;
+  const percentage = (Math.abs(used) / limit) * 100; // overflow allowed
   bar.style.width = percentage + '%';
-  bar.style.backgroundColor = difference >= 0 ? '#27a789' : '#ff4d4d';
 
-  // ✅ Show warning icon if over budget
+  // 🔴 Red if over budget, 🟢 Green if under
+  bar.style.backgroundColor = left >= 0 ? '#27a789' : '#ff4d4d';
+
+  // ⚠️ Show warning if over budget
   const warning = document.getElementById('budgetWarning');
   if (warning) {
-    warning.style.display = difference < 0 ? 'inline' : 'none';
+    if (left < 0) {
+      warning.style.display = 'inline';
+      warning.classList.add('blink'); // optional CSS animation
+    } else {
+      warning.style.display = 'none';
+      warning.classList.remove('blink');
+    }
   }
 }
 
