@@ -63,8 +63,11 @@ const limitInput = document.getElementById('yearlyLimitInput');
 if (limitInput) {
   const limit = parseFloat(limitInput.value);
   if (!isNaN(limit)) {
-    const filtered = window.entries || []; // fallback to all entries
-    updateFilteredBudgetBar(limit, filtered);
+    // Green bar = all entries
+    updateFullYearBudgetBar(limit, window.entries);
+
+    // Blue bar = filtered view
+    updateFilteredBudgetBar(limit, window.filteredEntries || []);
   }
 }
 
@@ -766,7 +769,7 @@ card.addEventListener('click', (event) => {
 const limit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
 if (!isNaN(limit)) {
   updateFullYearBudgetBar(limit, window.entries);            // ✅ full bar (green)
-  updateFilteredBudgetBar(limit); // now calculates from bank balance (income - expenses)
+  updateFilteredBudgetBar(limit, window.filteredEntries);    // ✅ filtered bar (blue)
 }
 }
 
@@ -2891,39 +2894,35 @@ async function loadAndRenderYearlyLimit() {
 
 
 
-function updateFilteredBudgetBar(limit) {
-  if (!window.entries || !Array.isArray(window.entries)) return;
+function updateFilteredBudgetBar(limit, filtered) {
+  if (!limit || isNaN(limit)) return;
 
-  let totalPlus = 0, totalMinus = 0;
+  const income = (filtered || []).reduce((sum, entry) => {
+    return entry.type === 'plus' ? sum + parseFloat(entry.amount || 0) : sum;
+  }, 0);
 
-  for (const entry of window.entries) {
-    const amount = parseFloat(entry.amount) || 0;
-    const type = (entry.type || '').toLowerCase();
-    if (type === 'income') totalPlus += amount;
-    else if (type === 'expense') totalMinus += amount;
-  }
+  const expenses = (filtered || []).reduce((sum, entry) => {
+    return entry.type === 'minus' ? sum + parseFloat(entry.amount || 0) : sum;
+  }, 0);
 
-  const actual = totalPlus - totalMinus;      // 🟢 Your current standing
-  const target = limit;                       // 🔵 Your set yearly target
-  const difference = actual - target;         // 🟣 How far above/below target
-  const percent = Math.min(Math.abs(actual / target) * 100, 100);
+  const actualDifference = income - expenses;
+  const left = actualDifference - limit;
+  const percent = Math.min(Math.abs(actualDifference / limit) * 100, 100);
 
+  // Set text content
   document.getElementById('filteredSpentLabel').textContent =
-    actual.toLocaleString('de-CH', { minimumFractionDigits: 2 });   // 🟢 actual progress
+    actualDifference.toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
   document.getElementById('filteredLeftLabel').textContent =
-    (difference < 0
-      ? `-${Math.abs(difference).toLocaleString('de-CH', { minimumFractionDigits: 2 })}`
-      : difference.toLocaleString('de-CH', { minimumFractionDigits: 2 }));  // 🟣 ahead/behind
+    (left < 0 ? `-${Math.abs(left).toLocaleString('de-CH', { minimumFractionDigits: 2 })}` : left.toLocaleString('de-CH', { minimumFractionDigits: 2 }));
 
   document.getElementById('filteredLimitLabel').textContent =
-    target.toLocaleString('de-CH', { minimumFractionDigits: 2 });  // 🔵 target
+    limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
+  // Set bar color
   const progressFill = document.getElementById('filteredProgressFill');
-  if (progressFill) {
-    progressFill.style.width = `${percent}%`;
-    progressFill.style.backgroundColor = difference < 0 ? 'red' : '#00bfff';
-  }
+  progressFill.style.width = `${percent}%`;
+  progressFill.style.backgroundColor = left < 0 ? 'red' : '#00bfff';
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
