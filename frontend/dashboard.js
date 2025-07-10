@@ -752,7 +752,8 @@ card.addEventListener('click', (event) => {
 const currentLimit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
 if (!isNaN(currentLimit)) {
   updateFullYearBudgetBar(currentLimit);         // ✅ shows the full-year bar (green)
-  updateFilteredBudgetBar(currentLimit, filtered); // ✅ shows the filtered bar (blue)
+ const filteredWithBalance = getFilteredEntriesIncludingBalanceAndTransfer(filtered);
+updateFilteredBudgetBar(currentLimit, filteredWithBalance); // ✅ Right
 }
 }
 
@@ -2870,6 +2871,22 @@ async function loadAndRenderYearlyLimit() {
     }
   }
 }
+
+
+function getFilteredEntriesIncludingBalanceAndTransfer(filteredEntries) {
+  const allEntries = window.entries || [];
+
+  const specialPersons = ['Balance', 'Transfer'];
+  const alwaysIncluded = allEntries.filter(e => 
+    specialPersons.includes(e.person) &&
+    e.date?.startsWith(new Date().getFullYear().toString())
+  );
+
+  const combined = [...filteredEntries, ...alwaysIncluded.filter(e => !filteredEntries.includes(e))];
+
+  return combined;
+}
+
 
 function updateFilteredBudgetBar(limit, filteredEntries) {
   if (!limit || isNaN(limit)) return;
