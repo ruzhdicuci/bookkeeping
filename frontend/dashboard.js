@@ -2916,37 +2916,37 @@ function getFilteredEntriesIncludingBalanceAndTransfer(filteredEntries) {
 function updateFilteredBudgetBar(limit) {
   if (!limit || isNaN(limit)) return;
 
-  const entries = filteredEntries || window.entries || [];
-  let totalExpense = 0;
+  const entries = window.filteredEntries || [];
 
+  let totalExpense = 0;
   for (const entry of entries) {
     if (entry.type === 'minus') {
       totalExpense += parseFloat(entry.amount || 0);
     }
   }
 
-  // Show full limit as 'spent' and 'limit' visually
+  // Show limit as full bar
   document.getElementById('filteredSpentLabel').textContent =
     limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
   document.getElementById('filteredLimitLabel').textContent =
     limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
-  // Extra spending after budget
+  // Show overspending (can be negative or positive)
   const extra = totalExpense - limit;
   document.getElementById('filteredLeftLabel').textContent =
     extra.toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
-  // Progress fill logic: how much over or within budget
+  // Update progress bar fill
   const percent = Math.min(Math.abs(totalExpense / limit) * 100, 100);
-  document.getElementById('filteredProgressFill').style.width = `${percent}%`;
-
-  // Optional: Red bar if exceeded
   const bar = document.getElementById('filteredProgressFill');
-  if (totalExpense > limit) {
+  bar.style.width = `${percent}%`;
+
+  // Optional: red if over limit
+  if (extra > 0) {
     bar.style.backgroundColor = 'red';
   } else {
-    bar.style.backgroundColor = ''; // use default blue or CSS class
+    bar.style.backgroundColor = ''; // reset to default
   }
 }
 
