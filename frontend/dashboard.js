@@ -756,32 +756,21 @@ card.addEventListener('click', (event) => {
   document.getElementById('totalIncome').textContent = incomeTotal.toFixed(2);
   document.getElementById('totalExpense').textContent = expenseTotal.toFixed(2);
   document.getElementById('totalBalance').textContent = (incomeTotal - expenseTotal).toFixed(2);
- 
+  const difference = incomeTotal - expenseTotal;
 // ✅ Now, finally add this:
   // ✅ Final part — add this at the end of the function
 window.filteredEntries = filtered;
 
-const difference = incomeTotal - expenseTotal;
-
 setTimeout(() => {
   const limit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
-  if (!isNaN(limit) && typeof difference === 'number' && !isNaN(difference)) {
-    updateFullYearBudgetBar(limit, difference);
-  } else {
-    console.warn("⛔ Not updating bar — limit or difference invalid", limit, difference);
+  if (!isNaN(limit)) {
+    updateFullYearBudgetBar(limit, fullDifference);
+   
   }
 }, 0);
 } // ← ends the function
 
-function calculateYearlyDifference(entries) {
-  if (!Array.isArray(entries) || entries.length === 0) return undefined;
 
-  return entries.reduce((sum, e) => {
-    if (e.type === 'plus') return sum + e.amount;
-    if (e.type === 'minus') return sum - e.amount;
-    return sum;
-  }, 0);
-}
 
 async function editEntry(id) {
   // Ensure entries are loaded
@@ -2804,19 +2793,17 @@ async function setYearlyLimit() {
   }, 0);
 
   // ✅ Only update bars — no re-rendering!
-const diff = calculateYearlyDifference(window.entries); // use your own function if needed
-updateFullYearBudgetBar(limit, difference);
+  updateFullYearBudgetBar(limit, difference);
 
   // Sync
   await syncYearlyLimitsToMongo();
 }
 window.setYearlyLimit = setYearlyLimit;
-function updateFullYearBudgetBar(limit) {
-  if (
-    typeof difference !== 'number' ||
-    isNaN(difference) ||
-    Array.isArray(difference)
-  ) {
+
+function updateFullYearBudgetBar(limit, difference) {
+  console.log("✅ updateFullYearBudgetBar: Limit =", limit, "Difference =", difference);
+
+  if (typeof difference !== 'number' || isNaN(difference)) {
     console.warn("❌ Skipping updateFullYearBudgetBar — invalid difference:", difference);
     return;
   }
@@ -2825,31 +2812,28 @@ function updateFullYearBudgetBar(limit) {
   const plusLabel = document.getElementById('yearlyLeftLabel');
   const spentLabel = document.getElementById('yearlySpentLabel');
   const totalLabel = document.getElementById('yearlyLimitLabel');
-  const warning = document.getElementById('budgetWarning');
 
   if (!bar || !plusLabel || !spentLabel || !totalLabel) {
     console.warn("❌ Budget bar elements not found in DOM");
     return;
   }
 
-  // 🏷️ Labels
-  totalLabel.textContent = limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  plusLabel.textContent = difference.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  const left = difference;
+  const used = limit - left;
 
-  const used = limit - difference;
+  totalLabel.textContent = limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  plusLabel.textContent = left.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   spentLabel.textContent = (used >= 0 ? '-' : '+') + Math.abs(used).toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
-  // 📊 Bar logic
-  const percentage = Math.min(Math.abs(difference) / limit, 1) * 100;
+  const percentage = (Math.abs(difference) / limit) * 100;
   bar.style.width = percentage + '%';
   bar.style.backgroundColor = difference >= 0 ? '#27a789' : '#ff4d4d';
 
-  // ⚠️ Show warning
+  // ✅ Show warning icon if over budget
+  const warning = document.getElementById('budgetWarning');
   if (warning) {
     warning.style.display = difference < 0 ? 'inline' : 'none';
   }
-
-  console.log("📊 Budget bar updated. Diff:", difference, "Percent:", percentage);
 }
 
 async function syncYearlyLimitsToMongo() {
