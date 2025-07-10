@@ -748,19 +748,16 @@ card.addEventListener('click', (event) => {
   document.getElementById('totalExpense').textContent = expenseTotal.toFixed(2);
   document.getElementById('totalBalance').textContent = (incomeTotal - expenseTotal).toFixed(2);
 
- window.filteredEntries = filtered;
+window.filteredEntries = filtered;
 
-
-// ✅ Update budget bar with correct data
-// At the end of renderEntries():
 setTimeout(() => {
   const limit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
   if (!isNaN(limit)) {
     updateFullYearBudgetBar(limit, window.entries);
     updateFilteredBudgetBar(limit, window.filteredEntries);
   }
-}, 0); // slight delay ensures DOM is painted + difference is rendered
-
+}, 0);
+} // ← closing the renderEntries() function here
 
 
 async function editEntry(id) {
@@ -2752,27 +2749,38 @@ function getUserIdFromToken() {
 }
 
 window.getUserIdFromToken  = getUserIdFromToken;
-
 async function setYearlyLimit() {
-  const limitInput = document.getElementById('yearlyLimitInput');
-  const limit = parseFloat(limitInput?.value);
-  if (isNaN(limit)) return;
+  const limit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
+  const year = new Date().getFullYear().toString();
+
+  if (!limit || isNaN(limit)) {
+    alert("Invalid limit value");
+    return;
+  }
 
   const token = localStorage.getItem('token');
   const payload = JSON.parse(atob(token.split('.')[1]));
   const userId = payload.userId;
-  const year = new Date().getFullYear().toString(); // Ensure year is a string
 
   debug("📤 Saving limit:", limit, "for year", year, "userId:", userId);
 
   // Save locally to Dexie
-  await saveYearlyLimitLocally({ userId, year, limit, synced: false, lastUpdated: Date.now() });
+  await saveYearlyLimitLocally({
+    userId,
+    year,
+    limit,
+    synced: false,
+    lastUpdated: Date.now()
+  });
 
-  // Update the progress bar UI
+  // ✅ Re-read filtered entries from global state
+  const filtered = window.filteredEntries || [];
+
+  // ✅ Update the progress bar UI
   updateFullYearBudgetBar(limit, window.entries);
-  updateFilteredBudgetBar(limit, window.filteredEntries);
+  updateFilteredBudgetBar(limit, filtered);
 
-  // Try to sync to backend
+  // ✅ Try to sync to backend
   await syncYearlyLimitsToMongo();
 }
 
