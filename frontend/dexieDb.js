@@ -255,7 +255,7 @@ async function fetchAndCacheEntries() {
 }
 
 
-async function saveYearlyLimitLocally({ userId, year, limit }) {
+async function saveYearlyLimitLocally({ userId, year, limit, startFrom  }) {
   if (!userId || !year) {
     console.warn("❗ Invalid userId or year:", userId, year);
     return;
