@@ -2915,8 +2915,8 @@ async function loadAndRenderYearlyLimit() {
       userId,
       year,
       limit: data.limit,
-      startFrom: data.startFrom || '', // Optional fallback
-      startFrom: data.startFrom || null,
+      startFrom: data.startFrom || ''// Optional fallback
+
     });
 
     document.getElementById('yearlyLimitInput').value = data.limit;
