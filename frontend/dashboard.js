@@ -2774,6 +2774,7 @@ async function setYearlyLimit() {
   const token = localStorage.getItem('token');
   const payload = JSON.parse(atob(token.split('.')[1]));
   const userId = payload.userId;
+ const startFrom = document.getElementById('startFromInput')?.value;
 
   debug("📤 Saving limit:", limit, "for year", year, "userId:", userId);
 
@@ -2782,6 +2783,7 @@ async function setYearlyLimit() {
     userId,
     year,
     limit,
+    startFrom, // include this
     synced: false,
     lastUpdated: Date.now()
   });
@@ -2845,7 +2847,7 @@ async function syncYearlyLimitsToMongo() {
 
     if (!unsynced.length) return;
 
-    const { year, limit } = unsynced[0]; // 👈 Extract only what the backend expects
+    const { userId, year, limit, startFrom } = unsynced[0]; // 👈 include startFrom
 
     const res = await fetch(`${backend}/api/yearly-limit`, {
       method: 'POST',
@@ -2853,7 +2855,7 @@ async function syncYearlyLimitsToMongo() {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`
       },
-      body: JSON.stringify({ year, limit }) // ✅ No userId here!
+      body: JSON.stringify({ year, limit, startFrom }) // ✅ include startFrom in request
     });
 
     const result = await res.text();
@@ -2861,13 +2863,12 @@ async function syncYearlyLimitsToMongo() {
 
     if (!res.ok) throw new Error(result);
 
-    await db.yearlyLimits.update([unsynced[0].userId, year], { synced: true });
+    await db.yearlyLimits.update([userId, year], { synced: true }); // ✅ keep as is
     debug("✅ Yearly limit synced to MongoDB");
   } catch (err) {
     console.error("❌ Failed to sync yearly limit:", err);
   }
 }
-
 
 async function loadAndRenderYearlyLimit() {
   const year = new Date().getFullYear().toString();
@@ -2886,31 +2887,49 @@ async function loadAndRenderYearlyLimit() {
                             .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
   const difference = totalPlus - totalMinus;
 
-  if (localLimit) {
-    document.getElementById('yearlyLimitInput').value = localLimit.limit;
-    updateFullYearBudgetBar(localLimit.limit, difference);
-  } else {
-    debug("🌐 Fetching limit from server...");
-    try {
-      const res = await fetch(`${backend}/api/yearly-limit?year=${year}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
-      });
+ if (localLimit) {
+  document.getElementById('yearlyLimitInput').value = localLimit.limit;
 
-      if (!res.ok) throw new Error(await res.text());
-
-      const data = await res.json();
-      debug("✅ Server responded with:", data);
-
-      await saveYearlyLimitLocally({ userId, year, limit: data.limit });
-
-      document.getElementById('yearlyLimitInput').value = data.limit;
-      updateFullYearBudgetBar(data.limit, difference);
-    } catch (err) {
-      console.error("❌ Error loading yearly limit from server:", err);
-    }
+  // ✅ Restore saved start date
+  if (localLimit.startFrom) {
+    document.getElementById('startFromInput').value = localLimit.startFrom;
   }
+
+  updateFullYearBudgetBar(localLimit.limit, difference);
+} else {
+  debug("🌐 Fetching limit from server...");
+  try {
+    const res = await fetch(`${backend}/api/yearly-limit?year=${year}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+
+    if (!res.ok) throw new Error(await res.text());
+
+    const data = await res.json();
+    debug("✅ Server responded with:", data);
+
+    // ✅ Save limit and startFrom if present
+    await saveYearlyLimitLocally({
+      userId,
+      year,
+      limit: data.limit,
+      startFrom: data.startFrom || '', // Optional fallback
+      startFrom: data.startFrom || null,
+    });
+
+    document.getElementById('yearlyLimitInput').value = data.limit;
+
+    if (data.startFrom) {
+      document.getElementById('startFromInput').value = data.startFrom;
+    }
+
+    updateFullYearBudgetBar(data.limit, difference);
+  } catch (err) {
+    console.error("❌ Error loading yearly limit from server:", err);
+  }
+}
 }
 
 

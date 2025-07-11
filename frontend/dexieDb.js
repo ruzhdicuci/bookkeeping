@@ -265,6 +265,7 @@ async function saveYearlyLimitLocally({ userId, year, limit }) {
     userId,
     year: year.toString(), // ✅ Force to string
     limit,
+    startFrom: startFrom || '', // ✅ Include startFrom if provided
     synced: false,
     lastUpdated: Date.now()
   };
