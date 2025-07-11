@@ -2800,11 +2800,11 @@ async function setYearlyLimit() {
 }
 window.setYearlyLimit = setYearlyLimit;
 
-function updateFullYearBudgetBar(limit, entries) {
-  console.log("✅ updateFullYearBudgetBar: Limit =", limit);
+function updateFullYearBudgetBar(limit, difference) {
+  debug("✅ updateFullYearBudgetBar: Limit =", limit, "Difference =", difference);
 
-  if (!Array.isArray(entries)) {
-    console.warn("❌ Skipping updateFullYearBudgetBar — invalid entries:", entries);
+  if (typeof difference !== 'number' || isNaN(difference)) {
+    console.warn("❌ Skipping updateFullYearBudgetBar — invalid difference:", difference);
     return;
   }
 
@@ -2812,30 +2812,25 @@ function updateFullYearBudgetBar(limit, entries) {
   const plusLabel = document.getElementById('yearlyLeftLabel');
   const spentLabel = document.getElementById('yearlySpentLabel');
   const totalLabel = document.getElementById('yearlyLimitLabel');
-  const warning = document.getElementById('budgetWarning');
 
   if (!bar || !plusLabel || !spentLabel || !totalLabel) {
     console.warn("❌ Budget bar elements not found in DOM");
     return;
   }
 
-  const totalUsed = entries
-    .filter(e => e.type === 'minus')
-    .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
+  const left = difference;
+  const used = limit - left;
 
-  const difference = limit - totalUsed;
-
-  // 🧮 Labels
   totalLabel.textContent = limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  plusLabel.textContent = difference.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  spentLabel.textContent = '-' + totalUsed.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  plusLabel.textContent = left.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  spentLabel.textContent = (used >= 0 ? '-' : '+') + Math.abs(used).toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
-  // 📊 Bar fill logic
-  const percentage = Math.min(totalUsed / limit, 1) * 100;
+  const percentage = (Math.abs(difference) / limit) * 100;
   bar.style.width = percentage + '%';
   bar.style.backgroundColor = difference >= 0 ? '#27a789' : '#ff4d4d';
 
-  // ⚠️ Show warning if over budget
+  // ✅ Show warning icon if over budget
+  const warning = document.getElementById('budgetWarning');
   if (warning) {
     warning.style.display = difference < 0 ? 'inline' : 'none';
   }
@@ -2935,3 +2930,16 @@ window.addEventListener('DOMContentLoaded', async () => {
 });
 
 window.loadPersons = loadPersons;
+
+
+document.getElementById('startFromInput').addEventListener('change', function () {
+  const selectedDate = this.value;
+  localStorage.setItem('startFromDate', selectedDate);
+});
+
+window.addEventListener('DOMContentLoaded', () => {
+  const savedDate = localStorage.getItem('startFromDate');
+  if (savedDate) {
+    document.getElementById('startFromInput').value = savedDate;
+  }
+});
