@@ -142,6 +142,7 @@ const YearlyLimit = mongoose.model('YearlyLimit', new mongoose.Schema({
   userId: String,
   year: String,
   limit: Number,
+  startFrom: String, // 👈 Add this line
   lastUpdated: Number
 }));
 
@@ -366,7 +367,12 @@ app.get('/api/yearly-limit', auth, async (req, res) => {
   try {
     const result = await YearlyLimit.findOne({ userId: req.user.userId, year });
     debug("📦 Found in DB:", result);
-    res.json(result || { limit: 0 });
+
+    res.json({
+      limit: result?.limit || 0,
+      startFrom: result?.startFrom || ''
+    });
+
   } catch (err) {
     console.error("❌ Error loading limit:", err);
     res.status(500).json({ error: 'Server error loading yearly limit' });
