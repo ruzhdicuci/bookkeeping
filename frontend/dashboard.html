@@ -100,6 +100,20 @@ Kredit Limits
   Searches
 </label>
 
+
+<label class="custom-checkbox">
+  <input type="checkbox" id="toggleBudget" checked />
+  <span class="checkmark"></span>
+  Budget
+</label>
+
+
+<label class="custom-checkbox">
+  <input type="checkbox" id="toggleWidget" checked />
+  <span class="checkmark"></span>
+  Budget
+</label>
+
 </div>
 
 
@@ -362,7 +376,7 @@ totalsContainer.appendChild(summaryCard);
 <div class="credit-grid" id="creditGrid">
   <!-- Input Cards -->
   
-
+ 
 
 
 
@@ -405,7 +419,7 @@ totalsContainer.appendChild(summaryCard);
 </div>
 </div>
 </div>
- 
+ </div>
   </div>
 
  <div id="totalsSection">
@@ -434,6 +448,8 @@ totalsContainer.appendChild(summaryCard);
 </div>
  </div>
 
+
+ <div id="budgetSection"> 
  <div class="filter-grid">
  
 <div id="yearlyBudgetContainer" style="margin-top: 1px; margin-bottom: 1px; background-color: white; padding:15px; border-radius: 10px;">
@@ -441,17 +457,17 @@ totalsContainer.appendChild(summaryCard);
   <div style="display: flex; align-items: center; gap: 10px;">
     
     <!-- 🟣 Spent -->
-    <span style="font-size: 1.1rem; font-weight: bold; color: mediumvioletred;">
+    <span style="font-size: 1.1rem; font-weight: bold; color: rgb(249, 85, 189);">
       <span id="yearlySpentLabel">0.00</span>
     </span>
 
     <!-- 🟢 Left (center aligned) -->
-    <span style="margin: 0 auto; font-size: 1.1rem; font-weight: bold; color: seagreen;">
+    <span style="margin: 0 auto; font-size: 1.1rem; font-weight: bold; color: rgb(55, 155, 98);">
       <span id="yearlyLeftLabel">0.00</span>
     </span>
 
     <!-- 🔵 Limit -->
-    <span style="font-size: 1.1rem; font-weight: bold; color: royalblue;">
+    <span style="font-size: 1.1rem; font-weight: bold; color: rgb(119, 152, 251);">
       <span id="yearlyLimitLabel">0.00</span>
     </span>
   </div>
@@ -469,8 +485,20 @@ totalsContainer.appendChild(summaryCard);
   <!-- Inputs -->
   <button id="setbtn" onclick="setYearlyLimit()">Set Limit</button>
   <input type="number" id="yearlyLimitInput" value="10000" style="width: 100px; height: 24px;">
-  <input type="date" id="startFromInput" style="width: 110px; height: 24px;">
+  <input type="date" id="startFromInput" style="width: 130px; height: 24px;">
 </div>
+</div>
+</div>
+
+
+ <div id="widgetSection"> 
+
+<div id="monthlyWidgetsContainer" class="monthly-widgets-grid"></div>
+<button onclick="clearMonthFilter()">Reset Filter</button>
+<label for="fromDate">From:</label>
+<input type="date" id="fromDate" style="height: 24px;">
+<label for="toDate">To:</label>
+<input type="date" id="toDate" style="height: 24px;   margin-bottom: 10px;">
 </div>
 
 

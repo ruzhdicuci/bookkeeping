@@ -2604,6 +2604,8 @@ setupToggle('toggleAverage', 'averageSection');
 setupToggle('toggleMultiselect', 'multiselectSection');
 setupToggle('toggleFilters', 'filtersSection');
 setupToggle('toggleSearches', 'searchesSection');
+setupToggle('toggleBudget', 'budgetSection');
+setupToggle('toggleWidget', 'widgetSection');
 
 });
 
@@ -2887,13 +2889,19 @@ async function loadAndRenderYearlyLimit() {
                             .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
   const difference = totalPlus - totalMinus;
 
- if (localLimit) {
+if (localLimit) {
   document.getElementById('yearlyLimitInput').value = localLimit.limit;
 
   // ✅ Restore saved start date
   if (localLimit.startFrom) {
     document.getElementById('startFromInput').value = localLimit.startFrom;
   }
+
+  // ✅ Always render monthly widgets if limit is known
+  renderMonthlyWidgets(window.entries || [], parseFloat(localLimit.limit));
+
+
+
 
   updateFullYearBudgetBar(localLimit.limit, difference);
 } else {
@@ -2962,3 +2970,79 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('startFromInput').value = savedDate;
   }
 });
+
+
+function renderMonthlyWidgets(entries, yearlyLimit, startFrom = null) {
+  const container = document.getElementById('monthlyWidgetsContainer');
+  if (!container) return;
+
+  container.innerHTML = '';
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const monthlyLimit = yearlyLimit ? yearlyLimit / 12 : null;
+
+  const startDate = startFrom ? new Date(startFrom) : null;
+
+  for (let i = 0; i < 12; i++) {
+    const monthEntries = entries.filter(e => {
+      const d = new Date(e.date);
+      return (
+        (!startDate || d >= startDate) &&
+        d.getMonth() === i &&
+        d.getFullYear() === new Date().getFullYear()
+      );
+    });
+
+    const income = monthEntries
+      .filter(e => (e.type || '').toLowerCase() === 'plus')
+      .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+
+    const spent = monthEntries
+      .filter(e => (e.type || '').toLowerCase() === 'minus')
+      .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+
+    const left = monthlyLimit ? (monthlyLimit - spent) : null;
+    const percentUsed = monthlyLimit ? Math.min(spent / monthlyLimit, 1) * 100 : 0;
+
+    const card = document.createElement('div');
+    card.className = 'monthly-widget';
+    card.innerHTML = `
+      <div class="month">${months[i]}</div>
+      <div class="income">+${income.toLocaleString('de-CH', { minimumFractionDigits: 2 })}</div>
+      <div class="spent">-${spent.toLocaleString('de-CH', { minimumFractionDigits: 2 })}</div>
+      ${
+        monthlyLimit
+          ? `<div class="left">+${left.toLocaleString('de-CH', { minimumFractionDigits: 2 })}</div>
+             <div class="bar-container"><div class="bar-fill" style="width:${percentUsed}%; background-color:${left >= 0 ? '#27a789' : '#ff4d4d'};"></div></div>`
+          : `<div style="height: 18px;"></div>`
+      }
+    `;
+
+    // ✅ Add click filter
+    card.onclick = () => applyMonthFilter(i);
+    container.appendChild(card);
+  }
+}
+
+window.renderMonthlyWidgets = renderMonthlyWidgets;
+
+
+function applyMonthFilter(monthIndex) {
+  const currentYear = new Date().getFullYear();
+  const from = new Date(currentYear, monthIndex, 1);
+  const to = new Date(currentYear, monthIndex + 1, 0); // last day of the month
+
+  document.getElementById('fromDate').valueAsDate = from;
+  document.getElementById('toDate').valueAsDate = to;
+
+  renderEntries(); // ✅ re-renders entries using updated filters
+}
+
+function clearMonthFilter() {
+  document.getElementById('fromDate').value = '';
+  document.getElementById('toDate').value = '';
+
+  renderEntries(); // ✅ Refresh the list using all dates
+}
+
+window.applyMonthFilter = applyMonthFilter;
+window.clearMonthFilter = clearMonthFilter;
