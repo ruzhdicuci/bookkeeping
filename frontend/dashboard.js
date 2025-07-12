@@ -2965,7 +2965,6 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-
 function renderMonthlyWidgets(entries, yearlyLimit, startFrom = null) {
   const container = document.getElementById('monthlyWidgetsContainer');
   if (!container) return;
@@ -2975,6 +2974,7 @@ function renderMonthlyWidgets(entries, yearlyLimit, startFrom = null) {
   const monthlyLimit = yearlyLimit ? yearlyLimit / 12 : null;
 
   const startDate = startFrom ? new Date(startFrom) : null;
+  const currentYear = new Date().getFullYear();
 
   for (let i = 0; i < 12; i++) {
     const monthEntries = entries.filter(e => {
@@ -2982,17 +2982,17 @@ function renderMonthlyWidgets(entries, yearlyLimit, startFrom = null) {
       return (
         (!startDate || d >= startDate) &&
         d.getMonth() === i &&
-        d.getFullYear() === new Date().getFullYear()
+        d.getFullYear() === currentYear
       );
     });
 
-const income = monthEntries
-  .filter(e => parseFloat(e.amount) > 0)
-  .reduce((sum, e) => sum + parseFloat(e.amount), 0);
+    const income = monthEntries
+      .filter(e => parseFloat(e.amount) > 0)
+      .reduce((sum, e) => sum + parseFloat(e.amount), 0);
 
-const spent = monthEntries
-  .filter(e => parseFloat(e.amount) < 0)
-  .reduce((sum, e) => sum + Math.abs(parseFloat(e.amount)), 0); // abs so we show +number
+    const spent = monthEntries
+      .filter(e => parseFloat(e.amount) < 0)
+      .reduce((sum, e) => sum + Math.abs(parseFloat(e.amount)), 0); // abs to show positive value
 
     const left = monthlyLimit ? (monthlyLimit - spent) : null;
     const percentUsed = monthlyLimit ? Math.min(spent / monthlyLimit, 1) * 100 : 0;
@@ -3011,8 +3011,21 @@ const spent = monthEntries
       }
     `;
 
-    // ✅ Add click filter
-    card.onclick = () => applyMonthFilter(i);
+    // ✅ Filter entries when a month is clicked
+    card.onclick = () => {
+      const year = new Date().getFullYear();
+      const start = new Date(year, i, 1);
+      const end = new Date(year, i + 1, 0); // last day of month
+
+      // Use your existing filterEntries logic if available
+      const filtered = entries.filter(e => {
+        const d = new Date(e.date);
+        return d >= start && d <= end;
+      });
+
+      renderEntries(filtered); // assumes you have this global method
+    };
+
     container.appendChild(card);
   }
 }
