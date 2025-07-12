@@ -3021,21 +3021,26 @@ window.renderMonthlyWidgets = renderMonthlyWidgets;
 
 
 function applyMonthFilter(monthIndex) {
-  const currentYear = new Date().getFullYear();
-  const from = new Date(currentYear, monthIndex, 1);
-  const to = new Date(currentYear, monthIndex + 1, 0); // last day of the month
+  const year = new Date().getFullYear(); // Or get from current view if needed
 
-  document.getElementById('fromDate').valueAsDate = from;
-  document.getElementById('toDate').valueAsDate = to;
+  // ✅ Get first day of the month
+  const from = new Date(year, monthIndex, 1);
 
-  renderEntries(); // ✅ re-renders entries using updated filters
+  // ✅ Get last day of the month by jumping to next month, then subtracting one day
+  const to = new Date(year, monthIndex + 1, 0); // 0th of next month = last day of current
+
+  // Set to the date inputs
+  document.getElementById('fromDate').value = from.toISOString().split('T')[0];
+  document.getElementById('toDate').value = to.toISOString().split('T')[0];
+
+  // Trigger the filtering
+  filterEntries(); // ✅ make sure this function exists and uses fromDate & toDate
 }
 
 function clearMonthFilter() {
   document.getElementById('fromDate').value = '';
   document.getElementById('toDate').value = '';
-
-  renderEntries(); // ✅ Refresh the list using all dates
+  filterEntries();
 }
 
 window.applyMonthFilter = applyMonthFilter;
