@@ -2881,7 +2881,7 @@ async function loadAndRenderYearlyLimit() {
   const localLimit = await getYearlyLimitFromCache(userId, year);
   debug("💾 Local limit:", localLimit);
 
-  const entries = window.entries || []; // fallback
+  const entries = window.entries || [];
 
   const totalPlus = entries.filter(e => (e.type || '').toLowerCase() === 'plus')
                            .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
@@ -2889,57 +2889,51 @@ async function loadAndRenderYearlyLimit() {
                             .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
   const difference = totalPlus - totalMinus;
 
-if (localLimit) {
-  document.getElementById('yearlyLimitInput').value = localLimit.limit;
+  if (localLimit) {
+    document.getElementById('yearlyLimitInput').value = localLimit.limit;
 
-  // ✅ Restore saved start date
-  if (localLimit.startFrom) {
-    document.getElementById('startFromInput').value = localLimit.startFrom;
-  }
-
-  // ✅ Always render monthly widgets if limit is known
-  renderMonthlyWidgets(window.entries || [], parseFloat(localLimit.limit));
-
-
-
-
-  updateFullYearBudgetBar(localLimit.limit, difference);
-} else {
-  debug("🌐 Fetching limit from server...");
-  try {
-    const res = await fetch(`${backend}/api/yearly-limit?year=${year}`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
-    });
-
-    if (!res.ok) throw new Error(await res.text());
-
-    const data = await res.json();
-    debug("✅ Server responded with:", data);
-
-    // ✅ Save limit and startFrom if present
-    await saveYearlyLimitLocally({
-      userId,
-      year,
-      limit: data.limit,
-      startFrom: data.startFrom || ''// Optional fallback
-
-    });
-
-    document.getElementById('yearlyLimitInput').value = data.limit;
-
-    if (data.startFrom) {
-      document.getElementById('startFromInput').value = data.startFrom;
+    if (localLimit.startFrom) {
+      document.getElementById('startFromInput').value = localLimit.startFrom;
     }
 
-    updateFullYearBudgetBar(data.limit, difference);
-  } catch (err) {
-    console.error("❌ Error loading yearly limit from server:", err);
+    renderMonthlyWidgets(entries, parseFloat(localLimit.limit), localLimit.startFrom);
+    updateFullYearBudgetBar(localLimit.limit, difference);
+
+  } else {
+    debug("🌐 Fetching limit from server...");
+    try {
+      const res = await fetch(`${backend}/api/yearly-limit?year=${year}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (!res.ok) throw new Error(await res.text());
+
+      const data = await res.json();
+      debug("✅ Server responded with:", data);
+
+      await saveYearlyLimitLocally({
+        userId,
+        year,
+        limit: data.limit,
+        startFrom: data.startFrom || ''
+      });
+
+      document.getElementById('yearlyLimitInput').value = data.limit;
+
+      if (data.startFrom) {
+        document.getElementById('startFromInput').value = data.startFrom;
+      }
+
+      renderMonthlyWidgets(entries, parseFloat(data.limit), data.startFrom);
+      updateFullYearBudgetBar(data.limit, difference);
+
+    } catch (err) {
+      console.error("❌ Error loading yearly limit from server:", err);
+    }
   }
 }
-}
-
 
 
 window.addEventListener('DOMContentLoaded', async () => {
@@ -2992,13 +2986,13 @@ function renderMonthlyWidgets(entries, yearlyLimit, startFrom = null) {
       );
     });
 
-    const income = monthEntries
-      .filter(e => (e.type || '').toLowerCase() === 'plus')
-      .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+const income = monthEntries
+  .filter(e => parseFloat(e.amount) > 0)
+  .reduce((sum, e) => sum + parseFloat(e.amount), 0);
 
-    const spent = monthEntries
-      .filter(e => (e.type || '').toLowerCase() === 'minus')
-      .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+const spent = monthEntries
+  .filter(e => parseFloat(e.amount) < 0)
+  .reduce((sum, e) => sum + Math.abs(parseFloat(e.amount)), 0); // abs so we show +number
 
     const left = monthlyLimit ? (monthlyLimit - spent) : null;
     const percentUsed = monthlyLimit ? Math.min(spent / monthlyLimit, 1) * 100 : 0;
