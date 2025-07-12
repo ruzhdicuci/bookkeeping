@@ -2965,19 +2965,22 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-function renderMonthlyWidgets(entries, yearlyLimit, startFrom = null) {
+
+
+
+async function renderMonthlyWidgets(allEntries, yearlyLimit, startFrom = null) {
   const container = document.getElementById('monthlyWidgetsContainer');
   if (!container) return;
 
   container.innerHTML = '';
   const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const monthlyLimit = yearlyLimit ? yearlyLimit / 12 : null;
-
+  const defaultMonthlyLimit = yearlyLimit ? yearlyLimit / 12 : null;
   const startDate = startFrom ? new Date(startFrom) : null;
   const currentYear = new Date().getFullYear();
+  const userId = getUserIdFromToken();
 
   for (let i = 0; i < 12; i++) {
-    const monthEntries = entries.filter(e => {
+    const monthEntries = allEntries.filter(e => {
       const d = new Date(e.date);
       return (
         (!startDate || d >= startDate) &&
@@ -2987,51 +2990,62 @@ function renderMonthlyWidgets(entries, yearlyLimit, startFrom = null) {
     });
 
     const income = monthEntries
-      .filter(e => parseFloat(e.amount) > 0)
-      .reduce((sum, e) => sum + parseFloat(e.amount), 0);
+      .filter(e => (e.type || '').toLowerCase() === 'plus')
+      .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
 
-    const spent = monthEntries
-      .filter(e => parseFloat(e.amount) < 0)
-      .reduce((sum, e) => sum + Math.abs(parseFloat(e.amount)), 0); // abs to show positive value
+    const expenses = monthEntries
+      .filter(e => (e.type || '').toLowerCase() === 'minus')
+      .reduce((sum, e) => sum + Math.abs(parseFloat(e.amount) || 0), 0);
 
-    const left = monthlyLimit ? (monthlyLimit - spent) : null;
-    const percentUsed = monthlyLimit ? Math.min(spent / monthlyLimit, 1) * 100 : 0;
+    // ⬇️ Load monthly budget from Dexie
+    const monthlyKey = `${userId}-${currentYear}-${i}`;
+    const local = await db.monthlyBudgets.get([userId, currentYear.toString(), i.toString()]);
+    const customBudget = local?.budget ?? defaultMonthlyLimit;
+
+    const left = customBudget !== null ? (customBudget - expenses) : null;
+    const percentUsed = customBudget ? Math.min(expenses / customBudget, 1) * 100 : 0;
 
     const card = document.createElement('div');
     card.className = 'monthly-widget';
+
     card.innerHTML = `
       <div class="month">${months[i]}</div>
       <div class="income">+${income.toLocaleString('de-CH', { minimumFractionDigits: 2 })}</div>
-      <div class="spent">-${spent.toLocaleString('de-CH', { minimumFractionDigits: 2 })}</div>
-      ${
-        monthlyLimit
-          ? `<div class="left">+${left.toLocaleString('de-CH', { minimumFractionDigits: 2 })}</div>
-             <div class="bar-container"><div class="bar-fill" style="width:${percentUsed}%; background-color:${left >= 0 ? '#27a789' : '#ff4d4d'};"></div></div>`
-          : `<div style="height: 18px;"></div>`
-      }
+      <div class="spent">-${expenses.toLocaleString('de-CH', { minimumFractionDigits: 2 })}</div>
+      <div class="left">+${left.toLocaleString('de-CH', { minimumFractionDigits: 2 })}</div>
+      <div class="bar-container">
+        <div class="bar-fill" style="width:${percentUsed}%; background-color:${left >= 0 ? '#27a789' : '#ff4d4d'};"></div>
+      </div>
+      <input type="number" placeholder="Custom budget" value="${customBudget ?? ''}" 
+        class="monthly-budget-input" style="width: 80px; margin-top: 5px;" data-month="${i}">
     `;
-
-    // ✅ Filter entries when a month is clicked
-    card.onclick = () => {
-      const year = new Date().getFullYear();
-      const start = new Date(year, i, 1);
-      const end = new Date(year, i + 1, 0); // last day of month
-
-      // Use your existing filterEntries logic if available
-      const filtered = entries.filter(e => {
-        const d = new Date(e.date);
-        return d >= start && d <= end;
-      });
-
-      renderEntries(filtered); // assumes you have this global method
-    };
 
     container.appendChild(card);
   }
+
+  // 💾 Save budget input on blur
+  container.querySelectorAll('.monthly-budget-input').forEach(input => {
+    input.addEventListener('blur', async () => {
+      const monthIndex = input.dataset.month;
+      const value = parseFloat(input.value || 0);
+      const key = [userId, currentYear.toString(), monthIndex.toString()];
+
+      await db.monthlyBudgets.put({
+        userId,
+        year: currentYear.toString(),
+        month: monthIndex.toString(),
+        budget: value,
+        synced: false,
+        lastUpdated: Date.now()
+      });
+
+      console.log(`💾 Monthly budget saved for ${monthIndex}:`, value);
+
+      // Re-render the widgets to update left/percentUsed
+      renderMonthlyWidgets(allEntries, yearlyLimit, startFrom);
+    });
+  });
 }
 
 window.renderMonthlyWidgets = renderMonthlyWidgets;
-
-
-
 
