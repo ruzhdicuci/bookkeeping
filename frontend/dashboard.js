@@ -924,7 +924,10 @@ async function duplicateEntry(id) {
     await fetchEntries(); // ✅ reload entries
     renderMonthlyWidgets(window.entries); // Re-render the monthly widgets
     showToast("✅ Entry duplicated");
-    await refreshAfterChange();
+    await fetchEntries();
+renderEntries(window.entries);
+renderMonthlyWidgets(window.entries);
+renderBankBalanceForm();
   } else {
     alert("❌ Failed to duplicate entry");
   }
