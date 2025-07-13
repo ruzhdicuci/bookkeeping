@@ -2428,7 +2428,7 @@ margin-top: -20px;
   position: absolute; /* or fixed */
   top: 50px; /* adjust based on your header height */
 
-  height: 330px;
+  height: 100%;
   width: 130px;
 color: white;
   background-color:   rgb(0, 0, 0);
@@ -2575,7 +2575,7 @@ padding: 4px 6px;
 
 @media (max-width: 600px) {
   #customizeSidebar {
-  height: 300px;
+  height: 100%;
     font-size: 14px;
   
   }
@@ -2857,6 +2857,7 @@ body.dark #yearlyLimitInput {
 }
 body.dark #yearlyBudgetContainer input {
   background-color: #222222 !important;
+  color: rgb(44, 205, 249);
 }
 
 
@@ -2867,27 +2868,87 @@ padding-top: 4px;
 padding-bottom: 4px;
  font-size: 0.8rem;
     font-weight: normal;
-   color: rgb(44, 205, 249);
+   color: rgb(40, 32, 32);
 }
 
 
-.monthly-widgets-grid {
+
+
+.monthly-widgets-wrapper {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
-  margin-top: 1rem;
+  justify-content: center;
+  gap: 0.3rem;
+  padding: 10px;
+ 
+  background: #e3e0db;
+  border-radius: 10px;
+  margin-top: 10px;
+  margin-bottom: 4px;
 }
 
 .monthly-widget {
-  background: white;
+  flex: 1 1 120px;
+  max-width: 160px;
+  min-width: 100px;
+  padding: 12px;
   border-radius: 10px;
-  padding: 1rem;
-  width: 120px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  background: white;
   text-align: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
 .monthly-widget .month {
   font-weight: bold;
-  margin-bottom: 0.5rem;
+  margin-bottom: 6px;
+  color: #5a4a4a;
+}
+
+.monthly-widget .income,
+.monthly-widget .net,
+.monthly-widget .spent {
+  margin: 2px 0;
+}
+
+.monthly-widget .spent {
+  color: rgb(255, 0, 238);
+}
+
+
+
+.monthly-widget.positive {
+  background: #e9fdf3; /* light green tint */
+  border: 1px solid #b9e9d1;
+}
+.monthly-widget.negative {
+  background: #fff0f2; /* light red tint */
+  border: 1px solid #f5c2c7;
+}
+
+.monthly-widget .net {
+  font-weight: bold;
+  font-size: 1.1em;
+  background: #fff;
+  border-radius: 8px;
+  padding: 2px 8px;
+  display: inline-block;
+  margin-top: 4px;
+  color: inherit; /* uses inherited green/red */
+}
+
+.monthly-widget {
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: transform 0.2s;
+}
+.monthly-widget:hover {
+  transform: translateY(-2px);
+}
+
+.monthly-widget .income,
+.monthly-widget .spent {
+  font-size: 0.9em;
+}
+.monthly-widget .net {
+  font-size: 1em;
 }

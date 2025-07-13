@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   await db.entries.clear();              // 🧹 Clear old cache
   await db.entries.bulkPut(window.entries); // 💾 Save fresh ones
   renderEntries(window.entries);         // ✅ Render fresh ones
- renderMonthlyWidgets(window.filteredEntries);
+ renderMonthlyWidgets(window.entries);
 
   await loadInitialBankBalances();
 
@@ -2209,6 +2209,7 @@ try {
   populateFilters();
   renderEntries();
   renderBankBalanceForm();
+  renderMonthlyWidgets(window.filteredEntries || window.entries);
 
   debug('✅ Entry synced to server.');
 } catch (error) {
@@ -2608,6 +2609,7 @@ setupToggle('toggleMultiselect', 'multiselectSection');
 setupToggle('toggleFilters', 'filtersSection');
 setupToggle('toggleSearches', 'searchesSection');
 setupToggle('toggleBudget', 'budgetSection');
+setupToggle('toggleWidget', 'widgetSection');
 
 });
 
@@ -2968,44 +2970,74 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 
+function isIncome(entry) {
+  const type = (entry.type || '').toLowerCase();
+  return type === 'plus' || type === 'income' || type === '+';
+}
+
+function isExpense(entry) {
+  const type = (entry.type || '').toLowerCase();
+  return type === 'minus' || type === 'expense' || type === '-';
+}
+
+function isValidEntry(entry) {
+  const excluded = ['Balance', 'Transfer'];
+  return entry && !excluded.includes(entry.person);
+}
+
 function renderMonthlyWidgets(entries) {
   const container = document.getElementById('monthlyWidgetsContainer');
   if (!container) return;
 
   container.innerHTML = '';
 
-  const targetMonths = ['2025-07', '2025-08', '2025-09', '2025-10', '2025-11', '2025-12'];
+  // Filter out Balance/Transfer
+  const filteredEntries = entries.filter(isValidEntry);
 
-  targetMonths.forEach(monthStr => {
-    const monthEntries = entries.filter(e => {
-      if (!e.date) return false;
-      const d = new Date(e.date);
-      const entryMonth = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-      return entryMonth === monthStr;
-    });
+  // Group by "YYYY-MM"
+  const grouped = {};
+  filteredEntries.forEach(e => {
+    if (!e.date) return;
+    const d = new Date(e.date);
+    if (isNaN(d)) return;
+
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    if (!grouped[key]) grouped[key] = [];
+    grouped[key].push(e);
+  });
+
+  const keys = Object.keys(grouped).sort();
+  console.log("📊 Monthly widget rendered for:", keys);
+
+  for (const key of keys) {
+    const monthEntries = grouped[key];
 
     const income = monthEntries
-      .filter(e => (e.type || '').toLowerCase() === 'plus')
-      .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+      .filter(isIncome)
+      .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
 
     const expenses = monthEntries
-      .filter(e => (e.type || '').toLowerCase() === 'minus')
-      .reduce((sum, e) => sum + Math.abs(parseFloat(e.amount) || 0), 0);
+      .filter(isExpense)
+      .reduce((sum, e) => sum + Math.abs(parseFloat(e.amount || 0)), 0);
 
     const net = income - expenses;
 
     const card = document.createElement('div');
     card.className = 'monthly-widget';
     card.innerHTML = `
-      <div class="month">${monthStr}</div>
+      <div class="month">${key}</div>
       <div class="income">+${income.toLocaleString('de-CH', { minimumFractionDigits: 2 })}</div>
       <div class="spent">-${expenses.toLocaleString('de-CH', { minimumFractionDigits: 2 })}</div>
       <div class="net" style="color:${net >= 0 ? '#27a789' : '#ff4d4d'};">
         ${net >= 0 ? '+' : ''}${net.toLocaleString('de-CH', { minimumFractionDigits: 2 })}
       </div>
     `;
+
+    // 🌈 Add color class based on net result
+card.classList.add(net >= 0 ? 'positive' : 'negative');
+
     container.appendChild(card);
-  });
+  }
 }
 
-window.renderMonthlyWidgets = renderMonthlyWidgets;
+
