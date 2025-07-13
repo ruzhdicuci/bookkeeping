@@ -2968,24 +2968,29 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 
-
 function renderMonthlyWidgets(entries) {
   const container = document.getElementById('monthlyWidgetsContainer');
   if (!container) return;
 
   container.innerHTML = '';
 
-  const months = ['Jul','Aug','Sep','Oct','Nov','Dec'];
-  const monthIndices = [6, 7, 8, 9, 10, 11];
-  const currentYear = new Date().getFullYear();
+  const groupedByMonth = {};
 
-  for (let m = 0; m < 6; m++) {
-    const monthIndex = monthIndices[m];
+  for (const e of entries) {
+    if (!e.date) continue;
+    const d = new Date(e.date);
+    if (isNaN(d)) continue;
 
-    const monthEntries = entries.filter(e => {
-      const d = new Date(e.date);
-      return d.getMonth() === monthIndex && d.getFullYear() === currentYear;
-    });
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    if (!groupedByMonth[key]) groupedByMonth[key] = [];
+    groupedByMonth[key].push(e);
+  }
+
+  // Sort months ascending
+  const sortedMonths = Object.keys(groupedByMonth).sort();
+
+  for (const monthKey of sortedMonths) {
+    const monthEntries = groupedByMonth[monthKey];
 
     const income = monthEntries
       .filter(e => (e.type || '').toLowerCase() === 'plus')
@@ -3000,7 +3005,7 @@ function renderMonthlyWidgets(entries) {
     const card = document.createElement('div');
     card.className = 'monthly-widget';
     card.innerHTML = `
-      <div class="month">${months[m]}</div>
+      <div class="month">${monthKey}</div>
       <div class="income">+${income.toLocaleString('de-CH', { minimumFractionDigits: 2 })}</div>
       <div class="spent">-${expenses.toLocaleString('de-CH', { minimumFractionDigits: 2 })}</div>
       <div class="net" style="color:${net >= 0 ? '#27a789' : '#ff4d4d'};">
