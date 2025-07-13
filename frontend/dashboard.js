@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   await db.entries.clear();              // 🧹 Clear old cache
   await db.entries.bulkPut(window.entries); // 💾 Save fresh ones
   renderEntries(window.entries);         // ✅ Render fresh ones
-  renderMonthlyWidgets(window.entries); // call it AFTER fetch
+ renderMonthlyWidgets(window.filteredEntries);
 
   await loadInitialBankBalances();
 
@@ -2974,23 +2974,15 @@ function renderMonthlyWidgets(entries) {
 
   container.innerHTML = '';
 
-  const groupedByMonth = {};
+  const targetMonths = ['2025-07', '2025-08', '2025-09', '2025-10', '2025-11', '2025-12'];
 
-  for (const e of entries) {
-    if (!e.date) continue;
-    const d = new Date(e.date);
-    if (isNaN(d)) continue;
-
-    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-    if (!groupedByMonth[key]) groupedByMonth[key] = [];
-    groupedByMonth[key].push(e);
-  }
-
-  // Sort months ascending
-  const sortedMonths = Object.keys(groupedByMonth).sort();
-
-  for (const monthKey of sortedMonths) {
-    const monthEntries = groupedByMonth[monthKey];
+  targetMonths.forEach(monthStr => {
+    const monthEntries = entries.filter(e => {
+      if (!e.date) return false;
+      const d = new Date(e.date);
+      const entryMonth = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      return entryMonth === monthStr;
+    });
 
     const income = monthEntries
       .filter(e => (e.type || '').toLowerCase() === 'plus')
@@ -3005,16 +2997,15 @@ function renderMonthlyWidgets(entries) {
     const card = document.createElement('div');
     card.className = 'monthly-widget';
     card.innerHTML = `
-      <div class="month">${monthKey}</div>
+      <div class="month">${monthStr}</div>
       <div class="income">+${income.toLocaleString('de-CH', { minimumFractionDigits: 2 })}</div>
       <div class="spent">-${expenses.toLocaleString('de-CH', { minimumFractionDigits: 2 })}</div>
       <div class="net" style="color:${net >= 0 ? '#27a789' : '#ff4d4d'};">
         ${net >= 0 ? '+' : ''}${net.toLocaleString('de-CH', { minimumFractionDigits: 2 })}
       </div>
     `;
-
     container.appendChild(card);
-  }
+  });
 }
 
 window.renderMonthlyWidgets = renderMonthlyWidgets;
