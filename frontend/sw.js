@@ -1,6 +1,8 @@
 const CACHE_NAME = 'bookkeeping-cache-v2';
 const urlsToCache = [
   './',
+  './libs/dexie.min.js',
+  './libs/idb.min.js',
   './dashboard.html',
   './dashboard.js',
   './notes.html',
