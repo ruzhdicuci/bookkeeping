@@ -13,13 +13,12 @@ const backend =
 export const db = new Dexie('bookkeeping-db');
 
 // Always keep the highest version here
-db.version(308).stores({
+db.version(307).stores({
   entries: '_id, date, amount, category, person, bank, synced, lastUpdated, note',
   notes: '_id, title, content, done, synced, lastUpdated',
   balances: 'bank',
   customCards: '_id,name,limit,synced,lastUpdated',
-  yearlyLimits: '[userId+year], synced, year, limit, startFrom, lastUpdated',
-  monthlyBudgets: '[userId+year+month], synced, year, month, budget, lastUpdated' // 🆕
+  yearlyLimits: '[userId+year], synced, year, limit, startFrom, lastUpdated'
 });
 
 // 🧪 Add this right after defining the stores
@@ -310,23 +309,6 @@ async function getUnsyncedYearlyLimits() {
   }
 }
 
-
-async function getMonthlyBudget(userId, year, month) {
-  return await db.monthlyBudgets.get([userId, year, month]);
-}
-
-async function saveMonthlyBudget(userId, year, month, budget) {
-  return await db.monthlyBudgets.put({
-    userId,
-    year,
-    month,
-    budget,
-    synced: false,
-    lastUpdated: Date.now()
-  });
-}
-
-
 // ✅ Export all at once
 export {
   saveNoteLocally,
@@ -347,9 +329,7 @@ export {
   fetchAndCacheEntries,
     saveYearlyLimitLocally,
   getYearlyLimitFromCache,
-  getUnsyncedYearlyLimits,
-  getMonthlyBudget,
-  saveMonthlyBudget
+  getUnsyncedYearlyLimits
 };
 
 window.db = db; // ✅ For debugging

@@ -55,10 +55,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   await fetchEntries(); // populates window.entries
   await db.entries.clear();              // 🧹 Clear old cache
   await db.entries.bulkPut(window.entries); // 💾 Save fresh ones
-  updateDashboardWidgets();            // ✅ Renders everything: entries, top bar, monthly
   renderEntries(window.entries);         // ✅ Render fresh ones
-updateSummaryTotals();         // updates the top income/expense bars
-renderMonthlyWidgets(window.entries, window.yearlyLimit, window.startFrom); // updates 
+
   await loadInitialBankBalances();
 
   if (navigator.onLine) syncToCloud();
@@ -327,8 +325,6 @@ async function fetchEntries() {
     // ✅ Save entries locally
     await db.entries.clear();
     await db.entries.bulkPut(window.entries);
-        // ✅ Now update totals + widgets
-    updateDashboardWidgets();
   } catch (err) {
     console.warn('⚠️ fetchEntries failed, loading from Dexie instead:', err);
 
@@ -2212,7 +2208,6 @@ try {
   renderBankBalanceForm();
 
   debug('✅ Entry synced to server.');
-  updateDashboardWidgets();
 } catch (error) {
   console.warn('📴 Offline detected – saving entry locally.');
   await saveEntryLocally(entry); // ✅ save to IndexedDB
@@ -2434,8 +2429,6 @@ async function fetchEntriesAndSyncToDexie() {
 
     debug("✅ Synced entries from backend to Dexie:", entries.length);
     renderEntries(entries);
-        // ✅ Update totals + widgets
-    updateDashboardWidgets();
   } catch (err) {
     console.error("❌ fetchEntriesAndSyncToDexie failed:", err);
   }
@@ -2612,7 +2605,6 @@ setupToggle('toggleMultiselect', 'multiselectSection');
 setupToggle('toggleFilters', 'filtersSection');
 setupToggle('toggleSearches', 'searchesSection');
 setupToggle('toggleBudget', 'budgetSection');
-setupToggle('toggleWidget', 'widgetSection');
 
 });
 
@@ -2888,7 +2880,7 @@ async function loadAndRenderYearlyLimit() {
   const localLimit = await getYearlyLimitFromCache(userId, year);
   debug("💾 Local limit:", localLimit);
 
-  const entries = window.entries || [];
+  const entries = window.entries || []; // fallback
 
   const totalPlus = entries.filter(e => (e.type || '').toLowerCase() === 'plus')
                            .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
@@ -2896,51 +2888,51 @@ async function loadAndRenderYearlyLimit() {
                             .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
   const difference = totalPlus - totalMinus;
 
-  if (localLimit) {
-    document.getElementById('yearlyLimitInput').value = localLimit.limit;
+ if (localLimit) {
+  document.getElementById('yearlyLimitInput').value = localLimit.limit;
 
-    if (localLimit.startFrom) {
-      document.getElementById('startFromInput').value = localLimit.startFrom;
-    }
+  // ✅ Restore saved start date
+  if (localLimit.startFrom) {
+    document.getElementById('startFromInput').value = localLimit.startFrom;
+  }
 
-    renderMonthlyWidgets(entries, parseFloat(localLimit.limit), localLimit.startFrom);
-    updateFullYearBudgetBar(localLimit.limit, difference);
-
-  } else {
-    debug("🌐 Fetching limit from server...");
-    try {
-      const res = await fetch(`${backend}/api/yearly-limit?year=${year}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-
-      if (!res.ok) throw new Error(await res.text());
-
-      const data = await res.json();
-      debug("✅ Server responded with:", data);
-
-      await saveYearlyLimitLocally({
-        userId,
-        year,
-        limit: data.limit,
-        startFrom: data.startFrom || ''
-      });
-
-      document.getElementById('yearlyLimitInput').value = data.limit;
-
-      if (data.startFrom) {
-        document.getElementById('startFromInput').value = data.startFrom;
+  updateFullYearBudgetBar(localLimit.limit, difference);
+} else {
+  debug("🌐 Fetching limit from server...");
+  try {
+    const res = await fetch(`${backend}/api/yearly-limit?year=${year}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
       }
+    });
 
-      renderMonthlyWidgets(entries, parseFloat(data.limit), data.startFrom);
-      updateFullYearBudgetBar(data.limit, difference);
+    if (!res.ok) throw new Error(await res.text());
 
-    } catch (err) {
-      console.error("❌ Error loading yearly limit from server:", err);
+    const data = await res.json();
+    debug("✅ Server responded with:", data);
+
+    // ✅ Save limit and startFrom if present
+    await saveYearlyLimitLocally({
+      userId,
+      year,
+      limit: data.limit,
+      startFrom: data.startFrom || ''// Optional fallback
+
+    });
+
+    document.getElementById('yearlyLimitInput').value = data.limit;
+
+    if (data.startFrom) {
+      document.getElementById('startFromInput').value = data.startFrom;
     }
+
+    updateFullYearBudgetBar(data.limit, difference);
+  } catch (err) {
+    console.error("❌ Error loading yearly limit from server:", err);
   }
 }
+}
+
 
 
 window.addEventListener('DOMContentLoaded', async () => {
@@ -2960,107 +2952,14 @@ window.addEventListener('DOMContentLoaded', async () => {
 window.loadPersons = loadPersons;
 
 
-function renderMonthlyWidgets(entries, yearlyLimit = 0, startFrom = null) {
-  const container = document.getElementById('monthlyWidgetsContainer');
-  if (!container) return;
+document.getElementById('startFromInput').addEventListener('change', function () {
+  const selectedDate = this.value;
+  localStorage.setItem('startFromDate', selectedDate);
+});
 
-  container.innerHTML = '';
-
-  const months = ['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  const monthIndices = [6, 7, 8, 9, 10, 11]; // July to December
-  const startDate = startFrom ? new Date(startFrom) : null;
-  const currentYear = new Date().getFullYear();
-
-  // Fallback if entries are missing or empty
-  if (!Array.isArray(entries) || entries.length === 0) return;
-
-  const totalIncome = entries
-    .filter(e => (e.type || '').toLowerCase() === 'plus')
-    .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
-
-  const totalExpenses = entries
-    .filter(e => (e.type || '').toLowerCase() === 'minus')
-    .reduce((sum, e) => sum + Math.abs(parseFloat(e.amount) || 0), 0);
-
-  const netAvailable = totalIncome - totalExpenses;
-  const evenlySplit = netAvailable / 6;
-
-  for (let m = 0; m < 6; m++) {
-    const monthIndex = monthIndices[m];
-
-    const monthEntries = entries.filter(e => {
-      const d = new Date(e.date);
-      return (
-        (!startDate || d >= startDate) &&
-        d.getMonth() === monthIndex &&
-        d.getFullYear() === currentYear
-      );
-    });
-
-    const income = monthEntries
-      .filter(e => (e.type || '').toLowerCase() === 'plus')
-      .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
-
-    const spent = monthEntries
-      .filter(e => (e.type || '').toLowerCase() === 'minus')
-      .reduce((sum, e) => sum + Math.abs(parseFloat(e.amount) || 0), 0);
-
-    const left = evenlySplit + (income - spent);
-    const percentUsed = evenlySplit ? Math.min(spent / evenlySplit, 1) * 100 : 0;
-
-    const card = document.createElement('div');
-    card.className = 'monthly-widget';
-    card.innerHTML = `
-      <div class="month">${months[m]}</div>
-      <div class="income">+${income.toLocaleString('de-CH', { minimumFractionDigits: 2 })}</div>
-      <div class="spent">-${spent.toLocaleString('de-CH', { minimumFractionDigits: 2 })}</div>
-      <div class="left">${left >= 0 ? '+' : ''}${left.toLocaleString('de-CH', { minimumFractionDigits: 2 })}</div>
-      <div class="bar-container">
-        <div class="bar-fill" style="width:${percentUsed}%; background-color:${left >= 0 ? '#27a789' : '#ff4d4d'};"></div>
-      </div>
-    `;
-
-    container.appendChild(card);
+window.addEventListener('DOMContentLoaded', () => {
+  const savedDate = localStorage.getItem('startFromDate');
+  if (savedDate) {
+    document.getElementById('startFromInput').value = savedDate;
   }
-}
-
-window.renderMonthlyWidgets = renderMonthlyWidgets;
-
-function updateDashboardWidgets() {
-  const limitInput = document.getElementById('yearlyLimitInput');
-  const startInput = document.getElementById('startFromInput');
-
-  window.yearlyLimit = parseFloat(limitInput?.value || '0') || 0;
-  window.startFrom = startInput?.value || null;
-
-  renderEntries(window.entries);
-  updateSummaryTotals?.();
-  renderMonthlyWidgets(window.entries, window.yearlyLimit, window.startFrom);
-}
-
-window.updateDashboardWidgets = updateDashboardWidgets;
-
-function updateSummaryTotals() {
-  const entries = window.entries || [];
-
-  const totalIncome = entries
-    .filter(e => (e.type || '').toLowerCase() === 'plus')
-    .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
-
-  const totalExpenses = entries
-    .filter(e => (e.type || '').toLowerCase() === 'minus')
-    .reduce((sum, e) => sum + Math.abs(parseFloat(e.amount || 0)), 0);
-
-  const net = totalIncome - totalExpenses;
-
-  const incomeEl = document.getElementById('totalIncomeLabel');
-  if (incomeEl) incomeEl.textContent = `+${totalIncome.toFixed(2)}`;
-
-  const expensesEl = document.getElementById('totalExpensesLabel');
-  if (expensesEl) expensesEl.textContent = `-${totalExpenses.toFixed(2)}`;
-
-  const netEl = document.getElementById('netDifferenceLabel');
-  if (netEl) netEl.textContent = `${net >= 0 ? '+' : ''}${net.toFixed(2)}`;
-}
-
-window.updateSummaryTotals = updateSummaryTotals;
+});

@@ -927,7 +927,16 @@ height: 40px;
 }
 
 
-
+.filter-grid2 {
+  
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+ 
+ padding-bottom: 10px;
+ 
+  background: #e3e0db;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
 
 #bankBalanceTableContainer {
     margin-top: -7px;
@@ -936,6 +945,14 @@ margin-left: -8px;
 margin-right: -8px;
 }
 
+.filter-grid3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 6px;
+    background: #e3e0db;
+  padding: 12px;
+
+}
 
 
 .modal.hidden {
@@ -1902,6 +1919,9 @@ body.dark .filter-grid {
 }
 
 
+body.dark .filter-grid2  {
+  background-color: #222;
+}
 
 
 
@@ -2848,42 +2868,4 @@ padding-bottom: 4px;
  font-size: 0.8rem;
     font-weight: normal;
    color: rgb(44, 205, 249);
-}
-
-#widgetSection   {
-   background: #e3e0db;
- margin-top: -5px;
- border-radius: 10px;
- margin-bottom: 6px;
-  }
-
-.monthly-widgets-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(125px, 1fr));
-  gap: 6px;
-  margin-top: 1rem;
-  padding: 0.6rem;
-
-}
-.monthly-widget {
-  border-radius: 12px;
-  background: #ffffff;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  padding: 10px;
-  font-size: 13px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  text-align: center;
-}
-.monthly-widget .month { font-weight: bold; color: #333; }
-.monthly-widget .spent { color: #d10000; }
-.monthly-widget .left { color: #27a789; }
-.monthly-widget .bar-container {
-  height: 6px; background: #ddd; border-radius: 4px; overflow: hidden;
-}
-.monthly-widget .bar-fill {
-  height: 100%;
-  background-color: #27a789;
-  transition: width 0.3s ease;
 }
