@@ -2213,8 +2213,6 @@ try {
   populateNewEntryDropdowns();
   populateFilters();
   renderEntries();
- 
-  window.filteredEntries = applyFilters(window.entries); // ensure filters are updated
   renderMonthlyWidgets(window.entries);
    renderBankBalanceForm();
 
