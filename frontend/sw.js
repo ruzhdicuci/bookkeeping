@@ -11,8 +11,7 @@ const urlsToCache = [
   './style.css',
   './manifest.json',
   './icon.jpg',
-  'https://cdn.jsdelivr.net/npm/dexie@3.2.4/dist/dexie.min.js',
-  'https://cdn.jsdelivr.net/npm/idb@7/build/iife/index-min.js'
+
 ];
 // Install event
 self.addEventListener('install', event => {
