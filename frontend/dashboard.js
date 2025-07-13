@@ -2220,6 +2220,7 @@ try {
   const cachedEntries = await getCachedEntries(); 
   window.entries = cachedEntries; // optionally update global cache
   renderEntries(cachedEntries);
+  renderMonthlyWidgets(cachedEntries);
 
   document.getElementById('entryForm').reset();
   alert('📥 Entry saved locally and will sync when back online.');
