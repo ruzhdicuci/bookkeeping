@@ -2209,7 +2209,8 @@ try {
   populateFilters();
   renderEntries();
   renderBankBalanceForm();
-  renderMonthlyWidgets(window.filteredEntries || window.entries);
+  window.filteredEntries = applyFilters(window.entries); // ensure filters are updated
+  renderMonthlyWidgets(window.entries);
 
   debug('✅ Entry synced to server.');
 } catch (error) {
