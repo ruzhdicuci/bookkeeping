@@ -55,6 +55,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   await fetchEntries(); // populates window.entries
   await db.entries.clear();              // 🧹 Clear old cache
   await db.entries.bulkPut(window.entries); // 💾 Save fresh ones
+  updateDashboardWidgets();            // ✅ Renders everything: entries, top bar, monthly
   renderEntries(window.entries);         // ✅ Render fresh ones
 updateSummaryTotals();         // updates the top income/expense bars
 renderMonthlyWidgets(window.entries, window.yearlyLimit, window.startFrom); // updates 
@@ -2959,18 +2960,20 @@ window.addEventListener('DOMContentLoaded', async () => {
 window.loadPersons = loadPersons;
 
 
-function renderMonthlyWidgets(entries, yearlyLimit, startFrom = null) {
+function renderMonthlyWidgets(entries, yearlyLimit = 0, startFrom = null) {
   const container = document.getElementById('monthlyWidgetsContainer');
   if (!container) return;
 
   container.innerHTML = '';
 
-  const months = ['Jul','Aug','Sep','Oct','Nov','Dec'];
-  const monthIndices = [6, 7, 8, 9, 10, 11]; // Jul to Dec
+  const months = ['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const monthIndices = [6, 7, 8, 9, 10, 11]; // July to December
   const startDate = startFrom ? new Date(startFrom) : null;
   const currentYear = new Date().getFullYear();
 
-  // Calculate global income and expenses
+  // Fallback if entries are missing or empty
+  if (!Array.isArray(entries) || entries.length === 0) return;
+
   const totalIncome = entries
     .filter(e => (e.type || '').toLowerCase() === 'plus')
     .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
@@ -3011,7 +3014,7 @@ function renderMonthlyWidgets(entries, yearlyLimit, startFrom = null) {
       <div class="month">${months[m]}</div>
       <div class="income">+${income.toLocaleString('de-CH', { minimumFractionDigits: 2 })}</div>
       <div class="spent">-${spent.toLocaleString('de-CH', { minimumFractionDigits: 2 })}</div>
-      <div class="left">+${left.toLocaleString('de-CH', { minimumFractionDigits: 2 })}</div>
+      <div class="left">${left >= 0 ? '+' : ''}${left.toLocaleString('de-CH', { minimumFractionDigits: 2 })}</div>
       <div class="bar-container">
         <div class="bar-fill" style="width:${percentUsed}%; background-color:${left >= 0 ? '#27a789' : '#ff4d4d'};"></div>
       </div>
@@ -3023,15 +3026,19 @@ function renderMonthlyWidgets(entries, yearlyLimit, startFrom = null) {
 
 window.renderMonthlyWidgets = renderMonthlyWidgets;
 
-
 function updateDashboardWidgets() {
+  const limitInput = document.getElementById('yearlyLimitInput');
+  const startInput = document.getElementById('startFromInput');
+
+  window.yearlyLimit = parseFloat(limitInput?.value || '0') || 0;
+  window.startFrom = startInput?.value || null;
+
   renderEntries(window.entries);
-  updateSummaryTotals?.(); // Optional if you have top total bars
+  updateSummaryTotals?.();
   renderMonthlyWidgets(window.entries, window.yearlyLimit, window.startFrom);
 }
 
-window.updateDashboardWidgets =  updateDashboardWidgets;
-
+window.updateDashboardWidgets = updateDashboardWidgets;
 
 function updateSummaryTotals() {
   const entries = window.entries || [];
@@ -3046,7 +3053,6 @@ function updateSummaryTotals() {
 
   const net = totalIncome - totalExpenses;
 
-  // ✅ Update HTML safely
   const incomeEl = document.getElementById('totalIncomeLabel');
   if (incomeEl) incomeEl.textContent = `+${totalIncome.toFixed(2)}`;
 
