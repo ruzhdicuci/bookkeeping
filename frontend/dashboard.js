@@ -56,7 +56,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   await db.entries.clear();              // 🧹 Clear old cache
   await db.entries.bulkPut(window.entries); // 💾 Save fresh ones
   renderEntries(window.entries);         // ✅ Render fresh ones
-
+updateSummaryTotals();         // updates the top income/expense bars
+renderMonthlyWidgets(window.entries, window.yearlyLimit, window.startFrom); // updates 
   await loadInitialBankBalances();
 
   if (navigator.onLine) syncToCloud();
@@ -325,6 +326,8 @@ async function fetchEntries() {
     // ✅ Save entries locally
     await db.entries.clear();
     await db.entries.bulkPut(window.entries);
+        // ✅ Now update totals + widgets
+    updateDashboardWidgets();
   } catch (err) {
     console.warn('⚠️ fetchEntries failed, loading from Dexie instead:', err);
 
@@ -2208,6 +2211,7 @@ try {
   renderBankBalanceForm();
 
   debug('✅ Entry synced to server.');
+  updateDashboardWidgets();
 } catch (error) {
   console.warn('📴 Offline detected – saving entry locally.');
   await saveEntryLocally(entry); // ✅ save to IndexedDB
@@ -2429,6 +2433,8 @@ async function fetchEntriesAndSyncToDexie() {
 
     debug("✅ Synced entries from backend to Dexie:", entries.length);
     renderEntries(entries);
+        // ✅ Update totals + widgets
+    updateDashboardWidgets();
   } catch (err) {
     console.error("❌ fetchEntriesAndSyncToDexie failed:", err);
   }
@@ -3016,3 +3022,39 @@ function renderMonthlyWidgets(entries, yearlyLimit, startFrom = null) {
 }
 
 window.renderMonthlyWidgets = renderMonthlyWidgets;
+
+
+function updateDashboardWidgets() {
+  renderEntries(window.entries);
+  updateSummaryTotals?.(); // Optional if you have top total bars
+  renderMonthlyWidgets(window.entries, window.yearlyLimit, window.startFrom);
+}
+
+window.updateDashboardWidgets =  updateDashboardWidgets;
+
+
+function updateSummaryTotals() {
+  const entries = window.entries || [];
+
+  const totalIncome = entries
+    .filter(e => (e.type || '').toLowerCase() === 'plus')
+    .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
+
+  const totalExpenses = entries
+    .filter(e => (e.type || '').toLowerCase() === 'minus')
+    .reduce((sum, e) => sum + Math.abs(parseFloat(e.amount || 0)), 0);
+
+  const net = totalIncome - totalExpenses;
+
+  // ✅ Update HTML safely
+  const incomeEl = document.getElementById('totalIncomeLabel');
+  if (incomeEl) incomeEl.textContent = `+${totalIncome.toFixed(2)}`;
+
+  const expensesEl = document.getElementById('totalExpensesLabel');
+  if (expensesEl) expensesEl.textContent = `-${totalExpenses.toFixed(2)}`;
+
+  const netEl = document.getElementById('netDifferenceLabel');
+  if (netEl) netEl.textContent = `${net >= 0 ? '+' : ''}${net.toFixed(2)}`;
+}
+
+window.updateSummaryTotals = updateSummaryTotals;
