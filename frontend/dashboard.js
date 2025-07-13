@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   await db.entries.bulkPut(window.entries); // 💾 Save fresh ones
   renderEntries(window.entries);         // ✅ Render fresh ones
  renderMonthlyWidgets(window.entries);
-
+renderBankBalanceForm();     
   await loadInitialBankBalances();
 
   if (navigator.onLine) syncToCloud();
@@ -922,7 +922,9 @@ async function duplicateEntry(id) {
     const newEntry = await res.json();
     window.highlightedEntryId = newEntry._id;
     await fetchEntries(); // ✅ reload entries
+    renderMonthlyWidgets(window.entries); // Re-render the monthly widgets
     showToast("✅ Entry duplicated");
+    await refreshAfterChange();
   } else {
     alert("❌ Failed to duplicate entry");
   }
@@ -944,6 +946,7 @@ async function deleteEntry(id) {
   populateNewEntryDropdowns();     // Rebuild inputs with updated data
   populateFilters();               // Rebuild filters
   renderBankBalanceForm();         // ✅ Refresh bank balance table
+  renderMonthlyWidgets(window.entries); // ✅ Refresh monthly widgets
 }
 
 
@@ -2208,9 +2211,10 @@ try {
   populateNewEntryDropdowns();
   populateFilters();
   renderEntries();
-  renderBankBalanceForm();
+ 
   window.filteredEntries = applyFilters(window.entries); // ensure filters are updated
   renderMonthlyWidgets(window.entries);
+   renderBankBalanceForm();
 
   debug('✅ Entry synced to server.');
 } catch (error) {
@@ -3041,5 +3045,4 @@ card.classList.add(net >= 0 ? 'positive' : 'negative');
     container.appendChild(card);
   }
 }
-
 
