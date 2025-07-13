@@ -921,13 +921,12 @@ async function duplicateEntry(id) {
   if (res.ok) {
     const newEntry = await res.json();
     window.highlightedEntryId = newEntry._id;
-    await fetchEntries(); // ✅ reload entries
-    renderMonthlyWidgets(window.entries); // Re-render the monthly widgets
-    showToast("✅ Entry duplicated");
+    // ✅ Update everything
     await fetchEntries();
-renderEntries(window.entries);
-renderMonthlyWidgets(window.entries);
-renderBankBalanceForm();
+    renderEntries(window.entries);
+    renderMonthlyWidgets(window.entries);
+    renderBankBalanceForm();
+    showToast("✅ Entry duplicated");
   } else {
     alert("❌ Failed to duplicate entry");
   }
