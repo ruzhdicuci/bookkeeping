@@ -2872,7 +2872,9 @@ padding-bottom: 4px;
 }
 
 
-
+body.dark .monthly-widgets-wrapper {
+  background-color: #2c2c2c !important;
+}
 
 .monthly-widgets-wrapper {
   display: flex;
@@ -2918,11 +2920,11 @@ padding-bottom: 4px;
 
 .monthly-widget.positive {
   background: #e9fdf3; /* light green tint */
-  border: 1px solid #b9e9d1;
+  border: none;
 }
 .monthly-widget.negative {
   background: #fff0f2; /* light red tint */
-  border: 1px solid #f5c2c7;
+  border: none;
 }
 
 .monthly-widget .net {
