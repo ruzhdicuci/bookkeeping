@@ -2963,3 +2963,50 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('startFromInput').value = savedDate;
   }
 });
+
+
+
+function renderMonthlyWidgets(entries) {
+  const container = document.getElementById('monthlyWidgetsContainer');
+  if (!container) return;
+
+  container.innerHTML = '';
+
+  const months = ['Jul','Aug','Sep','Oct','Nov','Dec'];
+  const monthIndices = [6, 7, 8, 9, 10, 11];
+  const currentYear = new Date().getFullYear();
+
+  for (let m = 0; m < 6; m++) {
+    const monthIndex = monthIndices[m];
+
+    const monthEntries = entries.filter(e => {
+      const d = new Date(e.date);
+      return d.getMonth() === monthIndex && d.getFullYear() === currentYear;
+    });
+
+    const income = monthEntries
+      .filter(e => (e.type || '').toLowerCase() === 'plus')
+      .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+
+    const expenses = monthEntries
+      .filter(e => (e.type || '').toLowerCase() === 'minus')
+      .reduce((sum, e) => sum + Math.abs(parseFloat(e.amount) || 0), 0);
+
+    const net = income - expenses;
+
+    const card = document.createElement('div');
+    card.className = 'monthly-widget';
+    card.innerHTML = `
+      <div class="month">${months[m]}</div>
+      <div class="income">+${income.toLocaleString('de-CH', { minimumFractionDigits: 2 })}</div>
+      <div class="spent">-${expenses.toLocaleString('de-CH', { minimumFractionDigits: 2 })}</div>
+      <div class="net" style="color:${net >= 0 ? '#27a789' : '#ff4d4d'};">
+        ${net >= 0 ? '+' : ''}${net.toLocaleString('de-CH', { minimumFractionDigits: 2 })}
+      </div>
+    `;
+
+    container.appendChild(card);
+  }
+}
+
+window.renderMonthlyWidgets = renderMonthlyWidgets;
