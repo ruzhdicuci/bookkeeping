@@ -50,12 +50,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (cached.length) {
     debug("📦 Showing cached entries before server fetch");
     renderEntries(cached);
+  
+
   }
 
   await fetchEntries(); // populates window.entries
   await db.entries.clear();              // 🧹 Clear old cache
   await db.entries.bulkPut(window.entries); // 💾 Save fresh ones
   renderEntries(window.entries);         // ✅ Render fresh ones
+  renderMonthlyWidgets(window.entries); // call it AFTER fetch
 
   await loadInitialBankBalances();
 
