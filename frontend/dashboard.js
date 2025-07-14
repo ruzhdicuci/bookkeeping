@@ -2905,6 +2905,10 @@ async function loadAndRenderYearlyLimit() {
   // ✅ Restore saved start date
   if (localLimit.startFrom) {
     document.getElementById('startFromInput').value = localLimit.startFrom;
+    const fp = document.querySelector('#startFromInput')._flatpickr;
+if (fp && localLimit.startFrom) {
+  fp.setDate(localLimit.startFrom, true); // true = trigger change event
+}
   }
 
   updateFullYearBudgetBar(localLimit.limit, difference);
@@ -3013,7 +3017,7 @@ function renderMonthlyWidgets(entries) {
   });
 
   const keys = Object.keys(grouped).sort();
-  console.log("📊 Monthly widget rendered for:", keys);
+ debug("📊 Monthly widget rendered for:", keys);
 
   for (const key of keys) {
     const monthEntries = grouped[key];
