@@ -124,6 +124,7 @@ const typeFilter = document.getElementById('typeFilter');
 const dateSearch = document.getElementById('dateSearch');
 const descSearch = document.getElementById('descSearch');
 const amountSearch = document.getElementById('amountSearch');
+const personSearch = document.getElementById('personSearch'); // ✅ Add this
 
 
 // Set up event listeners for other filters
@@ -595,7 +596,8 @@ const fullDifference = fullIncome - fullExpense;
       (categoryValue === "All" || e.category === categoryValue) &&
       matchesMulti(categorySearch, e.category) &&
       (statusValue === 'All' || e.status === statusValue) &&
-      matchesMulti(amountSearch, e.amount + '')
+      matchesMulti(amountSearch, e.amount + '')  &&
+      matchesMulti(personSearch, e.person) // 👈 THIS LINE
     );
   });
 
