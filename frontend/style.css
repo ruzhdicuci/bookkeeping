@@ -3,16 +3,15 @@ body, html {
   user-select: none;
   -webkit-user-select: none;
   -ms-user-select: none;
-   overflow-x: none;
+  overflow-x: hidden;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE 10+ */
-margin: 0;
+	margin: 0;
 padding: 0;
     font-family: system-ui, sans-serif;
      transition: background 0.3s, color 0.3s;
   background: #f4f2ee;
 }
-
 
 
 
@@ -2835,6 +2834,11 @@ margin-top: -3px;
 
 #yearlyProgressFill {
   transition: width 0.6s ease-in-out, background-color 0.3s ease-in-out;
+	  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box; /* Prevent padding from overflowing */
+  overflow: hidden;  
+	
 }
 
 
