@@ -1404,13 +1404,13 @@ body.dark .entry-main .meta {
 }
 
 .status-pill.open {
-  background-color: #fce1e1;
-  color: black;
+  background-color: #9f1a1a;
+  color: rgb(255, 255, 255);
 }
 
 .status-pill.paid {
-  background-color: #9ffee8;
-   color: black;
+  background-color: #1e967a;
+   color: rgb(255, 255, 255);
 }
 
 
