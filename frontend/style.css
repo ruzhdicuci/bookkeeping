@@ -2703,36 +2703,54 @@ body {
 
 
 .close {
-  float: right;
-  cursor: pointer;
-  margin-top: -10px;
-  color: red;
+
+   border: 1px solid red;
+  margin-top: 10px;
+
+  background-color: red;
+  color:  white;
+padding: 8px;
+border: none;
+border-radius: 8px;
+font-size: 0.8rem;
+  margin-bottom: -15px;
+  margin-left: -2px;
 }
 .close:hover {
-color: black;
+color: red;
+ background-color: white;
+border: 1px solid red;
 }
 
 #entryNoteTextarea {
-  border: none;
+  border: 1px solid rgb(230, 228, 228);
     font-family: system-ui, sans-serif;
     font-weight: bold;
     font-size: 1rem;
-  
+    color: #00796b;
+    padding: 10px;
+    border-radius: 4px;
+  margin-left: -10px;
+  margin-top: -10px;
 }
 
 #saveNoteBtn {
-  border: none;
-  margin-top: 1px;
-   margin-bottom: -10px;
-  background-color: transparent;
-  color:  #00796b;
-padding: 0px;
+  border: 1px solid #00796b;;
+  margin-top: 10px;
+    margin-left: -8px;
+  background-color: #00796b;
+  color:  white;
+padding: 8px;
 border: none;
-
+border-radius: 8px;
+font-size: 0.8rem;
+  margin-bottom: -15px;
 }
   
 #saveNoteBtn:hover {
-  color:  red;
+  color: #00796b;
+ background-color: white;
+border: 1px solid #00796b;
 }
   
 
