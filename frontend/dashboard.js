@@ -2684,7 +2684,10 @@ window.drawCharts = drawCharts;
 window.updateFullYearBudgetBar = updateFullYearBudgetBar;
 window.syncYearlyLimitsToMongo  =syncYearlyLimitsToMongo;
 window.loadAndRenderYearlyLimit  = loadAndRenderYearlyLimit;
-window.update2025BarFromEntries = update2025BarFromEntries
+window.update2025BarFromEntries = update2025BarFromEntries;
+window.updateStatic2025BudgetBar = updateStatic2025BudgetBar;
+
+
 
 
 
@@ -2887,21 +2890,27 @@ function updateStatic2025BudgetBar(limit, difference) {
 
 
 function update2025BarFromEntries() {
-  const year = '2025';
-  const entries = (window.entries || []).filter(e => e.date?.startsWith(year));
+  const entries = window.entries || [];
+  const year = "2025";
 
-  const totalPlus = entries.filter(e => (e.type || '').toLowerCase() === 'plus')
+  // Filter only 2025 entries
+  const filtered = entries.filter(e => e.date?.startsWith(year));
+
+  const totalPlus = filtered
+    .filter(e => (e.type || '').toLowerCase() === 'plus')
     .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
 
-  const totalMinus = entries.filter(e => (e.type || '').toLowerCase() === 'minus')
+  const totalMinus = filtered
+    .filter(e => (e.type || '').toLowerCase() === 'minus')
     .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
 
-  const difference = totalPlus - totalMinus;
-  const limit = 10828; // Or get this from Dexie/Mongo as needed
+  const limit = 10828; // 🔁 You can replace with a real value from Dexie or backend
+  const diff = totalPlus - totalMinus;
 
-  updateStatic2025BudgetBar(limit, difference);
+  console.log("🟢 2025 Bar → +:", totalPlus, "–:", totalMinus, "Diff:", diff);
+
+  updateFullYearBudgetBar2025(limit, diff);
 }
-
 
 async function syncYearlyLimitsToMongo() {
   try {
