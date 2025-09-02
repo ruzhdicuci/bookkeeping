@@ -2705,9 +2705,9 @@ body {
 .close {
 
  
-  background-color: red;
-  border: none;
-  color: white;
+  background-color: white;
+  border: 1px solid red;
+  color: red;
   font-size: 12px;
   padding: 3px 10px;
   border-radius: 999px;
@@ -2716,9 +2716,9 @@ body {
     margin-top: 10px;
 }
 .close:hover {
-color: red;
- background-color: white;
-border: 1px solid red;
+color: white;
+ background-color: red;
+
 }
 
 .modal-content {
@@ -2740,9 +2740,9 @@ border: none;
 }
 
 #saveNoteBtn {
-       background-color: #00796b;
-  border: none;
-  color: white;
+       background-color: white;
+  border: 1px solid #00796b;
+  color: #00796b;
   font-size: 12px;
   padding: 3px 10px;
   border-radius: 999px;
@@ -2753,9 +2753,9 @@ border: none;
 
   
 #saveNoteBtn:hover {
-  color: #00796b;
- background-color: white;
-border: 1px solid #00796b;
+  color: white;
+ background-color: #00796b;
+
 }
   
 
@@ -2986,3 +2986,6 @@ body.dark .monthly-widgets-wrapper {
 .monthly-widget .net {
   font-size: 1em;
 }
+
+
+

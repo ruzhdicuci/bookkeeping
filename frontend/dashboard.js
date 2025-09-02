@@ -2803,10 +2803,8 @@ async function setYearlyLimit() {
   });
 
   // ✅ Compute difference manually
-  const difference = (window.entries || []).reduce((sum, e) => {
-    const amount = parseFloat(e.amount) || 0;
-    return (e.type || '').toLowerCase() === 'income' ? sum + amount : sum - amount;
-  }, 0);
+// ✅ Use filtered entries
+const difference = getFilteredDifference();
 
   // ✅ Only update bars — no re-rendering!
   updateFullYearBudgetBar(limit, difference);
@@ -2884,6 +2882,17 @@ async function syncYearlyLimitsToMongo() {
   }
 }
 
+
+function getFilteredDifference() {
+  const filtered = applyAllFilters(window.entries || []);
+  const totalPlus = filtered.filter(e => (e.type || '').toLowerCase() === 'plus')
+                            .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+  const totalMinus = filtered.filter(e => (e.type || '').toLowerCase() === 'minus')
+                             .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+  return totalPlus - totalMinus;
+}
+
+
 async function loadAndRenderYearlyLimit() {
   const year = new Date().getFullYear().toString();
   const userId = getUserIdFromToken();
@@ -2893,61 +2902,51 @@ async function loadAndRenderYearlyLimit() {
   const localLimit = await getYearlyLimitFromCache(userId, year);
   debug("💾 Local limit:", localLimit);
 
-  const entries = window.entries || []; // fallback
+  // ✅ Use filtered entries
+  const difference = getFilteredDifference();
 
-  const totalPlus = entries.filter(e => (e.type || '').toLowerCase() === 'plus')
-                           .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
-  const totalMinus = entries.filter(e => (e.type || '').toLowerCase() === 'minus')
-                            .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
-  const difference = totalPlus - totalMinus;
+  if (localLimit) {
+    document.getElementById('yearlyLimitInput').value = localLimit.limit;
 
- if (localLimit) {
-  document.getElementById('yearlyLimitInput').value = localLimit.limit;
-
-  // ✅ Restore saved start date
-  if (localLimit.startFrom) {
-    document.getElementById('startFromInput').value = localLimit.startFrom;
-    const fp = document.querySelector('#startFromInput')._flatpickr;
-if (fp && localLimit.startFrom) {
-  fp.setDate(localLimit.startFrom, true); // true = trigger change event
-}
-  }
-
-  updateFullYearBudgetBar(localLimit.limit, difference);
-} else {
-  debug("🌐 Fetching limit from server...");
-  try {
-    const res = await fetch(`${backend}/api/yearly-limit?year=${year}`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
+    if (localLimit.startFrom) {
+      document.getElementById('startFromInput').value = localLimit.startFrom;
+      const fp = document.querySelector('#startFromInput')._flatpickr;
+      if (fp && localLimit.startFrom) {
+        fp.setDate(localLimit.startFrom, true);
       }
-    });
-
-    if (!res.ok) throw new Error(await res.text());
-
-    const data = await res.json();
-    debug("✅ Server responded with:", data);
-
-    // ✅ Save limit and startFrom if present
-    await saveYearlyLimitLocally({
-      userId,
-      year,
-      limit: data.limit,
-      startFrom: data.startFrom || ''// Optional fallback
-
-    });
-
-    document.getElementById('yearlyLimitInput').value = data.limit;
-
-    if (data.startFrom) {
-      document.getElementById('startFromInput').value = data.startFrom;
     }
 
-    updateFullYearBudgetBar(data.limit, difference);
-  } catch (err) {
-    console.error("❌ Error loading yearly limit from server:", err);
+    updateFullYearBudgetBar(localLimit.limit, difference);
+  } else {
+    debug("🌐 Fetching limit from server...");
+    try {
+      const res = await fetch(`${backend}/api/yearly-limit?year=${year}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (!res.ok) throw new Error(await res.text());
+      const data = await res.json();
+      debug("✅ Server responded with:", data);
+
+      await saveYearlyLimitLocally({
+        userId,
+        year,
+        limit: data.limit,
+        startFrom: data.startFrom || ''
+      });
+
+      document.getElementById('yearlyLimitInput').value = data.limit;
+      if (data.startFrom) {
+        document.getElementById('startFromInput').value = data.startFrom;
+      }
+
+      updateFullYearBudgetBar(data.limit, difference);
+    } catch (err) {
+      console.error("❌ Error loading yearly limit from server:", err);
+    }
   }
-}
 }
 
 
@@ -3051,4 +3050,6 @@ card.classList.add(net >= 0 ? 'positive' : 'negative');
     container.appendChild(card);
   }
 }
+
+
 
