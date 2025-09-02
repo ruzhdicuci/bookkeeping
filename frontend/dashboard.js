@@ -1565,6 +1565,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 document.getElementById('statusFilter')?.addEventListener('change', () => {
   renderEntries();
   renderBankBalanceForm();
+  updateBudgetBarBasedOnFilters(); // ✅ Trigger correct difference on load
 });
 
 // ✅ Lock/unlock card input fields
@@ -2903,14 +2904,20 @@ function applyAllFilters(entries) {
 }
 
 function getFilteredDifference() {
-  const filtered = applyAllFilters(window.entries || []);
-  const totalPlus = filtered.filter(e => (e.type || '').toLowerCase() === 'plus')
-                            .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
-  const totalMinus = filtered.filter(e => (e.type || '').toLowerCase() === 'minus')
-                             .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+  const entries = window.entries || [];
+  const filtered = applyAllFilters(entries);
+
+  const totalPlus = filtered
+    .filter(e => (e.type || '').toLowerCase() === 'plus')
+    .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+
+  const totalMinus = filtered
+    .filter(e => (e.type || '').toLowerCase() === 'minus')
+    .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+
+  debug("📦 getFilteredDifference → totalPlus:", totalPlus, "totalMinus:", totalMinus);
   return totalPlus - totalMinus;
 }
-
 
 async function loadAndRenderYearlyLimit() {
   const year = new Date().getFullYear().toString();
