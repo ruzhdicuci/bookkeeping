@@ -2882,6 +2882,25 @@ async function syncYearlyLimitsToMongo() {
   }
 }
 
+function applyAllFilters(entries) {
+  const categoryFilter = document.getElementById('categoryFilter')?.value || 'All';
+  const typeFilter = document.getElementById('typeFilter')?.value || 'All';
+  const personFilter = document.getElementById('personFilter')?.value || 'All';
+  const bankFilter = document.getElementById('bankFilter')?.value || 'All';
+
+  const selectedMonths = [...document.querySelectorAll('#monthDropdown input[type="checkbox"]:checked')]
+    .map(cb => cb.value)
+    .filter(m => m !== 'All');
+
+  return entries.filter(entry => {
+    const dateMatch = selectedMonths.length ? selectedMonths.includes(entry.date?.slice(0, 7)) : true;
+    const categoryMatch = categoryFilter === 'All' || entry.category === categoryFilter;
+    const typeMatch = typeFilter === 'All' || entry.type === typeFilter;
+    const personMatch = personFilter === 'All' || entry.person === personFilter;
+    const bankMatch = bankFilter === 'All' || entry.bank === bankFilter;
+    return dateMatch && categoryMatch && typeMatch && personMatch && bankMatch;
+  });
+}
 
 function getFilteredDifference() {
   const filtered = applyAllFilters(window.entries || []);
