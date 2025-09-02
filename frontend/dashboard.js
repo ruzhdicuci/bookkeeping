@@ -2889,18 +2889,17 @@ async function syncYearlyLimitsToMongo() {
 function applyAllFilters(entries) {
   const categoryFilter = document.getElementById('categoryFilter')?.value || 'All';
   const typeFilter = document.getElementById('typeFilter')?.value || 'All';
-  const personFilter = document.getElementById('personFilter')?.value || 'All';
   const bankFilter = document.getElementById('bankFilter')?.value || 'All';
 
-  document.querySelectorAll('#monthOptions input[type="checkbox"]:checked')
-    .map(cb => cb.value)
-    .filter(m => m !== 'All');
+  // ✅ Correct month + person handling
+  const selectedMonths = Array.from(document.querySelectorAll('.monthOption:checked')).map(cb => cb.value);
+  const selectedPersons = Array.from(document.querySelectorAll('.personOption:checked')).map(cb => cb.value);
 
   return entries.filter(entry => {
-    const dateMatch = selectedMonths.length ? selectedMonths.includes(entry.date?.slice(0, 7)) : true;
+    const dateMatch = selectedMonths.length === 0 || selectedMonths.includes(entry.date?.slice(0, 7));
     const categoryMatch = categoryFilter === 'All' || entry.category === categoryFilter;
     const typeMatch = typeFilter === 'All' || entry.type === typeFilter;
-    const personMatch = personFilter === 'All' || entry.person === personFilter;
+    const personMatch = selectedPersons.length === 0 || selectedPersons.includes(entry.person);
     const bankMatch = bankFilter === 'All' || entry.bank === bankFilter;
     return dateMatch && categoryMatch && typeMatch && personMatch && bankMatch;
   });
