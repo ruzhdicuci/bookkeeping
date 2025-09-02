@@ -3140,7 +3140,10 @@ async function update2025BarFromEntries() {
   const limit = limitData?.limit || 0;
 
   const entries = window.entries || [];
-  const filtered = entries.filter(e => (e.date || '').slice(0, 4) === year);
+  const filtered = entries.filter(e => {
+  const d = new Date(e.date);
+  return !isNaN(d) && d.getFullYear().toString() === year;
+});
 
   const totalPlus = filtered
     .filter(e => (e.type || '').toLowerCase() === 'plus')
