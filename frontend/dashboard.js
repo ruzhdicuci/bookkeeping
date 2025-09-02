@@ -3116,12 +3116,7 @@ function setupYearlyBarLiveUpdate() {
   });
 }
 
-function updateBudgetBarBasedOnFilters() {
-  const localLimit = window.yearlyLimit || { limit: 0 }; // fallback
-  const filteredDifference = getFilteredDifference();
-  updateFullYearBudgetBar(localLimit.limit, filteredDifference);
 
-}
 
 setupYearlyBarLiveUpdate(); // 👈 Call this once after DOM is ready
 
