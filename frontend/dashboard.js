@@ -1,4 +1,4 @@
-const DEBUG_MODE = true; // or true for development
+const DEBUG_MODE = false; // or true for development
 const debug = (...args) => DEBUG_MODE && console.log(...args);
 
 import {
@@ -147,14 +147,12 @@ document.querySelectorAll('.monthOption, #selectAllMonths').forEach(cb => {
 document.querySelectorAll('#monthOptions input[type="checkbox"]').forEach(cb => {
   cb.addEventListener('change', () => {
     renderBankBalanceForm(); // ✅ re-calculate table
-    updateBudgetBarBasedOnFilters(); // ✅ add here
   });
 });
 // Person checkboxes
 document.addEventListener('change', (e) => {
   if (e.target.matches('#personOptions input[type="checkbox"]')) {
     renderEntries();
-    updateBudgetBarBasedOnFilters(); // ✅ add here
   }
 });
 window.entries = [];
@@ -474,7 +472,6 @@ function populateFilters() {
       document.querySelectorAll('.monthOption').forEach(cb => cb.checked = allChecked);
       renderEntries();
       renderBankBalanceForm();
-      updateBudgetBarBasedOnFilters(); // ✅ add here
     });
 
     document.querySelectorAll('.monthOption').forEach(cb => {
@@ -1568,7 +1565,6 @@ window.addEventListener('DOMContentLoaded', async () => {
 document.getElementById('statusFilter')?.addEventListener('change', () => {
   renderEntries();
   renderBankBalanceForm();
-  updateBudgetBarBasedOnFilters(); // ✅ Trigger correct difference on load
 });
 
 // ✅ Lock/unlock card input fields
@@ -2807,8 +2803,10 @@ async function setYearlyLimit() {
   });
 
   // ✅ Compute difference manually
-// ✅ Use filtered entries
-const difference = getFilteredDifference();
+  const difference = (window.entries || []).reduce((sum, e) => {
+    const amount = parseFloat(e.amount) || 0;
+    return (e.type || '').toLowerCase() === 'income' ? sum + amount : sum - amount;
+  }, 0);
 
   // ✅ Only update bars — no re-rendering!
   updateFullYearBudgetBar(limit, difference);
@@ -2886,47 +2884,6 @@ async function syncYearlyLimitsToMongo() {
   }
 }
 
-function applyAllFilters(entries) {
-  const categoryFilter = document.getElementById('categoryFilter')?.value || 'All';
-  const typeFilter = document.getElementById('typeFilter')?.value || 'All';
-  const personFilter = document.getElementById('personFilter')?.value || 'All';
-  const bankFilter = document.getElementById('bankFilter')?.value || 'All';
-
-  // ✅ Select month checkboxes safely
-  const monthCheckboxes = document.querySelectorAll('#monthOptions input[type="checkbox"]:checked');
-  const selectedMonths = Array.from(monthCheckboxes).map(cb => cb.value).filter(m => m !== 'All');
-
-  const monthFilterActive = selectedMonths.length > 0;
-
-  return entries.filter(entry => {
-    const entryMonth = entry.date?.slice(0, 7);
-    const dateMatch = monthFilterActive ? selectedMonths.includes(entryMonth) : true;
-
-    const categoryMatch = categoryFilter === 'All' || entry.category === categoryFilter;
-    const typeMatch = typeFilter === 'All' || entry.type === typeFilter;
-    const personMatch = personFilter === 'All' || entry.person === personFilter;
-    const bankMatch = bankFilter === 'All' || entry.bank === bankFilter;
-
-    return dateMatch && categoryMatch && typeMatch && personMatch && bankMatch;
-  });
-}
-
-function getFilteredDifference() {
-  const entries = window.entries || [];
-  const filtered = applyAllFilters(entries);
-
-  const totalPlus = filtered
-    .filter(e => (e.type || '').toLowerCase() === 'plus')
-    .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
-
-  const totalMinus = filtered
-    .filter(e => (e.type || '').toLowerCase() === 'minus')
-    .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
-
-  debug("📦 getFilteredDifference → totalPlus:", totalPlus, "totalMinus:", totalMinus);
-  return totalPlus - totalMinus;
-}
-
 async function loadAndRenderYearlyLimit() {
   const year = new Date().getFullYear().toString();
   const userId = getUserIdFromToken();
@@ -2936,51 +2893,61 @@ async function loadAndRenderYearlyLimit() {
   const localLimit = await getYearlyLimitFromCache(userId, year);
   debug("💾 Local limit:", localLimit);
 
-  // ✅ Use filtered entries
-  const difference = getFilteredDifference();
+  const entries = window.entries || []; // fallback
 
-  if (localLimit) {
-    document.getElementById('yearlyLimitInput').value = localLimit.limit;
+  const totalPlus = entries.filter(e => (e.type || '').toLowerCase() === 'plus')
+                           .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+  const totalMinus = entries.filter(e => (e.type || '').toLowerCase() === 'minus')
+                            .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+  const difference = totalPlus - totalMinus;
 
-    if (localLimit.startFrom) {
-      document.getElementById('startFromInput').value = localLimit.startFrom;
-      const fp = document.querySelector('#startFromInput')._flatpickr;
-      if (fp && localLimit.startFrom) {
-        fp.setDate(localLimit.startFrom, true);
-      }
-    }
+ if (localLimit) {
+  document.getElementById('yearlyLimitInput').value = localLimit.limit;
 
-    updateFullYearBudgetBar(localLimit.limit, difference);
-  } else {
-    debug("🌐 Fetching limit from server...");
-    try {
-      const res = await fetch(`${backend}/api/yearly-limit?year=${year}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-
-      if (!res.ok) throw new Error(await res.text());
-      const data = await res.json();
-      debug("✅ Server responded with:", data);
-
-      await saveYearlyLimitLocally({
-        userId,
-        year,
-        limit: data.limit,
-        startFrom: data.startFrom || ''
-      });
-
-      document.getElementById('yearlyLimitInput').value = data.limit;
-      if (data.startFrom) {
-        document.getElementById('startFromInput').value = data.startFrom;
-      }
-
-      updateFullYearBudgetBar(data.limit, difference);
-    } catch (err) {
-      console.error("❌ Error loading yearly limit from server:", err);
-    }
+  // ✅ Restore saved start date
+  if (localLimit.startFrom) {
+    document.getElementById('startFromInput').value = localLimit.startFrom;
+    const fp = document.querySelector('#startFromInput')._flatpickr;
+if (fp && localLimit.startFrom) {
+  fp.setDate(localLimit.startFrom, true); // true = trigger change event
+}
   }
+
+  updateFullYearBudgetBar(localLimit.limit, difference);
+} else {
+  debug("🌐 Fetching limit from server...");
+  try {
+    const res = await fetch(`${backend}/api/yearly-limit?year=${year}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+
+    if (!res.ok) throw new Error(await res.text());
+
+    const data = await res.json();
+    debug("✅ Server responded with:", data);
+
+    // ✅ Save limit and startFrom if present
+    await saveYearlyLimitLocally({
+      userId,
+      year,
+      limit: data.limit,
+      startFrom: data.startFrom || ''// Optional fallback
+
+    });
+
+    document.getElementById('yearlyLimitInput').value = data.limit;
+
+    if (data.startFrom) {
+      document.getElementById('startFromInput').value = data.startFrom;
+    }
+
+    updateFullYearBudgetBar(data.limit, difference);
+  } catch (err) {
+    console.error("❌ Error loading yearly limit from server:", err);
+  }
+}
 }
 
 
@@ -3086,68 +3053,4 @@ card.classList.add(net >= 0 ? 'positive' : 'negative');
 }
 
 
-// ✅ Recompute yearly budget difference on any filter change
-['#categoryFilter', '#typeFilter', '#personFilter', '#bankFilter'].forEach(id => {
-  document.querySelector(id)?.addEventListener('change', () => {
-    const localLimit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
-    if (!isNaN(localLimit)) {
-      const filteredDiff = getFilteredDifference();
-      updateFullYearBudgetBar(localLimit, filteredDiff);
-    }
-  });
-});
 
-// ✅ For month checkboxes (they change on click, not change)
-document.querySelectorAll('#monthOptions input[type="checkbox"]').forEach(cb => {
-  cb.addEventListener('click', () => {
-    const localLimit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
-    if (!isNaN(localLimit)) {
-      const filteredDiff = getFilteredDifference();
-      updateFullYearBudgetBar(localLimit, filteredDiff);
-    }
-  });
-});
-
-
-function setupYearlyBarLiveUpdate() {
-  const filterIds = ['#categoryFilter', '#typeFilter', '#personFilter', '#bankFilter'];
-
-  filterIds.forEach(id => {
-    document.querySelector(id)?.addEventListener('change', updateBudgetBarBasedOnFilters);
-  });
-
-  document.querySelectorAll('#monthOptions input[type="checkbox"]').forEach(cb => {
-    cb.addEventListener('change', updateBudgetBarBasedOnFilters); // 👈 use 'change' not 'click'
-  });
-}
-
-
-
-setupYearlyBarLiveUpdate(); // 👈 Call this once after DOM is ready
-
-document.addEventListener('DOMContentLoaded', () => {
-  setupYearlyBarLiveUpdate();
-});
-
-async function updateBudgetBarBasedOnFilters() {
-  const userId = getUserIdFromToken();
-  const year = new Date().getFullYear().toString();
-  const localLimit = await getYearlyLimitFromCache(userId, year);
-
-  if (!localLimit) return;
-
-  // ✅ Apply filters based on checkboxes and dropdowns
-  const filtered = applyAllFilters(window.entries || []);
-
-  const totalPlus = filtered.filter(e => (e.type || '').toLowerCase() === 'plus')
-                            .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
-
-  const totalMinus = filtered.filter(e => (e.type || '').toLowerCase() === 'minus')
-                             .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
-
-  const difference = totalPlus - totalMinus;
-
-  console.log("🟢 [BudgetBar] Filtered +:", totalPlus, "Filtered -:", totalMinus, "→ Diff:", difference);
-
-  updateFullYearBudgetBar(localLimit.limit, difference);
-}
