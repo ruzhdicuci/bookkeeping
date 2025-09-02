@@ -1524,6 +1524,7 @@ function calculateCurrentBankBalance(bankName) {
 window.addEventListener('DOMContentLoaded', async () => {
   await fetchEntries();
   await loadInitialBankBalances();
+  await restore2025LimitInputs();
 
   populateNewEntryDropdowns();
   populateFilters();
@@ -1566,6 +1567,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 document.getElementById('statusFilter')?.addEventListener('change', () => {
   renderEntries();
   renderBankBalanceForm();
+  
 });
 
 // ✅ Lock/unlock card input fields
@@ -2889,27 +2891,7 @@ function updateStatic2025BudgetBar(limit, difference) {
 }
 
 
-async function update2025BarFromEntries() {
-  const userId = getUserIdFromToken();
-  const year = "2025";
-  const limitData = await getYearlyLimitFromCache(userId, year);
-  const limit = limitData?.limit || 0;
 
-  const entries = window.entries || [];
-  const filtered = entries.filter(e => e.date?.startsWith(year));
-
-  const totalPlus = filtered
-    .filter(e => (e.type || '').toLowerCase() === 'plus')
-    .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
-
-  const totalMinus = filtered
-    .filter(e => (e.type || '').toLowerCase() === 'minus')
-    .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
-
-  const difference = totalPlus - totalMinus;
-
-  updateFullYearBudgetBar2025(limit, difference);
-}
 
 async function syncYearlyLimitsToMongo() {
   try {
@@ -3170,4 +3152,34 @@ async function update2025BarFromEntries() {
   console.log("📊 update2025BarFromEntries → Limit:", limit, "Plus:", totalPlus, "Minus:", totalMinus, "Diff:", difference);
 
   updateFullYearBudgetBar2025(limit, difference);
+
+  return difference; // ✅ Optional: lets you reuse it later
+}
+
+document.getElementById('setLimit2025Btn')?.addEventListener('click', async () => {
+  const userId = getUserIdFromToken();
+  const year = "2025";
+  const limit = parseFloat(document.getElementById('limitInput2025').value) || 0;
+  const startFrom = document.getElementById('limitStartDate2025').value || null;
+
+  if (!userId || limit <= 0) {
+    alert("❌ Please enter a valid limit.");
+    return;
+  }
+
+  // Save to Dexie + sync
+  await saveYearlyLimitLocally({ userId, year, limit, startFrom, synced: false });
+  update2025BarFromEntries();
+});
+
+async function restore2025LimitInputs() {
+  const userId = getUserIdFromToken();
+  const limitData = await getYearlyLimitFromCache(userId, "2025");
+
+  if (limitData) {
+    document.getElementById('limitInput2025').value = limitData.limit || '';
+    if (limitData.startFrom) {
+      document.getElementById('limitStartDate2025').value = limitData.startFrom;
+    }
+  }
 }
