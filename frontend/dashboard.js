@@ -3071,4 +3071,24 @@ card.classList.add(net >= 0 ? 'positive' : 'negative');
 }
 
 
+// ✅ Recompute yearly budget difference on any filter change
+['#categoryFilter', '#typeFilter', '#personFilter', '#bankFilter'].forEach(id => {
+  document.querySelector(id)?.addEventListener('change', () => {
+    const localLimit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
+    if (!isNaN(localLimit)) {
+      const filteredDiff = getFilteredDifference();
+      updateFullYearBudgetBar(localLimit, filteredDiff);
+    }
+  });
+});
 
+// ✅ For month checkboxes (they change on click, not change)
+document.querySelectorAll('#monthDropdown input[type="checkbox"]').forEach(cb => {
+  cb.addEventListener('click', () => {
+    const localLimit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
+    if (!isNaN(localLimit)) {
+      const filteredDiff = getFilteredDifference();
+      updateFullYearBudgetBar(localLimit, filteredDiff);
+    }
+  });
+});
