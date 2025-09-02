@@ -710,6 +710,7 @@ card.addEventListener('click', (event) => {
     loadMoreBtn.onclick = () => {
       currentPage++;
       renderEntries();
+       update2025BarFromEntries();
     };
     container.appendChild(loadMoreBtn);
   }
@@ -2683,6 +2684,7 @@ window.drawCharts = drawCharts;
 window.updateFullYearBudgetBar = updateFullYearBudgetBar;
 window.syncYearlyLimitsToMongo  =syncYearlyLimitsToMongo;
 window.loadAndRenderYearlyLimit  = loadAndRenderYearlyLimit;
+window.update2025BarFromEntries = update2025BarFromEntries
 
 
 
@@ -2851,6 +2853,55 @@ function updateFullYearBudgetBar(limit, difference) {
     warning.style.display = difference < 0 ? 'inline' : 'none';
   }
 }
+
+
+function updateStatic2025BudgetBar(limit, difference) {
+  debug("📅 updateStatic2025BudgetBar → Limit =", limit, "Difference =", difference);
+
+  if (typeof difference !== 'number' || isNaN(difference)) {
+    console.warn("❌ Skipping updateStatic2025BudgetBar — invalid difference:", difference);
+    return;
+  }
+
+  const bar = document.getElementById('bar2025Fill');
+  const plusLabel = document.getElementById('bar2025LeftLabel');
+  const spentLabel = document.getElementById('bar2025SpentLabel');
+  const totalLabel = document.getElementById('bar2025LimitLabel');
+
+  if (!bar || !plusLabel || !spentLabel || !totalLabel) {
+    console.warn("❌ 2025 Budget bar elements not found in DOM");
+    return;
+  }
+
+  const left = difference;
+  const used = limit - left;
+
+  totalLabel.textContent = limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  plusLabel.textContent = left.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  spentLabel.textContent = (used >= 0 ? '-' : '+') + Math.abs(used).toLocaleString('de-CH', { minimumFractionDigits: 2 });
+
+  const percentage = (Math.abs(difference) / limit) * 100;
+  bar.style.width = percentage + '%';
+  bar.style.backgroundColor = difference >= 0 ? '#27a789' : '#ff4d4d';
+}
+
+
+function update2025BarFromEntries() {
+  const year = '2025';
+  const entries = (window.entries || []).filter(e => e.date?.startsWith(year));
+
+  const totalPlus = entries.filter(e => (e.type || '').toLowerCase() === 'plus')
+    .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+
+  const totalMinus = entries.filter(e => (e.type || '').toLowerCase() === 'minus')
+    .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+
+  const difference = totalPlus - totalMinus;
+  const limit = 10828; // Or get this from Dexie/Mongo as needed
+
+  updateStatic2025BudgetBar(limit, difference);
+}
+
 
 async function syncYearlyLimitsToMongo() {
   try {
