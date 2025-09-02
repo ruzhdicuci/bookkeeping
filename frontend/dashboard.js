@@ -3092,3 +3092,33 @@ document.querySelectorAll('#monthDropdown input[type="checkbox"]').forEach(cb =>
     }
   });
 });
+
+
+function setupYearlyBarLiveUpdate() {
+  const filterIds = ['#categoryFilter', '#typeFilter', '#personFilter', '#bankFilter'];
+
+  filterIds.forEach(id => {
+    document.querySelector(id)?.addEventListener('change', updateBudgetBarBasedOnFilters);
+  });
+
+  document.querySelectorAll('#monthDropdown input[type="checkbox"]').forEach(cb => {
+    cb.addEventListener('change', updateBudgetBarBasedOnFilters); // 👈 use 'change' not 'click'
+  });
+}
+
+function updateBudgetBarBasedOnFilters() {
+  const localLimit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
+  if (!isNaN(localLimit)) {
+    const filteredDiff = getFilteredDifference();
+    updateFullYearBudgetBar(localLimit, filteredDiff);
+    debug("🔄 Budget bar updated based on filters. Difference:", filteredDiff);
+  } else {
+    console.warn("⚠️ No yearly limit value available");
+  }
+}
+
+setupYearlyBarLiveUpdate(); // 👈 Call this once after DOM is ready
+
+document.addEventListener('DOMContentLoaded', () => {
+  setupYearlyBarLiveUpdate();
+});
