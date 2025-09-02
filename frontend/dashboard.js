@@ -3114,3 +3114,60 @@ card.classList.add(net >= 0 ? 'positive' : 'negative');
 
 
 
+function updateFullYearBudgetBar2025(limit, difference) {
+  console.log("🟢 updateFullYearBudgetBar2025: Limit =", limit, "Difference =", difference);
+
+  if (typeof difference !== 'number' || isNaN(difference)) {
+    console.warn("❌ Skipping 2025 bar — invalid difference:", difference);
+    return;
+  }
+
+  const bar = document.getElementById('bar2025Fill');
+  const plusLabel = document.getElementById('bar2025LeftLabel');
+  const spentLabel = document.getElementById('bar2025SpentLabel');
+  const totalLabel = document.getElementById('bar2025LimitLabel');
+  const warning = document.getElementById('budgetWarning2025');
+
+  if (!bar || !plusLabel || !spentLabel || !totalLabel) {
+    console.warn("❌ 2025 Budget Bar elements not found");
+    return;
+  }
+
+  const left = difference;
+  const used = limit - left;
+
+  totalLabel.textContent = limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  plusLabel.textContent = left.toLocaleString('de-CH', { minimumFractionDigits: 2 });
+  spentLabel.textContent = (used >= 0 ? '-' : '+') + Math.abs(used).toLocaleString('de-CH', { minimumFractionDigits: 2 });
+
+  const percentage = (Math.abs(difference) / limit) * 100;
+  bar.style.width = percentage + '%';
+  bar.style.backgroundColor = difference >= 0 ? '#27a789' : '#ff4d4d';
+
+  if (warning) {
+    warning.style.display = difference < 0 ? 'inline' : 'none';
+  }
+}
+
+
+async function update2025BarFromEntries() {
+  const userId = getUserIdFromToken();
+  const year = "2025";
+  const limitData = await getYearlyLimitFromCache(userId, year);
+  const limit = limitData?.limit || 0;
+
+  const entries = window.entries || [];
+  const filtered = entries.filter(e => e.date?.startsWith(year));
+
+  const totalPlus = filtered
+    .filter(e => (e.type || '').toLowerCase() === 'plus')
+    .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+
+  const totalMinus = filtered
+    .filter(e => (e.type || '').toLowerCase() === 'minus')
+    .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+
+  const difference = totalPlus - totalMinus;
+
+  updateFullYearBudgetBar2025(limit, difference);
+}

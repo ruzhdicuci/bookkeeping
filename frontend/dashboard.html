@@ -493,16 +493,36 @@ totalsContainer.appendChild(summaryCard);
 
 
 
-<div class="yearly-bar-wrapper" style="margin-top: 20px;">
-<div style="margin-top: 2rem;">
-  <h3>2025 Budget Bar</h3>
-  <div class="bar-labels">
-    <span id="yearlySpentLabel2025">0.00</span>
-    <span id="yearlyLeftLabel2025">0.00</span>
-    <span id="yearlyLimitLabel2025">0.00</span>
+<div id="budget2025Container" style="margin-top: 20px; background-color: white; padding:15px; border-radius: 10px;">
+  <strong style="display:block; margin-bottom:4px;">2025 Budget Bar</strong>
+
+  <!-- Labels Row -->
+  <div style="display: flex; align-items: center; gap: 10px;">
+    
+    <!-- 🟣 Spent -->
+    <span style="font-size: 1.1rem; font-weight: bold; color: rgb(249, 85, 189);">
+      <span id="bar2025SpentLabel">-0.00</span>
+    </span>
+
+    <!-- 🟢 Left -->
+    <span style="margin: 0 auto; font-size: 1.1rem; font-weight: bold; color: rgb(55, 155, 98);">
+      <span id="bar2025LeftLabel">+0.00</span>
+    </span>
+
+    <!-- 🔵 Limit -->
+    <span style="font-size: 1.1rem; font-weight: bold; color: rgb(119, 152, 251);">
+      <span id="bar2025LimitLabel">0.00</span>
+    </span>
   </div>
-  <div class="progress-bar">
-    <div class="fill" id="yearlyProgressFill2025"></div>
+
+  <!-- Progress Bar -->
+  <div style="position: relative; margin-top: 10px; margin-bottom: 10px; background: #d7d3d3; height: 14px; border-radius: 7px;">
+    <div id="bar2025Fill" style="height: 100%; border-radius: 7px; width: 0%; background: #27a789; transition: width 0.5s ease;"></div>
+  </div>
+
+  <!-- Warning icon -->
+  <div>
+    <span id="budgetWarning2025" style="display: none; color: red; font-weight: bold;">⚠️ Over budget in 2025!</span>
   </div>
 </div>
 
