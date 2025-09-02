@@ -953,6 +953,7 @@ async function deleteEntry(id) {
   populateFilters();               // Rebuild filters
   renderBankBalanceForm();         // ✅ Refresh bank balance table
   renderMonthlyWidgets(window.entries); // ✅ Refresh monthly widgets
+  await update2025BarFromEntries();          // ✅ Refresh the 2025 budget bar
 }
 
 
