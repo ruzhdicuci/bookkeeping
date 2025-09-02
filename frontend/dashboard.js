@@ -2892,15 +2892,15 @@ function applyAllFilters(entries) {
   const personFilter = document.getElementById('personFilter')?.value || 'All';
   const bankFilter = document.getElementById('bankFilter')?.value || 'All';
 
-  // ✅ FIXED: Store selectedMonths into a variable
+  // ✅ Proper month selection
   const selectedMonths = Array.from(
     document.querySelectorAll('#monthOptions input[type="checkbox"]:checked')
-  ).map(cb => cb.value);
+  ).map(cb => cb.value).filter(m => m !== 'All');
 
   return entries.filter(entry => {
-    const dateMatch = selectedMonths.length
-      ? selectedMonths.includes(entry.date?.slice(0, 7))
-      : true;
+    const dateMatch = selectedMonths.length === 0
+      ? true
+      : selectedMonths.includes(entry.date?.slice(0, 7));
 
     const categoryMatch = categoryFilter === 'All' || entry.category === categoryFilter;
     const typeMatch = typeFilter === 'All' || entry.type === typeFilter;
