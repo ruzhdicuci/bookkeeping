@@ -2889,11 +2889,13 @@ function updateStatic2025BudgetBar(limit, difference) {
 }
 
 
-function update2025BarFromEntries() {
-  const entries = window.entries || [];
+async function update2025BarFromEntries() {
+  const userId = getUserIdFromToken();
   const year = "2025";
+  const limitData = await getYearlyLimitFromCache(userId, year);
+  const limit = limitData?.limit || 0;
 
-  // Filter only 2025 entries
+  const entries = window.entries || [];
   const filtered = entries.filter(e => e.date?.startsWith(year));
 
   const totalPlus = filtered
@@ -2904,12 +2906,9 @@ function update2025BarFromEntries() {
     .filter(e => (e.type || '').toLowerCase() === 'minus')
     .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
 
-  const limit = 10828; // 🔁 You can replace with a real value from Dexie or backend
-  const diff = totalPlus - totalMinus;
+  const difference = totalPlus - totalMinus;
 
-  console.log("🟢 2025 Bar → +:", totalPlus, "–:", totalMinus, "Diff:", diff);
-
-  updateFullYearBudgetBar2025(limit, diff);
+  updateFullYearBudgetBar2025(limit, difference);
 }
 
 async function syncYearlyLimitsToMongo() {
@@ -3113,7 +3112,6 @@ card.classList.add(net >= 0 ? 'positive' : 'negative');
 }
 
 
-
 function updateFullYearBudgetBar2025(limit, difference) {
   console.log("🟢 updateFullYearBudgetBar2025: Limit =", limit, "Difference =", difference);
 
@@ -3140,7 +3138,7 @@ function updateFullYearBudgetBar2025(limit, difference) {
   plusLabel.textContent = left.toLocaleString('de-CH', { minimumFractionDigits: 2 });
   spentLabel.textContent = (used >= 0 ? '-' : '+') + Math.abs(used).toLocaleString('de-CH', { minimumFractionDigits: 2 });
 
-  const percentage = (Math.abs(difference) / limit) * 100;
+  const percentage = limit === 0 ? 0 : (Math.abs(difference) / limit) * 100;
   bar.style.width = percentage + '%';
   bar.style.backgroundColor = difference >= 0 ? '#27a789' : '#ff4d4d';
 
@@ -3157,7 +3155,7 @@ async function update2025BarFromEntries() {
   const limit = limitData?.limit || 0;
 
   const entries = window.entries || [];
-  const filtered = entries.filter(e => e.date?.startsWith(year));
+  const filtered = entries.filter(e => (e.date || '').startsWith(year));
 
   const totalPlus = filtered
     .filter(e => (e.type || '').toLowerCase() === 'plus')
@@ -3168,6 +3166,8 @@ async function update2025BarFromEntries() {
     .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
 
   const difference = totalPlus - totalMinus;
+
+  console.log("📊 update2025BarFromEntries → Limit:", limit, "Plus:", totalPlus, "Minus:", totalMinus, "Diff:", difference);
 
   updateFullYearBudgetBar2025(limit, difference);
 }
