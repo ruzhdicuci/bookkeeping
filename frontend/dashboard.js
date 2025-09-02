@@ -2229,6 +2229,7 @@ try {
   // ✅ read entries from IndexedDB and re-render
   const cachedEntries = await getCachedEntries(); 
   window.entries = cachedEntries; // optionally update global cache
+  await update2025BarFromEntries();
   renderEntries(cachedEntries);
   renderMonthlyWidgets(cachedEntries);
 
@@ -3137,7 +3138,7 @@ async function update2025BarFromEntries() {
   const limit = limitData?.limit || 0;
 
   const entries = window.entries || [];
-  const filtered = entries.filter(e => (e.date || '').startsWith(year));
+  const filtered = entries.filter(e => (e.date || '').slice(0, 4) === year);
 
   const totalPlus = filtered
     .filter(e => (e.type || '').toLowerCase() === 'plus')
