@@ -61,7 +61,8 @@ document.addEventListener('DOMContentLoaded', async () => {
  renderMonthlyWidgets(window.entries);
 renderBankBalanceForm();     
   await loadInitialBankBalances();
-
+  // ✅ Add this:
+  await update2025BarFromEntries();
   if (navigator.onLine) syncToCloud();
 
 
