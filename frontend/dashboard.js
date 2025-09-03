@@ -3054,41 +3054,49 @@ card.classList.add(net >= 0 ? 'positive' : 'negative');
   }
 }
 
+async function getYearlyLimitFromCache(year) {
+  return await db.yearlyLimits.get(`${userId}${year}`); // or your key structure
+}
 
-function renderYearlyDifferences(entries) {
+async function renderYearlyDifferences(entries) {
   if (!entries?.length) return;
+
+  const yearly = {};
+
+  entries.forEach(e => {
+    const year = e.date?.slice(0, 4);
+    if (!year) return;
+
+    if (!yearly[year]) yearly[year] = { income: 0, expense: 0 };
+
+    const amount = parseFloat(e.amount) || 0;
+    const type = (e.type || '').toLowerCase();
+
+    if (type === 'income' || type === 'plus') yearly[year].income += amount;
+    else if (type === 'expense' || type === 'minus') yearly[year].expense += amount;
+  });
 
   const container = document.getElementById('yearlyDifferencesList');
   if (!container) return;
 
-  const sortedEntries = entries
-    .filter(e => e.date && e.amount && e.type)
-    .sort((a, b) => new Date(a.date) - new Date(b.date));
+  const yearKeys = Object.keys(yearly).sort();
 
-  const cumulativeBalanceByYear = {};
-  let runningBalance = 0;
+  const lines = await Promise.all(yearKeys.map(async (year) => {
+    const { income, expense } = yearly[year];
+    const limitObj = await getYearlyLimitFromCache(year);
+    const limit = parseFloat(limitObj?.limit || 0);
 
-  sortedEntries.forEach(e => {
-    const year = e.date.slice(0, 4);
-    const amount = parseFloat(e.amount) || 0;
-    const type = (e.type || '').toLowerCase();
+    const diff = income - expense + limit;
 
-    if (type === 'income' || type === 'plus') {
-      runningBalance += amount;
-    } else if (type === 'expense' || type === 'minus') {
-      runningBalance -= amount;
-    }
-
-    cumulativeBalanceByYear[year] = runningBalance;
-  });
-
-  container.innerHTML = Object.entries(cumulativeBalanceByYear).sort().map(([year, balance]) => {
-    const formatted = balance.toLocaleString('de-CH', {
+    const formatted = diff.toLocaleString('de-CH', {
       style: 'currency',
       currency: 'CHF',
       minimumFractionDigits: 2
     });
-    const color = balance >= 0 ? 'green' : 'crimson';
+    const color = diff >= 0 ? 'green' : 'crimson';
+
     return `<div><strong>${year}:</strong> <span style="color:${color}">${formatted}</span></div>`;
-  }).join('');
+  }));
+
+  container.innerHTML = lines.join('');
 }
