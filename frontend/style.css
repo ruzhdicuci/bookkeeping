@@ -2988,31 +2988,55 @@ body.dark .monthly-widgets-wrapper {
 }
 
 
-#yearlyYearCards {
-  display: flex;
+
+
+.year-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  flex: 1 1 240px;
+  max-width: 260px;
+  min-width: 200px;
+    display: flex;
   flex-wrap: wrap;
-  gap: 5px;
-  justify-content: center; /* ✅ Center the cards */
+  gap: 10px;
+  font-size: 0.7rem; /* ✅ make font slightly smaller */
 }
 
-#yearlyYearCards > div {
-  flex: 1 1 calc(33.333% - 20px); /* 3 cards per row on big screens */
-  max-width: 300px;
-  min-width: 220px;
-  color: #3a3737;
+.year-card .label {
+  font-weight: 500;
+  margin-top: 4px;
 }
 
-/* Tablet or small desktop */
-@media (max-width: 900px) {
-  #yearlyYearCards > div {
-    flex: 1 1 calc(50% - 20px); /* 2 cards per row */
-  }
+.year-card .income,
+.year-card .expense,
+.year-card .balance {
+  font-weight: bold;
+  font-size: 1rem;
+  margin-bottom: 4px;
 }
 
-/* Mobile */
+.year-card .income {
+  color: #169c81;
+}
+
+.year-card .expense {
+  color: #c63d2f;
+}
+
+.year-card .balance {
+  color: #27a3ae;
+}
+
+
+/* ✅ Mobile: fit 2 cards per row */
 @media (max-width: 600px) {
-  #yearlyYearCards > div {
-    flex: 1 1 100%; /* 1 card per row */
+  .year-card {
+    flex: 0 0 30%;
+    max-width: 30%;
+
+     font-size: 0.7rem; 
   }
 }
 

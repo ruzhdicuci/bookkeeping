@@ -3062,6 +3062,12 @@ card.classList.add(net >= 0 ? 'positive' : 'negative');
   }
 }
 
+function formatNumber(n) {
+  return n.toLocaleString('de-CH', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+}
 
 async function renderRealYearlyCards() {
   const entries = await getCachedEntries(); // Not fetchEntries!
@@ -3095,33 +3101,18 @@ async function renderRealYearlyCards() {
     const balance = income - expense;
     const balanceColor = balance >= 0 ? '#0c8a86' : '#db4534';
 
-    return `
-      <div style="
-        flex: 1;
-        min-width: 200px;
-        max-width: 240px;
-        background: #fff;
-        border-radius: 10px;
-        padding: 15px;
-        color: #3a3737;
-        font-size: 15px;
-        margin-bottom: 10px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-      ">
-       <h4 style="margin: 0 0 6px 0;">📅 ${year}</h4>
-  <div>Income: <strong style="color:#0c8a86; font-size: 1rem;">
-    ${income.toLocaleString('de-CH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-  </strong></div>
-  <div>Expenses: <strong style="color:#db4534; font-size: 1rem;">
-    ${expense.toLocaleString('de-CH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-  </strong></div>
-  <div>Balance: <strong style="color:#04b5d8; font-size: 1rem;">
-    ${balance.toLocaleString('de-CH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-  </strong></div>
-      </div>
-    `;
+return `
+  <div class="year-card">
+    <h4 class="year-heading">📅 ${year}</h4>
+    <div class="label">Income:</div>
+    <div class="income">${formatNumber(income)}</div>
+
+    <div class="label">Expenses:</div>
+    <div class="expense">${formatNumber(expense)}</div>
+
+    <div class="label">Balance:</div>
+    <div class="balance">${formatNumber(balance)}</div>
+  </div>
+`;
   }).join('');
 }
