@@ -3055,45 +3055,37 @@ card.classList.add(net >= 0 ? 'positive' : 'negative');
 }
 
 
+function renderYearlyDifferences(entries) {
+  if (!entries?.length) return;
 
-function renderYearlyDifferences(entries = window.entries || []) {
-  console.log("📅 Entries received in renderYearlyDifferences:", entries.length);
   const yearly = {};
 
   entries.forEach(e => {
-    const date = e.date || '';
+    const date = e.date?.slice(0, 4); // Only keep year
+    if (!date) return;
+
+    if (!yearly[date]) yearly[date] = { plus: 0, minus: 0 };
+
     const amount = parseFloat(e.amount) || 0;
     const type = (e.type || '').toLowerCase();
-    const year = date.slice(0, 4);
 
-    if (!year || isNaN(amount)) {
-      console.warn("⛔ Skipping invalid entry", e);
-      return;
-    }
-
-    if (!yearly[year]) yearly[year] = { plus: 0, minus: 0 };
-
-    if (type === 'plus') yearly[year].plus += amount;
-    if (type === 'minus') yearly[year].minus += amount;
+    if (type === 'plus') yearly[date].plus += amount;
+    else if (type === 'minus') yearly[date].minus += amount;
   });
 
-  const container = document.getElementById('yearlyDifferencesList');
-  container.innerHTML = '';
+  // Build HTML
+  const container = document.getElementById('yearlyDifferencesContainer');
+  if (!container) return;
 
-  const years = Object.entries(yearly).sort();
-
-  if (years.length === 0) {
-    container.textContent = "No data available.";
-    return;
-  }
-
-  years.forEach(([year, { plus, minus }]) => {
+  container.innerHTML = Object.entries(yearly).sort().map(([year, { plus, minus }]) => {
     const diff = plus - minus;
-    const color = diff >= 0 ? '#28a745' : '#dc3545';
-    const sign = diff >= 0 ? '+' : '-';
+    const formatted = diff.toLocaleString('de-CH', {
+      style: 'currency',
+      currency: 'CHF',
+      minimumFractionDigits: 2
+    });
+    const color = diff >= 0 ? 'green' : 'crimson';
 
-    const line = document.createElement('div');
-    line.innerHTML = `<strong>${year}:</strong> <span style="color:${color}; font-weight:bold;">${sign}${Math.abs(diff).toLocaleString('de-CH', { minimumFractionDigits: 2 })}</span>`;
-    container.appendChild(line);
-  });
+    return `<div><strong>${year}:</strong> <span style="color:${color}">${formatted}</span></div>`;
+  }).join('');
 }
