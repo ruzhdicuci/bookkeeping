@@ -3058,34 +3058,37 @@ card.classList.add(net >= 0 ? 'positive' : 'negative');
 function renderYearlyDifferences(entries) {
   if (!entries?.length) return;
 
-  const yearly = {};
-
-  entries.forEach(e => {
-    const date = e.date?.slice(0, 4); // Only keep year
-    if (!date) return;
-
-    if (!yearly[date]) yearly[date] = { plus: 0, minus: 0 };
-
-    const amount = parseFloat(e.amount) || 0;
-    const type = (e.type || '').toLowerCase();
-
-    if (type === 'plus') yearly[date].plus += amount;
-    else if (type === 'minus') yearly[date].minus += amount;
-  });
-
-  // Build HTML
   const container = document.getElementById('yearlyDifferencesList');
   if (!container) return;
 
-  container.innerHTML = Object.entries(yearly).sort().map(([year, { plus, minus }]) => {
-    const diff = plus - minus;
-    const formatted = diff.toLocaleString('de-CH', {
+  const yearlyBalances = {};
+  const yearsSorted = [...new Set(entries.map(e => e.date?.slice(0, 4)).filter(Boolean))].sort();
+
+  let cumulativeBalance = 0;
+
+  yearsSorted.forEach(year => {
+    const yearEntries = entries.filter(e => e.date?.startsWith(year));
+    let yearPlus = 0;
+    let yearMinus = 0;
+
+    yearEntries.forEach(e => {
+      const amount = parseFloat(e.amount) || 0;
+      const type = (e.type || '').toLowerCase();
+      if (type === 'income' || type === 'plus') yearPlus += amount;
+      else if (type === 'expense' || type === 'minus') yearMinus += amount;
+    });
+
+    cumulativeBalance += yearPlus - yearMinus;
+    yearlyBalances[year] = cumulativeBalance;
+  });
+
+  container.innerHTML = Object.entries(yearlyBalances).map(([year, balance]) => {
+    const formatted = balance.toLocaleString('de-CH', {
       style: 'currency',
       currency: 'CHF',
       minimumFractionDigits: 2
     });
-    const color = diff >= 0 ? 'green' : 'crimson';
-
+    const color = balance >= 0 ? 'green' : 'crimson';
     return `<div><strong>${year}:</strong> <span style="color:${color}">${formatted}</span></div>`;
   }).join('');
 }
