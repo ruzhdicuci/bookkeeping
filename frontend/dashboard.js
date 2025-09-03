@@ -3055,14 +3055,13 @@ card.classList.add(net >= 0 ? 'positive' : 'negative');
 }
 
 
-
 async function renderYearlyDifferences(entries) {
   if (!entries?.length) return;
 
-  const userId = getUserIdFromToken(); // ✅ ADD THIS LINE
+  const userId = getUserIdFromToken();
   const yearly = {};
 
-  // Group by year
+  // Step 1: Group income and expenses by year
   entries.forEach(e => {
     const year = e.date?.slice(0, 4);
     if (!year) return;
@@ -3084,10 +3083,27 @@ async function renderYearlyDifferences(entries) {
   const lines = await Promise.all(yearKeys.map(async (year) => {
     const { income, expense } = yearly[year];
 
-    // ✅ FIX: pass both userId and year
+    // Try to get saved yearly limit from Dexie
     const limitObj = await getYearlyLimitFromCache(userId, year);
+    let startBalance = 0;
 
-    const startBalance = parseFloat(limitObj?.limit || 0); // ✅ start balance for that year
+    if (limitObj && typeof limitObj.limit === 'number' && !isNaN(limitObj.limit)) {
+      startBalance = limitObj.limit;
+    } else {
+      // Fallback: Calculate from all previous entries
+      const yearStart = `${year}-01`;
+      const prevEntries = entries.filter(e => e.date?.slice(0, 7) < yearStart);
+
+      const prevPlus = prevEntries
+        .filter(e => (e.type || '').toLowerCase() === 'plus')
+        .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+      const prevMinus = prevEntries
+        .filter(e => (e.type || '').toLowerCase() === 'minus')
+        .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+
+      startBalance = prevPlus - prevMinus;
+    }
+
     const diff = income - expense + startBalance;
 
     const formatted = diff.toLocaleString('de-CH', {
@@ -3097,7 +3113,6 @@ async function renderYearlyDifferences(entries) {
     });
 
     const color = diff >= 0 ? 'green' : 'crimson';
-
     return `<div><strong>${year}:</strong> <span style="color:${color}">${formatted}</span></div>`;
   }));
 
