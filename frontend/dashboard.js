@@ -3055,56 +3055,35 @@ card.classList.add(net >= 0 ? 'positive' : 'negative');
 }
 
 
-async function renderYearlyDifferences(entries) {
-  if (!entries?.length) return;
+function renderYearlyDifferences(entries) {
+  const yearlyTotals = {};
 
-  const userId = getUserIdFromToken(); // ✅ Required
-  const yearly = {};
+  entries.forEach(entry => {
+    if (!entry.date || !entry.amount) return;
 
-  // Group by year and calculate income/expense per year
-  entries.forEach(e => {
-    const year = e.date?.slice(0, 4);
-    if (!year) return;
+    const year = entry.date.slice(0, 4);
+    const amount = parseFloat(entry.amount) || 0;
+    if (!yearlyTotals[year]) {
+      yearlyTotals[year] = { income: 0, expense: 0 };
+    }
 
-    if (!yearly[year]) yearly[year] = { income: 0, expense: 0 };
-
-    const amount = parseFloat(e.amount) || 0;
-    const type = (e.type || '').toLowerCase();
-
-    if (type === 'income' || type === 'plus') yearly[year].income += amount;
-    else if (type === 'expense' || type === 'minus') yearly[year].expense += amount;
+    if ((entry.type || '').toLowerCase() === 'plus') {
+      yearlyTotals[year].income += amount;
+    } else if ((entry.type || '').toLowerCase() === 'minus') {
+      yearlyTotals[year].expense += amount;
+    }
   });
-
-  // 🧠 New: Get total starting balance for each year (from db.balances)
-  const bankBalances = await getCachedBankBalances();
-
-  function getStartBalanceForYear(year) {
-    return bankBalances
-      .filter(b => b.userId === userId && b.year === year)
-      .reduce((sum, b) => sum + (parseFloat(b.initial) || 0), 0);
-  }
 
   const container = document.getElementById('yearlyDifferencesList');
-  if (!container) return;
+  container.innerHTML = '';
 
-  const yearKeys = Object.keys(yearly).sort();
+  const sortedYears = Object.keys(yearlyTotals).sort();
 
-  const lines = yearKeys.map((year) => {
-    const { income, expense } = yearly[year];
-
-    const startBalance = getStartBalanceForYear(year); // ✅ REAL bank start balance
-    const diff = income - expense + startBalance;
-
-    const formatted = diff.toLocaleString('de-CH', {
-      style: 'currency',
-      currency: 'CHF',
-      minimumFractionDigits: 2
-    });
-
-    const color = diff >= 0 ? 'green' : 'crimson';
-
-    return `<div><strong>${year}:</strong> <span style="color:${color}">${formatted}</span></div>`;
+  sortedYears.forEach(year => {
+    const { income, expense } = yearlyTotals[year];
+    const diff = income - expense;
+    const div = document.createElement('div');
+    div.innerHTML = `📆 <strong>${year}</strong>: <span style="color:${diff >= 0 ? 'green' : 'red'};">${diff.toFixed(2)}</span>`;
+    container.appendChild(div);
   });
-
-  container.innerHTML = lines.join('');
 }
