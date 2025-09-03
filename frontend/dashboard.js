@@ -3054,9 +3054,6 @@ card.classList.add(net >= 0 ? 'positive' : 'negative');
   }
 }
 
-async function getYearlyLimitFromCache(year) {
-  return await db.yearlyLimits.get(`${userId}${year}`); // or your key structure
-}
 
 async function renderYearlyDifferences(entries) {
   if (!entries?.length) return;
