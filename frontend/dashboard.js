@@ -2221,6 +2221,8 @@ try {
   renderEntries();
   renderMonthlyWidgets(window.entries);
    renderBankBalanceForm();
+   await renderRealYearlyCards(); // ✅ live update of yearly income/expense/balance
+
 
   debug('✅ Entry synced to server.');
 } catch (error) {
