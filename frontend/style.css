@@ -2988,18 +2988,33 @@ body.dark .monthly-widgets-wrapper {
 }
 
 
-#yearlyYearCards > div {
-  flex: 1 1 calc(50% - 20px);
-  color: #3a3737;
-  
+#yearlyYearCards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  justify-content: center; /* ✅ Center the cards */
 }
 
-@media (max-width: 600px) {
+#yearlyYearCards > div {
+  flex: 1 1 calc(33.333% - 20px); /* 3 cards per row on big screens */
+  max-width: 300px;
+  min-width: 220px;
+  color: #3a3737;
+}
+
+/* Tablet or small desktop */
+@media (max-width: 900px) {
   #yearlyYearCards > div {
-    flex: 1 1 100%;
+    flex: 1 1 calc(50% - 20px); /* 2 cards per row */
   }
 }
 
+/* Mobile */
+@media (max-width: 600px) {
+  #yearlyYearCards > div {
+    flex: 1 1 100%; /* 1 card per row */
+  }
+}
 
 
 
