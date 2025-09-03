@@ -1523,7 +1523,7 @@ function calculateCurrentBankBalance(bankName) {
 window.addEventListener('DOMContentLoaded', async () => {
   await fetchEntries();
   await loadInitialBankBalances();
-
+renderYearlyDifferences(window.entries); // ✅ now data is available
   populateNewEntryDropdowns();
   populateFilters();
   renderEntries();
@@ -2085,7 +2085,7 @@ document.addEventListener('keydown', e => {
 
 document.addEventListener("DOMContentLoaded", () => {
   fetchEntries(); // or whatever starts your rendering logic
-  renderYearlyDifferences(window.entries);
+  
 });
 
 document.addEventListener('keydown', (e) => {
@@ -3057,14 +3057,19 @@ card.classList.add(net >= 0 ? 'positive' : 'negative');
 
 
 function renderYearlyDifferences(entries = window.entries || []) {
+  console.log("📅 Entries received in renderYearlyDifferences:", entries.length);
   const yearly = {};
 
   entries.forEach(e => {
-    const year = (e.date || '').slice(0, 4);
+    const date = e.date || '';
     const amount = parseFloat(e.amount) || 0;
     const type = (e.type || '').toLowerCase();
+    const year = date.slice(0, 4);
 
-    if (!year || isNaN(amount)) return;
+    if (!year || isNaN(amount)) {
+      console.warn("⛔ Skipping invalid entry", e);
+      return;
+    }
 
     if (!yearly[year]) yearly[year] = { plus: 0, minus: 0 };
 
@@ -3075,9 +3080,16 @@ function renderYearlyDifferences(entries = window.entries || []) {
   const container = document.getElementById('yearlyDifferencesList');
   container.innerHTML = '';
 
-  Object.entries(yearly).sort().forEach(([year, { plus, minus }]) => {
+  const years = Object.entries(yearly).sort();
+
+  if (years.length === 0) {
+    container.textContent = "No data available.";
+    return;
+  }
+
+  years.forEach(([year, { plus, minus }]) => {
     const diff = plus - minus;
-    const color = diff >= 0 ? '#28a745' : '#dc3545'; // green or red
+    const color = diff >= 0 ? '#28a745' : '#dc3545';
     const sign = diff >= 0 ? '+' : '-';
 
     const line = document.createElement('div');
