@@ -1,4 +1,4 @@
-const DEBUG_MODE = false; // or true for development
+const DEBUG_MODE = true; // or true for development
 const debug = (...args) => DEBUG_MODE && console.log(...args);
 
 import {
@@ -3055,11 +3055,14 @@ card.classList.add(net >= 0 ? 'positive' : 'negative');
 }
 
 
+
 async function renderYearlyDifferences(entries) {
   if (!entries?.length) return;
 
+  const userId = getUserIdFromToken(); // ✅ ADD THIS LINE
   const yearly = {};
 
+  // Group by year
   entries.forEach(e => {
     const year = e.date?.slice(0, 4);
     if (!year) return;
@@ -3080,16 +3083,19 @@ async function renderYearlyDifferences(entries) {
 
   const lines = await Promise.all(yearKeys.map(async (year) => {
     const { income, expense } = yearly[year];
-    const limitObj = await getYearlyLimitFromCache(year);
-    const limit = parseFloat(limitObj?.limit || 0);
 
-    const diff = income - expense + limit;
+    // ✅ FIX: pass both userId and year
+    const limitObj = await getYearlyLimitFromCache(userId, year);
+
+    const startBalance = parseFloat(limitObj?.limit || 0); // ✅ start balance for that year
+    const diff = income - expense + startBalance;
 
     const formatted = diff.toLocaleString('de-CH', {
       style: 'currency',
       currency: 'CHF',
       minimumFractionDigits: 2
     });
+
     const color = diff >= 0 ? 'green' : 'crimson';
 
     return `<div><strong>${year}:</strong> <span style="color:${color}">${formatted}</span></div>`;
