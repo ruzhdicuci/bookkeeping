@@ -1521,9 +1521,12 @@ function calculateCurrentBankBalance(bankName) {
 
 
 window.addEventListener('DOMContentLoaded', async () => {
-  await fetchEntries();
-  await loadInitialBankBalances();
-renderYearlyDifferences(window.entries); // ✅ now data is available
+await initDexie();                 // ⬅️ Ensure Dexie is ready (if needed)
+  await fetchEntries();             // ⬅️ Loads entries and saves to Dexie
+  await loadInitialBankBalances();  // ⬅️ Loads balances and saves to Dexie
+
+  await renderRealYearEndBalances(); // ✅ Now entries and balances are cached
+
   populateNewEntryDropdowns();
   populateFilters();
   renderEntries();
@@ -2684,7 +2687,8 @@ window.drawCharts = drawCharts;
 window.updateFullYearBudgetBar = updateFullYearBudgetBar;
 window.syncYearlyLimitsToMongo  =syncYearlyLimitsToMongo;
 window.loadAndRenderYearlyLimit  = loadAndRenderYearlyLimit;
-window.renderYearlyDifferences = renderYearlyDifferences
+window.renderRealYearEndBalances = renderRealYearEndBalances;;
+
 
 
 
@@ -3055,35 +3059,43 @@ card.classList.add(net >= 0 ? 'positive' : 'negative');
 }
 
 
-function renderYearlyDifferences(entries) {
-  const yearlyTotals = {};
+async function renderRealYearEndBalances() {
+  const entries = await getCachedEntries();
+  const balances = await getCachedBankBalances();
 
-  entries.forEach(entry => {
-    if (!entry.date || !entry.amount) return;
+  const yearlySums = {};
 
-    const year = entry.date.slice(0, 4);
-    const amount = parseFloat(entry.amount) || 0;
-    if (!yearlyTotals[year]) {
-      yearlyTotals[year] = { income: 0, expense: 0 };
-    }
+  // Process entries to get Income - Expenses
+  entries.forEach(e => {
+    const year = e.date?.slice(0, 4);
+    if (!year) return;
+    if (!yearlySums[year]) yearlySums[year] = { income: 0, expense: 0, balance: 0 };
 
-    if ((entry.type || '').toLowerCase() === 'plus') {
-      yearlyTotals[year].income += amount;
-    } else if ((entry.type || '').toLowerCase() === 'minus') {
-      yearlyTotals[year].expense += amount;
-    }
+    const amount = parseFloat(e.amount || 0);
+    const type = (e.type || '').toLowerCase();
+
+    if (type === 'plus' || type === 'income') yearlySums[year].income += amount;
+    else if (type === 'minus' || type === 'expense') yearlySums[year].expense += amount;
+  });
+
+  // Process balances
+  balances.forEach(b => {
+    const year = b.year?.toString();
+    if (!year) return;
+    if (!yearlySums[year]) yearlySums[year] = { income: 0, expense: 0, balance: 0 };
+
+    yearlySums[year].balance += parseFloat(b.balance || b.amount || 0);
   });
 
   const container = document.getElementById('yearlyDifferencesList');
-  container.innerHTML = '';
-
-  const sortedYears = Object.keys(yearlyTotals).sort();
-
-  sortedYears.forEach(year => {
-    const { income, expense } = yearlyTotals[year];
-    const diff = income - expense;
-    const div = document.createElement('div');
-    div.innerHTML = `📆 <strong>${year}</strong>: <span style="color:${diff >= 0 ? 'green' : 'red'};">${diff.toFixed(2)}</span>`;
-    container.appendChild(div);
-  });
+  container.innerHTML = Object.entries(yearlySums).sort().map(([year, data]) => {
+    const diff = data.income - data.expense;
+    return `
+      <div>
+        📅 <strong>${year}:</strong> 
+        Income – Expenses = <span style="color:green">CHF ${diff.toLocaleString('de-CH', { minimumFractionDigits: 2 })}</span>, 
+        Final Balance = <span style="color:blue">CHF ${data.balance.toLocaleString('de-CH', { minimumFractionDigits: 2 })}</span>
+      </div>
+    `;
+  }).join('');
 }
