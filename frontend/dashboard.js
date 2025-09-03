@@ -3089,26 +3089,34 @@ async function renderRealYearlyCards() {
 
   container.innerHTML = Object.entries(yearly).map(([year, { income, expense }]) => {
     const balance = income - expense;
-    const balanceColor = balance >= 0 ? 'green' : 'crimson';
+    const balanceColor = balance >= 0 ? '#0c8a86' : '#db4534';
 
     return `
       <div style="
         flex: 1;
-        min-width: 220px;
-        max-width: 280px;
+        min-width: 200px;
+        max-width: 240px;
         background: #fff;
         border-radius: 10px;
         padding: 15px;
+        color: #3a3737;
+        font-size: 15px;
         margin-bottom: 10px;
         box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         display: flex;
         flex-direction: column;
         gap: 5px;
       ">
-        <h4 style="margin-bottom: 10px;">📅 ${year}</h4>
-        <div>Income: <strong style="color:green">${income.toLocaleString('de-CH', { style: 'currency', currency: 'CHF' })}</strong></div>
-        <div>Expenses: <strong style="color:crimson">${expense.toLocaleString('de-CH', { style: 'currency', currency: 'CHF' })}</strong></div>
-        <div>Balance: <strong style="color:${balanceColor}">${balance.toLocaleString('de-CH', { style: 'currency', currency: 'CHF' })}</strong></div>
+       <h4 style="margin: 0 0 6px 0;">📅 ${year}</h4>
+  <div>Income: <strong style="color:#0c8a86; font-size: 1rem;">
+    ${income.toLocaleString('de-CH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+  </strong></div>
+  <div>Expenses: <strong style="color:#db4534; font-size: 1rem;">
+    ${expense.toLocaleString('de-CH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+  </strong></div>
+  <div>Balance: <strong style="color:#04b5d8; font-size: 1rem;">
+    ${balance.toLocaleString('de-CH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+  </strong></div>
       </div>
     `;
   }).join('');
