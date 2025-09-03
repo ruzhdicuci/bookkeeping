@@ -61,8 +61,7 @@ document.addEventListener('DOMContentLoaded', async () => {
  renderMonthlyWidgets(window.entries);
 renderBankBalanceForm();     
   await loadInitialBankBalances();
-  // ✅ Add this:
-  await update2025BarFromEntries();
+
   if (navigator.onLine) syncToCloud();
 
 
@@ -711,7 +710,6 @@ card.addEventListener('click', (event) => {
     loadMoreBtn.onclick = () => {
       currentPage++;
       renderEntries();
-       update2025BarFromEntries();
     };
     container.appendChild(loadMoreBtn);
   }
@@ -953,7 +951,6 @@ async function deleteEntry(id) {
   populateFilters();               // Rebuild filters
   renderBankBalanceForm();         // ✅ Refresh bank balance table
   renderMonthlyWidgets(window.entries); // ✅ Refresh monthly widgets
-  await update2025BarFromEntries();          // ✅ Refresh the 2025 budget bar
 }
 
 
@@ -1526,7 +1523,6 @@ function calculateCurrentBankBalance(bankName) {
 window.addEventListener('DOMContentLoaded', async () => {
   await fetchEntries();
   await loadInitialBankBalances();
-  await restore2025LimitInputs();
 
   populateNewEntryDropdowns();
   populateFilters();
@@ -1569,7 +1565,6 @@ window.addEventListener('DOMContentLoaded', async () => {
 document.getElementById('statusFilter')?.addEventListener('change', () => {
   renderEntries();
   renderBankBalanceForm();
-  
 });
 
 // ✅ Lock/unlock card input fields
@@ -2231,7 +2226,6 @@ try {
   // ✅ read entries from IndexedDB and re-render
   const cachedEntries = await getCachedEntries(); 
   window.entries = cachedEntries; // optionally update global cache
-  await update2025BarFromEntries();
   renderEntries(cachedEntries);
   renderMonthlyWidgets(cachedEntries);
 
@@ -2689,10 +2683,6 @@ window.drawCharts = drawCharts;
 window.updateFullYearBudgetBar = updateFullYearBudgetBar;
 window.syncYearlyLimitsToMongo  =syncYearlyLimitsToMongo;
 window.loadAndRenderYearlyLimit  = loadAndRenderYearlyLimit;
-window.update2025BarFromEntries = update2025BarFromEntries;
-window.updateStatic2025BudgetBar = updateStatic2025BudgetBar;
-
-
 
 
 
@@ -2861,40 +2851,6 @@ function updateFullYearBudgetBar(limit, difference) {
     warning.style.display = difference < 0 ? 'inline' : 'none';
   }
 }
-
-
-function updateStatic2025BudgetBar(limit, difference) {
-  debug("📅 updateStatic2025BudgetBar → Limit =", limit, "Difference =", difference);
-
-  if (typeof difference !== 'number' || isNaN(difference)) {
-    console.warn("❌ Skipping updateStatic2025BudgetBar — invalid difference:", difference);
-    return;
-  }
-
-  const bar = document.getElementById('bar2025Fill');
-  const plusLabel = document.getElementById('bar2025LeftLabel');
-  const spentLabel = document.getElementById('bar2025SpentLabel');
-  const totalLabel = document.getElementById('bar2025LimitLabel');
-
-  if (!bar || !plusLabel || !spentLabel || !totalLabel) {
-    console.warn("❌ 2025 Budget bar elements not found in DOM");
-    return;
-  }
-
-  const left = difference;
-  const used = limit - left;
-
-  totalLabel.textContent = limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  plusLabel.textContent = left.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  spentLabel.textContent = (used >= 0 ? '-' : '+') + Math.abs(used).toLocaleString('de-CH', { minimumFractionDigits: 2 });
-
-  const percentage = (Math.abs(difference) / limit) * 100;
-  bar.style.width = percentage + '%';
-  bar.style.backgroundColor = difference >= 0 ? '#27a789' : '#ff4d4d';
-}
-
-
-
 
 async function syncYearlyLimitsToMongo() {
   try {
@@ -3097,89 +3053,4 @@ card.classList.add(net >= 0 ? 'positive' : 'negative');
 }
 
 
-function updateFullYearBudgetBar2025(limit, difference) {
-  console.log("🟢 updateFullYearBudgetBar2025: Limit =", limit, "Difference =", difference);
 
-  if (typeof difference !== 'number' || isNaN(difference)) {
-    console.warn("❌ Skipping 2025 bar — invalid difference:", difference);
-    return;
-  }
-
-  const bar = document.getElementById('bar2025Fill');
-  const plusLabel = document.getElementById('bar2025LeftLabel');
-  const spentLabel = document.getElementById('bar2025SpentLabel');
-  const totalLabel = document.getElementById('bar2025LimitLabel');
-  const warning = document.getElementById('budgetWarning2025');
-
-  if (!bar || !plusLabel || !spentLabel || !totalLabel) {
-    console.warn("❌ 2025 Budget Bar elements not found");
-    return;
-  }
-
-  const left = difference;
-  const used = limit - left;
-
-  totalLabel.textContent = limit.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  plusLabel.textContent = left.toLocaleString('de-CH', { minimumFractionDigits: 2 });
-  spentLabel.textContent = (used >= 0 ? '-' : '+') + Math.abs(used).toLocaleString('de-CH', { minimumFractionDigits: 2 });
-
-  const percentage = limit === 0 ? 0 : (Math.abs(difference) / limit) * 100;
-  bar.style.width = percentage + '%';
-  bar.style.backgroundColor = difference >= 0 ? '#27a789' : '#ff4d4d';
-
-  if (warning) {
-    warning.style.display = difference < 0 ? 'inline' : 'none';
-  }
-}
-
-
-
-function parseToYear(dateStr) {
-  if (!dateStr) return null;
-  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-    return new Date(dateStr).getFullYear();
-  }
-  if (/^\d{2}\.\d{2}\.\d{4}$/.test(dateStr)) {
-    const [day, month, year] = dateStr.split(".");
-    return parseInt(year);
-  }
-  return null;
-}
-
-async function update2025BarFromEntries() {
-  const userId = getUserIdFromToken();
-  const year = 2025;
-  const limitData = await getYearlyLimitFromCache(userId, year.toString());
-  const limit = limitData?.limit || 0;
-
-  const entries = window.entries || [];
-  const filtered = entries.filter(e => parseToYear(e.date) === year);
-
-  const totalPlus = filtered
-    .filter(e => (e.type || '').toLowerCase() === 'plus')
-    .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
-
-  const totalMinus = filtered
-    .filter(e => (e.type || '').toLowerCase() === 'minus')
-    .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
-
-  const difference = totalPlus - totalMinus;
-
-  console.log("📊 update2025BarFromEntries → Limit:", limit, "Plus:", totalPlus, "Minus:", totalMinus, "Diff:", difference);
-
-  updateFullYearBudgetBar2025(limit, difference);
-  return difference;
-}
-
-
-async function restore2025LimitInputs() {
-  const userId = getUserIdFromToken();
-  const limitData = await getYearlyLimitFromCache(userId, "2025");
-
-  if (limitData) {
-    document.getElementById('limitInput2025').value = limitData.limit || '';
-    if (limitData.startFrom) {
-      document.getElementById('limitStartDate2025').value = limitData.startFrom;
-    }
-  }
-}
