@@ -3058,10 +3058,10 @@ card.classList.add(net >= 0 ? 'positive' : 'negative');
 async function renderYearlyDifferences(entries) {
   if (!entries?.length) return;
 
-  const userId = getUserIdFromToken();
+  const userId = getUserIdFromToken(); // ✅ Required
   const yearly = {};
 
-  // Step 1: Group income and expenses by year
+  // Group by year and calculate income/expense per year
   entries.forEach(e => {
     const year = e.date?.slice(0, 4);
     if (!year) return;
@@ -3075,35 +3075,24 @@ async function renderYearlyDifferences(entries) {
     else if (type === 'expense' || type === 'minus') yearly[year].expense += amount;
   });
 
+  // 🧠 New: Get total starting balance for each year (from db.balances)
+  const bankBalances = await getCachedBankBalances();
+
+  function getStartBalanceForYear(year) {
+    return bankBalances
+      .filter(b => b.userId === userId && b.year === year)
+      .reduce((sum, b) => sum + (parseFloat(b.initial) || 0), 0);
+  }
+
   const container = document.getElementById('yearlyDifferencesList');
   if (!container) return;
 
   const yearKeys = Object.keys(yearly).sort();
 
-  const lines = await Promise.all(yearKeys.map(async (year) => {
+  const lines = yearKeys.map((year) => {
     const { income, expense } = yearly[year];
 
-    // Try to get saved yearly limit from Dexie
-    const limitObj = await getYearlyLimitFromCache(userId, year);
-    let startBalance = 0;
-
-    if (limitObj && typeof limitObj.limit === 'number' && !isNaN(limitObj.limit)) {
-      startBalance = limitObj.limit;
-    } else {
-      // Fallback: Calculate from all previous entries
-      const yearStart = `${year}-01`;
-      const prevEntries = entries.filter(e => e.date?.slice(0, 7) < yearStart);
-
-      const prevPlus = prevEntries
-        .filter(e => (e.type || '').toLowerCase() === 'plus')
-        .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
-      const prevMinus = prevEntries
-        .filter(e => (e.type || '').toLowerCase() === 'minus')
-        .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
-
-      startBalance = prevPlus - prevMinus;
-    }
-
+    const startBalance = getStartBalanceForYear(year); // ✅ REAL bank start balance
     const diff = income - expense + startBalance;
 
     const formatted = diff.toLocaleString('de-CH', {
@@ -3113,8 +3102,9 @@ async function renderYearlyDifferences(entries) {
     });
 
     const color = diff >= 0 ? 'green' : 'crimson';
+
     return `<div><strong>${year}:</strong> <span style="color:${color}">${formatted}</span></div>`;
-  }));
+  });
 
   container.innerHTML = lines.join('');
 }
