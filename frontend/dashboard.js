@@ -3059,42 +3059,37 @@ card.classList.add(net >= 0 ? 'positive' : 'negative');
 }
 
 
-async function renderRealYearEndBalances() {
+async function renderRealYearlyCards() {
   const entries = await getCachedEntries();
-  const balances = await getCachedBankBalances();
+  const yearly = {};
 
-  const yearlySums = {};
-
-  // Process entries to get Income - Expenses
   entries.forEach(e => {
     const year = e.date?.slice(0, 4);
     if (!year) return;
-    if (!yearlySums[year]) yearlySums[year] = { income: 0, expense: 0, balance: 0 };
 
     const amount = parseFloat(e.amount || 0);
     const type = (e.type || '').toLowerCase();
 
-    if (type === 'plus' || type === 'income') yearlySums[year].income += amount;
-    else if (type === 'minus' || type === 'expense') yearlySums[year].expense += amount;
+    if (!yearly[year]) yearly[year] = { income: 0, expense: 0 };
+
+    if (type === 'plus' || type === 'income') {
+      yearly[year].income += amount;
+    } else if (type === 'minus' || type === 'expense') {
+      yearly[year].expense += amount;
+    }
   });
 
-  // Process balances
-  balances.forEach(b => {
-    const year = b.year?.toString();
-    if (!year) return;
-    if (!yearlySums[year]) yearlySums[year] = { income: 0, expense: 0, balance: 0 };
+  const container = document.getElementById('yearlyYearCards');
+  container.innerHTML = Object.entries(yearly).map(([year, { income, expense }]) => {
+    const balance = income - expense;
+    const balanceColor = balance >= 0 ? 'green' : 'crimson';
 
-    yearlySums[year].balance += parseFloat(b.balance || b.amount || 0);
-  });
-
-  const container = document.getElementById('yearlyDifferencesList');
-  container.innerHTML = Object.entries(yearlySums).sort().map(([year, data]) => {
-    const diff = data.income - data.expense;
     return `
-      <div>
-        📅 <strong>${year}:</strong> 
-        Income – Expenses = <span style="color:green">CHF ${diff.toLocaleString('de-CH', { minimumFractionDigits: 2 })}</span>, 
-        Final Balance = <span style="color:blue">CHF ${data.balance.toLocaleString('de-CH', { minimumFractionDigits: 2 })}</span>
+      <div style="flex: 1; min-width: 200px; background: #fff; border-radius: 10px; padding: 15px; box-shadow: 0 2px 6px rgba(0,0,0,0.1)">
+        <h4>📅 ${year}</h4>
+        <div>Income: <strong style="color:green">${income.toLocaleString('de-CH', {style: 'currency', currency: 'CHF'})}</strong></div>
+        <div>Expenses: <strong style="color:crimson">${expense.toLocaleString('de-CH', {style: 'currency', currency: 'CHF'})}</strong></div>
+        <div>Balance: <strong style="color:${balanceColor}">${balance.toLocaleString('de-CH', {style: 'currency', currency: 'CHF'})}</strong></div>
       </div>
     `;
   }).join('');
