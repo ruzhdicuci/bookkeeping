@@ -491,14 +491,17 @@ totalsContainer.appendChild(summaryCard);
 </div>
 </div>
 
+ <div class="filter-grid">
 
-
-<div id="yearlyDifferencesContainer" style="margin-top: 30px; padding: 15px;">
-  <h3>📊 Yearly Overview</h3>
-  <div id="yearlyYearCards" style="display: flex; gap: 20px; flex-wrap: wrap;"></div>
+<div id="yearlyDifferencesContainer" style="margin-bottom: -10px; display: flex; justify-content: center;">
+  <div id="yearlyYearCards" style="
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    justify-content: center;
+  "></div>
 </div>
-
-
+</div>
 
 <div id="widgetSection"> 
 

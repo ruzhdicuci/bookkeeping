@@ -1525,7 +1525,7 @@ await initDexie();                 // ⬅️ Ensure Dexie is ready (if needed)
   await fetchEntries();             // ⬅️ Loads entries and saves to Dexie
   await loadInitialBankBalances();  // ⬅️ Loads balances and saves to Dexie
 
-  await renderRealYearEndBalances(); // ✅ Now entries and balances are cached
+  await renderRealYearlyCards(); // ✅ Now entries and balances are cached
 
   populateNewEntryDropdowns();
   populateFilters();
@@ -2687,7 +2687,7 @@ window.drawCharts = drawCharts;
 window.updateFullYearBudgetBar = updateFullYearBudgetBar;
 window.syncYearlyLimitsToMongo  =syncYearlyLimitsToMongo;
 window.loadAndRenderYearlyLimit  = loadAndRenderYearlyLimit;
-window.renderRealYearEndBalances = renderRealYearEndBalances;;
+window.renderRealYearlyCards = renderRealYearlyCards;
 
 
 
@@ -3060,12 +3060,17 @@ card.classList.add(net >= 0 ? 'positive' : 'negative');
 
 
 async function renderRealYearlyCards() {
-  const entries = await getCachedEntries();
+  const entries = await getCachedEntries(); // Not fetchEntries!
+
   const yearly = {};
 
   entries.forEach(e => {
     const year = e.date?.slice(0, 4);
     if (!year) return;
+
+    // ✅ Skip persons "Transfer" and "Balance"
+    const person = (e.person || '').toLowerCase();
+    if (person === 'transfer' || person === 'balance') return;
 
     const amount = parseFloat(e.amount || 0);
     const type = (e.type || '').toLowerCase();
@@ -3080,16 +3085,30 @@ async function renderRealYearlyCards() {
   });
 
   const container = document.getElementById('yearlyYearCards');
+  if (!container) return;
+
   container.innerHTML = Object.entries(yearly).map(([year, { income, expense }]) => {
     const balance = income - expense;
     const balanceColor = balance >= 0 ? 'green' : 'crimson';
 
     return `
-      <div style="flex: 1; min-width: 200px; background: #fff; border-radius: 10px; padding: 15px; box-shadow: 0 2px 6px rgba(0,0,0,0.1)">
-        <h4>📅 ${year}</h4>
-        <div>Income: <strong style="color:green">${income.toLocaleString('de-CH', {style: 'currency', currency: 'CHF'})}</strong></div>
-        <div>Expenses: <strong style="color:crimson">${expense.toLocaleString('de-CH', {style: 'currency', currency: 'CHF'})}</strong></div>
-        <div>Balance: <strong style="color:${balanceColor}">${balance.toLocaleString('de-CH', {style: 'currency', currency: 'CHF'})}</strong></div>
+      <div style="
+        flex: 1;
+        min-width: 220px;
+        max-width: 280px;
+        background: #fff;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 10px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      ">
+        <h4 style="margin-bottom: 10px;">📅 ${year}</h4>
+        <div>Income: <strong style="color:green">${income.toLocaleString('de-CH', { style: 'currency', currency: 'CHF' })}</strong></div>
+        <div>Expenses: <strong style="color:crimson">${expense.toLocaleString('de-CH', { style: 'currency', currency: 'CHF' })}</strong></div>
+        <div>Balance: <strong style="color:${balanceColor}">${balance.toLocaleString('de-CH', { style: 'currency', currency: 'CHF' })}</strong></div>
       </div>
     `;
   }).join('');
