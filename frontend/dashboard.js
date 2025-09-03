@@ -3061,28 +3061,28 @@ function renderYearlyDifferences(entries) {
   const container = document.getElementById('yearlyDifferencesList');
   if (!container) return;
 
-  const yearlyBalances = {};
-  const yearsSorted = [...new Set(entries.map(e => e.date?.slice(0, 4)).filter(Boolean))].sort();
+  const sortedEntries = entries
+    .filter(e => e.date && e.amount && e.type)
+    .sort((a, b) => new Date(a.date) - new Date(b.date));
 
-  let cumulativeBalance = 0;
+  const cumulativeBalanceByYear = {};
+  let runningBalance = 0;
 
-  yearsSorted.forEach(year => {
-    const yearEntries = entries.filter(e => e.date?.startsWith(year));
-    let yearPlus = 0;
-    let yearMinus = 0;
+  sortedEntries.forEach(e => {
+    const year = e.date.slice(0, 4);
+    const amount = parseFloat(e.amount) || 0;
+    const type = (e.type || '').toLowerCase();
 
-    yearEntries.forEach(e => {
-      const amount = parseFloat(e.amount) || 0;
-      const type = (e.type || '').toLowerCase();
-      if (type === 'income' || type === 'plus') yearPlus += amount;
-      else if (type === 'expense' || type === 'minus') yearMinus += amount;
-    });
+    if (type === 'income' || type === 'plus') {
+      runningBalance += amount;
+    } else if (type === 'expense' || type === 'minus') {
+      runningBalance -= amount;
+    }
 
-    cumulativeBalance += yearPlus - yearMinus;
-    yearlyBalances[year] = cumulativeBalance;
+    cumulativeBalanceByYear[year] = runningBalance;
   });
 
-  container.innerHTML = Object.entries(yearlyBalances).map(([year, balance]) => {
+  container.innerHTML = Object.entries(cumulativeBalanceByYear).sort().map(([year, balance]) => {
     const formatted = balance.toLocaleString('de-CH', {
       style: 'currency',
       currency: 'CHF',
