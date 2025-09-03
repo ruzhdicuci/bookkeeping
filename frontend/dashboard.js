@@ -3133,17 +3133,27 @@ function updateFullYearBudgetBar2025(limit, difference) {
 }
 
 
+
+function parseToYear(dateStr) {
+  if (!dateStr) return null;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+    return new Date(dateStr).getFullYear();
+  }
+  if (/^\d{2}\.\d{2}\.\d{4}$/.test(dateStr)) {
+    const [day, month, year] = dateStr.split(".");
+    return parseInt(year);
+  }
+  return null;
+}
+
 async function update2025BarFromEntries() {
   const userId = getUserIdFromToken();
-  const year = "2025";
-  const limitData = await getYearlyLimitFromCache(userId, year);
+  const year = 2025;
+  const limitData = await getYearlyLimitFromCache(userId, year.toString());
   const limit = limitData?.limit || 0;
 
   const entries = window.entries || [];
-  const filtered = entries.filter(e => {
-  const d = new Date(e.date);
-  return !isNaN(d) && d.getFullYear().toString() === year;
-});
+  const filtered = entries.filter(e => parseToYear(e.date) === year);
 
   const totalPlus = filtered
     .filter(e => (e.type || '').toLowerCase() === 'plus')
@@ -3158,25 +3168,9 @@ async function update2025BarFromEntries() {
   console.log("📊 update2025BarFromEntries → Limit:", limit, "Plus:", totalPlus, "Minus:", totalMinus, "Diff:", difference);
 
   updateFullYearBudgetBar2025(limit, difference);
-
-  return difference; // ✅ Optional: lets you reuse it later
+  return difference;
 }
 
-document.getElementById('setLimit2025Btn')?.addEventListener('click', async () => {
-  const userId = getUserIdFromToken();
-  const year = "2025";
-  const limit = parseFloat(document.getElementById('limitInput2025').value) || 0;
-  const startFrom = document.getElementById('limitStartDate2025').value || null;
-
-  if (!userId || limit <= 0) {
-    alert("❌ Please enter a valid limit.");
-    return;
-  }
-
-  // Save to Dexie + sync
-  await saveYearlyLimitLocally({ userId, year, limit, startFrom, synced: false });
-  update2025BarFromEntries();
-});
 
 async function restore2025LimitInputs() {
   const userId = getUserIdFromToken();
