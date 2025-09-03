@@ -928,6 +928,7 @@ async function duplicateEntry(id) {
     renderEntries(window.entries);
     renderMonthlyWidgets(window.entries);
     renderBankBalanceForm();
+    await renderRealYearlyCards();
     showToast("✅ Entry duplicated");
   } else {
     alert("❌ Failed to duplicate entry");
@@ -951,6 +952,7 @@ async function deleteEntry(id) {
   populateFilters();               // Rebuild filters
   renderBankBalanceForm();         // ✅ Refresh bank balance table
   renderMonthlyWidgets(window.entries); // ✅ Refresh monthly widgets
+  await renderRealYearlyCards();
 }
 
 
