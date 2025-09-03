@@ -3074,7 +3074,7 @@ function renderYearlyDifferences(entries) {
   });
 
   // Build HTML
-  const container = document.getElementById('yearlyDifferencesContainer');
+  const container = document.getElementById('yearlyDifferencesList');
   if (!container) return;
 
   container.innerHTML = Object.entries(yearly).sort().map(([year, { plus, minus }]) => {
