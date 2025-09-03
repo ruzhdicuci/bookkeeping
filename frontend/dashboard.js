@@ -2085,6 +2085,7 @@ document.addEventListener('keydown', e => {
 
 document.addEventListener("DOMContentLoaded", () => {
   fetchEntries(); // or whatever starts your rendering logic
+  renderYearlyDifferences(window.entries);
 });
 
 document.addEventListener('keydown', (e) => {
@@ -2683,6 +2684,7 @@ window.drawCharts = drawCharts;
 window.updateFullYearBudgetBar = updateFullYearBudgetBar;
 window.syncYearlyLimitsToMongo  =syncYearlyLimitsToMongo;
 window.loadAndRenderYearlyLimit  = loadAndRenderYearlyLimit;
+window.renderYearlyDifferences = renderYearlyDifferences
 
 
 
@@ -3054,3 +3056,32 @@ card.classList.add(net >= 0 ? 'positive' : 'negative');
 
 
 
+function renderYearlyDifferences(entries = window.entries || []) {
+  const yearly = {};
+
+  entries.forEach(e => {
+    const year = (e.date || '').slice(0, 4);
+    const amount = parseFloat(e.amount) || 0;
+    const type = (e.type || '').toLowerCase();
+
+    if (!year || isNaN(amount)) return;
+
+    if (!yearly[year]) yearly[year] = { plus: 0, minus: 0 };
+
+    if (type === 'plus') yearly[year].plus += amount;
+    if (type === 'minus') yearly[year].minus += amount;
+  });
+
+  const container = document.getElementById('yearlyDifferencesList');
+  container.innerHTML = '';
+
+  Object.entries(yearly).sort().forEach(([year, { plus, minus }]) => {
+    const diff = plus - minus;
+    const color = diff >= 0 ? '#28a745' : '#dc3545'; // green or red
+    const sign = diff >= 0 ? '+' : '-';
+
+    const line = document.createElement('div');
+    line.innerHTML = `<strong>${year}:</strong> <span style="color:${color}; font-weight:bold;">${sign}${Math.abs(diff).toLocaleString('de-CH', { minimumFractionDigits: 2 })}</span>`;
+    container.appendChild(line);
+  });
+}
