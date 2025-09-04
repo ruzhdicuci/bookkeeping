@@ -1934,6 +1934,9 @@ body.dark .filter-grid {
   background-color: #222;
 }
 
+body.dark .filter-grid4 {
+  background-color: #222;
+}
 
 body.dark .filter-grid2  {
   background-color: #222;
@@ -3033,11 +3036,15 @@ body.dark .monthly-widgets-wrapper {
   font-size: 1rem;
   margin-bottom: 1px;
   color: #3a3737;
-  
 }
 
+body.dark .year-heading {
+   color: white;
+}
 
-
+body.dark .summary-label {
+   color: white;
+}
 
 
 /* Label */
@@ -3045,7 +3052,7 @@ body.dark .monthly-widgets-wrapper {
   font-weight: 500;
   color: #333;
   margin-bottom: 4px;
-  font-size: 0.75rem;
+  font-size: 0.65rem;
 }
 
 /* Value + Colors */
