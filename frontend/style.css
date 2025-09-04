@@ -1428,6 +1428,20 @@ body.dark .entry-main .meta {
    margin-top: 10px;
 }
 
+.filter-grid4 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+
+  margin-bottom: 10px;
+  padding: 2px;
+  
+  background: #e3e0db;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+
+   margin-top: 10px;
+}
+
 .filter-grid input,
 .filter-grid select {
   padding: 8px 10px;
@@ -2431,7 +2445,7 @@ margin-top: -20px;
   top: 50px; /* adjust based on your header height */
 
   height: 100%;
-  width: 130px;
+  width: 200px;
 color: white;
   background-color:   rgb(0, 0, 0);
  
@@ -2988,25 +3002,28 @@ body.dark .monthly-widgets-wrapper {
 }
 
 
-
 /* Container */
 #yearlyYearCards {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+
   align-items: center;
-  margin-bottom: 20px;
+ 
+
 }
 
 /* Group per year */
 .year-group {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 5px;
   justify-content: center;
   align-items: flex-start;
   padding: 10px;
   border-radius: 8px;
+  margin-bottom: 8px;
+  margin-top: -30px;
+
 }
 
 /* Year heading */
@@ -3014,20 +3031,43 @@ body.dark .monthly-widgets-wrapper {
   width: 100%;
   text-align: center;
   font-size: 1rem;
-  margin-bottom: 8px;
+  margin-bottom: 1px;
   color: #3a3737;
+  
 }
 
 
 
-/* ✅ Responsive: stack cards on small screens */
-@media (max-width: 600px) {
-  .summary-card {
-    flex: 0 0 45%;
-    max-width: 45%;
-  }
 
-  .year-heading {
-    font-size: 0.85rem;
-  }
+
+/* Label */
+.summary-label {
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 4px;
+  font-size: 0.75rem;
+}
+
+/* Value + Colors */
+.summary-value {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+.summary-value.income {
+  color: #169c81;
+   font-size: 1rem;
+}
+.summary-value.expense {
+  color: #c63d2f;
+   font-size: 1rem;
+}
+.summary-value.balance {
+  color: #27a3ae;
+   font-size: 1rem;
+}
+
+
+#monthlyAverageCard {
+ margin-bottom: -4px;
+
 }

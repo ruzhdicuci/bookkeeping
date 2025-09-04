@@ -2626,6 +2626,7 @@ setupToggle('toggleFilters', 'filtersSection');
 setupToggle('toggleSearches', 'searchesSection');
 setupToggle('toggleBudget', 'budgetSection');
 setupToggle('toggleWidget', 'widgetSection');
+setupToggle('toggleAll', 'allSection');
 
 });
 

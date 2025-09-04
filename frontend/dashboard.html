@@ -112,7 +112,13 @@ Kredit Limits
 <label class="custom-checkbox">
   <input type="checkbox" id="toggleWidget" checked />
   <span class="checkmark"></span>
-  Budget All Years
+  Budget All
+</label>
+
+<label class="custom-checkbox">
+  <input type="checkbox" id="toggleAll" checked />
+  <span class="checkmark"></span>
+ Years income
 </label>
 
 </div>
@@ -491,18 +497,22 @@ totalsContainer.appendChild(summaryCard);
 </div>
 </div>
 
- <div class="filter-grid">
+
+<div id="allSection"> 
+ <div class="filter-grid4">
 
 <div id="yearlyDifferencesContainer" style="margin-bottom: -10px; display: flex; justify-content: center;">
   <div id="yearlyYearCards" style="
     display: flex;
   flex-wrap: wrap;
-    gap: 5px;
+ margin-top: 8px;
     justify-content: center;
-  margin-bottom: 10px;
+
   "></div>
 </div>
 </div>
+</div>
+
 
 <div id="widgetSection"> 
 
