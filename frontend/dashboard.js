@@ -455,35 +455,84 @@ function populateFilters() {
   // ✅ Month checkboxes
   const monthContainer = document.getElementById('monthOptions');
   if (monthContainer) {
-    monthContainer.innerHTML = `
-      <label><input type="checkbox" id="selectAllMonths" checked /> <strong>All</strong></label>
-      <hr style="margin: 4px 0;">
-      ${months.map(m => `
-        <label>
-          <input type="checkbox" class="monthOption" value="${m}" checked />
-          ${m}
-        </label>
-      `).join('')}
-    `;
+  // Group months by year
+  const monthsByYear = {};
+  months.forEach(m => {
+    const [year] = m.split('-');
+    if (!monthsByYear[year]) monthsByYear[year] = [];
+    monthsByYear[year].push(m);
+  });
 
-    const selectAllMonths = document.getElementById('selectAllMonths');
-    selectAllMonths.addEventListener('change', function () {
-      const allChecked = this.checked;
-      document.querySelectorAll('.monthOption').forEach(cb => cb.checked = allChecked);
+  let html = '';
+
+  // Master "Select All" checkbox (global)
+  html += `
+    <label><input type="checkbox" id="selectAllMonths" checked /> <strong>All</strong></label>
+    <hr style="margin: 4px 0;">
+  `;
+
+  for (const year in monthsByYear) {
+    const yearMonths = monthsByYear[year];
+
+    html += `
+      <div class="yearGroup" data-year="${year}">
+        <div style="padding: 4px 0 2px;"><strong>📅 ${year}</strong></div>
+        <label style="margin-left: 8px;">
+          <input type="checkbox" class="selectYear" data-year="${year}" checked /> All ${year}
+        </label>
+        ${yearMonths.map(m => `
+          <label style="margin-left: 16px;">
+            <input type="checkbox" class="monthOption" value="${m}" data-year="${year}" checked />
+            ${m}
+          </label>
+        `).join('')}
+        <hr style="margin: 6px 0;">
+      </div>
+    `;
+  }
+
+  monthContainer.innerHTML = html;
+
+  // ✅ Global "Select All"
+  const selectAllMonths = document.getElementById('selectAllMonths');
+  selectAllMonths.addEventListener('change', function () {
+    const allChecked = this.checked;
+    document.querySelectorAll('.monthOption, .selectYear').forEach(cb => cb.checked = allChecked);
+    renderEntries();
+    renderBankBalanceForm();
+  });
+
+  // ✅ Per-year "Select All"
+  document.querySelectorAll('.selectYear').forEach(cb => {
+    cb.addEventListener('change', function () {
+      const year = this.dataset.year;
+      const checked = this.checked;
+      document.querySelectorAll(`.monthOption[data-year="${year}"]`).forEach(m => m.checked = checked);
       renderEntries();
       renderBankBalanceForm();
     });
+  });
 
-    document.querySelectorAll('.monthOption').forEach(cb => {
-      cb.addEventListener('change', () => {
-        const all = document.querySelectorAll('.monthOption');
-        const checked = document.querySelectorAll('.monthOption:checked');
-        selectAllMonths.checked = all.length === checked.length;
-        renderEntries();
-        renderBankBalanceForm();
-      });
+  // ✅ Individual month checkboxes
+  document.querySelectorAll('.monthOption').forEach(cb => {
+    cb.addEventListener('change', () => {
+      // Update per-year "select all"
+      const year = cb.dataset.year;
+      const all = document.querySelectorAll(`.monthOption[data-year="${year}"]`);
+      const checked = document.querySelectorAll(`.monthOption[data-year="${year}"]:checked`);
+      const yearCheckbox = document.querySelector(`.selectYear[data-year="${year}"]`);
+      if (yearCheckbox) yearCheckbox.checked = all.length === checked.length;
+
+      // Update global "select all"
+      const allMonths = document.querySelectorAll('.monthOption');
+      const allChecked = document.querySelectorAll('.monthOption:checked');
+      selectAllMonths.checked = allMonths.length === allChecked.length;
+
+      renderEntries();
+      renderBankBalanceForm();
     });
-  }
+  });
+}
 
   // ✅ Bank dropdown
   const bankFilterEl = document.getElementById('bankFilter');
