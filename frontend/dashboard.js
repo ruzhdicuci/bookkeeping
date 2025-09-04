@@ -3102,17 +3102,21 @@ async function renderRealYearlyCards() {
     const balanceColor = balance >= 0 ? '#0c8a86' : '#db4534';
 
 return `
-  <div class="year-card">
-    <h4 class="year-heading">📅 ${year}</h4>
-    <div class="label">Income:</div>
-    <div class="income">${formatNumber(income)}</div>
-
-    <div class="label">Expenses:</div>
-    <div class="expense">${formatNumber(expense)}</div>
-
-    <div class="label">Balance:</div>
-    <div class="balance">${formatNumber(balance)}</div>
-  </div>
-`;
-  }).join('');
+    <div class="year-group">
+      <h4 class="year-heading">📅 ${year}</h4>
+      <div class="summary-card">
+        <div class="summary-label">Income</div>
+        <div class="summary-value income">${formatNumber(income)}</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">Expenses</div>
+        <div class="summary-value expense">${formatNumber(expense)}</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">Balance</div>
+        <div class="summary-value balance">${formatNumber(balance)}</div>
+      </div>
+    </div>
+  `;
+}).join('');
 }
