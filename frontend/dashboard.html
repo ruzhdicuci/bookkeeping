@@ -118,7 +118,7 @@ Kredit Limits
 <label class="custom-checkbox">
   <input type="checkbox" id="toggleAll" checked />
   <span class="checkmark"></span>
- Years income
+Balance per Year
 </label>
 
 </div>
@@ -250,7 +250,8 @@ Kredit Limits
   </div></div>  
 
 
-    <div id="addEntrySection">
+    <div id="addEntrySection" class="section-block">
+       <div class="section-heading">Add Entry&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="dropdown-arrow">▾</span> </div>
 <div class="filter-grid" >
 
  <form id="entryForm" class="entry-form responsive-form" style="margin-top: -2px; padding-bottom: 5px; padding-top: 5px;">
@@ -304,13 +305,15 @@ Kredit Limits
      </div>
   </div>
 
-<div id="bankBalancesSection">
-
-<div class="filter-grid" style="margin-top: 10px;">
-  
+ <div id="bankBalancesSection" class="section-block">
+ <div class="section-heading">Bank Balances&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="dropdown-arrow">▾</span> </div>
+<div class="filter-grid"> 
     <!-- Original table rendering (can stay for fallback/testing) -->
 <div id="bankBalanceTableContainer"></div>
 </div>
+</div>
+
+
 <!-- New card-based layout -->
 <div id="bankBalanceCards" class="balance-card-grid"></div>
 
@@ -318,7 +321,7 @@ Kredit Limits
 
 
 <div id="bankBalanceTotals"></div>
-</div>
+
 
 <script>
 function renderBankBalanceCards() {
@@ -375,9 +378,12 @@ Differe = `
 totalsContainer.appendChild(summaryCard);
 }
 </script>
-<div id="creditLimitsSection">
 
-<div class="filter-grid" style="margin-top: -11px;">
+
+
+<div id="creditLimitsSection" class="section-block">
+ <div class="section-heading">Credit Limits&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="dropdown-arrow">▾</span> </div>
+<div class="filter-grid">
 
 
 <div class="credit-grid" id="creditGrid">
@@ -429,7 +435,10 @@ totalsContainer.appendChild(summaryCard);
  </div>
   </div>
 
- <div id="totalsSection">
+
+
+ <div id="totalsSection"  class="section-block">
+      <div class="section-heading">Totals&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="dropdown-arrow">▾</span> </div>
 <div class="filter-grid" >
 <div class="summary-totals-card ">
   <div class="summary-card">
@@ -448,15 +457,19 @@ totalsContainer.appendChild(summaryCard);
  </div>
 </div>
 
-<div id="averageSection">
+
+
+<div id="averageSection" class="section-block">
+       <div class="section-heading">Average&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="dropdown-arrow">▾</span> </div>
 <div class="filter-grid" >
 <div id="monthlyAverageCard"></div>
   </div>
 </div>
  </div>
 
-
- <div id="budgetSection"> 
+ 
+ <div id="budgetSection" class="section-block"> 
+<div class="section-heading">Budget&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="dropdown-arrow">▾</span> </div>
  <div class="filter-grid">
  
 <div id="yearlyBudgetContainer" style="margin-top: 1px; margin-bottom: 1px; background-color: white; padding:15px; border-radius: 10px;">
@@ -497,15 +510,18 @@ totalsContainer.appendChild(summaryCard);
 </div>
 </div>
 
+  
 
-<div id="allSection"> 
+<div id="allSection" class="section-block"> 
+  <div class="section-heading">Budget All&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="dropdown-arrow">▾</span>
+ </div>
  <div class="filter-grid4">
 
 <div id="yearlyDifferencesContainer" style="margin-bottom: -10px; display: flex; justify-content: center;">
   <div id="yearlyYearCards" style="
     display: flex;
   flex-wrap: wrap;
- margin-top: 8px;
+ margin-top:8px;
   margin-bottom: 4px;
     justify-content: center;
 
@@ -515,14 +531,20 @@ totalsContainer.appendChild(summaryCard);
 </div>
 
 
-<div id="widgetSection"> 
+
+<div id="widgetSection" class="section-block">
+         <div class="section-heading">Balance per Year&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="dropdown-arrow">▾</span>
+         </div>
 
   <div id="monthlyWidgetsContainer" class="monthly-widgets-wrapper">
  <div id="monthlyWidgetsContainer" class="monthly-widgets-grid"></div>
 </div>
 </div>
 
- <div id="multiselectSection">
+
+
+ <div id="multiselectSection" class="section-block">
+   <div class="section-heading">Multiselect&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="dropdown-arrow">▾</span> </div>
   <div class="tabs-wrapper" style="margin-top: -1px; margin-bottom: -3px;">
  <div class="tabs">
       <div   id="personMultiSelect" onclick="togglePersonDropdown()">
@@ -564,7 +586,9 @@ totalsContainer.appendChild(summaryCard);
 
 
 <!-- Dropdown filters (category, type, etc.) -->
-<div id="filtersSection">
+      
+<div id="filtersSection" class="section-block">
+         <div class="section-heading">Filters&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="dropdown-arrow">▾</span> </div>
   <div class="filter-grid">
 
 <select id="categoryFilter">
@@ -624,8 +648,9 @@ totalsContainer.appendChild(summaryCard);
    </div>
 
   <!-- Search filter tags -->
-<div id="searchesSection"> 
 
+<div id="searchesSection" class="section-block"> 
+ <div class="section-heading">Searches&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="dropdown-arrow">▾</span> </div>
 <div class="filters-row">
  <div class="filter-grid">
   <div class="filter-field">

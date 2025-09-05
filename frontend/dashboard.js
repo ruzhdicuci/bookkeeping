@@ -2680,9 +2680,6 @@ setupToggle('toggleAll', 'allSection');
 });
 
 
-
-
-
 window.sidebarToggleBtn = sidebarToggleBtn;
 window.customizeSidebar = customizeSidebar;
 window.showCustomAlert = showCustomAlert;
@@ -3170,3 +3167,29 @@ return `
   `;
 }).join('');
 }
+
+
+document.querySelectorAll('.section-heading').forEach(heading => {
+  heading.addEventListener('click', () => {
+    const content = heading.nextElementSibling;
+    const arrow = heading.querySelector('.dropdown-arrow');
+
+    const isHidden = content.classList.toggle('hidden');
+
+    if (isHidden) {
+      heading.classList.add('collapsed');
+      arrow.textContent = '▸';
+    } else {
+      heading.classList.remove('collapsed');
+      arrow.textContent = '▾';
+
+      // 🔁 Force reflow for layout bugs
+      const grid = content.querySelector('.credit-grid');
+      if (grid) {
+        grid.style.display = 'none';
+        void grid.offsetWidth;
+        grid.style.display = 'flex';
+      }
+    }
+  });
+});

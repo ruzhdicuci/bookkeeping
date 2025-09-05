@@ -941,7 +941,7 @@ height: 40px;
 }
 
 #bankBalanceTableContainer {
-    margin-top: -7px;
+   
 margin-bottom: -13px;
 margin-left: -8px;
 margin-right: -8px;
@@ -1425,7 +1425,7 @@ body.dark .entry-main .meta {
   border-radius: 10px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.05);
 
-   margin-top: 10px;
+
 }
 
 .filter-grid4 {
@@ -1439,7 +1439,7 @@ body.dark .entry-main .meta {
   border-radius: 10px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.05);
 
-   margin-top: 10px;
+   
 }
 
 .filter-grid input,
@@ -1698,6 +1698,7 @@ width: 100px; /* Match credit limit cards */
   gap: 1rem;
   align-items: stretch;
   margin-right: -5px;
+  margin-bottom: -20px;
 }
 
 .balance-summary-card {
@@ -2822,11 +2823,9 @@ body.dark .entry-card.has-note::after {
   border-radius: 6px;
   cursor: pointer;
 }
-
 .hidden {
-  display: none;
+  display: none !important;
 }
-
 #personChartOptions {
   display: flex;
   flex-direction: column;
@@ -2932,7 +2931,7 @@ body.dark .monthly-widgets-wrapper {
  
   background: #e3e0db;
   border-radius: 10px;
-  margin-top: 10px;
+ 
   margin-bottom: 4px;
 }
 
@@ -3078,3 +3077,58 @@ body.dark .summary-label {
  margin-bottom: -4px;
 
 }
+
+
+.section-heading {
+  font-weight: 600;
+  padding-left: 6px;
+  font-size: 0.8rem;
+  color: rgb(130, 115, 115);
+  padding-bottom: 3px;
+ text-align: center;
+  border-top: 1px solid rgb(223, 218, 218);
+padding-top: 2px;
+  margin-top: 10px;
+    cursor: pointer;
+
+}
+
+body.dark .section-heading {
+  border-top: 1px solid rgb(56, 55, 55);
+  color: rgb(152, 152, 152);
+  }
+
+.section-heading:hover {
+  background-color: white;
+  color: red;
+}
+
+.section-block.collapsed .section-heading {
+  color: red;
+}
+
+.dropdown-arrow {
+  transition: transform 0.2s ease;
+  font-size: 1rem;
+}
+
+
+
+
+.section-content {
+  display: block;
+}
+
+.section-content.hidden {
+  display: none;
+}
+
+.section-heading {
+  cursor: pointer;
+  
+}
+
+.section-heading.collapsed {
+  color: red;
+}
+
