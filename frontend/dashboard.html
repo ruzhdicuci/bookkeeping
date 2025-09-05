@@ -254,7 +254,7 @@ Balance per Year
        <div class="section-heading">Add Entry&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="dropdown-arrow">▾</span> </div>
 <div class="filter-grid" >
 
- <form id="entryForm" class="entry-form responsive-form" style="margin-top: -2px; padding-bottom: 5px; padding-top: 5px;">
+ <form id="entryForm" class="entry-form responsive-form" style="margin-top: -6px; padding-bottom: 5px; padding-top: 5px;">
   <div class="form-grid">
     <input type="text" id="newDate" placeholder="Select Date" class="flatpickr-input">
     <input type="text" id="newDescription" placeholder="Description" required />
@@ -305,11 +305,11 @@ Balance per Year
      </div>
   </div>
 
- <div id="bankBalancesSection" class="section-block">
+ <div id="bankBalancesSection" class="section-block" style="padding-bottom: 4px;">
  <div class="section-heading">Bank Balances&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="dropdown-arrow">▾</span> </div>
 <div class="filter-grid"> 
     <!-- Original table rendering (can stay for fallback/testing) -->
-<div id="bankBalanceTableContainer"></div>
+<div id="bankBalanceTableContainer" style="margin-top: -8px;" ></div>
 </div>
 </div>
 
@@ -536,6 +536,7 @@ totalsContainer.appendChild(summaryCard);
          <div class="section-heading">Balance per Year&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="dropdown-arrow">▾</span>
          </div>
 
+
   <div id="monthlyWidgetsContainer" class="monthly-widgets-wrapper">
  <div id="monthlyWidgetsContainer" class="monthly-widgets-grid"></div>
 </div>
@@ -545,7 +546,8 @@ totalsContainer.appendChild(summaryCard);
 
  <div id="multiselectSection" class="section-block">
    <div class="section-heading">Multiselect&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="dropdown-arrow">▾</span> </div>
-  <div class="tabs-wrapper" style="margin-top: -1px; margin-bottom: -3px;">
+   <div class="filter-grid" >
+  <div class="tabs-wrapper" style="margin-top: -5px; margin-bottom: -3px;">
  <div class="tabs">
       <div   id="personMultiSelect" onclick="togglePersonDropdown()">
        <button id="bt1"  id="selectedPersonsLabel">
@@ -569,7 +571,7 @@ totalsContainer.appendChild(summaryCard);
     <span class="reset-icon" style="color: black; font-size: 0.8rem;color: rgb(255, 0, 149);">clear all filters</span> 
   </button>
   <span class="tooltip-text">Reset all filters to default</span>
-     
+     </div>
      </div>
    
     </div> 

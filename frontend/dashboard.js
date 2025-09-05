@@ -3170,6 +3170,32 @@ return `
 
 
 document.querySelectorAll('.section-heading').forEach(heading => {
+  heading.addEventListener('mouseenter', () => {
+    if (heading.classList.contains('collapsed')) {
+      const content = heading.nextElementSibling?.cloneNode(true);
+      if (content) {
+        content.classList.remove('hidden');
+        content.style.position = 'absolute';
+        content.style.background = '#e3e0db';
+        content.style.border = '1px solid #ccc';
+        content.style.padding = '10px';
+        content.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
+        content.style.zIndex = 9999;
+        content.style.top = heading.getBoundingClientRect().bottom + window.scrollY + 'px';
+        content.style.left = heading.getBoundingClientRect().left + 'px';
+        content.classList.add('hover-preview');
+        document.body.appendChild(content);
+      }
+    }
+  });
+
+  heading.addEventListener('mouseleave', () => {
+    document.querySelectorAll('.hover-preview').forEach(el => el.remove());
+  });
+});
+
+
+document.querySelectorAll('.section-heading').forEach(heading => {
   heading.addEventListener('click', () => {
     const content = heading.nextElementSibling;
     const arrow = heading.querySelector('.dropdown-arrow');
@@ -3184,12 +3210,13 @@ document.querySelectorAll('.section-heading').forEach(heading => {
       arrow.textContent = '▾';
 
       // 🔁 Force reflow for layout bugs
-      const grid = content.querySelector('.credit-grid');
+      const grid = content.querySelector('#creditLimitsSection');
       if (grid) {
         grid.style.display = 'none';
         void grid.offsetWidth;
         grid.style.display = 'flex';
       }
+      
     }
   });
 });
