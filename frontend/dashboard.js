@@ -428,7 +428,9 @@ function populateFilters() {
       selectAllBox.addEventListener('change', function () {
         document.querySelectorAll('.personOption').forEach(cb => cb.checked = this.checked);
         renderEntries();
-        renderExpenseStats(); 
+        setTimeout(() => {
+  renderExpenseStats();
+}, 100);
       });
 
       document.querySelectorAll('.personOption').forEach(cb => {
@@ -437,7 +439,9 @@ function populateFilters() {
           const checked = document.querySelectorAll('.personOption:checked');
           selectAllBox.checked = all.length === checked.length;
           renderEntries();
-          renderExpenseStats(); 
+          setTimeout(() => {
+  renderExpenseStats();
+}, 100);
         });
       });
 
@@ -2071,6 +2075,9 @@ document.querySelectorAll('.personOption').forEach(cb => {
 
   // Render and show correct toast
   renderEntries();
+  setTimeout(() => {
+  renderExpenseStats();
+}, 100);
   showToast("All filters re-enabled");
 
   // Re-enable toast logic
@@ -3253,7 +3260,6 @@ function renderExpenseStats() {
   console.log("📅 Current month:", currentMonth);
 
   const excluded = ['Transfer', 'Balance', 'Ausgaben', 'Aus-Rudi'];
-
   const activePersons = Array.from(document.querySelectorAll('.personOption:checked'))
     .map(cb => cb.value)
     .filter(name => name && !excluded.includes(name));
@@ -3267,14 +3273,9 @@ function renderExpenseStats() {
 
     const match = isExpense && inCurrentMonth && isPerson;
     if (!match) {
-      console.log("❌ Skipped entry:", {
-        reason: {
-          type: e.type,
-          date: e.date,
-          person: e.person
-        },
-        entry: e
-      });
+      if (!isExpense) console.log("❌ Skipped: not minus", e);
+      else if (!inCurrentMonth) console.log("❌ Skipped: not in current month", e);
+      else if (!isPerson) console.log("❌ Skipped: excluded person", e);
     }
     return match;
   });
@@ -3283,9 +3284,13 @@ function renderExpenseStats() {
   const currentDay = now.getDate();
   const average = currentDay > 0 ? total / currentDay : 0;
 
-  document.getElementById('expenseTotal').textContent = total.toFixed(2);
-  document.getElementById('expenseAverage').textContent = average.toFixed(2);
-  document.getElementById('expenseDaysSoFar').textContent = currentDay;
+  // ✅ Update full HTML content
+  container.innerHTML = `
+    <p>📊 <strong>Current Month Expense Stats</strong></p>
+    <p><strong>Total so far:</strong> CHF ${total.toFixed(2)}</p>
+    <p><strong>Average per day (up to ${currentDay}):</strong> CHF ${average.toFixed(2)}</p>
+    <p>⚠️ Target is ~50 CHF/day</p>
+  `;
 
   console.log(`✅ Total: ${total.toFixed(2)}, Avg: ${average.toFixed(2)}, Days: ${currentDay}`);
 }
