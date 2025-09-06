@@ -315,7 +315,9 @@ async function fetchEntries() {
     if (!res.ok) throw new Error('Failed to fetch entries');
 
     const data = await res.json();
-    window.entries = Array.isArray(data) ? data.sort((a, b) => b.date.localeCompare(a.date)) : [];
+    window.entries = Array.isArray(data)
+      ? data.sort((a, b) => b.date.localeCompare(a.date))
+      : [];
 
     debug("📦 Entries:", window.entries);
     window.persons = [...new Set(window.entries.map(e => e.person).filter(Boolean))];
@@ -323,9 +325,11 @@ async function fetchEntries() {
 
     renderEntries();
     populateNewEntryDropdowns();
-    populateFilters();
+    populateFilters(); // ✅ this must come BEFORE
     renderBankBalanceForm();
-     renderExpenseStats();   // ✅ ADD HERE!
+
+    // ✅ Now call it here, after checkboxes exist
+    renderExpenseStats();  
 
     // ✅ Save entries locally
     await db.entries.clear();
@@ -334,17 +338,17 @@ async function fetchEntries() {
     console.warn('⚠️ fetchEntries failed, loading from Dexie instead:', err);
 
     try {
-      const cached = await db.entries.toArray();
-      window.entries = cached || [];
+        const cached = await db.entries.toArray();
+window.entries = cached || [];
 
-      debug("📦 Loaded entries from IndexedDB:", window.entries);
-      window.persons = [...new Set(window.entries.map(e => e.person).filter(Boolean))];
+debug("📦 Loaded entries from IndexedDB:", window.entries);
+window.persons = [...new Set(window.entries.map(e => e.person).filter(Boolean))];
 
-      renderEntries();
-      populateNewEntryDropdowns();
-      populateFilters();
-      renderBankBalanceForm();
-      renderExpenseStats(); // ✅ Add this line here too! ✅
+renderEntries();
+populateNewEntryDropdowns();
+populateFilters();
+renderBankBalanceForm();
+renderExpenseStats();  // ✅ ADD THIS LINE
     } catch (dexieErr) {
       console.error('❌ Dexie fallback also failed:', dexieErr);
       window.entries = [];
@@ -428,9 +432,9 @@ function populateFilters() {
       selectAllBox.addEventListener('change', function () {
         document.querySelectorAll('.personOption').forEach(cb => cb.checked = this.checked);
         renderEntries();
-        setTimeout(() => {
-  renderExpenseStats();
-}, 100);
+setTimeout(() => {
+  renderExpenseStats();  // ✅ now delayed and safe
+}, 150);
       });
 
       document.querySelectorAll('.personOption').forEach(cb => {
@@ -439,9 +443,9 @@ function populateFilters() {
           const checked = document.querySelectorAll('.personOption:checked');
           selectAllBox.checked = all.length === checked.length;
           renderEntries();
-          setTimeout(() => {
-  renderExpenseStats();
-}, 100);
+setTimeout(() => {
+  renderExpenseStats();  // ✅ now delayed and safe
+}, 150);
         });
       });
 
@@ -3247,7 +3251,7 @@ function getActivePersons() {
 
 
 function renderExpenseStats() {
-  console.log("🔁 renderExpenseStats called");
+  console.log("🔁 Simplified renderExpenseStats called");
 
   const container = document.getElementById('expenseStatsContainer');
   if (!container) {
@@ -3256,41 +3260,31 @@ function renderExpenseStats() {
   }
 
   const now = new Date();
-  const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-  console.log("📅 Current month:", currentMonth);
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0'); // JS months are 0-based
+  const currentMonth = `${year}-${month}`;
 
-  const excluded = ['Transfer', 'Balance', 'Ausgaben', 'Aus-Rudi'];
-  const activePersons = Array.from(document.querySelectorAll('.personOption:checked'))
-    .map(cb => cb.value)
-    .filter(name => name && !excluded.includes(name));
-
-  console.log("✅ Active persons:", activePersons);
+  console.log("📅 Current month string:", currentMonth);
 
   const validEntries = (window.entries || []).filter(e => {
     const isExpense = e.type === 'minus';
-    const inCurrentMonth = e.date?.startsWith(currentMonth);
-    const isPerson = activePersons.includes(e.person);
+    const inMonth = (e.date || '').startsWith(currentMonth);
+    const match = isExpense && inMonth;
 
-    const match = isExpense && inCurrentMonth && isPerson;
-    if (!match) {
-      if (!isExpense) console.log("❌ Skipped: not minus", e);
-      else if (!inCurrentMonth) console.log("❌ Skipped: not in current month", e);
-      else if (!isPerson) console.log("❌ Skipped: excluded person", e);
+    if (match) {
+      console.log("✅ Matched entry:", e);
     }
     return match;
   });
 
   const total = validEntries.reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
   const currentDay = now.getDate();
-  const average = currentDay > 0 ? total / currentDay : 0;
+  const avg = total / currentDay;
 
-  // ✅ Update full HTML content
   container.innerHTML = `
-    <p>📊 <strong>Current Month Expense Stats</strong></p>
-    <p><strong>Total so far:</strong> CHF ${total.toFixed(2)}</p>
-    <p><strong>Average per day (up to ${currentDay}):</strong> CHF ${average.toFixed(2)}</p>
-    <p>⚠️ Target is ~50 CHF/day</p>
+    <p><strong>Total expenses so far:</strong> CHF ${total.toFixed(2)}</p>
+    <p><strong>Daily average:</strong> CHF ${avg.toFixed(2)}</p>
   `;
 
-  console.log(`✅ Total: ${total.toFixed(2)}, Avg: ${average.toFixed(2)}, Days: ${currentDay}`);
+  console.log("💰 Total:", total.toFixed(2), " | 📆 Day:", currentDay, " | 📊 Avg:", avg.toFixed(2));
 }
