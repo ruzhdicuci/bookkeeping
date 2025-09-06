@@ -1,4 +1,4 @@
-const DEBUG_MODE = false; // or true for development
+const DEBUG_MODE = true; // or true for development
 const debug = (...args) => DEBUG_MODE && console.log(...args);
 
 import {
@@ -325,6 +325,7 @@ async function fetchEntries() {
     populateNewEntryDropdowns();
     populateFilters();
     renderBankBalanceForm();
+     renderExpenseStats();   // ✅ ADD HERE!
 
     // ✅ Save entries locally
     await db.entries.clear();
@@ -343,6 +344,7 @@ async function fetchEntries() {
       populateNewEntryDropdowns();
       populateFilters();
       renderBankBalanceForm();
+      renderExpenseStats(); // ✅ Add this line here too! ✅
     } catch (dexieErr) {
       console.error('❌ Dexie fallback also failed:', dexieErr);
       window.entries = [];
@@ -759,6 +761,7 @@ card.addEventListener('click', (event) => {
     loadMoreBtn.onclick = () => {
       currentPage++;
       renderEntries();
+       renderExpenseStats();   // ✅ ADD HERE!
     };
     container.appendChild(loadMoreBtn);
   }
@@ -978,6 +981,7 @@ async function duplicateEntry(id) {
     renderMonthlyWidgets(window.entries);
     renderBankBalanceForm();
     await renderRealYearlyCards();
+   
     showToast("✅ Entry duplicated");
   } else {
     alert("❌ Failed to duplicate entry");
@@ -2739,6 +2743,7 @@ window.updateFullYearBudgetBar = updateFullYearBudgetBar;
 window.syncYearlyLimitsToMongo  =syncYearlyLimitsToMongo;
 window.loadAndRenderYearlyLimit  = loadAndRenderYearlyLimit;
 window.renderRealYearlyCards = renderRealYearlyCards;
+window.renderExpenseStats = renderExpenseStats;
 
 
 
@@ -3220,3 +3225,41 @@ document.querySelectorAll('.section-heading').forEach(heading => {
     }
   });
 });
+
+
+function renderExpenseStats() {
+  console.log("🔁 renderExpenseStats called");
+
+  const container = document.getElementById('expenseStatsContainer');
+  if (!container) {
+    console.warn("⚠️ #expenseStatsContainer not found");
+    return;
+  }
+
+  const now = new Date();
+  const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+  console.log("📅 Current month:", currentMonth);
+
+  const validEntries = (window.entries || []).filter(e => {
+    const isExpense = e.type === 'minus';
+    const inCurrentMonth = e.date?.startsWith(currentMonth);
+    const isPerson = e.person !== 'Transfer' && e.person !== 'Balance';
+
+    const match = isExpense && inCurrentMonth && isPerson;
+    if (match) {
+      console.log("✅ Matching expense entry:", e);
+    }
+    return match;
+  });
+
+  const total = validEntries.reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
+  const currentDay = now.getDate();
+  const average = currentDay > 0 ? total / currentDay : 0;
+
+  container.innerHTML = `
+    <strong>Total so far:</strong> CHF ${total.toFixed(2)}<br>
+    <strong>Average per day (up to ${currentDay}):</strong> CHF ${average.toFixed(2)}<br>
+    ⚠️ Target is ~50 CHF/day
+  `;
+}
