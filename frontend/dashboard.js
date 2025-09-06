@@ -428,6 +428,7 @@ function populateFilters() {
       selectAllBox.addEventListener('change', function () {
         document.querySelectorAll('.personOption').forEach(cb => cb.checked = this.checked);
         renderEntries();
+        renderExpenseStats(); 
       });
 
       document.querySelectorAll('.personOption').forEach(cb => {
@@ -436,6 +437,7 @@ function populateFilters() {
           const checked = document.querySelectorAll('.personOption:checked');
           selectAllBox.checked = all.length === checked.length;
           renderEntries();
+          renderExpenseStats(); 
         });
       });
 
@@ -2744,7 +2746,7 @@ window.syncYearlyLimitsToMongo  =syncYearlyLimitsToMongo;
 window.loadAndRenderYearlyLimit  = loadAndRenderYearlyLimit;
 window.renderRealYearlyCards = renderRealYearlyCards;
 window.renderExpenseStats = renderExpenseStats;
-
+window.getActivePersons = getActivePersons;
 
 
 
@@ -3227,6 +3229,16 @@ document.querySelectorAll('.section-heading').forEach(heading => {
 });
 
 
+
+function getActivePersons() {
+  const checkedBoxes = document.querySelectorAll('.personOption:checked');
+  const excluded = ['Transfer', 'Balance', 'Ausgaben', 'Aus-Rudi']; // 👈 Exclude these
+  return Array.from(checkedBoxes)
+    .map(cb => cb.value)
+    .filter(name => name && !excluded.includes(name));
+}
+
+
 function renderExpenseStats() {
   console.log("🔁 renderExpenseStats called");
 
@@ -3238,17 +3250,31 @@ function renderExpenseStats() {
 
   const now = new Date();
   const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-
   console.log("📅 Current month:", currentMonth);
+
+  const excluded = ['Transfer', 'Balance', 'Ausgaben', 'Aus-Rudi'];
+
+  const activePersons = Array.from(document.querySelectorAll('.personOption:checked'))
+    .map(cb => cb.value)
+    .filter(name => name && !excluded.includes(name));
+
+  console.log("✅ Active persons:", activePersons);
 
   const validEntries = (window.entries || []).filter(e => {
     const isExpense = e.type === 'minus';
     const inCurrentMonth = e.date?.startsWith(currentMonth);
-    const isPerson = e.person !== 'Transfer' && e.person !== 'Balance';
+    const isPerson = activePersons.includes(e.person);
 
     const match = isExpense && inCurrentMonth && isPerson;
-    if (match) {
-      console.log("✅ Matching expense entry:", e);
+    if (!match) {
+      console.log("❌ Skipped entry:", {
+        reason: {
+          type: e.type,
+          date: e.date,
+          person: e.person
+        },
+        entry: e
+      });
     }
     return match;
   });
@@ -3257,9 +3283,9 @@ function renderExpenseStats() {
   const currentDay = now.getDate();
   const average = currentDay > 0 ? total / currentDay : 0;
 
-  container.innerHTML = `
-    <strong>Total so far:</strong> CHF ${total.toFixed(2)}<br>
-    <strong>Average per day (up to ${currentDay}):</strong> CHF ${average.toFixed(2)}<br>
-    ⚠️ Target is ~50 CHF/day
-  `;
+  document.getElementById('expenseTotal').textContent = total.toFixed(2);
+  document.getElementById('expenseAverage').textContent = average.toFixed(2);
+  document.getElementById('expenseDaysSoFar').textContent = currentDay;
+
+  console.log(`✅ Total: ${total.toFixed(2)}, Avg: ${average.toFixed(2)}, Days: ${currentDay}`);
 }
