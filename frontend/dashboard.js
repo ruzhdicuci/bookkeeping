@@ -326,30 +326,32 @@ async function fetchEntries() {
 
     renderEntries();
     populateNewEntryDropdowns();
-    populateFilters(); // ✅ this must come BEFORE
+    populateFilters(); // ✅ must come BEFORE
     renderBankBalanceForm();
 
- 
-
-    // ✅ Save entries locally
     await db.entries.clear();
     await db.entries.bulkPut(window.entries);
-    // ✅ NOW call expense stats last
+
+    // ✅ Add this to trigger stats after all is ready
+    delayedRenderExpenseStats();
 
   } catch (err) {
     console.warn('⚠️ fetchEntries failed, loading from Dexie instead:', err);
 
     try {
-        const cached = await db.entries.toArray();
-window.entries = cached || [];
+      const cached = await db.entries.toArray();
+      window.entries = cached || [];
 
-debug("📦 Loaded entries from IndexedDB:", window.entries);
-window.persons = [...new Set(window.entries.map(e => e.person).filter(Boolean))];
+      debug("📦 Loaded entries from IndexedDB:", window.entries);
+      window.persons = [...new Set(window.entries.map(e => e.person).filter(Boolean))];
 
-renderEntries();
-populateNewEntryDropdowns();
-populateFilters();
-renderBankBalanceForm();
+      renderEntries();
+      populateNewEntryDropdowns();
+      populateFilters();
+      renderBankBalanceForm();
+
+      // ✅ Add this here too for Dexie fallback
+      delayedRenderExpenseStats();
 
     } catch (dexieErr) {
       console.error('❌ Dexie fallback also failed:', dexieErr);
@@ -2772,7 +2774,7 @@ window.updateFullYearBudgetBar = updateFullYearBudgetBar;
 window.syncYearlyLimitsToMongo  =syncYearlyLimitsToMongo;
 window.loadAndRenderYearlyLimit  = loadAndRenderYearlyLimit;
 window.renderRealYearlyCards = renderRealYearlyCards;
-
+window.renderExpenseStats = renderExpenseStats
 window.delayedRenderExpenseStats = delayedRenderExpenseStats
 
 
@@ -3258,17 +3260,57 @@ document.querySelectorAll('.section-heading').forEach(heading => {
 
 
 
+function renderExpenseStats() {
+  console.log("🔁 renderExpenseStats called");
+
+  const now = new Date();
+  const currentMonth = now.toISOString().slice(0, 7); // e.g. "2025-09"
+  const currentDay = now.getDate();
+
+  if (!Array.isArray(window.entries)) {
+    console.error("❌ window.entries is not an array");
+    return;
+  }
+
+  const excludedPersons = ['Aus-Rudi', 'Ausgaben', 'Balance', 'Transfer'];
+
+  const expenses = window.entries.filter(e => {
+    const type = (e.type || '').trim().toLowerCase();         // Should be 'expense'
+    const date = (e.date || '').trim();                       // Must start with currentMonth
+    const person = (e.person || '').trim();                   // Person to be excluded?
+
+    const isExpense = type === 'expense';
+    const inCurrentMonth = date.startsWith(currentMonth);
+    const notExcludedPerson = !excludedPersons.includes(person);
+
+    return isExpense && inCurrentMonth && notExcludedPerson;
+  });
+
+  console.log(`🧾 Found ${expenses.length} filtered expenses for ${currentMonth}:`);
+  console.table(expenses);
+
+  const total = expenses.reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
+  const average = currentDay > 0 ? total / currentDay : 0;
+
+  console.log(`✅ Rendered: Total = CHF ${total.toFixed(2)}, Avg = CHF ${average.toFixed(2)}, Day = ${currentDay}`);
+
+  const totalEl = document.getElementById('expenseTotal');
+  const avgEl = document.getElementById('expenseAverage');
+  const dayEl = document.getElementById('expenseDaysSoFar');
+
+  if (totalEl) totalEl.textContent = total.toFixed(2);
+  if (avgEl) avgEl.textContent = average.toFixed(2);
+  if (dayEl) dayEl.textContent = currentDay;
+}
 
 function delayedRenderExpenseStats() {
   setTimeout(() => {
-    const totalEl = document.getElementById('expenseTotal');
-    if (totalEl) {
+    if (document.getElementById('expenseTotal')) {
       renderExpenseStats();
     } else {
       console.warn("⏳ Waiting for #expenseTotal to exist...");
-      delayedRenderExpenseStats(); // ⏳ Retry
+      delayedRenderExpenseStats(); // Retry
     }
   }, 200);
 }
-
 
