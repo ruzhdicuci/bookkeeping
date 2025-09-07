@@ -3157,7 +3157,8 @@ body.dark .section-heading {
 
 .monthly-stats {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 5px;
+  font-size: 0.8rem;
 }
 
 
