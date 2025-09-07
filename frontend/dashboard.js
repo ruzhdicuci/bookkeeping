@@ -57,10 +57,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   await fetchEntries(); // populates window.entries
   await db.entries.clear();              // 🧹 Clear old cache
   await db.entries.bulkPut(window.entries); // 💾 Save fresh ones
-  // ✅ NOW call expense stats last
-setTimeout(() => {
-  renderExpenseStats();
-}, 50); // small delay for DOM updates
+
   renderEntries(window.entries);         // ✅ Render fresh ones
  renderMonthlyWidgets(window.entries);
 renderBankBalanceForm();     
@@ -332,16 +329,13 @@ async function fetchEntries() {
     populateFilters(); // ✅ this must come BEFORE
     renderBankBalanceForm();
 
-    // ✅ Now call it here, after checkboxes exist
-    renderExpenseStats();  
+ 
 
     // ✅ Save entries locally
     await db.entries.clear();
     await db.entries.bulkPut(window.entries);
     // ✅ NOW call expense stats last
-setTimeout(() => {
-  renderExpenseStats();
-}, 50); // small delay for DOM updates
+
   } catch (err) {
     console.warn('⚠️ fetchEntries failed, loading from Dexie instead:', err);
 
@@ -356,13 +350,33 @@ renderEntries();
 populateNewEntryDropdowns();
 populateFilters();
 renderBankBalanceForm();
-renderExpenseStats();  // ✅ ADD THIS LINE
+
     } catch (dexieErr) {
       console.error('❌ Dexie fallback also failed:', dexieErr);
       window.entries = [];
     }
   }
 }
+
+
+window.addEventListener('DOMContentLoaded', async () => {
+  await fetchEntries(); // ✅ fetch from backend
+
+  // ⏳ Wait until expenseTotal span is found before running stats
+  const waitForStatsContainer = setInterval(() => {
+    const totalEl = document.getElementById('expenseTotal');
+    const avgEl = document.getElementById('expenseAverage');
+    const dayEl = document.getElementById('expenseDaysSoFar');
+
+    if (totalEl && avgEl && dayEl) {
+      clearInterval(waitForStatsContainer);
+      console.log("✅ DOM ready — rendering expense stats...");
+      renderExpenseStats();
+    } else {
+      console.log("⏳ Waiting for #expenseTotal and others...");
+    }
+  }, 200);
+});
 
 function populateNewEntryDropdowns() {
   const entries = window.entries || [];
@@ -440,9 +454,7 @@ function populateFilters() {
       selectAllBox.addEventListener('change', function () {
         document.querySelectorAll('.personOption').forEach(cb => cb.checked = this.checked);
         renderEntries();
-setTimeout(() => {
-  renderExpenseStats();  // ✅ now delayed and safe
-}, 150);
+
       });
 
       document.querySelectorAll('.personOption').forEach(cb => {
@@ -451,9 +463,7 @@ setTimeout(() => {
           const checked = document.querySelectorAll('.personOption:checked');
           selectAllBox.checked = all.length === checked.length;
           renderEntries();
-setTimeout(() => {
-  renderExpenseStats();  // ✅ now delayed and safe
-}, 150);
+
         });
       });
 
@@ -779,7 +789,7 @@ card.addEventListener('click', (event) => {
     loadMoreBtn.onclick = () => {
       currentPage++;
       renderEntries();
-       renderExpenseStats();   // ✅ ADD HERE!
+   
     };
     container.appendChild(loadMoreBtn);
   }
@@ -2087,9 +2097,7 @@ document.querySelectorAll('.personOption').forEach(cb => {
 
   // Render and show correct toast
   renderEntries();
-  setTimeout(() => {
-  renderExpenseStats();
-}, 100);
+
   showToast("All filters re-enabled");
 
   // Re-enable toast logic
@@ -2764,7 +2772,8 @@ window.updateFullYearBudgetBar = updateFullYearBudgetBar;
 window.syncYearlyLimitsToMongo  =syncYearlyLimitsToMongo;
 window.loadAndRenderYearlyLimit  = loadAndRenderYearlyLimit;
 window.renderRealYearlyCards = renderRealYearlyCards;
-window.renderExpenseStats = renderExpenseStats;
+
+window.delayedRenderExpenseStats = delayedRenderExpenseStats
 
 
 
@@ -3250,42 +3259,16 @@ document.querySelectorAll('.section-heading').forEach(heading => {
 
 
 
-function renderExpenseStats() {
-  console.log("🔁 renderExpenseStats called");
-
-  const container = document.getElementById('expenseStatsContainer');
-  if (!container) {
-    console.warn("⚠️ #expenseStatsContainer not found");
-    return;
-  }
-
-  const now = new Date();
-  const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-  const currentDay = now.getDate();
-
-  if (!Array.isArray(window.entries)) {
-    console.error("❌ window.entries is not an array!");
-    return;
-  }
-
-  const validEntries = window.entries.filter(e => {
-    const type = (e.type || '').toLowerCase();
-    const date = (e.date || '');
-    return type === 'minus' && date.startsWith(currentMonth);
-  });
-
-  const total = validEntries.reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
-  const average = currentDay > 0 ? total / currentDay : 0;
-
-  // Log real entry data
-  console.log(`📆 Month: ${currentMonth}, 📅 Day: ${currentDay}`);
-  console.log(`✅ Valid entries this month: ${validEntries.length}`);
-  if (validEntries.length) console.log("🧾 Sample:", validEntries[0]);
-
-  // Update the DOM
-  document.getElementById('expenseTotal').textContent = total.toFixed(2);
-  document.getElementById('expenseAverage').textContent = average.toFixed(2);
-  document.getElementById('expenseDaysSoFar').textContent = currentDay;
-
-  console.log("✅ Finished renderExpenseStats");
+function delayedRenderExpenseStats() {
+  setTimeout(() => {
+    const totalEl = document.getElementById('expenseTotal');
+    if (totalEl) {
+      renderExpenseStats();
+    } else {
+      console.warn("⏳ Waiting for #expenseTotal to exist...");
+      delayedRenderExpenseStats(); // ⏳ Retry
+    }
+  }, 200);
 }
+
+
