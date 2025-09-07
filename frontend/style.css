@@ -3155,21 +3155,38 @@ body.dark .section-heading {
 }
 
 
-.expense-stats-card {
-  background-color: #f9f9f9;
-  border-left: 5px solid #e74c3c;
-  padding: 16px;
-  border-radius: 8px;
-  margin: 12px 0;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+.monthly-stats {
+  text-align: center;
+  margin-bottom: 20px;
 }
 
-.expense-stats-card h3 {
-  margin-top: 0;
-  font-weight: 600;
+
+
+.spending-progress-wrapper {
+  text-align: center;
+  margin: 20px auto;
+  max-width: 300px;
 }
 
-.expense-stats-card p {
-  margin: 6px 0;
+.spending-progress-bar {
+  height: 20px;
+  width: 100%;
+  background-color: #eee;
+  border-radius: 50px;
+  overflow: hidden;
+  position: relative;
+}
+
+.spending-progress-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 50px;
+  transition: width 0.5s ease;
+  background-color: #2ecc71; /* Default green */
+}
+
+.spending-progress-label {
+  margin-top: 8px;
+  font-weight: bold;
   font-size: 14px;
 }

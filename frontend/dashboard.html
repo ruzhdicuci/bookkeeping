@@ -530,13 +530,16 @@ totalsContainer.appendChild(summaryCard);
 </div>
 </div>
 
-<div id="expenseSummaryCard" class="summary-card">
-  <h3>📆 Monthly Spending</h3>
+<div class="monthly-stats">
   <p><strong>Total so far:</strong> CHF <span id="expenseTotal">0.00</span></p>
   <p><strong>Average per day (up to <span id="expenseDaysSoFar">0</span>):</strong> CHF <span id="expenseAverage">0.00</span></p>
 
+<div id="spendingProgressContainer" class="spending-progress-wrapper">
+  <div class="spending-progress-bar">
+    <div id="spendingProgressFill" class="spending-progress-fill"></div>
+  </div>
+  <div id="spendingProgressLabel" class="spending-progress-label">Today: CHF 0.00 / 50.00</div>
 </div>
-<canvas id="categoryExpenseChart" width="50" height="50"></canvas>
 
 <div id="widgetSection" class="section-block">
          <div class="section-heading">Balance per Year&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="dropdown-arrow">▾</span>

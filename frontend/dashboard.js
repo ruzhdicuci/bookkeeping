@@ -3259,19 +3259,26 @@ document.querySelectorAll('.section-heading').forEach(heading => {
 });
 
 
+
+const DAILY_TARGET = 50; // 💰 Daily CHF/day limit
+let renderRetryCount = 0;
+const MAX_RETRIES = 20;
+
 function renderExpenseStats() {
   console.log("🔁 renderExpenseStats called");
 
   const now = new Date();
   const currentMonth = now.toISOString().slice(0, 7);
+  const todayStr = now.toISOString().slice(0, 10);
+  const currentDay = now.getDate();
 
   if (!Array.isArray(window.entries)) {
     console.error("❌ window.entries is not an array");
     return;
   }
 
-  // ❗️Filter only current month's expenses and exclude certain persons
   const excludedPersons = ['Transfer', 'Balance', 'Aus-Rudi', 'Ausgaben'];
+
   const expenses = window.entries.filter(e => {
     const type = (e.type || '').trim().toLowerCase();
     const date = (e.date || '').trim();
@@ -3279,23 +3286,21 @@ function renderExpenseStats() {
     return type === 'expense' && date.startsWith(currentMonth) && !excludedPersons.includes(person);
   });
 
-  console.log(`🧾 Found ${expenses.length} expenses for ${currentMonth}:`);
+  console.log(`🧾 Found ${expenses.length} expenses for ${currentMonth}`);
   console.table(expenses);
 
   const total = expenses.reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
-  const currentDay = now.getDate();
   const average = currentDay > 0 ? total / currentDay : 0;
 
-  // Update DOM
+  // 📌 Update DOM
   const totalEl = document.getElementById('expenseTotal');
   const avgEl = document.getElementById('expenseAverage');
   const dayEl = document.getElementById('expenseDaysSoFar');
-
   if (totalEl) totalEl.textContent = total.toFixed(2);
   if (avgEl) avgEl.textContent = average.toFixed(2);
   if (dayEl) dayEl.textContent = currentDay;
 
-  // ✅ 💹 Render category chart
+  // 🟢 Category Chart
   const categorySums = {};
   for (const e of expenses) {
     const cat = e.category || 'Uncategorized';
@@ -3304,88 +3309,9 @@ function renderExpenseStats() {
 
   const labels = Object.keys(categorySums);
   const data = Object.values(categorySums);
-
   const ctx = document.getElementById('categoryExpenseChart')?.getContext('2d');
   if (ctx) {
     if (window.expenseChart) window.expenseChart.destroy();
-    window.expenseChart = new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        labels,
-        datasets: [{
-          data,
-          backgroundColor: ['#e74c3c', '#f39c12', '#3498db', '#2ecc71', '#9b59b6', '#95a5a6']
-        }]
-      },
-      options: {
-        plugins: {
-          legend: { position: 'bottom' },
-          title: {
-            display: true,
-            text: 'Expenses by Category (Current Month)'
-          }
-        }
-      }
-    });
-  }
-}
-
-
-let renderRetryCount = 0;
-const MAX_RETRIES = 20;
-
-function delayedRenderExpenseStats() {
-  setTimeout(() => {
-    const totalEl = document.getElementById('expenseTotal');
-    const chartEl = document.getElementById('categoryExpenseChart');
-
-    if (!totalEl || !chartEl) {
-      renderRetryCount++;
-      if (renderRetryCount > MAX_RETRIES) {
-        console.warn("⛔ Stopped trying after too many retries.");
-        return;
-      }
-
-      console.warn("⏳ Waiting for required DOM elements... Retry:", renderRetryCount);
-      delayedRenderExpenseStats(); // 🔁 Retry
-      return;
-    }
-
-    // ✅ DOM elements found: reset counter
-    renderRetryCount = 0;
-
-    // ✅ Your existing render logic goes here...
-    renderExpenseStats();
-
-    const now = new Date();
-    const currentMonth = now.toISOString().slice(0, 7);
-    const excludedPersons = ['Transfer', 'Aus-Rudi', 'Balance', 'Ausgaben'];
-
-    const expenses = (window.entries || []).filter(e => {
-      const type = (e.type || '').toLowerCase();
-      const date = e.date || '';
-      const person = (e.person || '').trim();
-      return (
-        type === 'expense' &&
-        date.startsWith(currentMonth) &&
-        !excludedPersons.includes(person)
-      );
-    });
-
-    const categorySums = {};
-    for (const e of expenses) {
-      const cat = e.category || 'Uncategorized';
-      categorySums[cat] = (categorySums[cat] || 0) + parseFloat(e.amount || 0);
-    }
-
-    const labels = Object.keys(categorySums);
-    const data = Object.values(categorySums);
-
-    const ctx = chartEl.getContext('2d');
-    if (window.expenseChart && typeof window.expenseChart.destroy === 'function') {
-      window.expenseChart.destroy();
-    }
-
     window.expenseChart = new Chart(ctx, {
       type: 'doughnut',
       data: {
@@ -3402,13 +3328,58 @@ function delayedRenderExpenseStats() {
       options: {
         plugins: {
           legend: { position: 'bottom' },
-          title: {
-            display: true,
-            text: 'Expenses by Category (Current Month)'
-          }
+          title: { display: true, text: 'Expenses by Category (Current Month)' }
         }
       }
     });
+  }
 
+  // 🎯 Progress Bar (for TODAY only)
+  const todaySpent = expenses
+    .filter(e => (e.date || '').startsWith(todayStr))
+    .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
+
+  renderSpendingTargetBar(todaySpent, DAILY_TARGET);
+}
+
+function delayedRenderExpenseStats() {
+  setTimeout(() => {
+    const totalEl = document.getElementById('expenseTotal');
+    const chartEl = document.getElementById('categoryExpenseChart');
+    const progressEl = document.getElementById('spendingProgressFill');
+
+    if (!totalEl || !chartEl || !progressEl) {
+      renderRetryCount++;
+      if (renderRetryCount > MAX_RETRIES) {
+        console.warn("⛔ Stopped trying after too many retries.");
+        return;
+      }
+      console.warn("⏳ Waiting for required DOM elements... Retry:", renderRetryCount);
+      delayedRenderExpenseStats();
+      return;
+    }
+
+    renderRetryCount = 0;
+    renderExpenseStats();
   }, 200);
+}
+
+function renderSpendingTargetBar(todaySpent, dailyLimit) {
+  const percent = Math.min((todaySpent / dailyLimit) * 100, 100);
+  const fill = document.getElementById('spendingProgressFill');
+  const label = document.getElementById('spendingProgressLabel');
+
+  // 🎨 Color logic
+  let color = '#2ecc71'; // green
+  if (percent >= 100) color = '#e74c3c'; // red
+  else if (percent >= 70) color = '#f39c12'; // yellow
+
+  if (fill) {
+    fill.style.width = `${percent}%`;
+    fill.style.backgroundColor = color;
+  }
+
+  if (label) {
+    label.textContent = `Today: CHF ${todaySpent.toFixed(2)} / ${dailyLimit.toFixed(2)}`;
+  }
 }
