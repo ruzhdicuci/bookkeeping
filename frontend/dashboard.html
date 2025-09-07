@@ -530,9 +530,11 @@ totalsContainer.appendChild(summaryCard);
 </div>
 </div>
 
-<div id="expenseStatsContainer">
+<div id="expenseSummaryCard" class="summary-card">
+  <h3>📆 Monthly Spending</h3>
   <p><strong>Total so far:</strong> CHF <span id="expenseTotal">0.00</span></p>
   <p><strong>Average per day (up to <span id="expenseDaysSoFar">0</span>):</strong> CHF <span id="expenseAverage">0.00</span></p>
+  <canvas id="expenseChart" width="200" height="200"></canvas>
 </div>
 
 <div id="widgetSection" class="section-block">
@@ -1192,6 +1194,8 @@ function openTab(tabId, btn) {
   <div id="entryTableBody" class="desktop-card-list"></div>
 </div>
 
+
+
 <div id="toast"></div>
 
 <div id="cardAddModal" class="modal" style="display: none;">
@@ -1245,6 +1249,15 @@ function openTab(tabId, btn) {
     <textarea id="entryNoteTextarea" rows="4" style="width: 100%;"></textarea>
     <button id="saveNoteBtn">save</button>
     <button id="closeNoteModal" class="close">close</button>
+  </div>
+</div>
+
+
+<div id="inactivityModal" class="modal hidden">
+  <div class="modal-content">
+    <h2>🔒 Inactivity Detected</h2>
+    <p id="inactivityCountdown">Logging out in <span id="countdown">60</span> seconds...</p>
+    <button id="continueSessionBtn">Continue</button>
   </div>
 </div>
 

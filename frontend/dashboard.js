@@ -3263,19 +3263,19 @@ function renderExpenseStats() {
   console.log("🔁 renderExpenseStats called");
 
   const now = new Date();
-  const currentMonth = now.toISOString().slice(0, 7); // e.g., "2025-09"
-
-  const EXCLUDED_PERSONS = ['Aus-Rudi', 'Ausgaben', 'Balance', 'Transfer'];
+  const currentMonth = now.toISOString().slice(0, 7);
 
   if (!Array.isArray(window.entries)) {
     console.error("❌ window.entries is not an array");
     return;
   }
 
+  const EXCLUDED_PERSONS = ['aus-rudi', 'ausgaben', 'balance', 'transfer'];
+
   const expenses = window.entries.filter(e => {
     const type = (e.type || '').trim().toLowerCase();
     const date = (e.date || '').trim();
-    const person = (e.person || '').trim();
+    const person = (e.person || '').trim().toLowerCase();
     return (
       type === 'expense' &&
       date.startsWith(currentMonth) &&
@@ -3283,9 +3283,20 @@ function renderExpenseStats() {
     );
   });
 
-  console.log(`🧾 Found ${expenses.length} valid expenses for ${currentMonth}:`);
-  console.table(expenses);
+  // 🔍 Log all persons found
+  const includedPersons = [...new Set(expenses.map(e => (e.person || '').trim()))];
+  console.log("👥 Included persons in stats:", includedPersons);
 
+  // 🔍 Log per-person breakdown
+  const byPerson = {};
+  expenses.forEach(e => {
+    const key = (e.person || '').trim();
+    const amount = parseFloat(e.amount || 0);
+    byPerson[key] = (byPerson[key] || 0) + amount;
+  });
+  console.table(byPerson);
+
+  // 💰 Totals
   const total = expenses.reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
   const currentDay = now.getDate();
   const average = currentDay > 0 ? total / currentDay : 0;
@@ -3316,3 +3327,47 @@ function delayedRenderExpenseStats() {
   }, 200);
 }
 
+const ctx = document.getElementById('expenseChart').getContext('2d');
+
+// Group expenses by category
+const grouped = {};
+expenses.forEach(e => {
+  const cat = (e.category || 'Other').trim();
+  grouped[cat] = (grouped[cat] || 0) + parseFloat(e.amount || 0);
+});
+
+const labels = Object.keys(grouped);
+const data = Object.values(grouped);
+
+if (window.expenseChartInstance) {
+  window.expenseChartInstance.destroy();
+}
+
+window.expenseChartInstance = new Chart(ctx, {
+  type: 'doughnut',
+  data: {
+    labels,
+    datasets: [{
+      data,
+      backgroundColor: [
+        '#FF6B6B', '#FFD93D', '#6BCB77', '#4D96FF', '#9D4EDD', '#FFA500'
+      ],
+      borderWidth: 1
+    }]
+  },
+  options: {
+    plugins: {
+      legend: {
+        position: 'bottom'
+      },
+      tooltip: {
+        callbacks: {
+          label: context => `${context.label}: CHF ${context.parsed.toFixed(2)}`
+        }
+      }
+    },
+    cutout: '60%',
+    responsive: true,
+    maintainAspectRatio: false
+  }
+});

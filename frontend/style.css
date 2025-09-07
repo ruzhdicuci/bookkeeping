@@ -3135,3 +3135,21 @@ body.dark .section-heading {
 }
 
 
+.summary-card {
+  background: #f8f8f8;
+  padding: 1rem;
+  border-radius: 10px;
+  box-shadow: 0 0 6px rgba(0,0,0,0.05);
+  margin-top: 1rem;
+  max-width: 320px;
+}
+
+.summary-card h3 {
+  font-size: 1.2em;
+  margin-bottom: 0.5rem;
+}
+
+.summary-card p {
+  margin: 0.2rem 0;
+  font-size: 0.95em;
+}
