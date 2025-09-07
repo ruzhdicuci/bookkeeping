@@ -2778,6 +2778,7 @@ window.renderRealYearlyCards = renderRealYearlyCards;
 window.renderExpenseStats = renderExpenseStats;
 window.delayedRenderExpenseStats = delayedRenderExpenseStats;
 window.saveDailyLimit = saveDailyLimit;
+window. waitAndRenderExpenseStats =  waitAndRenderExpenseStats
 
 
 
@@ -3283,6 +3284,30 @@ async function loadDailyLimit() {
   }
 }
 
+
+// ✅ Wait until all required elements and data are loaded
+function waitAndRenderExpenseStats() {
+  const interval = setInterval(() => {
+    const ready =
+      document.getElementById('expenseTotal') &&
+      document.getElementById('expenseAverage') &&
+      document.getElementById('dailyLimitInput') &&
+      document.getElementById('spendingProgressFill') &&
+      window.entries?.length > 0;
+
+    if (ready) {
+      clearInterval(interval);
+      renderExpenseStats();
+    }
+  }, 300);
+
+  // ⛔ Safety timeout after 10s
+  setTimeout(() => {
+    clearInterval(interval);
+    console.warn("⚠️ Still not ready after 10s, skipping stats render.");
+  }, 10000);
+}
+
 // 📊 Render expense stats and progress bar
 function renderExpenseStats() {
   console.log("🔁 renderExpenseStats called");
@@ -3383,16 +3408,27 @@ function renderSpendingTargetBar(todaySpent, dailyLimit) {
 window.addEventListener('DOMContentLoaded', async () => {
   await loadDailyLimit();
 
-  const checkReadyInterval = setInterval(() => {
+  const interval = setInterval(() => {
     const totalEl = document.getElementById('expenseTotal');
-    const progressEl = document.getElementById('spendingProgressFill');
+    const avgEl = document.getElementById('expenseAverage');
     const input = document.getElementById('dailyLimitInput');
+    const progressEl = document.getElementById('spendingProgressFill');
 
-    if (totalEl && progressEl && input && Array.isArray(window.entries)) {
-      clearInterval(checkReadyInterval);
+    const ready =
+      totalEl && avgEl && input && progressEl &&
+      Array.isArray(window.entries) && window.entries.length;
+
+    if (ready) {
+      clearInterval(interval);
       renderExpenseStats();
     }
-  }, 200);
+  }, 300);
+
+  // ⛔ Stop trying after 10s
+  setTimeout(() => {
+    clearInterval(interval);
+    console.warn("⚠️ Still not ready after 10s, skipping stats render.");
+  }, 10000);
 });
 
 // 💾 Save new daily limit to backend
