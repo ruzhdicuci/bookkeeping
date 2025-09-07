@@ -3259,41 +3259,40 @@ document.querySelectorAll('.section-heading').forEach(heading => {
 });
 
 
-
 function renderExpenseStats() {
   console.log("🔁 renderExpenseStats called");
 
   const now = new Date();
-  const currentMonth = now.toISOString().slice(0, 7); // e.g. "2025-09"
-  const currentDay = now.getDate();
+  const currentMonth = now.toISOString().slice(0, 7); // e.g., "2025-09"
+
+  const EXCLUDED_PERSONS = ['Aus-Rudi', 'Ausgaben', 'Balance', 'Transfer'];
 
   if (!Array.isArray(window.entries)) {
     console.error("❌ window.entries is not an array");
     return;
   }
 
-  const excludedPersons = ['Aus-Rudi', 'Ausgaben', 'Balance', 'Transfer'];
-
   const expenses = window.entries.filter(e => {
-    const type = (e.type || '').trim().toLowerCase();         // Should be 'expense'
-    const date = (e.date || '').trim();                       // Must start with currentMonth
-    const person = (e.person || '').trim();                   // Person to be excluded?
-
-    const isExpense = type === 'expense';
-    const inCurrentMonth = date.startsWith(currentMonth);
-    const notExcludedPerson = !excludedPersons.includes(person);
-
-    return isExpense && inCurrentMonth && notExcludedPerson;
+    const type = (e.type || '').trim().toLowerCase();
+    const date = (e.date || '').trim();
+    const person = (e.person || '').trim();
+    return (
+      type === 'expense' &&
+      date.startsWith(currentMonth) &&
+      !EXCLUDED_PERSONS.includes(person)
+    );
   });
 
-  console.log(`🧾 Found ${expenses.length} filtered expenses for ${currentMonth}:`);
+  console.log(`🧾 Found ${expenses.length} valid expenses for ${currentMonth}:`);
   console.table(expenses);
 
   const total = expenses.reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
+  const currentDay = now.getDate();
   const average = currentDay > 0 ? total / currentDay : 0;
 
   console.log(`✅ Rendered: Total = CHF ${total.toFixed(2)}, Avg = CHF ${average.toFixed(2)}, Day = ${currentDay}`);
 
+  // Update DOM
   const totalEl = document.getElementById('expenseTotal');
   const avgEl = document.getElementById('expenseAverage');
   const dayEl = document.getElementById('expenseDaysSoFar');
@@ -3302,6 +3301,9 @@ function renderExpenseStats() {
   if (avgEl) avgEl.textContent = average.toFixed(2);
   if (dayEl) dayEl.textContent = currentDay;
 }
+
+
+
 
 function delayedRenderExpenseStats() {
   setTimeout(() => {
