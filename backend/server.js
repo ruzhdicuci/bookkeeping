@@ -1,6 +1,6 @@
 const DEBUG_MODE = false; // or true for development
 const debug = (...args) => DEBUG_MODE && console.log(...args);
-const DailySetting = require('./models/DailySetting'); // Adjust path if needed
+const DailySetting = require('./models/DailySetting');
 const authMiddleware = require('./authMiddleware');
 require('dotenv').config();
 const mongoose = require('mongoose');
