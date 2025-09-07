@@ -2711,6 +2711,7 @@ setupToggle('toggleSearches', 'searchesSection');
 setupToggle('toggleBudget', 'budgetSection');
 setupToggle('toggleWidget', 'widgetSection');
 setupToggle('toggleAll', 'allSection');
+setupToggle('toggleBar', 'barSection');
 
 });
 
@@ -3260,11 +3261,10 @@ document.querySelectorAll('.section-heading').forEach(heading => {
 });
 
 
+
 let DAILY_TARGET = 50; // Default fallback
 let renderRetryCount = 0;
 const MAX_RETRIES = 20;
-
-
 
 // 🔁 Load saved daily limit from backend
 async function loadDailyLimit() {
@@ -3273,8 +3273,8 @@ async function loadDailyLimit() {
       headers: { Authorization: `Bearer ${token}` }
     });
     const data = await res.json();
-    if (res.ok && data?.dailyLimit) {
-      DAILY_TARGET = parseFloat(data.dailyLimit);
+    if (res.ok && data?.limit != null) {
+      DAILY_TARGET = parseFloat(data.limit);
       document.getElementById('dailyLimitInput').value = DAILY_TARGET;
       console.log("📥 Loaded daily limit:", DAILY_TARGET);
     }
@@ -3283,16 +3283,14 @@ async function loadDailyLimit() {
   }
 }
 
-
-
 // 📊 Render expense stats and progress bar
 function renderExpenseStats() {
   console.log("🔁 renderExpenseStats called");
 
   const now = new Date();
   const currentMonth = now.toISOString().slice(0, 7);
-  const todayStr = now.toISOString().slice(0, 10);
   const currentDay = now.getDate();
+  const todayStr = now.toISOString().slice(0, 10);
 
   if (!Array.isArray(window.entries)) {
     console.error("❌ window.entries is not an array");
@@ -3319,15 +3317,25 @@ function renderExpenseStats() {
   const avgEl = document.getElementById('expenseAverage');
   const dayEl = document.getElementById('expenseDaysSoFar');
   if (totalEl) totalEl.textContent = total.toFixed(2);
-  if (avgEl) avgEl.textContent = average.toFixed(2);
+ if (avgEl) {
+  avgEl.textContent = average.toFixed(2);
+
+  const wrapper = avgEl.closest('.highlight-amount-large');
+  if (wrapper) {
+    if (average > DAILY_TARGET) {
+      wrapper.classList.add('over-limit');
+    } else {
+      wrapper.classList.remove('over-limit');
+    }
+  }
+}
   if (dayEl) dayEl.textContent = currentDay;
 
-  // 🎯 Progress Bar (for TODAY only)
-  const todaySpent = expenses
-    .filter(e => (e.date || '').startsWith(todayStr))
-    .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
+  // 📊 Show average daily spending as progress
+  const progress = (average / DAILY_TARGET) * 100;
+  console.log(`📊 Progress (monthly average vs. target): ${progress.toFixed(2)}%`);
 
-  renderSpendingTargetBar(todaySpent, DAILY_TARGET);
+  renderSpendingTargetBar(average, DAILY_TARGET); // ✅ use avg vs. limit instead of todaySpent
 }
 
 // Wait until DOM is ready to render stats
@@ -3356,33 +3364,38 @@ function delayedRenderExpenseStats() {
 
 // Render the spending progress bar
 function renderSpendingTargetBar(todaySpent, dailyLimit) {
-  const percent = Math.min((todaySpent / dailyLimit) * 100, 100);
+  const percent = (todaySpent / dailyLimit) * 100;
   const fill = document.getElementById('spendingProgressFill');
   const label = document.getElementById('spendingProgressLabel');
 
-  let color = '#2ecc71'; // Green
-  if (percent >= 100) color = '#e74c3c'; // Red
-  else if (percent >= 70) color = '#f39c12'; // Yellow
+  let color = '#e74c3c'; // 🔴 Default = over limit = red
+  if (percent <= 100) color = '#2ecc71'; // ✅ Green if under or equal limit
 
   if (fill) {
-    fill.style.width = `${percent}%`;
+    fill.style.width = `${Math.min(percent, 100)}%`;
     fill.style.backgroundColor = color;
   }
 
-  if (label) {
-    label.textContent = `Today: CHF ${todaySpent.toFixed(2)} / ${dailyLimit.toFixed(2)}`;
-  }
+  console.log("🟢 Bar color:", color, "- progress:", percent.toFixed(2) + "%");
 }
 
 // 🚀 Initialize on load
 window.addEventListener('DOMContentLoaded', async () => {
   await loadDailyLimit();
-  delayedRenderExpenseStats();
+
+  const checkReadyInterval = setInterval(() => {
+    const totalEl = document.getElementById('expenseTotal');
+    const progressEl = document.getElementById('spendingProgressFill');
+    const input = document.getElementById('dailyLimitInput');
+
+    if (totalEl && progressEl && input && Array.isArray(window.entries)) {
+      clearInterval(checkReadyInterval);
+      renderExpenseStats();
+    }
+  }, 200);
 });
 
-
-
-
+// 💾 Save new daily limit to backend
 async function saveDailyLimit() {
   const input = document.getElementById('dailyLimitInput');
   const newLimit = parseFloat(input.value);
@@ -3399,14 +3412,14 @@ async function saveDailyLimit() {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`
       },
-      body: JSON.stringify({ limit: newLimit }) // ✅ correct structure
+      body: JSON.stringify({ limit: newLimit })
     });
 
     if (!res.ok) throw new Error('Request failed');
 
     alert('✅ Daily limit saved.');
     DAILY_TARGET = newLimit;
-    renderExpenseStats(); // update visuals
+    renderExpenseStats(); // update progress
   } catch (err) {
     console.error('Failed to save daily limit:', err);
     alert('❌ Failed to save daily limit.');

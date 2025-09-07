@@ -121,6 +121,15 @@ Kredit Limits
 Balance per Year
 </label>
 
+<label class="custom-checkbox">
+  <input type="checkbox" id="toggleBar" checked />
+  <span class="checkmark"></span>
+Limit per Day
+</label>
+
+
+
+
 </div>
 
 
@@ -530,25 +539,36 @@ totalsContainer.appendChild(summaryCard);
 </div>
 </div>
 
-<div class="monthly-stats">
-  <p><strong>Total so far:</strong> CHF <span id="expenseTotal">0.00</span></p>
-  <p><strong>Average per day (up to <span id="expenseDaysSoFar">0</span>):</strong> CHF <span id="expenseAverage">0.00</span></p>
+<div id="barSection" class="section-block"> 
+  <div class="section-heading">Daily Limit&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="dropdown-arrow">▾</span>
+ </div>
 
-<!-- 🎯 Spending progress bar for today -->
-<!-- Progress Bar -->
-<div class="progress-bar-wrapper">
-  <div class="progress-bar-track">
-    <div id="spendingProgressFill" class="progress-bar-fill"></div>
+ <div class="filter-grid5">
+  <div class="back">
+<div class="daily-summary-line">
+  <span><strong>Total:</strong> <span id="expenseTotal" class="highlight-amount-large">0.00</span></span>
+  <span><strong>Average (days:<span id="expenseDaysSoFar">0</span>):</strong> 
+    <span class="highlight-amount-large"><span id="expenseAverage">0.00</span></span>
+  </span>
+</div>
+
+<div class="daily-limit-bar-row">
+  <div class="daily-limit-inline">
+    <input id="dailyLimitInput" type="number" min="1" />
+    <button id="setbtn" onclick="saveDailyLimit()">Set Limit</button>
   </div>
-  <div id="spendingProgressLabel" class="progress-bar-label"></div>
+
+  <div class="progress-bar-wrapper small-bar">
+    <div class="progress-bar-track">
+      <div class="progress-bar-fill" id="spendingProgressFill"></div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
 </div>
 
-<!-- Set Daily Limit -->
-<div style="margin-top: 1rem;">
-  <label for="dailyLimitInput"><strong>Set Daily Limit (CHF):</strong></label>
-  <input type="number" id="dailyLimitInput" min="1" style="width: 80px;" />
-  <button onclick="saveDailyLimit()">💾 Save</button>
-</div>
+
 
 <div id="widgetSection" class="section-block">
          <div class="section-heading">Balance per Year&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="dropdown-arrow">▾</span>
