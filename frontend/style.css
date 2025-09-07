@@ -3146,7 +3146,7 @@ body.dark .section-heading {
 
 .summary-card h3 {
   font-size: 1.2em;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.2rem;
 }
 
 .summary-card p {
@@ -3162,31 +3162,23 @@ body.dark .section-heading {
 
 
 
-.spending-progress-wrapper {
-  text-align: center;
-  margin: 20px auto;
-  max-width: 300px;
-}
-
-.spending-progress-bar {
-  height: 20px;
+.progress-bar-wrapper {
+  margin-top: 10px;
   width: 100%;
-  background-color: #eee;
-  border-radius: 50px;
-  overflow: hidden;
-  position: relative;
 }
-
-.spending-progress-fill {
+.progress-bar-track {
+  background: #ddd;
+  height: 16px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.progress-bar-fill {
   height: 100%;
   width: 0%;
-  border-radius: 50px;
-  transition: width 0.5s ease;
-  background-color: #2ecc71; /* Default green */
+  background: #2ecc71;
+  transition: width 0.3s ease;
 }
-
-.spending-progress-label {
-  margin-top: 8px;
+.progress-bar-label {
+  margin-top: 4px;
   font-weight: bold;
-  font-size: 14px;
 }

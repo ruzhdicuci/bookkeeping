@@ -1,6 +1,6 @@
 const DEBUG_MODE = false; // or true for development
 const debug = (...args) => DEBUG_MODE && console.log(...args);
-const DailySetting = require('./models/DailySetting'); // Adjust path if needed
+
 const authMiddleware = require('./authMiddleware');
 require('dotenv').config();
 const mongoose = require('mongoose');
@@ -142,6 +142,7 @@ const YearlyLimit = mongoose.model('YearlyLimit', new mongoose.Schema({
   userId: String,
   year: String,
   limit: Number,
+  startFrom: String, // 👈 Add this line
   lastUpdated: Number
 }));
 
@@ -366,7 +367,12 @@ app.get('/api/yearly-limit', auth, async (req, res) => {
   try {
     const result = await YearlyLimit.findOne({ userId: req.user.userId, year });
     debug("📦 Found in DB:", result);
-    res.json(result || { limit: 0 });
+
+    res.json({
+      limit: result?.limit || 0,
+      startFrom: result?.startFrom || ''
+    });
+
   } catch (err) {
     console.error("❌ Error loading limit:", err);
     res.status(500).json({ error: 'Server error loading yearly limit' });
@@ -438,35 +444,4 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 3210;
 app.listen(PORT, () => {
   debug(`✅ API running on port ${PORT}`);
-});
-
-
-// ✅ Load saved daily limit
-app.get('/api/settings/dailyLimit', authMiddleware, async (req, res) => {
-  try {
-    const setting = await DailySetting.findOne({ userId: req.user.id });
-    res.json({ limit: setting?.limit || 50 }); // fallback if not set
-  } catch (err) {
-    console.error("❌ Failed to load daily limit", err);
-    res.status(500).json({ error: 'Failed to load daily limit' });
-  }
-});
-
-// ✅ Save daily limit
-app.post('/api/settings/dailyLimit', authMiddleware, async (req, res) => {
-  try {
-    const { limit } = req.body;
-    if (typeof limit !== 'number') return res.status(400).json({ error: 'Invalid limit' });
-
-    const updated = await DailySetting.findOneAndUpdate(
-      { userId: req.user.id },
-      { limit, updatedAt: new Date() },
-      { upsert: true, new: true }
-    );
-
-    res.json({ success: true, limit: updated.limit });
-  } catch (err) {
-    console.error("❌ Failed to save daily limit", err);
-    res.status(500).json({ error: 'Failed to save daily limit' });
-  }
 });

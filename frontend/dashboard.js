@@ -2774,8 +2774,9 @@ window.updateFullYearBudgetBar = updateFullYearBudgetBar;
 window.syncYearlyLimitsToMongo  =syncYearlyLimitsToMongo;
 window.loadAndRenderYearlyLimit  = loadAndRenderYearlyLimit;
 window.renderRealYearlyCards = renderRealYearlyCards;
-window.renderExpenseStats = renderExpenseStats
-window.delayedRenderExpenseStats = delayedRenderExpenseStats
+window.renderExpenseStats = renderExpenseStats;
+window.delayedRenderExpenseStats = delayedRenderExpenseStats;
+window.saveDailyLimit = saveDailyLimit;
 
 
 
@@ -3259,11 +3260,61 @@ document.querySelectorAll('.section-heading').forEach(heading => {
 });
 
 
-
-const DAILY_TARGET = 50; // 💰 Daily CHF/day limit
+let DAILY_TARGET = 50; // Default fallback
 let renderRetryCount = 0;
 const MAX_RETRIES = 20;
 
+
+
+// 🔁 Load saved daily limit from backend
+async function loadDailyLimit() {
+  try {
+    const res = await fetch(`${apiBase}/api/settings/dailyLimit`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const data = await res.json();
+    if (res.ok && data?.dailyLimit) {
+      DAILY_TARGET = parseFloat(data.dailyLimit);
+      document.getElementById('dailyLimitInput').value = DAILY_TARGET;
+      console.log("📥 Loaded daily limit:", DAILY_TARGET);
+    }
+  } catch (err) {
+    console.warn("⚠️ Could not load daily limit from backend", err);
+  }
+}
+
+// 💾 Save new daily limit to backend
+async function saveDailyLimit() {
+  const input = document.getElementById('dailyLimitInput');
+  const newLimit = parseFloat(input.value);
+  if (isNaN(newLimit) || newLimit <= 0) {
+    return alert("Enter a valid CHF amount (greater than 0).");
+  }
+
+  try {
+    const res = await fetch(`${apiBase}/api/settings/dailyLimit`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ dailyLimit: newLimit })
+    });
+
+    if (res.ok) {
+      DAILY_TARGET = newLimit;
+      alert("✅ Daily limit saved.");
+      renderExpenseStats();
+    } else {
+      alert("❌ Failed to save daily limit.");
+    }
+  } catch (err) {
+    console.error("❌ Error saving limit", err);
+    alert("❌ Could not save. Check console.");
+  }
+}
+
+// 📊 Render expense stats and progress bar
 function renderExpenseStats() {
   console.log("🔁 renderExpenseStats called");
 
@@ -3300,40 +3351,6 @@ function renderExpenseStats() {
   if (avgEl) avgEl.textContent = average.toFixed(2);
   if (dayEl) dayEl.textContent = currentDay;
 
-  // 🟢 Category Chart
-  const categorySums = {};
-  for (const e of expenses) {
-    const cat = e.category || 'Uncategorized';
-    categorySums[cat] = (categorySums[cat] || 0) + parseFloat(e.amount || 0);
-  }
-
-  const labels = Object.keys(categorySums);
-  const data = Object.values(categorySums);
-  const ctx = document.getElementById('categoryExpenseChart')?.getContext('2d');
-  if (ctx) {
-    if (window.expenseChart) window.expenseChart.destroy();
-    window.expenseChart = new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        labels,
-        datasets: [{
-          data,
-          backgroundColor: [
-            '#e74c3c', '#f39c12', '#3498db',
-            '#2ecc71', '#9b59b6', '#95a5a6',
-            '#1abc9c', '#34495e', '#d35400'
-          ]
-        }]
-      },
-      options: {
-        plugins: {
-          legend: { position: 'bottom' },
-          title: { display: true, text: 'Expenses by Category (Current Month)' }
-        }
-      }
-    });
-  }
-
   // 🎯 Progress Bar (for TODAY only)
   const todaySpent = expenses
     .filter(e => (e.date || '').startsWith(todayStr))
@@ -3342,13 +3359,15 @@ function renderExpenseStats() {
   renderSpendingTargetBar(todaySpent, DAILY_TARGET);
 }
 
+// Wait until DOM is ready to render stats
 function delayedRenderExpenseStats() {
   setTimeout(() => {
     const totalEl = document.getElementById('expenseTotal');
-    const chartEl = document.getElementById('categoryExpenseChart');
     const progressEl = document.getElementById('spendingProgressFill');
+    const labelEl = document.getElementById('spendingProgressLabel');
+    const input = document.getElementById('dailyLimitInput');
 
-    if (!totalEl || !chartEl || !progressEl) {
+    if (!totalEl || !progressEl || !labelEl || !input) {
       renderRetryCount++;
       if (renderRetryCount > MAX_RETRIES) {
         console.warn("⛔ Stopped trying after too many retries.");
@@ -3364,15 +3383,15 @@ function delayedRenderExpenseStats() {
   }, 200);
 }
 
+// Render the spending progress bar
 function renderSpendingTargetBar(todaySpent, dailyLimit) {
   const percent = Math.min((todaySpent / dailyLimit) * 100, 100);
   const fill = document.getElementById('spendingProgressFill');
   const label = document.getElementById('spendingProgressLabel');
 
-  // 🎨 Color logic
-  let color = '#2ecc71'; // green
-  if (percent >= 100) color = '#e74c3c'; // red
-  else if (percent >= 70) color = '#f39c12'; // yellow
+  let color = '#2ecc71'; // Green
+  if (percent >= 100) color = '#e74c3c'; // Red
+  else if (percent >= 70) color = '#f39c12'; // Yellow
 
   if (fill) {
     fill.style.width = `${percent}%`;
@@ -3383,3 +3402,9 @@ function renderSpendingTargetBar(todaySpent, dailyLimit) {
     label.textContent = `Today: CHF ${todaySpent.toFixed(2)} / ${dailyLimit.toFixed(2)}`;
   }
 }
+
+// 🚀 Initialize on load
+window.addEventListener('DOMContentLoaded', async () => {
+  await loadDailyLimit();
+  delayedRenderExpenseStats();
+});
