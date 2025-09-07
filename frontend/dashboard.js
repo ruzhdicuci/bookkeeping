@@ -3249,6 +3249,7 @@ document.querySelectorAll('.section-heading').forEach(heading => {
 
 
 
+
 function renderExpenseStats() {
   console.log("🔁 renderExpenseStats called");
 
@@ -3260,54 +3261,31 @@ function renderExpenseStats() {
 
   const now = new Date();
   const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-  console.log("📅 Current month:", currentMonth);
-
-  // const excluded = ['Transfer', 'Balance', 'Ausgaben', 'Aus-Rudi'];
-
-  const activePersons = Array.from(document.querySelectorAll('.personOption:checked'))
-    .map(cb => cb.value)
-    .filter(name => name && !excluded.includes(name));
-
-  console.log("✅ Active persons:", activePersons);
-  console.log("🧾 Total entries:", window.entries.length);
-console.log("🧪 First 5 entries sample:");
-console.log(window.entries.slice(0, 5));
+  const currentDay = now.getDate();
 
   if (!Array.isArray(window.entries)) {
     console.error("❌ window.entries is not an array!");
     return;
   }
 
-  let validEntries = [];
-  const displaySkipped = true; // Toggle this to false to silence skipped entries
-
-  for (const e of window.entries) {
-    const isExpense = (e.type || '').toLowerCase() === 'minus';
-    const inCurrentMonth = (e.date || '').startsWith(currentMonth);
-    const isPerson = activePersons.includes(e.person);
-
-    if (isExpense && inCurrentMonth && isPerson) {
-      validEntries.push(e);
-    } else if (displaySkipped) {
-      console.log("⛔ Skipped:", {
-        reason: {
-          type: e.type,
-          date: e.date,
-          person: e.person
-        },
-        entry: e
-      });
-    }
-  }
+  const validEntries = window.entries.filter(e => {
+    const type = (e.type || '').toLowerCase();
+    const date = (e.date || '');
+    return type === 'minus' && date.startsWith(currentMonth);
+  });
 
   const total = validEntries.reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
-  const currentDay = now.getDate();
   const average = currentDay > 0 ? total / currentDay : 0;
 
+  // Log real entry data
+  console.log(`📆 Month: ${currentMonth}, 📅 Day: ${currentDay}`);
+  console.log(`✅ Valid entries this month: ${validEntries.length}`);
+  if (validEntries.length) console.log("🧾 Sample:", validEntries[0]);
+
+  // Update the DOM
   document.getElementById('expenseTotal').textContent = total.toFixed(2);
   document.getElementById('expenseAverage').textContent = average.toFixed(2);
   document.getElementById('expenseDaysSoFar').textContent = currentDay;
 
-  console.log(`✅ Total: ${total.toFixed(2)}, Avg: ${average.toFixed(2)}, Days: ${currentDay}`);
   console.log("✅ Finished renderExpenseStats");
 }
