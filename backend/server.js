@@ -441,6 +441,9 @@ app.listen(PORT, () => {
 });
 
 
+
+
+
 // ✅ Load saved daily limit
 app.get('/api/settings/dailyLimit', authMiddleware, async (req, res) => {
   try {
@@ -455,8 +458,8 @@ app.get('/api/settings/dailyLimit', authMiddleware, async (req, res) => {
 // ✅ Save daily limit
 app.post('/api/settings/dailyLimit', authMiddleware, async (req, res) => {
   try {
-    const { limit } = req.body;
-    if (typeof limit !== 'number') return res.status(400).json({ error: 'Invalid limit' });
+   const limit = parseFloat(req.body.limit);
+if (isNaN(limit) || limit <= 0) return res.status(400).json({ error: 'Invalid limit' });
 
     const updated = await DailySetting.findOneAndUpdate(
       { userId: req.user.id },

@@ -3283,36 +3283,7 @@ async function loadDailyLimit() {
   }
 }
 
-// 💾 Save new daily limit to backend
-async function saveDailyLimit() {
-  const input = document.getElementById('dailyLimitInput');
-  const newLimit = parseFloat(input.value);
-  if (isNaN(newLimit) || newLimit <= 0) {
-    return alert("Enter a valid CHF amount (greater than 0).");
-  }
 
-  try {
-    const res = await fetch(`${apiBase}/api/settings/dailyLimit`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify({ dailyLimit: newLimit })
-    });
-
-    if (res.ok) {
-      DAILY_TARGET = newLimit;
-      alert("✅ Daily limit saved.");
-      renderExpenseStats();
-    } else {
-      alert("❌ Failed to save daily limit.");
-    }
-  } catch (err) {
-    console.error("❌ Error saving limit", err);
-    alert("❌ Could not save. Check console.");
-  }
-}
 
 // 📊 Render expense stats and progress bar
 function renderExpenseStats() {
@@ -3408,3 +3379,36 @@ window.addEventListener('DOMContentLoaded', async () => {
   await loadDailyLimit();
   delayedRenderExpenseStats();
 });
+
+
+
+
+async function saveDailyLimit() {
+  const input = document.getElementById('dailyLimitInput');
+  const newLimit = parseFloat(input.value);
+
+  if (isNaN(newLimit) || newLimit <= 0) {
+    alert('Please enter a valid daily limit.');
+    return;
+  }
+
+  try {
+    const res = await fetch(`${apiBase}/api/settings/dailyLimit`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ limit: newLimit }) // ✅ correct structure
+    });
+
+    if (!res.ok) throw new Error('Request failed');
+
+    alert('✅ Daily limit saved.');
+    DAILY_TARGET = newLimit;
+    renderExpenseStats(); // update visuals
+  } catch (err) {
+    console.error('Failed to save daily limit:', err);
+    alert('❌ Failed to save daily limit.');
+  }
+}
