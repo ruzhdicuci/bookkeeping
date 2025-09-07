@@ -3270,38 +3270,21 @@ function renderExpenseStats() {
     return;
   }
 
-  const EXCLUDED_PERSONS = ['aus-rudi', 'ausgaben', 'balance', 'transfer'];
-
+  // ❗️Filter only current month's expenses and exclude certain persons
+  const excludedPersons = ['Transfer', 'Balance', 'Aus-Rudi', 'Ausgaben'];
   const expenses = window.entries.filter(e => {
     const type = (e.type || '').trim().toLowerCase();
     const date = (e.date || '').trim();
-    const person = (e.person || '').trim().toLowerCase();
-    return (
-      type === 'expense' &&
-      date.startsWith(currentMonth) &&
-      !EXCLUDED_PERSONS.includes(person)
-    );
+    const person = (e.person || '').trim();
+    return type === 'expense' && date.startsWith(currentMonth) && !excludedPersons.includes(person);
   });
 
-  // 🔍 Log all persons found
-  const includedPersons = [...new Set(expenses.map(e => (e.person || '').trim()))];
-  console.log("👥 Included persons in stats:", includedPersons);
+  console.log(`🧾 Found ${expenses.length} expenses for ${currentMonth}:`);
+  console.table(expenses);
 
-  // 🔍 Log per-person breakdown
-  const byPerson = {};
-  expenses.forEach(e => {
-    const key = (e.person || '').trim();
-    const amount = parseFloat(e.amount || 0);
-    byPerson[key] = (byPerson[key] || 0) + amount;
-  });
-  console.table(byPerson);
-
-  // 💰 Totals
   const total = expenses.reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
   const currentDay = now.getDate();
   const average = currentDay > 0 ? total / currentDay : 0;
-
-  console.log(`✅ Rendered: Total = CHF ${total.toFixed(2)}, Avg = CHF ${average.toFixed(2)}, Day = ${currentDay}`);
 
   // Update DOM
   const totalEl = document.getElementById('expenseTotal');
@@ -3311,63 +3294,121 @@ function renderExpenseStats() {
   if (totalEl) totalEl.textContent = total.toFixed(2);
   if (avgEl) avgEl.textContent = average.toFixed(2);
   if (dayEl) dayEl.textContent = currentDay;
+
+  // ✅ 💹 Render category chart
+  const categorySums = {};
+  for (const e of expenses) {
+    const cat = e.category || 'Uncategorized';
+    categorySums[cat] = (categorySums[cat] || 0) + parseFloat(e.amount || 0);
+  }
+
+  const labels = Object.keys(categorySums);
+  const data = Object.values(categorySums);
+
+  const ctx = document.getElementById('categoryExpenseChart')?.getContext('2d');
+  if (ctx) {
+    if (window.expenseChart) window.expenseChart.destroy();
+    window.expenseChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels,
+        datasets: [{
+          data,
+          backgroundColor: ['#e74c3c', '#f39c12', '#3498db', '#2ecc71', '#9b59b6', '#95a5a6']
+        }]
+      },
+      options: {
+        plugins: {
+          legend: { position: 'bottom' },
+          title: {
+            display: true,
+            text: 'Expenses by Category (Current Month)'
+          }
+        }
+      }
+    });
+  }
 }
 
 
-
+let renderRetryCount = 0;
+const MAX_RETRIES = 20;
 
 function delayedRenderExpenseStats() {
   setTimeout(() => {
-    if (document.getElementById('expenseTotal')) {
-      renderExpenseStats();
-    } else {
-      console.warn("⏳ Waiting for #expenseTotal to exist...");
-      delayedRenderExpenseStats(); // Retry
+    const totalEl = document.getElementById('expenseTotal');
+    const chartEl = document.getElementById('categoryExpenseChart');
+
+    if (!totalEl || !chartEl) {
+      renderRetryCount++;
+      if (renderRetryCount > MAX_RETRIES) {
+        console.warn("⛔ Stopped trying after too many retries.");
+        return;
+      }
+
+      console.warn("⏳ Waiting for required DOM elements... Retry:", renderRetryCount);
+      delayedRenderExpenseStats(); // 🔁 Retry
+      return;
     }
-  }, 200);
-}
 
-const ctx = document.getElementById('expenseChart').getContext('2d');
+    // ✅ DOM elements found: reset counter
+    renderRetryCount = 0;
 
-// Group expenses by category
-const grouped = {};
-expenses.forEach(e => {
-  const cat = (e.category || 'Other').trim();
-  grouped[cat] = (grouped[cat] || 0) + parseFloat(e.amount || 0);
-});
+    // ✅ Your existing render logic goes here...
+    renderExpenseStats();
 
-const labels = Object.keys(grouped);
-const data = Object.values(grouped);
+    const now = new Date();
+    const currentMonth = now.toISOString().slice(0, 7);
+    const excludedPersons = ['Transfer', 'Aus-Rudi', 'Balance', 'Ausgaben'];
 
-if (window.expenseChartInstance) {
-  window.expenseChartInstance.destroy();
-}
+    const expenses = (window.entries || []).filter(e => {
+      const type = (e.type || '').toLowerCase();
+      const date = e.date || '';
+      const person = (e.person || '').trim();
+      return (
+        type === 'expense' &&
+        date.startsWith(currentMonth) &&
+        !excludedPersons.includes(person)
+      );
+    });
 
-window.expenseChartInstance = new Chart(ctx, {
-  type: 'doughnut',
-  data: {
-    labels,
-    datasets: [{
-      data,
-      backgroundColor: [
-        '#FF6B6B', '#FFD93D', '#6BCB77', '#4D96FF', '#9D4EDD', '#FFA500'
-      ],
-      borderWidth: 1
-    }]
-  },
-  options: {
-    plugins: {
-      legend: {
-        position: 'bottom'
+    const categorySums = {};
+    for (const e of expenses) {
+      const cat = e.category || 'Uncategorized';
+      categorySums[cat] = (categorySums[cat] || 0) + parseFloat(e.amount || 0);
+    }
+
+    const labels = Object.keys(categorySums);
+    const data = Object.values(categorySums);
+
+    const ctx = chartEl.getContext('2d');
+    if (window.expenseChart && typeof window.expenseChart.destroy === 'function') {
+      window.expenseChart.destroy();
+    }
+
+    window.expenseChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels,
+        datasets: [{
+          data,
+          backgroundColor: [
+            '#e74c3c', '#f39c12', '#3498db',
+            '#2ecc71', '#9b59b6', '#95a5a6',
+            '#1abc9c', '#34495e', '#d35400'
+          ]
+        }]
       },
-      tooltip: {
-        callbacks: {
-          label: context => `${context.label}: CHF ${context.parsed.toFixed(2)}`
+      options: {
+        plugins: {
+          legend: { position: 'bottom' },
+          title: {
+            display: true,
+            text: 'Expenses by Category (Current Month)'
+          }
         }
       }
-    },
-    cutout: '60%',
-    responsive: true,
-    maintainAspectRatio: false
-  }
-});
+    });
+
+  }, 200);
+}
