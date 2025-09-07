@@ -1251,15 +1251,10 @@ function openTab(tabId, btn) {
 </div>
 
 <div id="expenseStatsContainer">
-  <p>📊 <strong>Expense Stats</strong></p>
-</div>
-
-<div id="inactivityModal" class="modal hidden">
-  <div class="modal-content">
-    <h2>🔒 Inactivity Detected</h2>
-    <p id="inactivityCountdown">Logging out in <span id="countdown">60</span> seconds...</p>
-    <button id="continueSessionBtn">Continue</button>
-  </div>
+  <p>📊 <strong>Current Month Expense Stats</strong></p>
+  <p><strong>Total so far:</strong> CHF <span id="expenseTotal">0.00</span></p>
+  <p><strong>Average per day (up to <span id="expenseDaysSoFar">0</span>):</strong> CHF <span id="expenseAverage">0.00</span></p>
+  <p>⚠️ Target is ~50 CHF/day</p>
 </div>
 
 

@@ -57,6 +57,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   await fetchEntries(); // populates window.entries
   await db.entries.clear();              // 🧹 Clear old cache
   await db.entries.bulkPut(window.entries); // 💾 Save fresh ones
+  // ✅ NOW call expense stats last
+setTimeout(() => {
+  renderExpenseStats();
+}, 50); // small delay for DOM updates
   renderEntries(window.entries);         // ✅ Render fresh ones
  renderMonthlyWidgets(window.entries);
 renderBankBalanceForm();     
@@ -334,6 +338,10 @@ async function fetchEntries() {
     // ✅ Save entries locally
     await db.entries.clear();
     await db.entries.bulkPut(window.entries);
+    // ✅ NOW call expense stats last
+setTimeout(() => {
+  renderExpenseStats();
+}, 50); // small delay for DOM updates
   } catch (err) {
     console.warn('⚠️ fetchEntries failed, loading from Dexie instead:', err);
 
@@ -2757,7 +2765,7 @@ window.syncYearlyLimitsToMongo  =syncYearlyLimitsToMongo;
 window.loadAndRenderYearlyLimit  = loadAndRenderYearlyLimit;
 window.renderRealYearlyCards = renderRealYearlyCards;
 window.renderExpenseStats = renderExpenseStats;
-window.getActivePersons = getActivePersons;
+
 
 
 
@@ -3241,17 +3249,8 @@ document.querySelectorAll('.section-heading').forEach(heading => {
 
 
 
-function getActivePersons() {
-  const checkedBoxes = document.querySelectorAll('.personOption:checked');
-  const excluded = ['Transfer', 'Balance', 'Ausgaben', 'Aus-Rudi']; // 👈 Exclude these
-  return Array.from(checkedBoxes)
-    .map(cb => cb.value)
-    .filter(name => name && !excluded.includes(name));
-}
-
-
 function renderExpenseStats() {
-  console.log("🔁 Simplified renderExpenseStats called");
+  console.log("🔁 renderExpenseStats called");
 
   const container = document.getElementById('expenseStatsContainer');
   if (!container) {
@@ -3260,31 +3259,55 @@ function renderExpenseStats() {
   }
 
   const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0'); // JS months are 0-based
-  const currentMonth = `${year}-${month}`;
+  const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  console.log("📅 Current month:", currentMonth);
 
-  console.log("📅 Current month string:", currentMonth);
+  // const excluded = ['Transfer', 'Balance', 'Ausgaben', 'Aus-Rudi'];
 
-  const validEntries = (window.entries || []).filter(e => {
-    const isExpense = e.type === 'minus';
-    const inMonth = (e.date || '').startsWith(currentMonth);
-    const match = isExpense && inMonth;
+  const activePersons = Array.from(document.querySelectorAll('.personOption:checked'))
+    .map(cb => cb.value)
+    .filter(name => name && !excluded.includes(name));
 
-    if (match) {
-      console.log("✅ Matched entry:", e);
+  console.log("✅ Active persons:", activePersons);
+  console.log("🧾 Total entries:", window.entries.length);
+console.log("🧪 First 5 entries sample:");
+console.log(window.entries.slice(0, 5));
+
+  if (!Array.isArray(window.entries)) {
+    console.error("❌ window.entries is not an array!");
+    return;
+  }
+
+  let validEntries = [];
+  const displaySkipped = true; // Toggle this to false to silence skipped entries
+
+  for (const e of window.entries) {
+    const isExpense = (e.type || '').toLowerCase() === 'minus';
+    const inCurrentMonth = (e.date || '').startsWith(currentMonth);
+    const isPerson = activePersons.includes(e.person);
+
+    if (isExpense && inCurrentMonth && isPerson) {
+      validEntries.push(e);
+    } else if (displaySkipped) {
+      console.log("⛔ Skipped:", {
+        reason: {
+          type: e.type,
+          date: e.date,
+          person: e.person
+        },
+        entry: e
+      });
     }
-    return match;
-  });
+  }
 
   const total = validEntries.reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
   const currentDay = now.getDate();
-  const avg = total / currentDay;
+  const average = currentDay > 0 ? total / currentDay : 0;
 
-  container.innerHTML = `
-    <p><strong>Total expenses so far:</strong> CHF ${total.toFixed(2)}</p>
-    <p><strong>Daily average:</strong> CHF ${avg.toFixed(2)}</p>
-  `;
+  document.getElementById('expenseTotal').textContent = total.toFixed(2);
+  document.getElementById('expenseAverage').textContent = average.toFixed(2);
+  document.getElementById('expenseDaysSoFar').textContent = currentDay;
 
-  console.log("💰 Total:", total.toFixed(2), " | 📆 Day:", currentDay, " | 📊 Avg:", avg.toFixed(2));
+  console.log(`✅ Total: ${total.toFixed(2)}, Avg: ${average.toFixed(2)}, Days: ${currentDay}`);
+  console.log("✅ Finished renderExpenseStats");
 }
