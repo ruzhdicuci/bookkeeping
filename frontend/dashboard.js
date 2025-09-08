@@ -34,6 +34,9 @@ let entries = [];
 let persons = [];
 let currentNoteEntryId = null;
 let editModeActive = false;
+let DAILY_TARGET = 50; // Default fallback
+let renderRetryCount = 0;
+const MAX_RETRIES = 20;
 
 const apiBase = 'https://bookkeeping-i8e0.onrender.com';
 const token = localStorage.getItem('token');
@@ -70,9 +73,7 @@ renderBankBalanceForm();
   if (navigator.onLine) syncToCloud();
 
 
-let DAILY_TARGET = 50; // Default fallback
-let renderRetryCount = 0;
-const MAX_RETRIES = 20;
+
 
   // Your flatpickr and other logic continues...
   const dateInput = document.getElementById('newDate');
