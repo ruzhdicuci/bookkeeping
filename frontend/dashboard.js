@@ -2035,21 +2035,14 @@ function getCurrentUserId() {
     const token = localStorage.getItem('token');
     if (!token) return null;
 
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    const id = payload.userId;
-
-    if (typeof id !== 'string') {
-      console.warn("⚠️ userId from token is not a string:", id);
-      return null;
-    }
-
-    return id;
+    const payload = JSON.parse(atob(token.split('.')[1])); // decode JWT
+    const id = payload.userId || null;
+    return typeof id === 'string' ? id : String(id); // ✅ Force string
   } catch (err) {
     console.warn("⚠️ Couldn't extract userId from token", err);
     return null;
   }
 }
-
 
 window.addEventListener("online", async () => {
   debug("🔌 Back online. Attempting to sync custom cards...");
