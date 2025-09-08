@@ -15,7 +15,11 @@ import {
   getUnsyncedCustomCards,    // ✅ Add this here too
   getYearlyLimitFromCache,
   saveYearlyLimitLocally,
-  getUnsyncedYearlyLimits // ✅ ADD THIS
+  getUnsyncedYearlyLimits, // ✅ ADD THIS
+ saveDailyLimitLocally,
+  getCachedDailyLimit,
+  getUnsyncedDailyLimits,
+  markDailyLimitAsSynced
 } from './dexieDb.js';
 
 import { initDexie } from './dexieDb.js';
@@ -2811,7 +2815,7 @@ window.delayedRenderExpenseStats = delayedRenderExpenseStats;
 window.saveDailyLimit = saveDailyLimit;
 window. waitAndRenderExpenseStats =  waitAndRenderExpenseStats
 window.showSuccessModal = showSuccessModal
-
+window.syncDailyLimitsToBackend = syncDailyLimitsToBackend
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -3293,25 +3297,38 @@ async function loadDailyLimit() {
 
 // ✅ Wait until all required elements and data are loaded
 function waitAndRenderExpenseStats() {
-  const interval = setInterval(() => {
-    const ready =
-      document.getElementById('expenseTotal') &&
-      document.getElementById('expenseAverage') &&
-      document.getElementById('dailyLimitInput') &&
-      document.getElementById('spendingProgressFill') &&
-      window.entries?.length > 0;
+  let retryCount = 0;
 
-    if (ready) {
+  const interval = setInterval(() => {
+    retryCount++;
+
+    const totalEl = document.getElementById('expenseTotal');
+    const averageEl = document.getElementById('expenseAverage');
+    const inputEl = document.getElementById('dailyLimitInput');
+    const fillEl = document.getElementById('spendingProgressFill');
+    const entriesReady = Array.isArray(window.entries) && window.entries.length > 0;
+
+    if (totalEl && averageEl && inputEl && fillEl && entriesReady) {
       clearInterval(interval);
+      console.log("✅ All elements found, rendering...");
       renderExpenseStats();
+    } else {
+      console.warn(`⚠️ Waiting for required DOM elements... Retry: ${retryCount}`, {
+        missing: {
+          expenseTotal: !!totalEl,
+          expenseAverage: !!averageEl,
+          dailyLimitInput: !!inputEl,
+          spendingProgressFill: !!fillEl,
+          entriesReady: entriesReady,
+        },
+      });
+    }
+
+    if (retryCount >= 20) {
+      clearInterval(interval);
+      console.warn("⛔ Stopped trying after too many retries.");
     }
   }, 300);
-
-  // ⛔ Safety timeout after 10s
-  setTimeout(() => {
-    clearInterval(interval);
-    console.warn("⚠️ Still not ready after 10s, skipping stats render.");
-  }, 10000);
 }
 
 // 📊 Render expense stats and progress bar
@@ -3451,39 +3468,57 @@ window.addEventListener('DOMContentLoaded', async () => {
 });
 
 // 💾 Save new daily limit to backend
-async function saveDailyLimit() {
-  const input = document.getElementById('dailyLimitInput');
-  const newLimit = parseFloat(input.value);
-
-  if (isNaN(newLimit) || newLimit <= 0) {
-    alert('Please enter a valid daily limit.');
-    return;
+async function loadDailyLimit() {
+  const userId = getCurrentUserId(); // Or however you're storing it
+  let local = await getCachedDailyLimit(userId);
+  if (local?.limit) {
+    DAILY_TARGET = local.limit;
+    document.getElementById('dailyLimitInput').value = DAILY_TARGET;
   }
 
   try {
     const res = await fetch(`${apiBase}/api/settings/dailyLimit`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify({ limit: newLimit })
+      headers: { Authorization: `Bearer ${token}` }
     });
+    if (!res.ok) throw new Error('Failed to load');
 
-    if (!res.ok) throw new Error('Request failed');
+    const data = await res.json();
+    DAILY_TARGET = data.limit;
+    document.getElementById('dailyLimitInput').value = data.limit;
 
-  showSuccessModal("✅ Daily limit saved.");
-    DAILY_TARGET = newLimit;
-    renderExpenseStats(); // update progress
+    // ✅ Save fresh value to Dexie
+    await saveDailyLimitLocally(userId, data.limit);
   } catch (err) {
-    console.error('Failed to save daily limit:', err);
-    alert('❌ Failed to save daily limit.');
+    console.warn("⚠️ Failed to load from backend, using local cache", err);
   }
 }
 
 
+async function syncDailyLimitsToBackend() {
+  const unsynced = await getUnsyncedDailyLimits();
+  for (const item of unsynced) {
+    try {
+      const res = await fetch(`${apiBase}/api/settings/dailyLimit`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ limit: item.limit })
+      });
 
+      if (res.ok) {
+        await markDailyLimitAsSynced(item.userId);
+        console.log(`✅ Synced daily limit for ${item.userId}`);
+      }
+    } catch (err) {
+      console.error("❌ Sync error:", err);
+    }
+  }
+}
 
+// Call it when going online again
+window.addEventListener('online', syncDailyLimitsToBackend);
 
 // 👀 Hover preview logic
 document.querySelectorAll('#customizeSidebar label[data-section]').forEach(label => {

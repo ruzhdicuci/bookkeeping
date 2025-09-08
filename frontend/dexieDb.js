@@ -18,7 +18,9 @@ db.version(308).stores({
   notes: '_id, title, content, done, synced, lastUpdated',
   balances: 'bank',
   customCards: '_id,name,limit,synced,lastUpdated',
-  yearlyLimits: '[userId+year], synced, year, limit, startFrom, lastUpdated'
+  yearlyLimits: '[userId+year], synced, year, limit, startFrom, lastUpdated',
+  dailyLimits: '[userId],limit,updatedAt,synced'  // ✅ required
+
 });
 
 
@@ -311,6 +313,31 @@ async function getUnsyncedYearlyLimits() {
   }
 }
 
+
+export async function saveDailyLimitLocally(userId, limit) {
+  await db.dailyLimits.put({
+    userId,
+    limit,
+    updatedAt: new Date().toISOString(),
+    synced: false
+  });
+}
+
+export async function getCachedDailyLimit(userId) {
+  return await db.dailyLimits.get(userId);
+}
+
+export async function getUnsyncedDailyLimits() {
+  return await db.dailyLimits.where('synced').equals(false).toArray();
+}
+
+export async function markDailyLimitAsSynced(userId) {
+  const existing = await db.dailyLimits.get(userId);
+  if (existing) {
+    await db.dailyLimits.put({ ...existing, synced: true });
+  }
+}
+
 // ✅ Export all at once
 export {
   saveNoteLocally,
@@ -331,7 +358,11 @@ export {
   fetchAndCacheEntries,
     saveYearlyLimitLocally,
   getYearlyLimitFromCache,
-  getUnsyncedYearlyLimits
+  getUnsyncedYearlyLimits,
+  saveDailyLimitLocally,
+  getCachedDailyLimit,
+  getUnsyncedDailyLimits,
+  markDailyLimitAsSynced
 };
 
 window.db = db; // ✅ For debugging
