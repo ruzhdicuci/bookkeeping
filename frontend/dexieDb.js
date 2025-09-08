@@ -327,7 +327,8 @@ export async function getCachedDailyLimit(userId) {
   return await db.dailyLimits.get(userId);
 }
 
-export async function getUnsyncedDailyLimits() {
+// ✅ Define the function without export
+async function getUnsyncedDailyLimits() {
   return await db.dailyLimits.where('synced').equals(false).toArray();
 }
 
