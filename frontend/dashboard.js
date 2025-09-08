@@ -19,8 +19,7 @@ import {
  saveDailyLimitLocally,
   getCachedDailyLimit,
   getUnsyncedDailyLimits,
-  markDailyLimitAsSynced,
-  saveDailyLimit
+  markDailyLimitAsSynced
 } from './dexieDb.js';
 
 import { initDexie } from './dexieDb.js';
@@ -2816,7 +2815,7 @@ window.loadAndRenderYearlyLimit  = loadAndRenderYearlyLimit;
 window.renderRealYearlyCards = renderRealYearlyCards;
 window.renderExpenseStats = renderExpenseStats;
 
-window.saveDailyLimit = saveDailyLimit;
+
 window. waitAndRenderExpenseStats =  waitAndRenderExpenseStats
 window.showSuccessModal = showSuccessModal
 window.syncDailyLimitsToBackend = syncDailyLimitsToBackend
