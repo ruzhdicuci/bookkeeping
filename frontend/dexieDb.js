@@ -314,6 +314,11 @@ async function getUnsyncedYearlyLimits() {
 }
 
 async function saveDailyLimitLocally(userId, limit) {
+  if (!userId || typeof userId !== 'string') {
+    console.warn("❌ Invalid userId passed to saveDailyLimitLocally:", userId);
+    return;
+  }
+
   await db.dailyLimits.put({
     userId,
     limit,

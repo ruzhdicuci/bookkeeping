@@ -2030,6 +2030,26 @@ function clearSearch(id) {
   renderEntries();
 }
 
+function getCurrentUserId() {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) return null;
+
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const id = payload.userId;
+
+    if (typeof id !== 'string') {
+      console.warn("⚠️ userId from token is not a string:", id);
+      return null;
+    }
+
+    return id;
+  } catch (err) {
+    console.warn("⚠️ Couldn't extract userId from token", err);
+    return null;
+  }
+}
+
 
 window.addEventListener("online", async () => {
   debug("🔌 Back online. Attempting to sync custom cards...");
@@ -3429,28 +3449,23 @@ waitAndRenderExpenseStats(); // ✅ use this single retry-safe version
 });
 
 // 💾 Save new daily limit to backend
-// 💾 Save new daily limit to backend
 async function loadDailyLimit() {
   const userId = getCurrentUserId();
-
   if (!userId) {
-    console.warn("⚠️ No valid userId found, skipping daily limit load.");
+    console.warn("⚠️ No userId found, skipping daily limit load");
     return;
   }
 
-  try {
-    // 🔃 Try to load from Dexie first
-    const local = await getCachedDailyLimit(userId);
-    if (local?.limit) {
-      DAILY_TARGET = local.limit;
-      document.getElementById('dailyLimitInput').value = DAILY_TARGET;
-    }
+  let local = await getCachedDailyLimit(userId);
+  if (local?.limit) {
+    DAILY_TARGET = local.limit;
+    document.getElementById('dailyLimitInput').value = DAILY_TARGET;
+  }
 
-    // 🌐 Fetch from backend to get latest value
+  try {
     const res = await fetch(`${apiBase}/api/settings/dailyLimit`, {
       headers: { Authorization: `Bearer ${token}` }
     });
-
     if (!res.ok) throw new Error('Failed to load');
 
     const data = await res.json();
@@ -3459,11 +3474,14 @@ async function loadDailyLimit() {
 
     // ✅ Save fresh value to Dexie
     await saveDailyLimitLocally(userId, data.limit);
-
   } catch (err) {
     console.warn("⚠️ Failed to load from backend, using local cache", err);
   }
 }
+
+
+
+
 
 window.saveDailyLimit = async function () {
   const input = document.getElementById('dailyLimitInput');
@@ -3564,18 +3582,6 @@ document.querySelectorAll('#customizeSidebar label[data-section]').forEach(label
 
 
 
-function getCurrentUserId() {
-  try {
-    const token = localStorage.getItem('token');
-    if (!token) return null;
-
-    const payload = JSON.parse(atob(token.split('.')[1])); // decode JWT
-    return payload.userId || null;
-  } catch (err) {
-    console.warn("⚠️ Couldn't extract userId from token", err);
-    return null;
-  }
-}
 
 
 function showSuccessModal(message = "Saved!") {
