@@ -3454,6 +3454,41 @@ async function loadDailyLimit() {
   }
 }
 
+window.saveDailyLimit = async function () {
+  const input = document.getElementById('dailyLimitInput');
+  const newLimit = parseFloat(input.value);
+
+  if (isNaN(newLimit) || newLimit <= 0) {
+    alert("Please enter a valid daily limit.");
+    return;
+  }
+
+  const userId = getCurrentUserId(); // ✅ Already fixed in earlier step
+  DAILY_TARGET = newLimit;
+
+  // Save to Dexie
+  await saveDailyLimitLocally(userId, newLimit);
+
+  // Sync to backend
+  try {
+    const res = await fetch(`${apiBase}/api/settings/dailyLimit`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ limit: newLimit })
+    });
+
+    if (!res.ok) throw new Error("Backend save failed");
+    console.log("✅ Daily limit saved");
+  } catch (err) {
+    console.warn("⚠️ Failed to sync to backend:", err);
+  }
+
+  renderExpenseStats(); // ✅ Rerender with new limit
+};
+
 
 async function syncDailyLimitsToBackend() {
   const unsynced = await getUnsyncedDailyLimits();
