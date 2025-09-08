@@ -958,7 +958,7 @@ margin-right: -8px;
 
 .modal-content.success-modal {
   background: #1f1f1f;
-  color: #00ff99;
+  color: #ffffff;
   padding: 20px 32px;
   border-radius: 12px;
   font-family: system-ui, sans-serif;
@@ -976,17 +976,6 @@ margin-right: -8px;
   font-size: 1.5rem;
 }
 
-/* Optional animation */
-@keyframes fadeInOut {
-  0%   { opacity: 0; transform: scale(0.95); }
-  20%  { opacity: 1; transform: scale(1); }
-  80%  { opacity: 1; transform: scale(1); }
-  100% { opacity: 0; transform: scale(0.95); }
-}
-
-.modal-content.success-modal {
-  animation: fadeInOut 2.5s ease-out;
-}
 
 .modal.hidden {
   display: none;
@@ -3077,7 +3066,7 @@ body.dark .monthly-widgets-wrapper {
   width: 100%;
   text-align: center;
   font-size: 1rem;
-  margin-bottom: 1px;
+  margin-bottom: -15px;
   color: #3a3737;
 }
 
@@ -3307,25 +3296,6 @@ margin-bottom: 3px;
 
 
 
-.info-toggle-btn {
-  margin-left: 8px;
-  color: #db34a9;
- 
-  border: none;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  font-size: 14px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.2s ease;
-}
-
-.info-toggle-btn:hover {
- color: black;
-}
 
 
 /* Toggle Button */

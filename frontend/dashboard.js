@@ -3472,7 +3472,7 @@ async function saveDailyLimit() {
 
     if (!res.ok) throw new Error('Request failed');
 
-    alert('✅ Daily limit saved.');
+  showSuccessModal("✅ Daily limit saved.");
     DAILY_TARGET = newLimit;
     renderExpenseStats(); // update progress
   } catch (err) {
