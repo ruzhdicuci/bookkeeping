@@ -328,6 +328,11 @@ async function saveDailyLimitLocally(userId, limit) {
 }
 
 async function getCachedDailyLimit(userId) {
+  if (!userId || typeof userId !== 'string') {
+    console.warn("❌ Invalid userId passed to getCachedDailyLimit:", userId);
+    return null;
+  }
+
   return await db.dailyLimits.get(userId);
 }
 
