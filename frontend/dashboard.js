@@ -19,7 +19,8 @@ import {
  saveDailyLimitLocally,
   getCachedDailyLimit,
   getUnsyncedDailyLimits,
-  markDailyLimitAsSynced
+  markDailyLimitAsSynced,
+  saveDailyLimit
 } from './dexieDb.js';
 
 import { initDexie } from './dexieDb.js';
