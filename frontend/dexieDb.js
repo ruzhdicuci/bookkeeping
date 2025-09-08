@@ -313,8 +313,7 @@ async function getUnsyncedYearlyLimits() {
   }
 }
 
-
-export async function saveDailyLimitLocally(userId, limit) {
+async function saveDailyLimitLocally(userId, limit) {
   await db.dailyLimits.put({
     userId,
     limit,
