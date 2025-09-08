@@ -2036,14 +2036,14 @@ function getCurrentUserId() {
     if (!token) return null;
 
     const payload = JSON.parse(atob(token.split('.')[1]));
-    const raw = payload.userId;
+    const id = payload?.userId;
 
-    if (!raw) return null;
+    if (typeof id === 'string' && id.trim() !== '') {
+      return id;
+    }
 
-    const stringId = raw.toString();
-    if (!stringId || typeof stringId !== 'string') return null;
-
-    return stringId;
+    // Convert ObjectId or number to string fallback
+    return id?.toString?.() || null;
   } catch (err) {
     console.warn("⚠️ Couldn't extract userId from token", err);
     return null;
@@ -3449,7 +3449,7 @@ waitAndRenderExpenseStats(); // ✅ use this single retry-safe version
 
 // 💾 Save new daily limit to backend
 async function loadDailyLimit() {
-    const userId = getCurrentUserId();
+  const userId = getCurrentUserId();
   console.log("👤 Using userId:", userId);
   if (!userId) {
     console.warn("⚠️ No userId found, skipping daily limit load");
