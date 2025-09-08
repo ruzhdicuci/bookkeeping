@@ -336,8 +336,7 @@ async function fetchEntries() {
     await db.entries.clear();
     await db.entries.bulkPut(window.entries);
 
-    // ✅ Add this to trigger stats after all is ready
-    delayedRenderExpenseStats();
+
 
   } catch (err) {
     console.warn('⚠️ fetchEntries failed, loading from Dexie instead:', err);
@@ -354,8 +353,7 @@ async function fetchEntries() {
       populateFilters();
       renderBankBalanceForm();
 
-      // ✅ Add this here too for Dexie fallback
-      delayedRenderExpenseStats();
+   
 
     } catch (dexieErr) {
       console.error('❌ Dexie fallback also failed:', dexieErr);
@@ -2811,7 +2809,7 @@ window.syncYearlyLimitsToMongo  =syncYearlyLimitsToMongo;
 window.loadAndRenderYearlyLimit  = loadAndRenderYearlyLimit;
 window.renderRealYearlyCards = renderRealYearlyCards;
 window.renderExpenseStats = renderExpenseStats;
-window.delayedRenderExpenseStats = delayedRenderExpenseStats;
+
 window.saveDailyLimit = saveDailyLimit;
 window. waitAndRenderExpenseStats =  waitAndRenderExpenseStats
 window.showSuccessModal = showSuccessModal
@@ -3276,30 +3274,6 @@ document.querySelectorAll('.section-heading').forEach(heading => {
 let DAILY_TARGET = 50; // Default fallback
 let renderRetryCount = 0;
 const MAX_RETRIES = 20;
-// Wait until DOM is ready to render stats
-function delayedRenderExpenseStats() {
-  setTimeout(() => {
-    const totalEl = document.getElementById('expenseTotal');
-    const progressEl = document.getElementById('spendingProgressFill');
-    const labelEl = document.getElementById('spendingProgressLabel');
-    const input = document.getElementById('dailyLimitInput');
-
-    if (!totalEl || !progressEl || !labelEl || !input) {
-      renderRetryCount++;
-      if (renderRetryCount > MAX_RETRIES) {
-        console.warn("⛔ Stopped trying after too many retries.");
-        return;
-      }
-      console.warn("⏳ Waiting for required DOM elements... Retry:", renderRetryCount);
-      delayedRenderExpenseStats();
-      return;
-    }
-
-    renderRetryCount = 0;
-    renderExpenseStats();
-  }, 200);
-}
-
 
 
 // ✅ Wait until all required elements and data are loaded
