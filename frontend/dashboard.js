@@ -3429,18 +3429,28 @@ waitAndRenderExpenseStats(); // ✅ use this single retry-safe version
 });
 
 // 💾 Save new daily limit to backend
+// 💾 Save new daily limit to backend
 async function loadDailyLimit() {
-  const userId = getCurrentUserId(); // Or however you're storing it
-  let local = await getCachedDailyLimit(userId);
-  if (local?.limit) {
-    DAILY_TARGET = local.limit;
-    document.getElementById('dailyLimitInput').value = DAILY_TARGET;
+  const userId = getCurrentUserId();
+
+  if (!userId) {
+    console.warn("⚠️ No valid userId found, skipping daily limit load.");
+    return;
   }
 
   try {
+    // 🔃 Try to load from Dexie first
+    const local = await getCachedDailyLimit(userId);
+    if (local?.limit) {
+      DAILY_TARGET = local.limit;
+      document.getElementById('dailyLimitInput').value = DAILY_TARGET;
+    }
+
+    // 🌐 Fetch from backend to get latest value
     const res = await fetch(`${apiBase}/api/settings/dailyLimit`, {
       headers: { Authorization: `Bearer ${token}` }
     });
+
     if (!res.ok) throw new Error('Failed to load');
 
     const data = await res.json();
@@ -3449,6 +3459,7 @@ async function loadDailyLimit() {
 
     // ✅ Save fresh value to Dexie
     await saveDailyLimitLocally(userId, data.limit);
+
   } catch (err) {
     console.warn("⚠️ Failed to load from backend, using local cache", err);
   }
@@ -3482,6 +3493,7 @@ window.saveDailyLimit = async function () {
 
     if (!res.ok) throw new Error("Backend save failed");
     console.log("✅ Daily limit saved");
+    showSuccessModal("✅ Daily limit saved!");
   } catch (err) {
     console.warn("⚠️ Failed to sync to backend:", err);
   }
