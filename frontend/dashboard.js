@@ -3551,6 +3551,21 @@ document.querySelectorAll('#customizeSidebar label[data-section]').forEach(label
 });
 
 
+
+function getCurrentUserId() {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) return null;
+
+    const payload = JSON.parse(atob(token.split('.')[1])); // decode JWT
+    return payload.userId || null;
+  } catch (err) {
+    console.warn("⚠️ Couldn't extract userId from token", err);
+    return null;
+  }
+}
+
+
 function showSuccessModal(message = "Saved!") {
   const modal = document.getElementById("successModal");
   const text = modal.querySelector(".modal-text");
