@@ -3402,7 +3402,7 @@ function renderSpendingTargetBar(todaySpent, dailyLimit) {
 window.addEventListener('DOMContentLoaded', async () => {
   await loadDailyLimit();
   await syncDailyLimitsToBackend();
-
+waitAndRenderExpenseStats(); // ✅ use this single retry-safe version
   const interval = setInterval(() => {
     const totalEl = document.getElementById('expenseTotal');
     const avgEl = document.getElementById('expenseAverage');
