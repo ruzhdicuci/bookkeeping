@@ -3277,22 +3277,6 @@ let DAILY_TARGET = 50; // Default fallback
 let renderRetryCount = 0;
 const MAX_RETRIES = 20;
 
-// 🔁 Load saved daily limit from backend
-async function loadDailyLimit() {
-  try {
-    const res = await fetch(`${apiBase}/api/settings/dailyLimit`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    const data = await res.json();
-    if (res.ok && data?.limit != null) {
-      DAILY_TARGET = parseFloat(data.limit);
-      document.getElementById('dailyLimitInput').value = DAILY_TARGET;
-      console.log("📥 Loaded daily limit:", DAILY_TARGET);
-    }
-  } catch (err) {
-    console.warn("⚠️ Could not load daily limit from backend", err);
-  }
-}
 
 
 // ✅ Wait until all required elements and data are loaded

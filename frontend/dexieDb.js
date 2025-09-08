@@ -323,7 +323,7 @@ export async function saveDailyLimitLocally(userId, limit) {
   });
 }
 
-export async function getCachedDailyLimit(userId) {
+async function getCachedDailyLimit(userId) {
   return await db.dailyLimits.get(userId);
 }
 
