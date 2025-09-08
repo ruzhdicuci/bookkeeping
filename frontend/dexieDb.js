@@ -314,26 +314,35 @@ async function getUnsyncedYearlyLimits() {
 }
 
 async function saveDailyLimitLocally(userId, limit) {
-  if (!userId || typeof userId !== 'string') {
+  if (!userId || typeof userId !== 'string' || userId.trim() === '') {
     console.warn("❌ Invalid userId passed to saveDailyLimitLocally:", userId);
     return;
   }
 
-  await db.dailyLimits.put({
-    userId,
-    limit,
-    updatedAt: new Date().toISOString(),
-    synced: false
-  });
+  try {
+    await db.dailyLimits.put({
+      userId,
+      limit,
+      updatedAt: new Date().toISOString(),
+      synced: false
+    });
+  } catch (err) {
+    console.error("❌ Dexie PUT failed in saveDailyLimitLocally:", err);
+  }
 }
 
 async function getCachedDailyLimit(userId) {
-  if (!userId || typeof userId !== 'string') {
+  if (!userId || typeof userId !== 'string' || userId.trim() === '') {
     console.warn("❌ Invalid userId passed to getCachedDailyLimit:", userId);
     return null;
   }
 
-  return await db.dailyLimits.get(userId);
+  try {
+    return await db.dailyLimits.get(userId);
+  } catch (err) {
+    console.error("❌ Dexie GET failed in getCachedDailyLimit:", err);
+    return null;
+  }
 }
 
 // ✅ Define the function without export

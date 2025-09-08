@@ -2035,10 +2035,15 @@ function getCurrentUserId() {
     const token = localStorage.getItem('token');
     if (!token) return null;
 
-    const payload = JSON.parse(atob(token.split('.')[1])); // decode JWT
-    const userId = payload.userId;
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const raw = payload.userId;
 
-    return typeof userId === 'string' ? userId : userId?.toString();
+    if (!raw) return null;
+
+    const stringId = raw.toString();
+    if (!stringId || typeof stringId !== 'string') return null;
+
+    return stringId;
   } catch (err) {
     console.warn("⚠️ Couldn't extract userId from token", err);
     return null;
@@ -3444,7 +3449,8 @@ waitAndRenderExpenseStats(); // ✅ use this single retry-safe version
 
 // 💾 Save new daily limit to backend
 async function loadDailyLimit() {
-  const userId = getCurrentUserId();
+    const userId = getCurrentUserId();
+  console.log("👤 Using userId:", userId);
   if (!userId) {
     console.warn("⚠️ No userId found, skipping daily limit load");
     return;
