@@ -361,8 +361,7 @@ export {
   getUnsyncedYearlyLimits,
   saveDailyLimitLocally,
   getCachedDailyLimit,
-  getUnsyncedDailyLimits,
-  markDailyLimitAsSynced
+  getUnsyncedDailyLimits
 };
 
 window.db = db; // ✅ For debugging

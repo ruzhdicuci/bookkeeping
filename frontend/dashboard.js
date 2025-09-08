@@ -3443,6 +3443,7 @@ function renderSpendingTargetBar(todaySpent, dailyLimit) {
 // 🚀 Initialize on load
 window.addEventListener('DOMContentLoaded', async () => {
   await loadDailyLimit();
+  await syncDailyLimitsToBackend();
 
   const interval = setInterval(() => {
     const totalEl = document.getElementById('expenseTotal');
