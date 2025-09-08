@@ -3276,6 +3276,29 @@ document.querySelectorAll('.section-heading').forEach(heading => {
 let DAILY_TARGET = 50; // Default fallback
 let renderRetryCount = 0;
 const MAX_RETRIES = 20;
+// Wait until DOM is ready to render stats
+function delayedRenderExpenseStats() {
+  setTimeout(() => {
+    const totalEl = document.getElementById('expenseTotal');
+    const progressEl = document.getElementById('spendingProgressFill');
+    const labelEl = document.getElementById('spendingProgressLabel');
+    const input = document.getElementById('dailyLimitInput');
+
+    if (!totalEl || !progressEl || !labelEl || !input) {
+      renderRetryCount++;
+      if (renderRetryCount > MAX_RETRIES) {
+        console.warn("⛔ Stopped trying after too many retries.");
+        return;
+      }
+      console.warn("⏳ Waiting for required DOM elements... Retry:", renderRetryCount);
+      delayedRenderExpenseStats();
+      return;
+    }
+
+    renderRetryCount = 0;
+    renderExpenseStats();
+  }, 200);
+}
 
 
 
@@ -3370,29 +3393,6 @@ function renderExpenseStats() {
   renderSpendingTargetBar(average, DAILY_TARGET); // ✅ use avg vs. limit instead of todaySpent
 }
 
-// Wait until DOM is ready to render stats
-function delayedRenderExpenseStats() {
-  setTimeout(() => {
-    const totalEl = document.getElementById('expenseTotal');
-    const progressEl = document.getElementById('spendingProgressFill');
-    const labelEl = document.getElementById('spendingProgressLabel');
-    const input = document.getElementById('dailyLimitInput');
-
-    if (!totalEl || !progressEl || !labelEl || !input) {
-      renderRetryCount++;
-      if (renderRetryCount > MAX_RETRIES) {
-        console.warn("⛔ Stopped trying after too many retries.");
-        return;
-      }
-      console.warn("⏳ Waiting for required DOM elements... Retry:", renderRetryCount);
-      delayedRenderExpenseStats();
-      return;
-    }
-
-    renderRetryCount = 0;
-    renderExpenseStats();
-  }, 200);
-}
 
 // Render the spending progress bar
 function renderSpendingTargetBar(todaySpent, dailyLimit) {
