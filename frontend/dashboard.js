@@ -2662,22 +2662,37 @@ function toast(message, duration = 2000) {
 
 
 
+
 document.addEventListener('DOMContentLoaded', () => {
-  const toggleBtn = document.getElementById("sidebarToggleBtn");
   const sidebar = document.getElementById("customizeSidebar");
   const closeBtn = document.getElementById("sidebarClosePillar");
 
-  if (toggleBtn && sidebar) {
-    toggleBtn.addEventListener("click", () => {
-      sidebar.classList.toggle("show");
-    });
+  // Helper to toggle sidebar and arrow icon
+  function toggleSidebar() {
+    sidebar.classList.toggle("show");
+
+    const icon1 = document.getElementById("sidebarToggleBtn1");
+    const show = sidebar.classList.contains("show");
+    if (icon1) icon1.textContent = show ? "⟨" : "⟩";
   }
 
+  // Attach to both toggle buttons
+  ["sidebarToggleBtn1", "sidebarToggleBtn2"].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) {
+      btn.addEventListener("click", toggleSidebar);
+    }
+  });
+
+  // Close button in sidebar
   if (sidebar && closeBtn) {
     closeBtn.addEventListener("click", () => {
       sidebar.classList.remove("show");
+      const icon1 = document.getElementById("sidebarToggleBtn1");
+      if (icon1) icon1.textContent = "⟨";
     });
   }
+
 
   // Reusable function for toggle setup with localStorage
   function setupToggle(toggleId, sectionId) {
@@ -2700,23 +2715,39 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ✅ Setup for each toggle
-setupToggle('toggleBankBalances', 'bankBalancesSection');
+  setupToggle('toggleBankBalances', 'bankBalancesSection');
   setupToggle('toggleAddEntry', 'addEntrySection');
-setupToggle('toggleCreditLimits', 'creditLimitsSection');
-setupToggle('toggleTotals', 'totalsSection');
-setupToggle('toggleAverage', 'averageSection');
-setupToggle('toggleMultiselect', 'multiselectSection');
-setupToggle('toggleFilters', 'filtersSection');
-setupToggle('toggleSearches', 'searchesSection');
-setupToggle('toggleBudget', 'budgetSection');
-setupToggle('toggleWidget', 'widgetSection');
-setupToggle('toggleAll', 'allSection');
-setupToggle('toggleBar', 'barSection');
+  setupToggle('toggleCreditLimits', 'creditLimitsSection');
+  setupToggle('toggleTotals', 'totalsSection');
+  setupToggle('toggleAverage', 'averageSection');
+  setupToggle('toggleMultiselect', 'multiselectSection');
+  setupToggle('toggleFilters', 'filtersSection');
+  setupToggle('toggleSearches', 'searchesSection');
+  setupToggle('toggleBudget', 'budgetSection');
+  setupToggle('toggleWidget', 'widgetSection');
+  setupToggle('toggleAll', 'allSection');
+  setupToggle('toggleBar', 'barSection');
+});
 
+document.addEventListener('DOMContentLoaded', () => {
+  const toggleBtn1 = document.getElementById('sidebarToggleBtn1');
+
+  let hasScrolled = false;
+  window.addEventListener('scroll', () => {
+    if (!hasScrolled && window.scrollY > 30) {
+      hasScrolled = true;
+      toggleBtn1.classList.add('visible');
+
+      // Optional: Hide again after a few seconds
+      setTimeout(() => {
+        toggleBtn1.classList.remove('visible');
+        hasScrolled = false;
+      }, 3000);
+    }
+  });
 });
 
 
-window.sidebarToggleBtn = sidebarToggleBtn;
 window.customizeSidebar = customizeSidebar;
 window.showCustomAlert = showCustomAlert;
 window.getSelectedPersons = getSelectedPersons;
@@ -2779,7 +2810,7 @@ window.renderExpenseStats = renderExpenseStats;
 window.delayedRenderExpenseStats = delayedRenderExpenseStats;
 window.saveDailyLimit = saveDailyLimit;
 window. waitAndRenderExpenseStats =  waitAndRenderExpenseStats
-
+window.showSuccessModal = showSuccessModal
 
 
 
@@ -3209,31 +3240,6 @@ return `
 }
 
 
-document.querySelectorAll('.section-heading').forEach(heading => {
-  heading.addEventListener('mouseenter', () => {
-    if (heading.classList.contains('collapsed')) {
-      const content = heading.nextElementSibling?.cloneNode(true);
-      if (content) {
-        content.classList.remove('hidden');
-        content.style.position = 'absolute';
-        content.style.background = '#e3e0db';
-        content.style.border = '1px solid #ccc';
-        content.style.padding = '10px';
-        content.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
-        content.style.zIndex = 9999;
-        content.style.top = heading.getBoundingClientRect().bottom + window.scrollY + 'px';
-        content.style.left = heading.getBoundingClientRect().left + 'px';
-        content.classList.add('hover-preview');
-        document.body.appendChild(content);
-      }
-    }
-  });
-
-  heading.addEventListener('mouseleave', () => {
-    document.querySelectorAll('.hover-preview').forEach(el => el.remove());
-  });
-});
-
 
 document.querySelectorAll('.section-heading').forEach(heading => {
   heading.addEventListener('click', () => {
@@ -3389,19 +3395,32 @@ function delayedRenderExpenseStats() {
 
 // Render the spending progress bar
 function renderSpendingTargetBar(todaySpent, dailyLimit) {
-  const percent = (todaySpent / dailyLimit) * 100;
+  const percent = Math.min((todaySpent / dailyLimit) * 100, 100);
   const fill = document.getElementById('spendingProgressFill');
   const label = document.getElementById('spendingProgressLabel');
 
-  let color = '#e74c3c'; // 🔴 Default = over limit = red
-  if (percent <= 100) color = '#2ecc71'; // ✅ Green if under or equal limit
+  // ✅ Red if over limit, Green if within limit
+  const color = todaySpent > dailyLimit ? '#e74c3c' : '#2ecc71';
 
   if (fill) {
-    fill.style.width = `${Math.min(percent, 100)}%`;
+    fill.style.width = `${percent}%`;
     fill.style.backgroundColor = color;
+
+    // 💬 Show "X over" if applicable
+    if (todaySpent > dailyLimit) {
+      const over = (todaySpent - dailyLimit).toFixed(2);
+      fill.textContent = `+${over} over`;
+      fill.style.color = 'white';
+      fill.style.paddingLeft = '6px';
+      fill.style.fontWeight = 'bold';
+    } else {
+      fill.textContent = ''; // Clear if not over
+    }
   }
 
-  console.log("🟢 Bar color:", color, "- progress:", percent.toFixed(2) + "%");
+  if (label) {
+    label.textContent = `Today: CHF ${todaySpent.toFixed(2)} / ${dailyLimit.toFixed(2)}`;
+  }
 }
 
 // 🚀 Initialize on load
@@ -3460,4 +3479,55 @@ async function saveDailyLimit() {
     console.error('Failed to save daily limit:', err);
     alert('❌ Failed to save daily limit.');
   }
+}
+
+
+
+
+
+// 👀 Hover preview logic
+document.querySelectorAll('#customizeSidebar label[data-section]').forEach(label => {
+  const sectionId = label.getAttribute('data-section');
+  const previewBox = document.getElementById('sectionPreviewPopup');
+  const section = document.getElementById(sectionId);
+
+  if (!section || !previewBox) return;
+
+  label.addEventListener('mouseenter', (e) => {
+    // 🧠 Clone the section content (avoid altering original)
+    const clone = section.cloneNode(true);
+    clone.style.display = 'block';
+
+    // Remove previous content and insert new preview
+    previewBox.innerHTML = '';
+    previewBox.appendChild(clone);
+
+    // Position preview box next to the label
+    const rect = label.getBoundingClientRect();
+    previewBox.style.top = `${rect.top}px`;
+    previewBox.style.left = `${rect.right + 10}px`; // right of the sidebar
+    previewBox.style.display = 'block';
+  });
+
+  label.addEventListener('mouseleave', () => {
+    previewBox.style.display = 'none';
+  });
+
+  // Optional: Hide when mouse leaves the preview itself
+  previewBox.addEventListener('mouseleave', () => {
+    previewBox.style.display = 'none';
+  });
+});
+
+
+function showSuccessModal(message = "Saved!") {
+  const modal = document.getElementById("successModal");
+  const text = modal.querySelector(".modal-text");
+  text.textContent = message;
+
+  modal.classList.remove("hidden");
+
+  setTimeout(() => {
+    modal.classList.add("hidden");
+  }, 2500); // Hide after 2.5 seconds
 }

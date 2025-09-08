@@ -956,6 +956,37 @@ margin-right: -8px;
 
 }
 
+.modal-content.success-modal {
+  background: #1f1f1f;
+  color: #00ff99;
+  padding: 20px 32px;
+  border-radius: 12px;
+  font-family: system-ui, sans-serif;
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: center;
+  box-shadow: 0 0 12px rgba(0,255,200,0.3);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ✅ Icon */
+.modal-icon {
+  font-size: 1.5rem;
+}
+
+/* Optional animation */
+@keyframes fadeInOut {
+  0%   { opacity: 0; transform: scale(0.95); }
+  20%  { opacity: 1; transform: scale(1); }
+  80%  { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.95); }
+}
+
+.modal-content.success-modal {
+  animation: fadeInOut 2.5s ease-out;
+}
 
 .modal.hidden {
   display: none;
@@ -2454,22 +2485,24 @@ margin-top: -20px;
 
 
 #customizeSidebar {
-   transition: transform 0.3s ease;
-  transform: translateX(-100%);
-  position: absolute; /* or fixed */
-  top: 50px; /* adjust based on your header height */
-
-  height: 100%;
+  position: fixed;             /* ← this makes it stick to screen */
+  top: 50px;                   /* ← adjust based on your header */
+  left: 0;
+  height: calc(100vh - 50px);  /* ← full height minus header */
   width: 200px;
-color: white;
-  background-color:   rgb(0, 0, 0);
- 
-  box-shadow: 1px 0 8px   #63ddf8;
+
+  color: white;
+  background-color: rgb(0, 0, 0);
+  box-shadow: 1px 0 8px #63ddf8;
+
   padding: 16px 20px;
-  z-index: 1000;
- 
-border-radius: 8px;
-    font-family: system-ui, sans-serif;
+  z-index: 500;
+
+  border-radius: 0 8px 8px 0;
+  font-family: system-ui, sans-serif;
+
+  transition: transform 0.3s ease;
+  transform: translateX(-100%); /* hidden by default */
 }
 
 #customizeSidebar.show {
@@ -2538,7 +2571,7 @@ border-radius: 8px;
 }
 
 
-#sidebarToggleBtn {
+#sidebarToggleBtn2 {
   margin-top: 7px;
   margin-left: 10px;
   border: 1px solid white;
@@ -3236,8 +3269,27 @@ margin-bottom: 3px;
   height: 100%;
   width: 0%;
   background: #2ecc71;
-  border-radius: 10px;
   transition: width 0.3s ease;
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  white-space: nowrap;
+  border-radius: 10px;
+  text-align: center;
+}
+
+
+.progress-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: #2ecc71;
+  transition: width 0.3s ease;
+  display: flex;               /* ✅ Flexbox */
+  align-items: center;  
+  font-size: 12px;       /* ✅ Vertically center */
+  justify-content: center;     /* ✅ Horizontally center */
+  white-space: nowrap;
+  color: white;
 }
 
 .daily-limit-inline {
@@ -3253,3 +3305,96 @@ margin-bottom: 3px;
   font-size: 0.8rem;
 }
 
+
+
+.info-toggle-btn {
+  margin-left: 8px;
+  color: #db34a9;
+ 
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  font-size: 14px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.info-toggle-btn:hover {
+ color: black;
+}
+
+
+/* Toggle Button */
+.sidebar-toggle-btn {
+  position: fixed;
+  top: 100px;
+  left: 0;
+  z-index: 1000;
+  background-color: #e0e0e0;
+  border: none;
+  border-radius: 0 6px 6px 0;
+  padding: 6px 8px;
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: 0 0 4px rgba(0,0,0,0.2);
+  transition: left 0.3s ease;
+}
+
+
+#sidebarToggleBtn1 {
+  position: fixed;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  z-index: 1000;
+
+  background-color: black; /* Dark blue-gray */
+  color: white;
+  border: none;
+  padding: 44px 6px;
+  font-weight: bold;
+  border-radius: 0 6px 6px 0;
+  cursor: pointer;
+  font-size: 1.2rem;
+
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+#sidebarToggleBtn1:hover {
+  background-color: #1a252f;
+  color: yellow;
+padding: 44px 6px;
+}
+
+#sidebarToggleBtn1 {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#sidebarToggleBtn1.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+
+#sectionPreviewPopup {
+  position: fixed;
+  top: 0;
+  left: 220px; /* adjust based on your sidebar width */
+  width: 320px;
+  max-height: 400px;
+  overflow-y: auto;
+  background: white;
+  color: black;
+  border: 1px solid #63ddf8;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  padding: 12px;
+  border-radius: 8px;
+  z-index: 9999;
+  font-size: 0.9rem;
+  font-family: system-ui, sans-serif;
+}

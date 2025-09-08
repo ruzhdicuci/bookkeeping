@@ -43,51 +43,59 @@
 
 <div class="navbar">
   
-<button id="sidebarToggleBtn" style="font-size: 1rem;">☰</button>
+<!-- Toggle Button in Sidebar -->
+<button id="sidebarToggleBtn1" class="sidebar-toggle-btn">⟨</button>
+
+<!-- Toggle Button in Header -->
+<button id="sidebarToggleBtn2" style="font-size: 1rem;">☰</button>
+
+
+
 
 <div id="customizeSidebar" class="sidebar">
   <h4>Customize View</h4> 
-    <div id="sidebarClosePillar" title="Close Sidebar">⟨</div>
 
-<label class="custom-checkbox">
+<!-- Sidebar Close Pillar -->
+<div id="sidebarClosePillar" title="Close Sidebar">⟨</div>
+<label class="custom-checkbox" data-section="addEntrySection">
   <input type="checkbox" id="toggleAddEntry" checked />
   <span class="checkmark"></span>
   Add Entry
 </label>
 
-<label class="custom-checkbox">
+ <label class="custom-checkbox" data-section="bankBalancesSection">
   <input type="checkbox" id="toggleBankBalances" checked />
   <span class="checkmark"></span>
   Bank Balances
 </label>
 
-  <label class="custom-checkbox">
+ <label class="custom-checkbox" data-section="creditLimitsSection">
       <input type="checkbox" id="toggleCreditLimits" checked />
   <span class="checkmark"></span>
 Kredit Limits
 </label>
 
-<label class="custom-checkbox">
+<label class="custom-checkbox" data-section="totalsSection">
   <input type="checkbox" id="toggleTotals" checked />
   <span class="checkmark"></span>
   Totals
 </label>
 
- <label class="custom-checkbox">
+ <label class="custom-checkbox" data-section="averageSection">
   <input type="checkbox" id="toggleAverage" checked />
   <span class="checkmark"></span>
   Average
 </label>
 
 
-<label class="custom-checkbox">
+<label class="custom-checkbox" data-section="multiselectSection">
   <input type="checkbox" id="toggleMultiselect" checked />
   <span class="checkmark"></span>
   Multiselect
 </label>
 
  
-<label class="custom-checkbox">
+<label class="custom-checkbox" data-section="filtersSection">
   <input type="checkbox" id="toggleFilters" checked />
   <span class="checkmark"></span>
   Filters
@@ -95,33 +103,33 @@ Kredit Limits
 
 
 
-<label class="custom-checkbox">
+<label class="custom-checkbox" data-section="searchesSection">
   <input type="checkbox" id="toggleSearches" checked />
   <span class="checkmark"></span>
   Searches
 </label>
 
 
-<label class="custom-checkbox">
+<label class="custom-checkbox" data-section="budgetSection">
   <input type="checkbox" id="toggleBudget" checked />
   <span class="checkmark"></span>
   Budget
 </label>
 
 
-<label class="custom-checkbox">
+<label class="custom-checkbox" data-section="widgetSection">
   <input type="checkbox" id="toggleWidget" checked />
   <span class="checkmark"></span>
   Budget All
 </label>
 
-<label class="custom-checkbox">
+<label class="custom-checkbox" data-section="allSection">
   <input type="checkbox" id="toggleAll" checked />
   <span class="checkmark"></span>
 Balance per Year
 </label>
 
-<label class="custom-checkbox">
+<label class="custom-checkbox" data-section="barSection">
   <input type="checkbox" id="toggleBar" checked />
   <span class="checkmark"></span>
 Limit per Day
@@ -540,8 +548,11 @@ totalsContainer.appendChild(summaryCard);
 </div>
 
 <div id="barSection" class="section-block"> 
-  <div class="section-heading">Daily Limit&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="dropdown-arrow">▾</span>
- </div>
+<div class="section-heading">
+  <span>Daily Limit</span>
+  <span class="dropdown-arrow">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▾</span> 
+</div>
+
 
  <div class="filter-grid5">
   <div class="back">
@@ -621,6 +632,9 @@ totalsContainer.appendChild(summaryCard);
 
  </div>
 </div>
+
+
+
 
 
 
@@ -742,7 +756,7 @@ totalsContainer.appendChild(summaryCard);
   <!-- Dashboard Tab -->
   <div id="dashboardTab" class="tab-content active">
    
-
+<div id="sectionPreviewPopup" style="display: none;"></div>
 
 
   <script>
@@ -1272,6 +1286,14 @@ function openTab(tabId, btn) {
   <div class="modal-box">
     <p id="customAlertMessage">⚠️</p>
     <button id="customAlertOkBtn" class="modal-ok-btn">OK</button>
+  </div>
+</div>
+
+<!-- ✅ Success Modal -->
+<div id="successModal" class="modal hidden">
+  <div class="modal-content success-modal">
+    <div class="modal-icon">✅</div>
+    <div class="modal-text">Daily limit saved.</div>
   </div>
 </div>
 
