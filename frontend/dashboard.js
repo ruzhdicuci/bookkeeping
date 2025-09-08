@@ -70,6 +70,10 @@ renderBankBalanceForm();
   if (navigator.onLine) syncToCloud();
 
 
+let DAILY_TARGET = 50; // Default fallback
+let renderRetryCount = 0;
+const MAX_RETRIES = 20;
+
   // Your flatpickr and other logic continues...
   const dateInput = document.getElementById('newDate');
   if (dateInput) {
@@ -3271,9 +3275,6 @@ document.querySelectorAll('.section-heading').forEach(heading => {
 
 
 
-let DAILY_TARGET = 50; // Default fallback
-let renderRetryCount = 0;
-const MAX_RETRIES = 20;
 
 
 // ✅ Wait until all required elements and data are loaded
