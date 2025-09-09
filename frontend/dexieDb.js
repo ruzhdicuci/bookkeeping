@@ -19,7 +19,7 @@ db.version(308).stores({
   balances: 'bank',
   customCards: '_id,name,limit,synced,lastUpdated',
   yearlyLimits: '[userId+year], synced, year, limit, startFrom, lastUpdated',
-  dailyLimits: '[userId],limit,updatedAt,synced'  // ✅ required
+  dailyLimits: 'userId,limit,updatedAt,synced'
 
 });
 
