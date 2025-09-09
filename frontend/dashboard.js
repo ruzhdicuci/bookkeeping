@@ -3532,10 +3532,17 @@ window.saveDailyLimit = async function () {
   renderExpenseStats(); // ✅ Rerender with new limit
 };
 
-
 async function syncDailyLimitsToBackend() {
   const unsynced = await getUnsyncedDailyLimits();
+
   for (const item of unsynced) {
+    const userId = String(item.userId); // ✅ Ensure key is string
+
+    if (!userId.trim()) {
+      console.warn("❌ Skipping sync for invalid userId:", userId);
+      continue;
+    }
+
     try {
       const res = await fetch(`${apiBase}/api/settings/dailyLimit`, {
         method: 'POST',
@@ -3547,8 +3554,10 @@ async function syncDailyLimitsToBackend() {
       });
 
       if (res.ok) {
-        await markDailyLimitAsSynced(item.userId);
-        console.log(`✅ Synced daily limit for ${item.userId}`);
+        await markDailyLimitAsSynced(userId);
+        console.log(`✅ Synced daily limit for ${userId}`);
+      } else {
+        console.warn(`⚠️ Failed to sync for ${userId}:`, res.status);
       }
     } catch (err) {
       console.error("❌ Sync error:", err);
