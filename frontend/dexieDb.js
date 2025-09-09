@@ -14,7 +14,7 @@ const backend =
 
 export const db = new Dexie("bookkeeping-db");
 
-db.version(310).stores({
+db.version(311).stores({
   entries: '_id, date, amount, category, person, bank, synced, lastUpdated, note',
   notes: '_id, title, content, done, synced, lastUpdated',
   balances: 'bank',
@@ -314,7 +314,9 @@ async function getUnsyncedYearlyLimits() {
 }
 
 async function saveDailyLimitLocally(userId, limit) {
-  if (!userId || typeof userId !== 'string' || userId.trim() === '') {
+  userId = String(userId); // ✅ force string
+
+  if (!userId.trim()) {
     console.warn("❌ Invalid userId passed to saveDailyLimitLocally:", userId);
     return;
   }
@@ -332,9 +334,9 @@ async function saveDailyLimitLocally(userId, limit) {
 }
 
 async function getCachedDailyLimit(userId) {
-  console.log("📦 getCachedDailyLimit() called with:", userId);
+  userId = String(userId); // ✅ force string
 
-  if (!userId || typeof userId !== 'string' || userId.trim() === '') {
+  if (!userId.trim()) {
     console.warn("❌ Invalid userId passed to getCachedDailyLimit:", userId);
     return null;
   }
@@ -348,7 +350,6 @@ async function getCachedDailyLimit(userId) {
     return null;
   }
 }
-
 // ✅ Define the function without export
 async function getUnsyncedDailyLimits() {
   return await db.dailyLimits.where('synced').equals(false).toArray();
