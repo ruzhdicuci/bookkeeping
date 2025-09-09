@@ -24,17 +24,6 @@ db.version(310).stores({
 });
 
 // ✅ Wrap open in async function
-export async function initDexie() {
-  try {
-    await db.open();
-  } catch (err) {
-    console.error("❌ Dexie open failed:", err);
-  }
-}
-
-// 🧪 Add this right after defining the stores
-debug("📚 yearlyLimits schema:", db.yearlyLimits.schema.primKey, db.yearlyLimits.schema.indexes);
-
 // dexieDb.js (at the bottom)
 export async function initDexie() {
   try {
@@ -44,6 +33,10 @@ export async function initDexie() {
     console.error("❌ Failed to open Dexie DB:", err);
   }
 }
+// 🧪 Add this right after defining the stores
+debug("📚 yearlyLimits schema:", db.yearlyLimits.schema.primKey, db.yearlyLimits.schema.indexes);
+
+
 
 // ✅ Universal Dexie write fallback handler
 async function safeDexieWrite(fn, fallbackMessage = "⚠️ Offline cache issue. Reloading...") {
