@@ -314,7 +314,7 @@ async function getUnsyncedYearlyLimits() {
 }
 
 async function saveDailyLimitLocally(userId, limit) {
-  userId = String(userId); // ✅ force string
+  userId = String(userId); // ✅ force to string
 
   if (!userId.trim()) {
     console.warn("❌ Invalid userId passed to saveDailyLimitLocally:", userId);
@@ -342,7 +342,14 @@ async function getCachedDailyLimit(userId) {
   }
 
   try {
-    const result = await db.dailyLimits.get(userId);
+    console.log("🧪 db.dailyLimits.get() called with:", userId, typeof userId);
+
+if (typeof userId !== 'string' || userId.trim() === '') {
+  console.error("❌ Invalid userId type right before GET:", userId);
+  return null;
+}
+
+const result = await db.dailyLimits.get(userId);
     console.log("✅ Dexie GET success:", result);
     return result;
   } catch (err) {
