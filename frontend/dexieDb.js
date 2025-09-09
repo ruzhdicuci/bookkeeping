@@ -332,15 +332,19 @@ async function saveDailyLimitLocally(userId, limit) {
 }
 
 async function getCachedDailyLimit(userId) {
+  console.log("📦 getCachedDailyLimit() called with:", userId);
+
   if (!userId || typeof userId !== 'string' || userId.trim() === '') {
     console.warn("❌ Invalid userId passed to getCachedDailyLimit:", userId);
     return null;
   }
 
   try {
-    return await db.dailyLimits.get(userId);
+    const result = await db.dailyLimits.get(userId);
+    console.log("✅ Dexie GET success:", result);
+    return result;
   } catch (err) {
-    console.error("❌ Dexie GET failed in getCachedDailyLimit:", err);
+    console.error("❌ Dexie GET failed:", err);
     return null;
   }
 }
