@@ -2030,26 +2030,6 @@ function clearSearch(id) {
   renderEntries();
 }
 
-function getCurrentUserId() {
-  try {
-    const token = localStorage.getItem('token');
-    if (!token) return null;
-
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    const id = payload?.userId;
-
-    if (typeof id === 'string' && id.trim() !== '') {
-      return id;
-    }
-
-    // Convert ObjectId or number to string fallback
-    return id?.toString?.() || null;
-  } catch (err) {
-    console.warn("⚠️ Couldn't extract userId from token", err);
-    return null;
-  }
-}
-
 window.addEventListener("online", async () => {
   debug("🔌 Back online. Attempting to sync custom cards...");
 
@@ -3458,6 +3438,25 @@ window.addEventListener('DOMContentLoaded', async () => {
 });
 
 
+function getCurrentUserId() {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) return null;
+
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const id = payload?.userId;
+
+    if (typeof id === 'string' && id.trim() !== '') {
+      return id.trim();
+    }
+
+    // ObjectId or number fallback
+    return id?.toString?.().trim() || null;
+  } catch (err) {
+    console.warn("⚠️ Couldn't extract userId from token", err);
+    return null;
+  }
+}
 
 
 // 💾 Save new daily limit to backend
