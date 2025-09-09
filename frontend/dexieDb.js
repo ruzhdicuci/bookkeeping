@@ -351,9 +351,18 @@ async function getUnsyncedDailyLimits() {
 }
 
 export async function markDailyLimitAsSynced(userId) {
-  const existing = await db.dailyLimits.get(userId);
-  if (existing) {
-    await db.dailyLimits.put({ ...existing, synced: true });
+  if (!userId || typeof userId !== 'string' || userId.trim() === '') {
+    console.warn("❌ Invalid userId passed to markDailyLimitAsSynced:", userId);
+    return;
+  }
+
+  try {
+    const existing = await db.dailyLimits.get(userId);
+    if (existing) {
+      await db.dailyLimits.put({ ...existing, synced: true });
+    }
+  } catch (err) {
+    console.error("❌ Dexie error in markDailyLimitAsSynced:", err);
   }
 }
 
