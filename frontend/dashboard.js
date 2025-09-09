@@ -3396,7 +3396,7 @@ function renderSpendingTargetBar(todaySpent, dailyLimit) {
   const label = document.getElementById('spendingProgressLabel'); // Optional, if you have it
 
   const isOver = todaySpent > dailyLimit;
-  const color = isOver ? '#e74c3c' : '#297448ff';
+  const color = isOver ? '#e74c3c' : '#3b9661ff';
   const diff = Math.abs(todaySpent - dailyLimit).toFixed(2);
 
   if (fill) {

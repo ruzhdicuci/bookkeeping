@@ -3260,7 +3260,7 @@ margin-bottom: 3px;
 .progress-bar-fill {
   height: 100%;
   width: 0%;
-  background: #297448ff;
+  background: #3b9661ff;
   transition: width 0.3s ease;
   display: flex;               /* ✅ Flexbox */
   align-items: center;  
