@@ -12,16 +12,24 @@ const backend =
 
 export const db = new Dexie('bookkeeping-db');
 
+
 // Always keep the highest version here
-db.version(309).stores({
+db.version(310).stores({
   entries: '_id, date, amount, category, person, bank, synced, lastUpdated, note',
   notes: '_id, title, content, done, synced, lastUpdated',
   balances: 'bank',
   customCards: '_id,name,limit,synced,lastUpdated',
   yearlyLimits: '[userId+year], synced, year, limit, startFrom, lastUpdated',
-  dailyLimits: 'userId,limit,updatedAt,synced'
-
+  dailyLimits: '&userId, limit, updatedAt, synced' // ✅ fixed primary key
 });
+
+// ✅ Handle blocked upgrade
+db.on('blocked', () => {
+  alert("⚠️ Please close other tabs of this app to finish the database upgrade.");
+});
+
+// ✅ Open database explicitly (after schema is defined)
+await db.open();
 
 
 
