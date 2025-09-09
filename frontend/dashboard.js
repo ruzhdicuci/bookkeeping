@@ -3421,9 +3421,20 @@ function renderSpendingTargetBar(todaySpent, dailyLimit) {
 
 // 🚀 Initialize on load
 window.addEventListener('DOMContentLoaded', async () => {
-  await loadDailyLimit();
-  await syncDailyLimitsToBackend();
-waitAndRenderExpenseStats(); // ✅ use this single retry-safe version
+  try {
+    await loadDailyLimit(); // ⛔ catch Dexie or backend issues
+  } catch (err) {
+    console.error("❌ loadDailyLimit crashed:", err);
+  }
+
+  try {
+    await syncDailyLimitsToBackend(); // 🔁 sync issues
+  } catch (err) {
+    console.error("❌ syncDailyLimitsToBackend crashed:", err);
+  }
+
+  waitAndRenderExpenseStats(); // ✅ use this single retry-safe version
+
   const interval = setInterval(() => {
     const totalEl = document.getElementById('expenseTotal');
     const avgEl = document.getElementById('expenseAverage');
@@ -3440,12 +3451,15 @@ waitAndRenderExpenseStats(); // ✅ use this single retry-safe version
     }
   }, 300);
 
-  // ⛔ Stop trying after 10s
+  // 🛑 Stop trying after 10s
   setTimeout(() => {
     clearInterval(interval);
     console.warn("⚠️ Still not ready after 10s, skipping stats render.");
   }, 10000);
 });
+
+
+
 
 // 💾 Save new daily limit to backend
 async function loadDailyLimit() {
