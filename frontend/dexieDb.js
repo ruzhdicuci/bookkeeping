@@ -23,15 +23,6 @@ db.version(310).stores({
   dailyLimits: '&userId, limit, updatedAt, synced' // ✅ fixed primary key
 });
 
-// ✅ Handle blocked upgrade
-db.on('blocked', () => {
-  alert("⚠️ Please close other tabs of this app to finish the database upgrade.");
-});
-
-// ✅ Open database explicitly (after schema is defined)
-await db.open();
-
-
 
 // 🧪 Add this right after defining the stores
 debug("📚 yearlyLimits schema:", db.yearlyLimits.schema.primKey, db.yearlyLimits.schema.indexes);
