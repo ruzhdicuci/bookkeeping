@@ -1,4 +1,4 @@
-const DEBUG_MODE = true; // or true for development
+const DEBUG_MODE = false; // or true for development
 const debug = (...args) => DEBUG_MODE && console.log(...args);
 
 import {
@@ -3393,31 +3393,30 @@ function renderExpenseStats() {
 function renderSpendingTargetBar(todaySpent, dailyLimit) {
   const percent = Math.min((todaySpent / dailyLimit) * 100, 100);
   const fill = document.getElementById('spendingProgressFill');
-  const label = document.getElementById('spendingProgressLabel');
+  const label = document.getElementById('spendingProgressLabel'); // Optional, if you have it
 
-  // ✅ Red if over limit, Green if within limit
-  const color = todaySpent > dailyLimit ? '#e74c3c' : '#2ecc71';
+  const isOver = todaySpent > dailyLimit;
+  const color = isOver ? '#e74c3c' : '#2ecc71';
+  const diff = Math.abs(todaySpent - dailyLimit).toFixed(2);
 
   if (fill) {
     fill.style.width = `${percent}%`;
     fill.style.backgroundColor = color;
-
-    // 💬 Show "X over" if applicable
-    if (todaySpent > dailyLimit) {
-      const over = (todaySpent - dailyLimit).toFixed(2);
-      fill.textContent = `+${over} over`;
-      fill.style.color = 'white';
-      fill.style.paddingLeft = '6px';
-      fill.style.fontWeight = 'bold';
-    } else {
-      fill.textContent = ''; // Clear if not over
-    }
+    fill.style.color = 'white';
+    fill.style.fontWeight = 'bold';
+    fill.style.fontSize = '0.8rem';
+    fill.style.display = 'flex';
+    fill.style.alignItems = 'center';
+    fill.style.justifyContent = 'center';
+    fill.style.borderRadius = '999px'; // smooth edge
+    fill.textContent = isOver ? `+${diff} over` : `-${diff} under`;
   }
 
   if (label) {
     label.textContent = `Today: CHF ${todaySpent.toFixed(2)} / ${dailyLimit.toFixed(2)}`;
   }
 }
+
 
 // 🚀 Initialize on load
 window.addEventListener('DOMContentLoaded', async () => {
