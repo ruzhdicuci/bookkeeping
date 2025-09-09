@@ -314,42 +314,32 @@ async function getUnsyncedYearlyLimits() {
 }
 
 async function saveDailyLimitLocally(userId, limit) {
-  userId = String(userId); // ✅ force to string
-
-  if (!userId.trim()) {
-    console.warn("❌ Invalid userId passed to saveDailyLimitLocally:", userId);
-    return;
-  }
-
   try {
+    if (!userId) throw new Error("Missing userId");
+    const key = String(userId).trim();
+    if (!key) throw new Error("Empty userId string");
+
     await db.dailyLimits.put({
-      userId,
+      userId: key,
       limit,
       updatedAt: new Date().toISOString(),
       synced: false
     });
+
+    console.log("✅ Saved dailyLimit locally:", { key, limit });
   } catch (err) {
     console.error("❌ Dexie PUT failed in saveDailyLimitLocally:", err);
   }
 }
 
 async function getCachedDailyLimit(userId) {
-  userId = String(userId); // ✅ force string
-
-  if (!userId.trim()) {
-    console.warn("❌ Invalid userId passed to getCachedDailyLimit:", userId);
-    return null;
-  }
-
   try {
-    console.log("🧪 db.dailyLimits.get() called with:", userId, typeof userId);
+    if (!userId) throw new Error("Missing userId");
+    const key = String(userId).trim();
+    if (!key) throw new Error("Empty userId string");
 
-if (typeof userId !== 'string' || userId.trim() === '') {
-  console.error("❌ Invalid userId type right before GET:", userId);
-  return null;
-}
-
-const result = await db.dailyLimits.get(userId);
+    console.log("🔍 Getting dailyLimit for:", key, typeof key);
+    const result = await db.dailyLimits.get(key);
     console.log("✅ Dexie GET success:", result);
     return result;
   } catch (err) {
@@ -357,6 +347,7 @@ const result = await db.dailyLimits.get(userId);
     return null;
   }
 }
+
 // ✅ Define the function without export
 async function getUnsyncedDailyLimits() {
   return await db.dailyLimits.where('synced').equals(false).toArray();
