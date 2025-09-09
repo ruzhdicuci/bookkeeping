@@ -10,19 +10,27 @@ const backend =
     ? 'http://localhost:3000'
     : 'https://bookkeeping-i8e0.onrender.com';
 
-export const db = new Dexie('bookkeeping-db');
+// dexieDb.js
 
+export const db = new Dexie("bookkeeping-db");
 
-// Always keep the highest version here
 db.version(310).stores({
   entries: '_id, date, amount, category, person, bank, synced, lastUpdated, note',
   notes: '_id, title, content, done, synced, lastUpdated',
   balances: 'bank',
   customCards: '_id,name,limit,synced,lastUpdated',
   yearlyLimits: '[userId+year], synced, year, limit, startFrom, lastUpdated',
-  dailyLimits: '&userId, limit, updatedAt, synced' // ✅ fixed primary key
+  dailyLimits: '&userId, limit, updatedAt, synced'
 });
 
+// ✅ Wrap open in async function
+export async function initDexie() {
+  try {
+    await db.open();
+  } catch (err) {
+    console.error("❌ Dexie open failed:", err);
+  }
+}
 
 // 🧪 Add this right after defining the stores
 debug("📚 yearlyLimits schema:", db.yearlyLimits.schema.primKey, db.yearlyLimits.schema.indexes);
