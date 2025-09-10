@@ -568,14 +568,31 @@ totalsContainer.appendChild(summaryCard);
     <input id="dailyLimitInput" type="number" min="1" />
     <button id="setbtn" onclick="saveDailyLimit()">Set Limit</button>
   </div>
+<!-- Multi-select dropdown for excluding persons -->
+<div class="multi-select-dropdown">
+  <button id="excludePersonDropdownBtn" class="multi-select-btn" onclick="toggleExcludePersonDropdownV2()">
+    Exclude <span>▾</span>
+  </button>
 
+  <div id="excludePersonDropdownOptions" class="multi-select-options" style="display: none;">
+    <!-- Checkbox items inserted dynamically -->
+  </div>
+</div>
+
+<button onclick="saveExcludedPersonsV2()" class="btn-save">Save</button>
   <div class="progress-bar-wrapper small-bar">
     <div class="progress-bar-track">
       <div class="progress-bar-fill" id="spendingProgressFill"></div>
     </div>
+
   </div>
 </div>
-</div>
+
+
+
+
+
+
 </div>
 </div>
 

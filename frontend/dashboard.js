@@ -291,6 +291,7 @@ function toggleChartPersonDropdown() {
 }
 
 async function loadPersons() {
+   console.log("📥 loadPersons() called");
   try {
     const token = localStorage.getItem('token');
     const API_BASE =
@@ -310,6 +311,7 @@ async function loadPersons() {
 
     const persons = await res.json();
     window.persons = persons;
+    populateExcludePersonDropdownV2(persons);
     debug("👤 Loaded persons:", persons);
   } catch (err) {
     console.error("❌ Failed to load persons:", err);
@@ -2815,10 +2817,13 @@ window.renderRealYearlyCards = renderRealYearlyCards;
 window.renderExpenseStats = renderExpenseStats;
 
 
-window. waitAndRenderExpenseStats =  waitAndRenderExpenseStats
-window.showSuccessModal = showSuccessModal
-window.syncDailyLimitsToBackend = syncDailyLimitsToBackend
+window. waitAndRenderExpenseStats =  waitAndRenderExpenseStats;
+window.showSuccessModal = showSuccessModal;
+window.syncDailyLimitsToBackend = syncDailyLimitsToBackend;
 
+window.saveExcludedPersonsV2 = saveExcludedPersonsV2;
+window.toggleExcludePersonDropdownV2 = toggleExcludePersonDropdownV2;
+window.populateExcludePersonDropdownV2 = populateExcludePersonDropdownV2;
 
 document.addEventListener('DOMContentLoaded', () => {
   const themeSelect = document.getElementById('dropbtn');
@@ -3327,7 +3332,7 @@ function renderExpenseStats() {
     return;
   }
 
-  const excludedPersons = ['Transfer', 'Balance', 'Aus-Rudi', 'Ausgaben'];
+  const excludedPersons = JSON.parse(localStorage.getItem('excludedPersons') || '[]');
 
   const expenses = window.entries.filter(e => {
     const type = (e.type || '').trim().toLowerCase();
@@ -3347,18 +3352,18 @@ function renderExpenseStats() {
   const avgEl = document.getElementById('expenseAverage');
   const dayEl = document.getElementById('expenseDaysSoFar');
   if (totalEl) totalEl.textContent = total.toFixed(2);
- if (avgEl) {
-  avgEl.textContent = average.toFixed(2);
+  if (avgEl) {
+    avgEl.textContent = average.toFixed(2);
 
-  const wrapper = avgEl.closest('.highlight-amount-large');
-  if (wrapper) {
-    if (average > DAILY_TARGET) {
-      wrapper.classList.add('over-limit');
-    } else {
-      wrapper.classList.remove('over-limit');
+    const wrapper = avgEl.closest('.highlight-amount-large');
+    if (wrapper) {
+      if (average > DAILY_TARGET) {
+        wrapper.classList.add('over-limit');
+      } else {
+        wrapper.classList.remove('over-limit');
+      }
     }
   }
-}
   if (dayEl) dayEl.textContent = currentDay;
 
   // 📊 Show average daily spending as progress
@@ -3616,3 +3621,41 @@ function showSuccessModal(message = "Saved!") {
     modal.classList.add("hidden");
   }, 2500); // Hide after 2.5 seconds
 }
+
+
+
+function toggleExcludePersonDropdownV2() {
+  const box = document.getElementById('excludePersonDropdownOptions');
+  if (box) {
+    box.style.display = box.style.display === 'none' ? 'block' : 'none';
+  }
+}
+
+function saveExcludedPersonsV2() {
+  const checkboxes = document.querySelectorAll('#excludePersonDropdownOptions input[type="checkbox"]');
+  const selected = [...checkboxes].filter(cb => cb.checked).map(cb => cb.value);
+  localStorage.setItem('excludedPersons', JSON.stringify(selected));
+  showSuccessModal("✅ Excluded persons saved!");
+  renderExpenseStats();
+}
+
+function populateExcludePersonDropdownV2(persons) {
+  const container = document.getElementById('excludePersonDropdownOptions');
+  if (!container) return;
+
+  const saved = JSON.parse(localStorage.getItem('excludedPersons') || '[]');
+  container.innerHTML = '';
+
+  persons.forEach(person => {
+    const label = document.createElement('label');
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.value = person;
+    checkbox.checked = saved.includes(person);
+    label.appendChild(checkbox);
+    label.appendChild(document.createTextNode(' ' + person));
+    container.appendChild(label);
+  });
+}
+
+
