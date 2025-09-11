@@ -75,11 +75,9 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/dashboard.html'));
 });
 
-
-app.get('/', (req, res) => {
+app.get('/calendar.html', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/calendar.html'));
 });
-
 
 const SECRET = process.env.JWT_SECRET || 'fallback-secret';
 
