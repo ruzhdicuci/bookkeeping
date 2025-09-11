@@ -2169,11 +2169,26 @@ body.dark .entry-card .entry-label {
   color: white;
 }
 
+.calendar-button 
+{
+  background-color: #63ddf8;
+   width: 40px;
+      height: 40px;
+      border: none;
+      color: white;
+      margin-top: 4px;
+       margin-right: 2px;
+}
+.calendar-button:hover {
+  background-color: black;
+ 
+}
 
 #bt2 {
   background-color: #63ddf8;
    width: 40px;
       height: 40px;
+      border: none;
 }
 #bt2:hover {
   background-color: black;

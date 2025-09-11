@@ -171,11 +171,23 @@ async function fetchEntries() {
     });
   }
 
- document.addEventListener('DOMContentLoaded', async function initCalendar() {
-  const entries = await fetchEntries();
+document.addEventListener('DOMContentLoaded', async function initCalendar() {
+  const entries = await fetchEntries(); // ✅ Make sure to use await and assign it correctly
+  console.log("✅ Entries loaded:", entries);
+
   populateFilters(entries);
-  renderCalendar(entries);
+
+  if (typeof renderCalendar === 'function') {
+    renderCalendar(entries);
+  } else {
+    console.warn("⚠️ renderCalendar is not defined yet");
+  }
 });
+
+function renderCalendar(entries) {
+  console.log("🗓️ Rendering calendar... entries count:", entries.length);
+  // TODO: Replace this with actual calendar rendering logic
+}
 </script>
 
 </body>
