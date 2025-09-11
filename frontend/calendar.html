@@ -32,6 +32,19 @@
       gap: 10px;
       justify-content: center;
     }
+
+ #bt2 {
+  padding: 6px 12px;
+background-color: rgb(86, 236, 126);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+
+#bt2:hover {
+background-color: white;
+}
   </style>
 </head>
 <body>
@@ -43,6 +56,8 @@
   <select id="categoryFilter">
     <option value="">All Categories</option>
   </select>
+
+  <button id="bt2" onclick="location.href = 'dashboard.html?t=' + Date.now()">🔙</button>
 </div>
 
 <div id="calendar"></div>
@@ -85,32 +100,33 @@ async function fetchEntries() {
     }));
   }
 
-  function populateFilters(entries) {
-    const personSet = new Set();
-    const categorySet = new Set();
-
-    entries.forEach(e => {
-      if (e.person) personSet.add(e.person);
-      if (e.category) categorySet.add(e.category);
-    });
-
-    const personFilter = document.getElementById('personFilter');
-    const categoryFilter = document.getElementById('categoryFilter');
-
-    personSet.forEach(p => {
-      const opt = document.createElement('option');
-      opt.value = p;
-      opt.textContent = p;
-      personFilter.appendChild(opt);
-    });
-
-    categorySet.forEach(c => {
-      const opt = document.createElement('option');
-      opt.value = c;
-      opt.textContent = c;
-      categoryFilter.appendChild(opt);
-    });
+ function populateFilters(entries) {
+  if (!Array.isArray(entries)) {
+    console.warn("⚠️ Cannot populate filters. Entries is not an array.");
+    return;
   }
+
+  const persons = [...new Set(entries.map(e => e.person).filter(Boolean))];
+  const categories = [...new Set(entries.map(e => e.category).filter(Boolean))];
+
+  // Populate dropdowns
+  const personSelect = document.getElementById('personFilter');
+  const categorySelect = document.getElementById('categoryFilter');
+
+  persons.forEach(person => {
+    const opt = document.createElement('option');
+    opt.value = person;
+    opt.textContent = person;
+    personSelect.appendChild(opt);
+  });
+
+  categories.forEach(category => {
+    const opt = document.createElement('option');
+    opt.value = category;
+    opt.textContent = category;
+    categorySelect.appendChild(opt);
+  });
+}
 
   function filterEntries(person, category) {
     return allEntries.filter(e => {
@@ -155,7 +171,11 @@ async function fetchEntries() {
     });
   }
 
-  document.addEventListener('DOMContentLoaded', initCalendar);
+ document.addEventListener('DOMContentLoaded', async function initCalendar() {
+  const entries = await fetchEntries();
+  populateFilters(entries);
+  renderCalendar(entries);
+});
 </script>
 
 </body>
