@@ -60,15 +60,21 @@ async function fetchEntries() {
 
   const json = await res.json();
 
-  // ✅ Check for backend error
   if (!res.ok) {
-    console.error("❌ API error:", json);
+    console.error("❌ Failed to load entries:", json);
     alert(`❌ Failed to load entries: ${json.message || json.error || 'Unknown error'}`);
-    return []; // return empty array to avoid crashing
+    return [];
   }
 
-  allEntries = json.entries || [];
-  return allEntries;
+  const entries = json.entries || [];
+
+  // Safety: ensure it's an array
+  if (!Array.isArray(entries)) {
+    console.warn("⚠️ Entries is not an array", entries);
+    return [];
+  }
+
+  return entries;
 }
 
   function createEvents(entries) {
