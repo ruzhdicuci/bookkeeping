@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bookkeeping Calendar</title>
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 0;
+    }
+    #calendar {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 20px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .fc-event {
+      font-size: 0.8rem;
+      padding: 2px 4px;
+    }
+    .filter-bar {
+      max-width: 900px;
+      margin: 20px auto 0;
+      padding: 10px 20px;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+
+<div class="filter-bar">
+  <select id="personFilter">
+    <option value="">All Persons</option>
+  </select>
+  <select id="categoryFilter">
+    <option value="">All Categories</option>
+  </select>
+</div>
+
+<div id="calendar"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+<script>
+  const apiBase = 'https://bookkeeping-i8e0.onrender.com';
+  const token = localStorage.getItem('token');
+  let allEntries = [];
+
+  async function fetchEntries() {
+    const res = await fetch(`${apiBase}/api/entries`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const json = await res.json();
+    allEntries = json.entries || [];
+    return allEntries;
+  }
+
+  function createEvents(entries) {
+    return entries.map(e => ({
+      title: `${e.description} (${parseFloat(e.amount).toFixed(2)} CHF)`,
+      start: e.date,
+      extendedProps: e
+    }));
+  }
+
+  function populateFilters(entries) {
+    const personSet = new Set();
+    const categorySet = new Set();
+
+    entries.forEach(e => {
+      if (e.person) personSet.add(e.person);
+      if (e.category) categorySet.add(e.category);
+    });
+
+    const personFilter = document.getElementById('personFilter');
+    const categoryFilter = document.getElementById('categoryFilter');
+
+    personSet.forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p;
+      opt.textContent = p;
+      personFilter.appendChild(opt);
+    });
+
+    categorySet.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c;
+      opt.textContent = c;
+      categoryFilter.appendChild(opt);
+    });
+  }
+
+  function filterEntries(person, category) {
+    return allEntries.filter(e => {
+      return (!person || e.person === person) && (!category || e.category === category);
+    });
+  }
+
+  async function initCalendar() {
+    const entries = await fetchEntries();
+    populateFilters(entries);
+
+    const calendarEl = document.getElementById('calendar');
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: 'dayGridMonth',
+      height: 'auto',
+      headerToolbar: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'dayGridMonth,listMonth'
+      },
+      events: createEvents(entries),
+      eventClick: function(info) {
+        const e = info.event.extendedProps;
+        alert(`💳 ${e.description}\nCHF ${e.amount}\n${e.date}\nCategory: ${e.category || '-'}\nPerson: ${e.person || '-'}`);
+      }
+    });
+
+    calendar.render();
+
+    document.getElementById('personFilter').addEventListener('change', () => {
+      const p = document.getElementById('personFilter').value;
+      const c = document.getElementById('categoryFilter').value;
+      calendar.removeAllEvents();
+      calendar.addEventSource(createEvents(filterEntries(p, c)));
+    });
+
+    document.getElementById('categoryFilter').addEventListener('change', () => {
+      const p = document.getElementById('personFilter').value;
+      const c = document.getElementById('categoryFilter').value;
+      calendar.removeAllEvents();
+      calendar.addEventSource(createEvents(filterEntries(p, c)));
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', initCalendar);
+</script>
+
+</body>
+</html>

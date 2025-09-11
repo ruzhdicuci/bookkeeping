@@ -200,6 +200,21 @@ Limit per Day
 </div>
 </div>  
 
+<a href="./calendar.html" class="calendar-link">📅 Calendar View</a>
+
+<style>
+.calendar-link {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: bold;
+  margin-left: 10px;
+}
+.calendar-link:hover {
+  text-decoration: underline;
+}
+</style>
+
+
 <div class="tabs-wrapper">
  <div class="tabs">
       <select id="dropbtn">
@@ -486,7 +501,7 @@ totalsContainer.appendChild(summaryCard);
 
  
  <div id="budgetSection" class="section-block"> 
-<div class="section-heading">Budget&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="dropdown-arrow">▾</span> </div>
+<div class="section-heading">Planned Budget&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="dropdown-arrow">▾</span> </div>
  <div class="filter-grid">
  
 <div id="yearlyBudgetContainer" style="margin-top: 1px; margin-bottom: 1px; background-color: white; padding:15px; border-radius: 10px;">
@@ -530,8 +545,13 @@ totalsContainer.appendChild(summaryCard);
   
 
 <div id="allSection" class="section-block"> 
-  <div class="section-heading">Budget All&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="dropdown-arrow">▾</span>
- </div>
+  <div class="section-heading">
+   <span>Budget All</span> 
+   <span class="dropdown-arrow">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▾</span> 
+</div>
+
+
+
  <div class="filter-grid4">
 
 <div id="yearlyDifferencesContainer" style="margin-bottom: -10px; display: flex; justify-content: center;">
@@ -548,10 +568,7 @@ totalsContainer.appendChild(summaryCard);
 </div>
 
 <div id="barSection" class="section-block"> 
-<div class="section-heading">
-  <span>Daily Limit</span>
-  <span class="dropdown-arrow">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▾</span> 
-</div>
+       <div class="section-heading">Limit per Day&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="dropdown-arrow">▾</span> </div>
 
 
  <div class="filter-grid5">
@@ -563,7 +580,7 @@ totalsContainer.appendChild(summaryCard);
   </span>
 </div>
 
-<div class="daily-limit-bar-row">
+<div class="daily-limit-bar-row" style="margin-top: 20px;">
   <div class="daily-limit-inline">
     <input id="dailyLimitInput" type="number" min="1" />
     <button id="setbtn" onclick="saveDailyLimit()">Set Limit</button>
@@ -587,15 +604,9 @@ totalsContainer.appendChild(summaryCard);
 
   </div>
 </div>
-
-
-
-
-
-
 </div>
 </div>
-
+</div>
 
 
 <div id="widgetSection" class="section-block">
