@@ -69,27 +69,33 @@ background-color: white;
   let allEntries = [];
 
 async function fetchEntries() {
-  const res = await fetch(`${apiBase}/api/entries`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
+  try {
+    const res = await fetch(`${apiBase}/api/entries`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
 
-  const json = await res.json();
+    const json = await res.json();
+    console.log("📦 Fetched JSON:", json);
 
-  if (!res.ok) {
-    console.error("❌ Failed to load entries:", json);
-    alert(`❌ Failed to load entries: ${json.message || json.error || 'Unknown error'}`);
+    if (!res.ok) {
+      console.error("❌ Failed to load entries:", json);
+      alert(`❌ Failed to load entries: ${json.message || json.error || 'Unknown error'}`);
+      return [];
+    }
+
+    const entries = json.entries || [];
+    console.log("✅ Extracted entries:", entries);
+
+    if (!Array.isArray(entries)) {
+      console.warn("⚠️ Entries is not an array", entries);
+      return [];
+    }
+
+    return entries;
+  } catch (err) {
+    console.error("❌ Exception while fetching entries:", err);
     return [];
   }
-
-  const entries = json.entries || [];
-
-  // Safety: ensure it's an array
-  if (!Array.isArray(entries)) {
-    console.warn("⚠️ Entries is not an array", entries);
-    return [];
-  }
-
-  return entries;
 }
 
   function createEvents(entries) {
