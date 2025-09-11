@@ -79,6 +79,10 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/dashboard.html'));
 });
 
+app.get('/calendar.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'client', 'calendar.html'));
+});
+
 const SECRET = process.env.JWT_SECRET || 'fallback-secret';
 
 // ✅ Mongoose models
