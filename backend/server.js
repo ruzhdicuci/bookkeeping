@@ -71,10 +71,6 @@ app.use((req, res, next) => {
 
 app.use(express.static(path.join(__dirname, '../frontend')));
 
-app.get('/mobile', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/mobile/mobile.html'));
-});
-
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/dashboard.html'));
 });
