@@ -8,7 +8,7 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f5f5f5;
+      background: #f4f2ee;
       margin: 0;
       padding: 0;
     }
@@ -16,9 +16,10 @@
       max-width: 900px;
       margin: 40px auto;
       padding: 0 20px;
-      background: #fff;
+      background: white;
       border-radius: 8px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
+       height: calc(100vh - 50px);  /* ← full height minus header */
     }
     .fc-event {
       font-size: 0.8rem;
@@ -33,17 +34,21 @@
       justify-content: center;
     }
 
- #bt2 {
-  padding: 6px 12px;
-background-color: rgb(86, 236, 126);
+    #bt2 {
+      padding: 6px 12px;
+      background-color: rgb(86, 236, 126);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    #bt2:hover {
+      background-color: white;
+    }
+    
+    .fc-event {
+  color: white !important;
   border: none;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-
-#bt2:hover {
-background-color: white;
 }
   </style>
 </head>
@@ -59,7 +64,7 @@ background-color: white;
 
   <button id="bt2" onclick="location.href = 'dashboard.html?t=' + Date.now()">🔙</button>
 </div>
-
+<div id="monthlySummary" style="text-align:center; font-weight:bold; margin-top: 20px;"></div>
 <div id="calendar"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
@@ -68,71 +73,71 @@ background-color: white;
   const token = localStorage.getItem('token');
   let allEntries = [];
 
-async function fetchEntries() {
-  try {
-    const res = await fetch(`${apiBase}/api/entries`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
+  async function fetchEntries() {
+    try {
+      const res = await fetch(`${apiBase}/api/entries`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
 
-    const json = await res.json();
-    console.log("📦 Fetched JSON:", json);
+      const json = await res.json();
+      console.log("📦 Fetched JSON:", json);
 
-    if (!res.ok) {
-      console.error("❌ Failed to load entries:", json);
-      alert(`❌ Failed to load entries: ${json.message || json.error || 'Unknown error'}`);
+      const entries = json;
+      console.log("✅ Extracted entries:", entries);
+
+      if (!Array.isArray(entries)) {
+        console.warn("⚠️ Entries is not an array", entries);
+        return [];
+      }
+
+      return entries;
+    } catch (err) {
+      console.error("❌ Exception while fetching entries:", err);
       return [];
     }
-
-    const entries = json.entries || [];
-    console.log("✅ Extracted entries:", entries);
-
-    if (!Array.isArray(entries)) {
-      console.warn("⚠️ Entries is not an array", entries);
-      return [];
-    }
-
-    return entries;
-  } catch (err) {
-    console.error("❌ Exception while fetching entries:", err);
-    return [];
   }
-}
 
-  function createEvents(entries) {
-    return entries.map(e => ({
+function createEvents(entries) {
+  return entries.map(e => {
+        const isIncome = ['plus', 'income'].includes((e.type || '').toLowerCase());
+
+
+    return {
       title: `${e.description} (${parseFloat(e.amount).toFixed(2)} CHF)`,
       start: e.date,
-      extendedProps: e
-    }));
-  }
-
- function populateFilters(entries) {
-  if (!Array.isArray(entries)) {
-    console.warn("⚠️ Cannot populate filters. Entries is not an array.");
-    return;
-  }
-
-  const persons = [...new Set(entries.map(e => e.person).filter(Boolean))];
-  const categories = [...new Set(entries.map(e => e.category).filter(Boolean))];
-
-  // Populate dropdowns
-  const personSelect = document.getElementById('personFilter');
-  const categorySelect = document.getElementById('categoryFilter');
-
-  persons.forEach(person => {
-    const opt = document.createElement('option');
-    opt.value = person;
-    opt.textContent = person;
-    personSelect.appendChild(opt);
-  });
-
-  categories.forEach(category => {
-    const opt = document.createElement('option');
-    opt.value = category;
-    opt.textContent = category;
-    categorySelect.appendChild(opt);
+      extendedProps: e,
+      backgroundColor: isIncome ? 'green' : 'red',     // ✅ color background
+      textColor: 'white'                               // ✅ force white text
+    };
   });
 }
+
+  function populateFilters(entries) {
+    if (!Array.isArray(entries)) {
+      console.warn("⚠️ Cannot populate filters. Entries is not an array.");
+      return;
+    }
+
+    const persons = [...new Set(entries.map(e => e.person).filter(Boolean))];
+    const categories = [...new Set(entries.map(e => e.category).filter(Boolean))];
+
+    const personSelect = document.getElementById('personFilter');
+    const categorySelect = document.getElementById('categoryFilter');
+
+    persons.forEach(person => {
+      const opt = document.createElement('option');
+      opt.value = person;
+      opt.textContent = person;
+      personSelect.appendChild(opt);
+    });
+
+    categories.forEach(category => {
+      const opt = document.createElement('option');
+      opt.value = category;
+      opt.textContent = category;
+      categorySelect.appendChild(opt);
+    });
+  }
 
   function filterEntries(person, category) {
     return allEntries.filter(e => {
@@ -140,60 +145,124 @@ async function fetchEntries() {
     });
   }
 
-  async function initCalendar() {
-    const entries = await fetchEntries();
-    populateFilters(entries);
+function renderCalendar(entries) {
+  const calendarEl = document.getElementById('calendar');
 
-    const calendarEl = document.getElementById('calendar');
-    const calendar = new FullCalendar.Calendar(calendarEl, {
-      initialView: 'dayGridMonth',
-      height: 'auto',
-      headerToolbar: {
-        left: 'prev,next today',
-        center: 'title',
-        right: 'dayGridMonth,listMonth'
-      },
-      events: createEvents(entries),
-      eventClick: function(info) {
-        const e = info.event.extendedProps;
-        alert(`💳 ${e.description}\nCHF ${e.amount}\n${e.date}\nCategory: ${e.category || '-'}\nPerson: ${e.person || '-'}`);
-      }
-    });
+  const calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: 'dayGridMonth',
+    headerToolbar: {
+      left: 'prev,next today',
+      center: 'title',
+      right: 'dayGridMonth,timeGridWeek,listMonth'
+    },
+    events: createEvents(entries),
+    eventClick: function(info) {
+      const e = info.event.extendedProps;
+      alert(`💳 ${e.description}\nCHF ${e.amount}\n${e.date}\nCategory: ${e.category || '-'}\nPerson: ${e.person || '-'}`);
+    }
+  });
 
-    calendar.render();
+  calendar.render();
 
-    document.getElementById('personFilter').addEventListener('change', () => {
-      const p = document.getElementById('personFilter').value;
-      const c = document.getElementById('categoryFilter').value;
-      calendar.removeAllEvents();
-      calendar.addEventSource(createEvents(filterEntries(p, c)));
-    });
+  // ✅ Update monthly summary on calendar view change
+  calendar.on('datesSet', function(info) {
+    const p = document.getElementById('personFilter').value;
+    const c = document.getElementById('categoryFilter').value;
+    const filtered = filterEntries(p, c);
+    renderMonthlySummary(filtered);
+  });
 
-    document.getElementById('categoryFilter').addEventListener('change', () => {
-      const p = document.getElementById('personFilter').value;
-      const c = document.getElementById('categoryFilter').value;
-      calendar.removeAllEvents();
-      calendar.addEventSource(createEvents(filterEntries(p, c)));
-    });
-  }
+  // ✅ Update calendar and summary on person filter change
+  document.getElementById('personFilter').addEventListener('change', () => {
+    const p = document.getElementById('personFilter').value;
+    const c = document.getElementById('categoryFilter').value;
+    const filtered = filterEntries(p, c);
+    calendar.removeAllEvents();
+    calendar.addEventSource(createEvents(filtered));
+    renderMonthlySummary(filtered);
+  });
 
-document.addEventListener('DOMContentLoaded', async function initCalendar() {
-  const entries = await fetchEntries(); // ✅ Make sure to use await and assign it correctly
+  // ✅ Update calendar and summary on category filter change
+  document.getElementById('categoryFilter').addEventListener('change', () => {
+    const p = document.getElementById('personFilter').value;
+    const c = document.getElementById('categoryFilter').value;
+    const filtered = filterEntries(p, c);
+    calendar.removeAllEvents();
+    calendar.addEventSource(createEvents(filtered));
+    renderMonthlySummary(filtered);
+  });
+
+  // ✅ Initial monthly summary
+  renderMonthlySummary(entries);
+}
+  function updateMonthlySummary(entries) {
+  const totals = {};
+
+  entries.forEach(e => {
+    const month = e.date?.slice(0, 7); // YYYY-MM
+    const amount = parseFloat(e.amount) || 0;
+    const type = (e.type || '').toLowerCase();
+
+    if (!totals[month]) totals[month] = { plus: 0, minus: 0 };
+    if (type === 'plus') totals[month].plus += amount;
+    if (type === 'minus') totals[month].minus += amount;
+  });
+
+  const currentMonth = new Date().toISOString().slice(0, 7);
+  const sum = totals[currentMonth] || { plus: 0, minus: 0 };
+  const net = (sum.plus - sum.minus).toFixed(2);
+
+  document.getElementById('monthlySummary').innerHTML = `
+    📈 <span style="color:green">Income:</span> ${sum.plus.toFixed(2)} CHF
+    &nbsp; | &nbsp;
+    📉 <span style="color:red">Expenses:</span> ${sum.minus.toFixed(2)} CHF
+    &nbsp; | &nbsp;
+    💰 <strong>Net:</strong> ${net} CHF
+  `;
+}
+
+
+
+function renderMonthlySummary(entries) {
+  const container = document.getElementById('monthlySummary');
+  if (!container) return;
+
+  // Group entries by current month
+  const now = new Date();
+  const currentMonth = now.toISOString().slice(0, 7); // "2025-09"
+
+  const thisMonth = entries.filter(e => (e.date || '').startsWith(currentMonth));
+
+  let income = 0, expense = 0;
+thisMonth.forEach(e => {
+  const amt = parseFloat(e.amount) || 0;
+  const type = (e.type || '').toLowerCase();
+  if (type === 'plus' || type === 'income') income += amt;
+  else if (type === 'minus' || type === 'expense') expense += amt;
+});
+
+  const net = income - expense;
+
+  container.innerHTML = `
+    <div style="font-size: 1.2rem;">
+      📅 <strong>${currentMonth}</strong><br>
+      ✅ Income: <span style="color:green;">${income.toFixed(2)} CHF</span> |
+      ❌ Expense: <span style="color:red;">${expense.toFixed(2)} CHF</span> |
+      💰 Net: <strong>${net.toFixed(2)} CHF</strong>
+    </div>
+  `;
+}
+
+document.addEventListener('DOMContentLoaded', async function () {
+  const entries = await fetchEntries();         // ✅ Defined here
+  allEntries = entries;                         // Store globally
   console.log("✅ Entries loaded:", entries);
 
   populateFilters(entries);
-
-  if (typeof renderCalendar === 'function') {
-    renderCalendar(entries);
-  } else {
-    console.warn("⚠️ renderCalendar is not defined yet");
-  }
+  renderCalendar(entries);                      // ✅ Pass to calendar
 });
 
-function renderCalendar(entries) {
-  console.log("🗓️ Rendering calendar... entries count:", entries.length);
-  // TODO: Replace this with actual calendar rendering logic
-}
+
 </script>
 
 </body>
