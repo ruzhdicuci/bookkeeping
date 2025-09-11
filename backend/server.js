@@ -75,10 +75,11 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/dashboard.html'));
 });
 
-// Serve calendar.html explicitly
-app.get('/calendar.html', (req, res) => {
+
+app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/calendar.html'));
 });
+
 
 const SECRET = process.env.JWT_SECRET || 'fallback-secret';
 
