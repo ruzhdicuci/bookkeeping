@@ -1,38 +1,102 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Bookkeeping Calendar</title>
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
   <style>
     body {
       font-family: Arial, sans-serif;
       background: #f4f2ee;
-      margin: 0;
+      margin: 10px;
       padding: 0;
     }
     #calendar {
-      max-width: 900px;
-      margin: 40px auto;
+      max-width: 1000px;
+      margin: 30px auto;
       padding: 0 20px;
+      padding-top: 15px;
       background: white;
       border-radius: 8px;
+          border-color: #edecec;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
-       height: calc(100vh - 50px);  /* ← full height minus header */
     }
-    .fc-event {
-      font-size: 0.8rem;
-      padding: 2px 4px;
-    }
+
     .filter-bar {
-      max-width: 900px;
-      margin: 20px auto 0;
-      padding: 10px 20px;
-      display: flex;
-      gap: 10px;
-      justify-content: center;
+  display: flex;
+  align-items: center;
+
+  gap: 10px;       /* space between elements */
+  margin: 10px 0;
+  flex-wrap: wrap; /* ✅ makes it responsive */
+}
+
+.dropdown {
+  flex: 1;         /* equal width */
+  min-width: 120px;
+  background: white;
+  padding: 8px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+
+.dropdown {
+  flex: 1;
+  min-width:50px;          /* smaller */
+  max-width: 90px;          /* prevents being too wide */
+  background: #514d4d;
+  padding: 7px 12px;          /* less padding */
+  border-radius: 6px;        /* tighter corners */
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  font-size: 13px;           /* smaller text */
+}
+
+.dropdown label {
+  display: block;
+    font-size: 12px;
+   cursor: pointer;
+   color: white;
+   border-bottom: 1px solid #514d4d;
+
+}
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      margin-top: 4px;
+background-color: rgb(68, 63, 63);
+  border: 1px solid  #514d4d;
+  border-radius: 6px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  min-width: 160px;
+color: white;
+  overflow-y: auto;
+  padding: 8px;
+      z-index: 999;
+        cursor: pointer;
+
     }
+    .dropdown:hover .dropdown-content {
+      display: block;
+   
+    }
+
+        .dropdown label:hover  {
+      display: block;
+   
+      color:#ff6600; 
+ 
+    }
+
+  .dropdown-content  input[type="checkbox"] {
+  accent-color: #ff6600; /* matches your orange button */
+  cursor: pointer;
+  color:white;
+  margin-bottom: 3px;
+}
+
 
     #bt2 {
       padding: 6px 12px;
@@ -40,230 +104,342 @@
       border: none;
       border-radius: 8px;
       cursor: pointer;
+    
+    }
+    #bt2:hover {
+     background-color: white;
     }
 
-    #bt2:hover {
-      background-color: white;
-    }
+        #bt3 {
+      padding: 6px 12px;
+      background-color: black;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-left: -5px;
     
+    }
+    #bt3:hover {
+     background-color: white;
+    }
+
+
+
     .fc-event {
-  color: white !important;
-  border: none;
+      font-size: 0.8rem;
+      padding: 2px 4px;
+      color: white !important;
+      border: none;
+ 
+    }
+
+    body.dark-theme .fc {
+  --fc-page-bg-color: #222;
+  --fc-neutral-bg-color: #333;
+  --fc-border-color: #3d3d3d;
+  --fc-button-text-color: #fff;
+
+  --fc-event-bg-color: #008000;
+  --fc-event-border-color: #008000;
+  --fc-event-text-color: #fff;
+  --fc-today-bg-color: #2a2a2a;
+  --fc-now-indicator-color: red;
+  --fc-neutral-text-color: #eee;
+  --fc-more-link-color: #ccc;
 }
-  </style>
+
+  body.dark-theme {
+    background-color: #222;
+    color: #eee;
+  }
+  body.dark-theme #calendar {
+    background: #333;
+    color: #eee;
+  }
+  .theme-toggle {
+    background-color: #444;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 10px;
+    margin-left: 8px;
+    cursor: pointer;
+  }
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;           /* spacing between cards */
+margin-top: 15px;
+margin-bottom: -15px;
+ 
+}
+
+  body.dark-theme .summary-card{
+    background-color: #2c2c2c;
+    color: #eee;
+  }
+.summary-card {
+  flex: 1;             /* all cards same width */
+  padding: 10px;
+  border-radius: 8px;
+  background: white;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  font-size: 14px;     /* smaller */
+  width: 100px;
+}
+
+.summary-card .label {
+ 
+  margin-bottom: 5px;
+}
+
+  body.dark-theme .income .value {
+  color: rgb(119, 214, 119);
+  }
+    body.dark-theme .expense .value {
+  color: rgb(237, 111, 111);
+   
+}
+    body.dark-theme .net .value {
+  color: rgb(109, 201, 244);
+    
+}
+.income .value {
+  color: green;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.expense .value {
+  color: red;
+    font-size: 1.2rem;
+      font-weight: bold;
+}
+
+.net .value {
+  color: blue;
+    font-size: 1.2rem;
+      font-weight: bold;
+}
+
+/* 📱 Responsive FullCalendar Toolbar */
+.fc-header-toolbar {
+  flex-wrap: wrap !important;
+  justify-content: center;
+  gap: 10px;
+}
+
+.fc .fc-button {
+  font-size: 0.8rem;
+  padding: 6px 10px;
+  border-radius: 6px;
+  height: auto;
+}
+
+@media (max-width: 480px) {
+  .fc .fc-button {
+    font-size: 0.75rem;
+    padding: 5px 8px;
+  }
+
+  .fc .fc-toolbar-title {
+    font-size: 1rem;
+    margin-top: 8px;
+  }
+
+  .fc-header-toolbar {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+</style>
+
+<script>
+function toggleTheme() {
+  const isDark = document.body.classList.toggle('dark-theme');
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+}
+document.addEventListener('DOMContentLoaded', () => {
+  if (localStorage.getItem('theme') === 'dark') {
+    document.body.classList.add('dark-theme');
+  }
+});
+</script>
+
+
 </head>
 <body>
 
 <div class="filter-bar">
-  <select id="personFilter">
-    <option value="">All Persons</option>
-  </select>
-  <select id="categoryFilter">
-    <option value="">All Categories</option>
-  </select>
+  <div class="dropdown">
+    <label>👤 Persons</label>
+    <div class="dropdown-content" id="personDropdown"></div>
+  </div>
+
+  <div class="dropdown">
+    <label>📂 Categories</label>
+    <div class="dropdown-content" id="categoryDropdown"></div>
+  </div>
 
   <button id="bt2" onclick="location.href = 'dashboard.html?t=' + Date.now()">🔙</button>
+  <button id="bt3" class="theme-toggle" onclick="toggleTheme()">🌙</button>
 </div>
-<div id="monthlySummary" style="text-align:center; font-weight:bold; margin-top: 20px;"></div>
+
+  <div class="summary-row">
+    <div class="summary-card income">
+      <div class="label">Income</div>
+      <div class="value" id="incomeValue">0.00</div>
+    </div>
+    <div class="summary-card expense">
+      <div class="label">Expense</div>
+      <div class="value" id="expenseValue">0.00</div>
+    </div>
+    <div class="summary-card net">
+      <div class="label">Net</div>
+      <div class="value" id="netValue">0.00</div>
+    </div>
+  </div>
+
 <div id="calendar"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
 <script>
-  const apiBase = 'https://bookkeeping-i8e0.onrender.com';
-  const token = localStorage.getItem('token');
-  let allEntries = [];
+const apiBase = 'https://bookkeeping-i8e0.onrender.com';
+const token = localStorage.getItem('token');
+let allEntries = [];
 
-  async function fetchEntries() {
-    try {
-      const res = await fetch(`${apiBase}/api/entries`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      const json = await res.json();
-      console.log("📦 Fetched JSON:", json);
-
-      const entries = json;
-      console.log("✅ Extracted entries:", entries);
-
-      if (!Array.isArray(entries)) {
-        console.warn("⚠️ Entries is not an array", entries);
-        return [];
-      }
-
-      return entries;
-    } catch (err) {
-      console.error("❌ Exception while fetching entries:", err);
-      return [];
-    }
-  }
+async function fetchEntries() {
+  const res = await fetch(`${apiBase}/api/entries`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  const json = await res.json();
+  return Array.isArray(json) ? json : [];
+}
 
 function createEvents(entries) {
   return entries.map(e => {
-        const isIncome = ['plus', 'income'].includes((e.type || '').toLowerCase());
-
-
+    const isIncome = ['plus', 'income'].includes((e.type || '').toLowerCase());
     return {
       title: `${e.description} (${parseFloat(e.amount).toFixed(2)} CHF)`,
       start: e.date,
       extendedProps: e,
-      backgroundColor: isIncome ? 'green' : 'red',     // ✅ color background
-      textColor: 'white'                               // ✅ force white text
+      backgroundColor: isIncome ? 'green' : 'red',
+      textColor: 'white'
     };
   });
 }
 
-  function populateFilters(entries) {
-    if (!Array.isArray(entries)) {
-      console.warn("⚠️ Cannot populate filters. Entries is not an array.");
-      return;
-    }
+function getCheckedValues(containerId) {
+  return Array.from(document.querySelectorAll(`#${containerId} input:checked`)).map(cb => cb.value);
+}
 
-    const persons = [...new Set(entries.map(e => e.person).filter(Boolean))];
-    const categories = [...new Set(entries.map(e => e.category).filter(Boolean))];
+function filterEntries() {
+  const selectedPersons = getCheckedValues('personDropdown');
+  const selectedCats = getCheckedValues('categoryDropdown');
+  return allEntries.filter(e =>
+    (!selectedPersons.length || selectedPersons.includes(e.person)) &&
+    (!selectedCats.length || selectedCats.includes(e.category))
+  );
+}
 
-    const personSelect = document.getElementById('personFilter');
-    const categorySelect = document.getElementById('categoryFilter');
+function renderMonthlySummary(entries) {
+  const calendarDate = document.querySelector('.fc-toolbar-title')?.textContent || '';
+  const [monthName, year] = calendarDate.split(' ');
 
-    persons.forEach(person => {
-      const opt = document.createElement('option');
-      opt.value = person;
-      opt.textContent = person;
-      personSelect.appendChild(opt);
-    });
+  // Convert month name to number (01–12)
+  const monthMap = {
+    January: '01', February: '02', March: '03',
+    April: '04', May: '05', June: '06',
+    July: '07', August: '08', September: '09',
+    October: '10', November: '11', December: '12'
+  };
 
-    categories.forEach(category => {
-      const opt = document.createElement('option');
-      opt.value = category;
-      opt.textContent = category;
-      categorySelect.appendChild(opt);
-    });
-  }
+  const month = monthMap[monthName];
+  const yearMonth = `${year}-${month}`;  // e.g. "2025-09"
 
-  function filterEntries(person, category) {
-    return allEntries.filter(e => {
-      return (!person || e.person === person) && (!category || e.category === category);
-    });
-  }
+  // ✅ filter correctly
+  const monthEntries = entries.filter(e => (e.date || '').startsWith(yearMonth));
+
+  let income = 0, expense = 0;
+  monthEntries.forEach(e => {
+    const amt = parseFloat(e.amount) || 0;
+    const type = (e.type || '').toLowerCase();
+    if (type === 'plus' || type === 'income') income += amt;
+    else if (type === 'minus' || type === 'expense') expense += amt;
+  });
+
+  const net = income - expense;
+
+  document.getElementById('incomeValue').textContent = income.toFixed(2);
+  document.getElementById('expenseValue').textContent = expense.toFixed(2);
+  document.getElementById('netValue').textContent = net.toFixed(2);
+}
+
+
+function populateCheckboxFilters(entries) {
+  const persons = [...new Set(entries.map(e => e.person).filter(Boolean))].sort();
+  const categories = [...new Set(entries.map(e => e.category).filter(Boolean))].sort();
+
+  const personDiv = document.getElementById('personDropdown');
+  const catDiv = document.getElementById('categoryDropdown');
+
+  persons.forEach(p => {
+    personDiv.innerHTML += `<label><input type="checkbox" value="${p}" checked> ${p}</label><br>`;
+  });
+
+  categories.forEach(c => {
+    catDiv.innerHTML += `<label><input type="checkbox" value="${c}" checked> ${c}</label><br>`;
+  });
+
+  personDiv.addEventListener('change', updateCalendar);
+  catDiv.addEventListener('change', updateCalendar);
+}
+
+let calendar;
 
 function renderCalendar(entries) {
   const calendarEl = document.getElementById('calendar');
-
-  const calendar = new FullCalendar.Calendar(calendarEl, {
+  calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: 'dayGridMonth',
     headerToolbar: {
       left: 'prev,next today',
       center: 'title',
       right: 'dayGridMonth,timeGridWeek,listMonth'
     },
+    height: 'auto',
     events: createEvents(entries),
-    eventClick: function(info) {
+    eventClick(info) {
       const e = info.event.extendedProps;
       alert(`💳 ${e.description}\nCHF ${e.amount}\n${e.date}\nCategory: ${e.category || '-'}\nPerson: ${e.person || '-'}`);
+    },
+    datesSet() {
+      const filtered = filterEntries();
+      calendar.removeAllEvents();
+      calendar.addEventSource(createEvents(filtered));
+      renderMonthlySummary(filtered);
     }
   });
 
   calendar.render();
-
-  // ✅ Update monthly summary on calendar view change
-  calendar.on('datesSet', function(info) {
-    const p = document.getElementById('personFilter').value;
-    const c = document.getElementById('categoryFilter').value;
-    const filtered = filterEntries(p, c);
-    renderMonthlySummary(filtered);
-  });
-
-  // ✅ Update calendar and summary on person filter change
-  document.getElementById('personFilter').addEventListener('change', () => {
-    const p = document.getElementById('personFilter').value;
-    const c = document.getElementById('categoryFilter').value;
-    const filtered = filterEntries(p, c);
-    calendar.removeAllEvents();
-    calendar.addEventSource(createEvents(filtered));
-    renderMonthlySummary(filtered);
-  });
-
-  // ✅ Update calendar and summary on category filter change
-  document.getElementById('categoryFilter').addEventListener('change', () => {
-    const p = document.getElementById('personFilter').value;
-    const c = document.getElementById('categoryFilter').value;
-    const filtered = filterEntries(p, c);
-    calendar.removeAllEvents();
-    calendar.addEventSource(createEvents(filtered));
-    renderMonthlySummary(filtered);
-  });
-
-  // ✅ Initial monthly summary
   renderMonthlySummary(entries);
 }
-  function updateMonthlySummary(entries) {
-  const totals = {};
 
-  entries.forEach(e => {
-    const month = e.date?.slice(0, 7); // YYYY-MM
-    const amount = parseFloat(e.amount) || 0;
-    const type = (e.type || '').toLowerCase();
-
-    if (!totals[month]) totals[month] = { plus: 0, minus: 0 };
-    if (type === 'plus') totals[month].plus += amount;
-    if (type === 'minus') totals[month].minus += amount;
-  });
-
-  const currentMonth = new Date().toISOString().slice(0, 7);
-  const sum = totals[currentMonth] || { plus: 0, minus: 0 };
-  const net = (sum.plus - sum.minus).toFixed(2);
-
-  document.getElementById('monthlySummary').innerHTML = `
-    📈 <span style="color:green">Income:</span> ${sum.plus.toFixed(2)} CHF
-    &nbsp; | &nbsp;
-    📉 <span style="color:red">Expenses:</span> ${sum.minus.toFixed(2)} CHF
-    &nbsp; | &nbsp;
-    💰 <strong>Net:</strong> ${net} CHF
-  `;
+function updateCalendar() {
+  const filtered = filterEntries();
+  calendar.removeAllEvents();
+  calendar.addEventSource(createEvents(filtered));
+  renderMonthlySummary(filtered);
 }
 
-
-
-function renderMonthlySummary(entries) {
-  const container = document.getElementById('monthlySummary');
-  if (!container) return;
-
-  // Group entries by current month
-  const now = new Date();
-  const currentMonth = now.toISOString().slice(0, 7); // "2025-09"
-
-  const thisMonth = entries.filter(e => (e.date || '').startsWith(currentMonth));
-
-  let income = 0, expense = 0;
-thisMonth.forEach(e => {
-  const amt = parseFloat(e.amount) || 0;
-  const type = (e.type || '').toLowerCase();
-  if (type === 'plus' || type === 'income') income += amt;
-  else if (type === 'minus' || type === 'expense') expense += amt;
+document.addEventListener('DOMContentLoaded', async () => {
+  const entries = await fetchEntries();
+  allEntries = entries;
+  populateCheckboxFilters(entries);
+  renderCalendar(entries);
 });
-
-  const net = income - expense;
-
-  container.innerHTML = `
-    <div style="font-size: 1.2rem;">
-      📅 <strong>${currentMonth}</strong><br>
-      ✅ Income: <span style="color:green;">${income.toFixed(2)} CHF</span> |
-      ❌ Expense: <span style="color:red;">${expense.toFixed(2)} CHF</span> |
-      💰 Net: <strong>${net.toFixed(2)} CHF</strong>
-    </div>
-  `;
-}
-
-document.addEventListener('DOMContentLoaded', async function () {
-  const entries = await fetchEntries();         // ✅ Defined here
-  allEntries = entries;                         // Store globally
-  console.log("✅ Entries loaded:", entries);
-
-  populateFilters(entries);
-  renderCalendar(entries);                      // ✅ Pass to calendar
-});
-
-
 </script>
-
 </body>
 </html>
