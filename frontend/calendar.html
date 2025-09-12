@@ -255,6 +255,52 @@ margin-bottom: -15px;
   }
 }
 
+
+.custom-modal.hidden { display: none; }
+
+.custom-modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+}
+
+.custom-modal-content {
+  background: #262323;
+  padding: 20px;
+  border-radius: 12px;
+  width: 350px;
+  max-width: 90%;
+ border: 1px solid rgb(79, 77, 77);
+  color: white;
+}
+
+.custom-modal-content h3 {
+  margin-top: 0;
+  color: yellow;
+  border-bottom: 1px solid rgb(58, 55, 55);
+}
+
+.modal-actions {
+  margin-top: 15px;
+  text-align: right;
+}
+
+.cancel-btn {
+  background: rgb(21, 114, 98);
+  border: none;
+  color: white;
+  padding: 8px;
+  border-radius: 6px;
+}
+
+.cancel-btn:hover {
+  background: white;
+  color: rgb(21, 114, 98);
+}
 </style>
 
 <script>
@@ -304,6 +350,24 @@ document.addEventListener('DOMContentLoaded', () => {
   </div>
 
 <div id="calendar"></div>
+
+<div id="calendarEntryModal" class="custom-modal hidden">
+  <div class="custom-modal-content">
+    <h3 id="modalTitle">📄 Entry Details</h3>
+
+    <p><strong>Date:</strong> <span id="modalDate"></span></p>
+    <p><strong>Amount:</strong> CHF <span id="modalAmount"></span></p>
+    <p><strong>Category:</strong> <span id="modalCategory"></span></p>
+    <p><strong>Person:</strong> <span id="modalPerson"></span></p>
+    <p><strong>Bank:</strong> <span id="modalBank"></span></p>
+    <p><strong>Description:</strong> <span id="modalDescription"></span></p>
+
+    <div class="modal-actions">
+      <button onclick="closeCalendarEntryModal()" class="action-btn cancel-btn">OK</button>
+    </div>
+  </div>
+</div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
 <script>
@@ -411,10 +475,23 @@ function renderCalendar(entries) {
     },
     height: 'auto',
     events: createEvents(entries),
+
     eventClick(info) {
       const e = info.event.extendedProps;
-      alert(`💳 ${e.description}\nCHF ${e.amount}\n${e.date}\nCategory: ${e.category || '-'}\nPerson: ${e.person || '-'}`);
+
+      // ✅ Fill modal fields
+      document.getElementById("modalTitle").textContent = e.description || "Entry Details";
+      document.getElementById("modalDate").textContent = info.event.startStr;
+      document.getElementById("modalAmount").textContent = e.amount || "";
+      document.getElementById("modalCategory").textContent = e.category || "-";
+      document.getElementById("modalPerson").textContent = e.person || "-";
+      document.getElementById("modalBank").textContent = e.bank || "-";
+      document.getElementById("modalDescription").textContent = e.description || "-";
+
+      // ✅ Show modal
+      document.getElementById("calendarEntryModal").classList.remove("hidden");
     },
+
     datesSet() {
       const filtered = filterEntries();
       calendar.removeAllEvents();
@@ -426,6 +503,12 @@ function renderCalendar(entries) {
   calendar.render();
   renderMonthlySummary(entries);
 }
+
+
+function closeCalendarEntryModal() {
+  document.getElementById("calendarEntryModal").classList.add("hidden");
+}
+
 
 function updateCalendar() {
   const filtered = filterEntries();
