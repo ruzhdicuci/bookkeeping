@@ -1,69 +1,71 @@
 const DEBUG_MODE = false; // or true for development
-const dailySettingRoutes = require("./routes/dailySetting");
-app.use("/api/daily-setting", dailySettingRoutes);
 const debug = (...args) => DEBUG_MODE && console.log(...args);
-const DailySetting = require('./models/DailySetting');
-const authMiddleware = require('./authMiddleware');
-require('dotenv').config();
-const mongoose = require('mongoose');
-const express = require('express');
-const cors = require('cors');
-const path = require('path');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
+
+require("dotenv").config();
+const mongoose = require("mongoose");
+const express = require("express");
+const cors = require("cors");
+const path = require("path");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
 // ✅ Auth middleware
 function auth(req, res, next) {
-  const token = req.headers.authorization?.split(' ')[1];
-  if (!token) return res.status(401).json({ message: 'Missing token' });
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) return res.status(401).json({ message: "Missing token" });
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = { userId: decoded.userId };
     next();
   } catch {
-    res.status(403).json({ message: 'Invalid token' });
+    res.status(403).json({ message: "Invalid token" });
   }
 }
 
+// ✅ Connect Mongo
 const MONGO_URI = process.env.MONGODB_URI;
 if (!MONGO_URI) {
-  console.error('❌ MONGO_URI not set. Please check environment variables.');
+  console.error("❌ MONGO_URI not set. Please check environment variables.");
   process.exit(1);
 }
 
-mongoose.connect(MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  socketTimeoutMS: 45000
-}).then(() => {
-  debug('✅ MongoDB connected');
-}).catch(err => {
-  console.error('❌ MongoDB initial connection error:', err);
-});
+mongoose
+  .connect(MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    socketTimeoutMS: 45000,
+  })
+  .then(() => {
+    debug("✅ MongoDB connected");
+  })
+  .catch((err) => {
+    console.error("❌ MongoDB initial connection error:", err);
+  });
 
-
-
+// ✅ Initialize Express
 const app = express();
 const allowedOrigins = [
-  'https://we-search.ch',
-  'http://localhost:3000',
-  'http://127.0.0.1:3000'
+  "https://we-search.ch",
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
 ];
 
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('❌ Not allowed by CORS: ' + origin));
-    }
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-app.options('*', cors());
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("❌ Not allowed by CORS: " + origin));
+      }
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+app.options("*", cors());
 app.use(express.json());
 
 app.use((req, res, next) => {
@@ -71,28 +73,43 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.static(path.join(__dirname, '../frontend')));
+// ✅ Routes
+const dailySettingRoutes = require("./routes/dailySetting");
+app.use("/api/daily-setting", dailySettingRoutes);
 
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/dashboard.html'));
+// serve frontend
+app.use(express.static(path.join(__dirname, "../frontend")));
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend/dashboard.html"));
 });
 
-app.get('/calendar.html', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/calendar.html'));
+app.get("/calendar.html", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend/calendar.html"));
 });
 
-const SECRET = process.env.JWT_SECRET || 'fallback-secret';
+// ✅ Example mongoose models
+const Balance = mongoose.model(
+  "Balance",
+  new mongoose.Schema({
+    userId: String,
+    balances: Object,
+  })
+);
 
-// ✅ Mongoose models
-const Balance = mongoose.model('Balance', new mongoose.Schema({
-  userId: String,
-  balances: Object
-}));
+const User = mongoose.model(
+  "User",
+  new mongoose.Schema({
+    email: { type: String, unique: true },
+    password: String,
+  })
+);
 
-const User = mongoose.model('User', new mongoose.Schema({
-  email: { type: String, unique: true },
-  password: String
-}));
+const SECRET = process.env.JWT_SECRET || "fallback-secret";
+
+// ✅ Start server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
 
 const Entry = mongoose.model('Entry', new mongoose.Schema({
   userId: String,
