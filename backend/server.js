@@ -1,4 +1,6 @@
 const DEBUG_MODE = false; // or true for development
+const dailySettingRoutes = require("./routes/dailySetting");
+app.use("/api/daily-setting", dailySettingRoutes);
 const debug = (...args) => DEBUG_MODE && console.log(...args);
 const DailySetting = require('./models/DailySetting');
 const authMiddleware = require('./authMiddleware');

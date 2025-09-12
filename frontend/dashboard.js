@@ -3406,19 +3406,16 @@ function renderSpendingTargetBar(todaySpent, dailyLimit) {
 // 🚀 Initialize on load
 window.addEventListener('DOMContentLoaded', async () => {
   try {
-    await loadDailyLimit(); // ⛔ catch Dexie or backend issues
+    // Load limit from server (fallback localStorage)
+    const limit = await loadDailyLimit();
+    if (limit) {
+      document.getElementById("dailyLimitInput").value = limit;
+    }
   } catch (err) {
     console.error("❌ loadDailyLimit crashed:", err);
   }
 
-  try {
-    await syncDailyLimitsToBackend(); // 🔁 sync issues
-  } catch (err) {
-    console.error("❌ syncDailyLimitsToBackend crashed:", err);
-  }
-
-  waitAndRenderExpenseStats(); // ✅ use this single retry-safe version
-
+  // Render expense stats once entries + DOM are ready
   const interval = setInterval(() => {
     const totalEl = document.getElementById('expenseTotal');
     const avgEl = document.getElementById('expenseAverage');
@@ -3431,7 +3428,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     if (ready) {
       clearInterval(interval);
-      renderExpenseStats();
+      renderExpenseStats(); // uses the limit from input
     }
   }, 300);
 
@@ -3465,43 +3462,48 @@ function getCurrentUserId() {
 
 
 // 💾 Save new daily limit to backend
+// 💾 Load daily limit (server first, fallback to localStorage)
 async function loadDailyLimit() {
   const userId = getCurrentUserId();
   console.log("👤 Using userId:", userId);
   if (!userId) {
     console.warn("⚠️ No userId found, skipping daily limit load");
-    return;
-  }
-
-  let local = await getCachedDailyLimit(userId);
-  if (local?.limit) {
-    DAILY_TARGET = local.limit;
-    document.getElementById('dailyLimitInput').value = DAILY_TARGET;
+    return null;
   }
 
   try {
-    const res = await fetch(`${apiBase}/api/settings/dailyLimit`, {
+    // 🔹 Try server
+    const res = await fetch(`${apiBase}/api/daily-setting`, {
       headers: { Authorization: `Bearer ${token}` }
     });
-    if (!res.ok) throw new Error('Failed to load');
+    if (!res.ok) throw new Error("Failed to load from server");
 
     const data = await res.json();
-    DAILY_TARGET = data.limit;
-    document.getElementById('dailyLimitInput').value = data.limit;
-
-    // ✅ Save fresh value to Dexie
-    await saveDailyLimitLocally(userId, data.limit);
+    if (data && typeof data.limit === "number") {
+      DAILY_TARGET = data.limit;
+      localStorage.setItem("dailyLimit", data.limit);
+      document.getElementById("dailyLimitInput").value = data.limit;
+      return data.limit;
+    }
   } catch (err) {
-    console.warn("⚠️ Failed to load from backend, using local cache", err);
+    console.warn("⚠️ Failed to load from server, using localStorage:", err);
   }
+
+  // 🔹 Fallback: localStorage
+  const local = localStorage.getItem("dailyLimit");
+  if (local) {
+    DAILY_TARGET = parseFloat(local);
+    document.getElementById("dailyLimitInput").value = DAILY_TARGET;
+    return DAILY_TARGET;
+  }
+
+  return null;
 }
 
 
 
-
-
 window.saveDailyLimit = async function () {
-  const input = document.getElementById('dailyLimitInput');
+  const input = document.getElementById("dailyLimitInput");
   const newLimit = parseFloat(input.value);
 
   if (isNaN(newLimit) || newLimit <= 0) {
@@ -3509,68 +3511,30 @@ window.saveDailyLimit = async function () {
     return;
   }
 
-  const userId = getCurrentUserId(); // ✅ Already fixed in earlier step
   DAILY_TARGET = newLimit;
+  localStorage.setItem("dailyLimit", newLimit);
 
-  // Save to Dexie
-  await saveDailyLimitLocally(userId, newLimit);
-
-  // Sync to backend
   try {
-    const res = await fetch(`${apiBase}/api/settings/dailyLimit`, {
-      method: 'POST',
+    const res = await fetch(`${apiBase}/api/daily-setting`, {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`
       },
       body: JSON.stringify({ limit: newLimit })
     });
 
     if (!res.ok) throw new Error("Backend save failed");
-    console.log("✅ Daily limit saved");
+    console.log("✅ Daily limit saved to server");
     showSuccessModal("✅ Daily limit saved!");
   } catch (err) {
-    console.warn("⚠️ Failed to sync to backend:", err);
+    console.warn("⚠️ Failed to save to server, kept in localStorage:", err);
   }
 
-  renderExpenseStats(); // ✅ Rerender with new limit
+  renderExpenseStats(); // ✅ update UI immediately
 };
 
-async function syncDailyLimitsToBackend() {
-  const unsynced = await getUnsyncedDailyLimits();
 
-  for (const item of unsynced) {
-    const userId = String(item.userId); // ✅ Ensure key is string
-
-    if (!userId.trim()) {
-      console.warn("❌ Skipping sync for invalid userId:", userId);
-      continue;
-    }
-
-    try {
-      const res = await fetch(`${apiBase}/api/settings/dailyLimit`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ limit: item.limit })
-      });
-
-      if (res.ok) {
-        await markDailyLimitAsSynced(userId);
-        console.log(`✅ Synced daily limit for ${userId}`);
-      } else {
-        console.warn(`⚠️ Failed to sync for ${userId}:`, res.status);
-      }
-    } catch (err) {
-      console.error("❌ Sync error:", err);
-    }
-  }
-}
-
-// Call it when going online again
-window.addEventListener('online', syncDailyLimitsToBackend);
 
 // 👀 Hover preview logic
 document.querySelectorAll('#customizeSidebar label[data-section]').forEach(label => {
