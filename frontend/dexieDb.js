@@ -19,8 +19,7 @@ db.version(311).stores({
   notes: '_id, title, content, done, synced, lastUpdated',
   balances: 'bank',
   customCards: '_id,name,limit,synced,lastUpdated',
-  yearlyLimits: '[userId+year], synced, year, limit, startFrom, lastUpdated',
-  dailyLimits: '&userId, limit, updatedAt, synced'
+  yearlyLimits: '[userId+year], synced, year, limit, startFrom, lastUpdated'
 });
 
 // ✅ Wrap open in async function
@@ -313,61 +312,6 @@ async function getUnsyncedYearlyLimits() {
   }
 }
 
-async function saveDailyLimitLocally(userId, limit) {
-  try {
-    if (!userId) throw new Error("Missing userId");
-    const key = String(userId).trim();
-    if (!key) throw new Error("Empty userId string");
-
-    await db.dailyLimits.put({
-      userId: key,
-      limit,
-      updatedAt: new Date().toISOString(),
-      synced: false
-    });
-
-    console.log("✅ Saved dailyLimit locally:", { key, limit });
-  } catch (err) {
-    console.error("❌ Dexie PUT failed in saveDailyLimitLocally:", err);
-  }
-}
-
-async function getCachedDailyLimit(userId) {
-  try {
-    if (!userId) throw new Error("Missing userId");
-    const key = String(userId).trim();
-    if (!key) throw new Error("Empty userId string");
-
-    console.log("🔍 Getting dailyLimit for:", key, typeof key);
-    const result = await db.dailyLimits.get(key);
-    console.log("✅ Dexie GET success:", result);
-    return result;
-  } catch (err) {
-    console.error("❌ Dexie GET failed:", err);
-    return null;
-  }
-}
-
-// ✅ Define the function without export
-async function getUnsyncedDailyLimits() {
-  return await db.dailyLimits.where('synced').equals(false).toArray();
-}
-
-export async function markDailyLimitAsSynced(userId) {
-  if (!userId || typeof userId !== 'string' || userId.trim() === '') {
-    console.warn("❌ Invalid userId passed to markDailyLimitAsSynced:", userId);
-    return;
-  }
-
-  try {
-    const existing = await db.dailyLimits.get(userId);
-    if (existing) {
-      await db.dailyLimits.put({ ...existing, synced: true });
-    }
-  } catch (err) {
-    console.error("❌ Dexie error in markDailyLimitAsSynced:", err);
-  }
-}
 
 // ✅ Export all at once
 export {
@@ -390,9 +334,7 @@ export {
     saveYearlyLimitLocally,
   getYearlyLimitFromCache,
   getUnsyncedYearlyLimits,
-  saveDailyLimitLocally,
-  getCachedDailyLimit,
-  getUnsyncedDailyLimits
+
 };
 
 window.db = db; // ✅ For debugging

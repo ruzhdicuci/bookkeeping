@@ -1,6 +1,6 @@
 const DEBUG_MODE = false; // or true for development
 const debug = (...args) => DEBUG_MODE && console.log(...args);
-
+const authMiddleware = require('./authMiddleware');
 require("dotenv").config();
 const mongoose = require("mongoose");
 const express = require("express");
@@ -106,8 +106,6 @@ const User = mongoose.model(
 );
 
 const SECRET = process.env.JWT_SECRET || "fallback-secret";
-
-
 
 const Entry = mongoose.model('Entry', new mongoose.Schema({
   userId: String,
