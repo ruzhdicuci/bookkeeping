@@ -2819,6 +2819,7 @@ window.showSuccessModal = showSuccessModal;
 window.saveExcludedPersonsV2 = saveExcludedPersonsV2;
 window.toggleExcludePersonDropdownV2 = toggleExcludePersonDropdownV2;
 window.populateExcludePersonDropdownV2 = populateExcludePersonDropdownV2;
+window.onEntriesLoaded = onEntriesLoaded
 
 document.addEventListener('DOMContentLoaded', () => {
   const themeSelect = document.getElementById('dropbtn');
@@ -3399,21 +3400,11 @@ function renderSpendingTargetBar(todaySpent, dailyLimit) {
 
 
 // 🚀 Initialize on load
-window.addEventListener('DOMContentLoaded', async () => {
+// 🚀 Initialize on load
+window.addEventListener("DOMContentLoaded", async () => {
   try {
     // Load limit from server (fallback localStorage)
     const limit = await loadDailyLimit();
-    if (limit) {
-      document.getElementById("dailyLimitInput").value = limit;
-    }
-  } catch (err) {
-    console.error("❌ loadDailyLimit crashed:", err);
-  }
-
-  // 🚀 Initialize on load
-window.addEventListener("DOMContentLoaded", async () => {
-  try {
-    const limit = await loadDailyLimit(); // server first, fallback localStorage
     if (limit) {
       document.getElementById("dailyLimitInput").value = limit;
     }
