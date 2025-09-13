@@ -15,11 +15,8 @@ import {
   getUnsyncedCustomCards,    // ✅ Add this here too
   getYearlyLimitFromCache,
   saveYearlyLimitLocally,
-  getUnsyncedYearlyLimits, // ✅ ADD THIS
- saveDailyLimitLocally,
-  getCachedDailyLimit,
-  getUnsyncedDailyLimits,
-  markDailyLimitAsSynced
+  getUnsyncedYearlyLimits // ✅ ADD THIS
+
 } from './dexieDb.js';
 
 import { initDexie } from './dexieDb.js';
@@ -2819,8 +2816,6 @@ window.renderExpenseStats = renderExpenseStats;
 
 window. waitAndRenderExpenseStats =  waitAndRenderExpenseStats;
 window.showSuccessModal = showSuccessModal;
-window.syncDailyLimitsToBackend = syncDailyLimitsToBackend;
-
 window.saveExcludedPersonsV2 = saveExcludedPersonsV2;
 window.toggleExcludePersonDropdownV2 = toggleExcludePersonDropdownV2;
 window.populateExcludePersonDropdownV2 = populateExcludePersonDropdownV2;
@@ -3415,29 +3410,44 @@ window.addEventListener('DOMContentLoaded', async () => {
     console.error("❌ loadDailyLimit crashed:", err);
   }
 
-  // Render expense stats once entries + DOM are ready
-  const interval = setInterval(() => {
-    const totalEl = document.getElementById('expenseTotal');
-    const avgEl = document.getElementById('expenseAverage');
-    const input = document.getElementById('dailyLimitInput');
-    const progressEl = document.getElementById('spendingProgressFill');
+  // 🚀 Initialize on load
+window.addEventListener("DOMContentLoaded", async () => {
+  try {
+    const limit = await loadDailyLimit(); // server first, fallback localStorage
+    if (limit) {
+      document.getElementById("dailyLimitInput").value = limit;
+    }
+  } catch (err) {
+    console.error("❌ loadDailyLimit crashed:", err);
+  }
 
-    const ready =
-      totalEl && avgEl && input && progressEl &&
-      Array.isArray(window.entries) && window.entries.length;
+  // Check for DOM readiness (ignore entries at first)
+  const interval = setInterval(() => {
+    const totalEl = document.getElementById("expenseTotal");
+    const avgEl = document.getElementById("expenseAverage");
+    const input = document.getElementById("dailyLimitInput");
+    const progressEl = document.getElementById("spendingProgressFill");
+
+    const ready = totalEl && avgEl && input && progressEl;
 
     if (ready) {
       clearInterval(interval);
-      renderExpenseStats(); // uses the limit from input
+      renderExpenseStats(); // will render even if entries not loaded yet
     }
   }, 300);
 
-  // 🛑 Stop trying after 10s
+  // 🛑 Stop after 10s to avoid infinite loop
   setTimeout(() => {
     clearInterval(interval);
-    console.warn("⚠️ Still not ready after 10s, skipping stats render.");
+    console.warn("⚠️ Stopped waiting for DOM after 10s");
   }, 10000);
 });
+
+// 🔁 Once entries are loaded from backend, call this:
+async function onEntriesLoaded(entries) {
+  window.entries = entries;
+  renderExpenseStats(); // re-render with actual entries + stats
+}
 
 
 function getCurrentUserId() {
