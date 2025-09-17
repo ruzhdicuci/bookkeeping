@@ -339,7 +339,7 @@ font-weight: bolder;
 
 
 #themeToggle {
-  background: #63ddf8;
+  background: none;
     cursor: pointer;
    border: none;
  height:40px;
@@ -350,7 +350,7 @@ margin-top: 5px;
 
 }
 #themeToggle:hover {
-  background: black;
+  background: #63ddf8;
 
 }
 
@@ -373,22 +373,6 @@ border-radius: 10px;
   text-decoration: none;
 }
 
-#dropbtn {
-   font-size: 12px;
-  border: none;
-  outline: none;
-  color: white;
-width: 70px;
-padding-left: 5px;
-
-  background-color: #63ddf8;
-  font-family: system-ui, sans-serif;
-  height: 40px;
-  border-radius: 6px;
-  margin-right: 1px;
-  margin-top: 5px;
- 
-}
 .dropbtn {
    font-size: 14px;
   border: none;
@@ -486,7 +470,7 @@ color: rgb(213, 79, 79);
 
 
 #bt1  {
-  padding: 8px 10px;
+
  border:1px solid white;
   border-radius: 8px;
   font-size: 0.8rem;
@@ -494,7 +478,8 @@ color: rgb(213, 79, 79);
   cursor: pointer;
   box-sizing: border-box;
   width: 110px;
-  height:30px
+  height:30px;
+  margin-left: 4px;
 }
 
 #bt1:hover  {
@@ -645,34 +630,32 @@ font-size: 1.1rem;
 
 
 
-
-.tabs {
-  display: flex;
-  align-items: center;
-  gap: 1rem; /* spacing between buttons */
-  flex-wrap: wrap; /* allow wrapping on smaller screens */
-}
-
-.tabs button,
-.tabs .dropdown2,
-.tabs #personMultiSelect {
+/* Multiselect bar buttons */
+#personMultiSelect,
+#monthMultiSelect,
+.clearFiltersBtn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
-
- 
-  font-size: 1rem;
+  
   cursor: pointer;
-  border-radius: 6px;
-   padding: 8px 4px;
-   
-gap: 10px; 
+ 
+
+  transition: background 0.2s;
+  margin-bottom: 2px;
+  margin-top: 5px;
 }
 
 
 
-
+.multiselect-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2px;   /* less space between */
+  
+ 
+}
 
 
 /* remove inner spacing from button wrappers */
@@ -698,59 +681,9 @@ gap: 10px;
   display: block;
 }
 
-.tabs-wrapper {
-  display: flex;
-  justify-content: center;
- 
-gap: 0;
-
-
-}
-
-.tabs {
-  display: flex;
-  align-items: center;
-   margin-bottom:-3px; 
-  flex-wrap: wrap;
- gap: 0;
-}
 
 
 
-
-
-    .tab-button {
-   
-      background-color: #63ddf8;
-      border: none;
-     font-family: system-ui, sans-serif;
-font-size: 0.7rem;
-      cursor: pointer;
-      border-radius: 10px;
-      margin-left: 1px;
-   
-      margin-top: 10px;
-      margin-bottom: 5px;
-      width: 40px;
-      height: 40px;
-    }
-
-        .tab-button:hover {
-  
-   color: rgb(164, 255, 187);
-    background-color: black;
-    }
-
-          .tab-button.active:hover {
-  
-   color: rgb(164, 255, 187);
-    background-color: black;
-    }
-
-
-    .tab-button.active {
-      background-color: #63ddf8;
-    }
     .tab-content {
       display: none;
        
@@ -2169,31 +2102,9 @@ body.dark .entry-card .entry-label {
   color: white;
 }
 
-.calendar-button 
-{
-  background-color: #63ddf8;
-   width: 40px;
-      height: 40px;
-      border: none;
-      color: white;
-      margin-top: 4px;
-       margin-right: 2px;
-}
-.calendar-button:hover {
-  background-color: black;
- 
-}
 
-#bt2 {
-  background-color: #63ddf8;
-   width: 40px;
-      height: 40px;
-      border: none;
-}
-#bt2:hover {
-  background-color: black;
- 
-}
+
+
 
 #syncOverlay {
   position: fixed;
@@ -2585,7 +2496,7 @@ border-radius: 4px;
 padding: 4px 6px;
 }
 
-#sidebarToggleBtn:hover {
+#sidebarToggleBtn2:hover {
   color: white;
  background-color: black;
  cursor: pointer;
@@ -3490,4 +3401,92 @@ margin-top: -3px;
   color:  rgb(44, 205, 249);
   text-decoration: none;
 }
+
+
+
+
+.tabs2-wrapper {
+  border-bottom: 1px solid #d9d9d9;
+  background: none;
+  padding: 0 16px;
+}
+
+.tabs2 {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  
+}
+
+/* Universal tab button */
+.tabs2 .tab-button {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 12px 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: #555;
+  cursor: pointer;
+  transition: color .2s, border-color .2s;
+
+  /* Reset quirks */
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  border-radius: 0;
+}
+
+.tabs2 .tab-button:hover {
+  color: #00bfff;
+}
+
+.tabs2 .tab-button.active {
+  color: #00bfff;
+  font-weight: 600;
+  border-bottom: 3px solid #00bfff;
+}
+
+/* Dropdown as tab */
+.tabs2 select.tab-button {
+  padding-right: 20px;
+  background: none;
+  border: none;
+}
+.tabs2 select.tab-button:focus {
+  color: #1e63e9;
+  border-bottom: 2px solid #1e63e9;
+  outline: none;
+}
+
+#dropbtn {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 12px 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: #555;
+  cursor: pointer;
+  transition: color .2s, border-color .2s;
+
+  /* ✅ Reset browser quirks */
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  border-radius: 0;   /* remove the curve */
+}
+
+/* Responsive tweaks */
+@media (max-width: 600px) {
+  .tabs2 .tab-button {
+    font-size: 12px;
+    padding: 10px 0;
+  }
+    #dropbtn {
+      font-size: 10px;
+    font-size: 5px 0;
+  }
+}
+
 
