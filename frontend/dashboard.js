@@ -3248,8 +3248,9 @@ return `
 
 
 
-document.querySelectorAll('.section-heading').forEach(heading => {
-  heading.addEventListener('click', () => {
+document.querySelectorAll('.section-title').forEach(title => {
+  title.addEventListener('click', () => {
+    const heading = title.closest('.section-heading');
     const content = heading.nextElementSibling;
     const arrow = heading.querySelector('.dropdown-arrow');
 
@@ -3269,11 +3270,9 @@ document.querySelectorAll('.section-heading').forEach(heading => {
         void grid.offsetWidth;
         grid.style.display = 'flex';
       }
-      
     }
   });
 });
-
 
 
 

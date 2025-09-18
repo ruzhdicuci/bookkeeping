@@ -3015,6 +3015,16 @@ body.dark .summary-label {
 }
 
 
+.section-title {
+  cursor: pointer;
+  color: #333;
+  transition: color 0.2s;
+}
+
+.section-title:hover {
+  color: rgb(0, 179, 255);
+}
+
 .section-heading {
   font-weight: 600;
   padding-left: 18px;
@@ -3028,6 +3038,14 @@ padding-top: 2px;
     cursor: pointer;
 
 }
+/* remove hover effect from entire row */
+.section-heading:hover {
+  background: inherit;   /* reset */
+  color: inherit;        /* reset */
+  cursor: default;       /* no pointer */
+}
+
+
 
 body.dark .section-heading {
   border-bottom: 1px solid rgb(32, 31, 31);
@@ -3037,10 +3055,6 @@ body.dark .section-heading {
    color: rgb(216, 200, 71);
   }
 
-.section-heading:hover {
-  
-  color: rgb(77, 59, 59);
-}
 
 
 .dropdown-arrow {
