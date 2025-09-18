@@ -3421,11 +3421,7 @@ margin-top: -3px;
   cursor: pointer;
   transition: color .2s, border-color .2s;
 
-  /* ✅ Reset browser quirks */
-  outline: none;
-  appearance: none;
-  -webkit-appearance: none;
-  border-radius: 0;   /* remove the curve */
+  
 }
 
 /* Responsive tweaks */
@@ -3435,7 +3431,7 @@ margin-top: -3px;
     padding: 10px 0;
   }
     #dropbtn {
-      font-size: 10px;
+      font-size: 12px;
     font-size: 5px 0;
   }
 }
