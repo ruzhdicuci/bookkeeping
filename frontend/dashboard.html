@@ -56,85 +56,78 @@
   <h4>Customize View</h4> 
 
 <!-- Sidebar Close Pillar -->
-<div id="sidebarClosePillar" title="Close Sidebar">⟨</div>
-<label class="custom-checkbox" data-section="addEntrySection">
+ <div id="sidebarClosePillar" title="Close Sidebar">⟨</div>
+<label class="custom-switch" data-section="addEntrySection">
+  <span class="label-text">Add Entry</span>
   <input type="checkbox" id="toggleAddEntry" checked />
-  <span class="checkmark"></span>
-  Add Entry
+  <span class="slider"></span>
 </label>
 
- <label class="custom-checkbox" data-section="bankBalancesSection">
+<label class="custom-switch" data-section="bankBalancesSection">
+  <span class="label-text">Bank Balances</span>
   <input type="checkbox" id="toggleBankBalances" checked />
-  <span class="checkmark"></span>
-  Bank Balances
+  <span class="slider"></span>
 </label>
 
- <label class="custom-checkbox" data-section="creditLimitsSection">
-      <input type="checkbox" id="toggleCreditLimits" checked />
-  <span class="checkmark"></span>
-Kredit Limits
+<label class="custom-switch" data-section="creditLimitsSection">
+  <span class="label-text">Kredit Limits</span>
+  <input type="checkbox" id="toggleCreditLimits" checked />
+  <span class="slider"></span>
 </label>
 
-<label class="custom-checkbox" data-section="totalsSection">
+<label class="custom-switch" data-section="totalsSection">
+  <span class="label-text">Totals</span>
   <input type="checkbox" id="toggleTotals" checked />
-  <span class="checkmark"></span>
-  Totals
+  <span class="slider"></span>
 </label>
 
- <label class="custom-checkbox" data-section="averageSection">
+<label class="custom-switch" data-section="averageSection">
+  <span class="label-text">Average</span>
   <input type="checkbox" id="toggleAverage" checked />
-  <span class="checkmark"></span>
-  Average
+  <span class="slider"></span>
 </label>
 
-
-<label class="custom-checkbox" data-section="multiselectSection">
+<label class="custom-switch" data-section="multiselectSection">
+  <span class="label-text">Multiselect</span>
   <input type="checkbox" id="toggleMultiselect" checked />
-  <span class="checkmark"></span>
-  Multiselect
+  <span class="slider"></span>
 </label>
 
- 
-<label class="custom-checkbox" data-section="filtersSection">
+<label class="custom-switch" data-section="filtersSection">
+  <span class="label-text">Filters</span>
   <input type="checkbox" id="toggleFilters" checked />
-  <span class="checkmark"></span>
-  Filters
+  <span class="slider"></span>
 </label>
 
-
-
-<label class="custom-checkbox" data-section="searchesSection">
+<label class="custom-switch" data-section="searchesSection">
+  <span class="label-text">Searches</span>
   <input type="checkbox" id="toggleSearches" checked />
-  <span class="checkmark"></span>
-  Searches
+  <span class="slider"></span>
 </label>
 
-
-<label class="custom-checkbox" data-section="budgetSection">
+<label class="custom-switch" data-section="budgetSection">
+  <span class="label-text">Budget</span>
   <input type="checkbox" id="toggleBudget" checked />
-  <span class="checkmark"></span>
-  Budget
+  <span class="slider"></span>
 </label>
 
-
-<label class="custom-checkbox" data-section="widgetSection">
+<label class="custom-switch" data-section="widgetSection">
+  <span class="label-text">Budget All</span>
   <input type="checkbox" id="toggleWidget" checked />
-  <span class="checkmark"></span>
-  Budget All
+  <span class="slider"></span>
 </label>
 
-<label class="custom-checkbox" data-section="allSection">
+<label class="custom-switch" data-section="allSection">
+  <span class="label-text">Balance per Year</span>
   <input type="checkbox" id="toggleAll" checked />
-  <span class="checkmark"></span>
-Balance per Year
+  <span class="slider"></span>
 </label>
 
-<label class="custom-checkbox" data-section="barSection">
+<label class="custom-switch" data-section="barSection">
+  <span class="label-text">Limit per Day</span>
   <input type="checkbox" id="toggleBar" checked />
-  <span class="checkmark"></span>
-Limit per Day
+  <span class="slider"></span>
 </label>
-
 
 
 
@@ -229,7 +222,11 @@ Limit per Day
  
 
 <button onclick="location.href='notes.html'" class="tab-button" id="bt2" title="Open Notes">Notes</button>
+<label class="toggle-all-switch">
+  <input type="checkbox" id="toggleAllSwitch">
+  <span class="slider"></span>
 
+</label>
 
 </div>
 </div>

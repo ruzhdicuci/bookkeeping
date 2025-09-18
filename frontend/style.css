@@ -343,7 +343,7 @@ font-weight: bolder;
     cursor: pointer;
    border: none;
  height:40px;
-margin-top: 5px;
+ 
   width:40px;
     margin-left: 1px;
     font-size: 0.7;
@@ -2434,56 +2434,7 @@ margin-top: -20px;
   padding-bottom: 4px;
 }
 
-/* Sidebar checkbox wrapper */
-.custom-checkbox {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 10px 0;
-  font-size: 15px;
-  color: rgb(255, 255, 255);
-   border-bottom: 1px solid #1f1c1c;
-  cursor: pointer;
-  position: relative;
-}
 
-.custom-checkbox:hover {
-
-  color: #63ddf8;
-
- 
-}
-
-/* Hide native checkbox */
-.custom-checkbox input[type="checkbox"] {
-  display: none;
-}
-
-/* Style fake checkbox box */
-.custom-checkbox .checkmark {
-  width: 14px;
-  height: 14px;
-  background-color: #63ddf8;
- accent-color: white;
-  display: inline-block;
-  position: relative;
-  margin-top: 4px;
-  margin-bottom: 4px;
-
-}
-
-/* Add white checkmark when checked */
-.custom-checkbox input[type="checkbox"]:checked + .checkmark::after {
-  content: "";
-  position: absolute;
-  left: 4px;
-  top: 0px;
-  width: 5px;
-  height: 10px;
- border: solid rgb(27, 26, 26);/* ← changed from white to black */
-  border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
-}
 
 
 #sidebarToggleBtn2 {
@@ -2529,13 +2480,13 @@ padding: 4px 6px;
 
 #sidebarClosePillar {
   position: absolute;
-  top: 10px;
+  top: 20%;
   right: -12px;
   width: 24px;
   height: 40px;
   background-color:black;
- border: 1px solid #63ddf8;
-  color: white;
+ border: none;
+  color: #63ddf8;
   font-size: 20px;
   display: flex;
   align-items: center;
@@ -2550,6 +2501,7 @@ padding: 4px 6px;
 
 #sidebarClosePillar:hover {
   background-color: #63ddf8;
+  color: black;
 }
 
 @media (max-width: 600px) {
@@ -3255,7 +3207,6 @@ body.dark .daily-limit-inline input{
   border-radius: 0 6px 6px 0;
   cursor: pointer;
   font-size: 1.2rem;
-
   transition: background-color 0.3s, transform 0.2s;
 }
 
@@ -3406,8 +3357,8 @@ margin-top: -3px;
 
 
 .tabs2-wrapper {
-  border-bottom: 1px solid #d9d9d9;
-  background: none;
+  border-bottom: 1px solid #d1f3ff;
+  background: white;
   padding: 0 16px;
 }
 
@@ -3443,8 +3394,8 @@ margin-top: -3px;
 
 .tabs2 .tab-button.active {
   color: #00bfff;
-  font-weight: 600;
-  border-bottom: 3px solid #00bfff;
+  
+  border-bottom: 2px solid #00bfff;
 }
 
 /* Dropdown as tab */
@@ -3490,3 +3441,106 @@ margin-top: -3px;
 }
 
 
+.toggle-all-switch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #555;
+}
+
+.toggle-all-switch input {
+  display: none;
+}
+
+.toggle-all-switch .slider {
+  position: relative;
+  width: 40px;
+  height: 20px;
+  background: #ccc;
+  border-radius: 20px;
+  transition: background 0.3s;
+}
+
+.toggle-all-switch .slider::before {
+  content: "";
+  position: absolute;
+  height: 16px;
+  width: 16px;
+  left: 2px;
+  top: 2px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.3s;
+}
+
+/* ON state */
+.toggle-all-switch input:checked + .slider {
+  background: #00bfff;
+}
+.toggle-all-switch input:checked + .slider::before {
+  transform: translateX(20px);
+}
+
+
+
+
+
+
+/* Container */
+.custom-switch {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 8px 0;
+  cursor: pointer;
+  font-size: 14px;
+  color: #eee;
+ border-bottom: 1px solid #262525;
+}
+
+/* Hide the raw checkbox */
+.custom-switch input {
+  display: none;
+  margin-bottom: 5px;
+}
+
+/* Slider background */
+.custom-switch .slider {
+  position: relative;
+  width: 28px;    /* smaller width */
+  height: 16px;   /* smaller height */
+  background: #666;
+  border-radius: 16px;
+  transition: background 0.3s;
+  margin-bottom: 5px;
+}
+
+/* Slider knob */
+.custom-switch .slider::before {
+  content: "";
+  position: absolute;
+  height: 12px;
+  width: 12px;
+  left: 2px;
+  top: 2px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.3s;
+}
+
+/* ON state */
+.custom-switch input:checked + .slider {
+  background: #00bfff;
+}
+.custom-switch input:checked + .slider::before {
+  transform: translateX(12px); /* knob shift */
+}
+
+
+button, .tab-button {
+  -webkit-tap-highlight-color: transparent; /* removes the blue flash */
+  touch-action: manipulation;               /* prevents ghost clicks */
+}

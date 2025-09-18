@@ -3623,3 +3623,72 @@ function populateExcludePersonDropdownV2(persons) {
   });
 }
 
+
+
+const toggleAllSwitch = document.getElementById("toggleAllSwitch");
+const checkboxes = document.querySelectorAll("#customizeSidebar input[type=checkbox]");
+const STORAGE_KEY = "customizeSidebarState";
+
+/* Load saved state */
+function loadState() {
+  const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+  checkboxes.forEach(cb => {
+    if (saved[cb.id] !== undefined) {
+      cb.checked = saved[cb.id];
+      cb.dispatchEvent(new Event("change"));
+    }
+  });
+
+  // Set switch state based on whether all are checked
+  const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+  toggleAllSwitch.checked = allChecked;
+}
+
+/* Save current state */
+function saveState() {
+  const state = {};
+  checkboxes.forEach(cb => state[cb.id] = cb.checked);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+/* Handle switch toggle */
+toggleAllSwitch.addEventListener("change", () => {
+  const newState = toggleAllSwitch.checked;
+  checkboxes.forEach(cb => {
+    cb.checked = newState;
+    cb.dispatchEvent(new Event("change"));
+  });
+  saveState();
+});
+
+/* Also listen to individual checkboxes */
+checkboxes.forEach(cb => {
+  cb.addEventListener("change", () => {
+    saveState();
+    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+    toggleAllSwitch.checked = allChecked;
+  });
+});
+
+/* Init */
+loadState();
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  const addEntryInputs = document.querySelectorAll("#addEntrySection input, #addEntrySection select");
+
+  // lock by default
+  addEntryInputs.forEach(el => el.setAttribute("readonly", true));
+
+  // unlock when user taps the section
+  document.getElementById("addEntrySection").addEventListener("click", () => {
+    addEntryInputs.forEach(el => el.removeAttribute("readonly"));
+  });
+});
+
+document.querySelectorAll("button").forEach(btn => {
+  btn.addEventListener("touchend", () => {
+    btn.blur(); // removes stuck state
+  });
+});
