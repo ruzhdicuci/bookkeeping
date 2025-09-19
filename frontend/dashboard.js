@@ -3693,3 +3693,29 @@ document.querySelectorAll("button").forEach(btn => {
 });
 
 
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  const toggle = document.getElementById("colorToggle");
+  const menu   = document.getElementById("colorMenu");
+  const root   = document.documentElement;
+
+  toggle.addEventListener("click", () => {
+    menu.style.display = menu.style.display === "block" ? "none" : "block";
+  });
+
+  menu.addEventListener("click", (e) => {
+    if (e.target.classList.contains("swatch")) {
+      const color = e.target.dataset.color;
+      root.style.setProperty("--theme-color", color);
+      toggle.style.background = color;
+      menu.style.display = "none";
+    }
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!toggle.contains(e.target) && !menu.contains(e.target)) {
+      menu.style.display = "none";
+    }
+  });
+});

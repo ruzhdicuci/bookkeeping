@@ -196,64 +196,18 @@
 </button>
 
 <!-- Colors dropdown -->
-<div class="color-dropdown">
-  <button class="dropdown-toggle" id="colorToggle">🎨 Colors ▾</button>
-  <div class="dropdown-menu" id="colorMenu">
+
+  <i id="colorToggle"></i>
+  <div id="colorMenu" style="display:none; margin-top:8px;">
     <button class="swatch" style="background:#10a8fa;" data-color="#10a8fa"></button>
     <button class="swatch" style="background:orangered;" data-color="orangered"></button>
-    <button class="swatch" style="background:green;" data-color="green"></button>
-    <button class="swatch" style="background:purple;" data-color="purple"></button>
+    <button class="swatch" style="background:rgb(20, 157, 91);" data-color="green"></button>
+    <button class="swatch" style="background:rgb(170, 5, 170);" data-color="purple"></button>
   </div>
-</div>
+
 </div>  
 
-<script>
-window.addEventListener('DOMContentLoaded', () => {
-  const root = document.documentElement;
-  const KEY = 'themeColor';
 
-  const dropdown = document.getElementById('colorDropdown');
-  if (!dropdown) return; // nothing to init
-
-  const toggle = dropdown.querySelector('[data-role="toggle"]');
-  const menu   = dropdown.querySelector('[data-role="menu"]');
-
-  const open  = () => { menu.hidden = false; };
-  const close = () => { menu.hidden = true; };
-
-  // Restore saved color
-  const saved = localStorage.getItem(KEY);
-  if (saved) {
-    root.style.setProperty('--theme-color', saved);
-    if (toggle) toggle.style.background = saved;
-  }
-
-  // Toggle menu
-  toggle?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    menu.hidden = !menu.hidden;
-  });
-
-  // Pick color
-  menu?.addEventListener('click', (e) => {
-    const swatch = e.target.closest('.swatch');
-    if (!swatch) return;
-    const color = swatch.dataset.color;
-    root.style.setProperty('--theme-color', color);
-    localStorage.setItem(KEY, color);
-    if (toggle) toggle.style.background = color;
-    close();
-  });
-
-  // Close on outside click / Esc
-  document.addEventListener('click', (e) => {
-    if (!dropdown.contains(e.target)) close();
-  });
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') close();
-  });
-});
-</script>
 
 <div class="tabs2-wrapper">
  <div class="tabs2">

@@ -280,7 +280,7 @@ font-size: 1.1rem;
 
 
 
- #entrySubmitBtn {background-color:     #fdf6de;
+ #entrySubmitBtn {background-color:     #10a8fa;
 font-family: system-ui, sans-serif;
 font-weight: bold;
 
@@ -291,13 +291,13 @@ font-weight: bold;
    height: 38px;
   padding: 0.5rem 1rem;
   font-size: 1rem;
-            color: rgb(20, 157, 91);            
+            color: white;            
      
           }
 
          #entrySubmitBtn:hover {
             background-color: white; 
-            color: #00CDAC;
+            color: #10a8fa;
            
           }
          
@@ -3544,35 +3544,49 @@ button, .tab-button {
 
 
 
-
 :root { --theme-color: #10a8fa; }
 
-[hidden] { display: none !important; }
+#colorToggle {
+  background: var(--theme-color);
+  color: #fff;
+  border: 2px solid white;
+  padding: 0px 8px;
+  border-radius: 4px;
+  cursor: pointer;
 
-.color-dropdown { position: relative; display: inline-block; }
-.dropdown-toggle {
-  background: var(--theme-color); color:#fff; border:0;
-  padding:6px 12px; border-radius:6px; cursor:pointer;
 }
-.dropdown-menu {
-  position:absolute; top:100%; left:0; margin-top:6px;
-  background:#fff; border:1px solid #ccc; border-radius:8px;
-  padding:8px; display:flex; gap:8px; z-index:1000;
-  box-shadow:0 8px 24px rgba(0,0,0,.12);
+
+#colorToggle:hover {
+  background: black;
+
 }
+
+
+#colorMenu {
+  display: none;
+  padding: 8px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
 .swatch {
-  width:26px; height:26px; border-radius:50%;
-  border:2px solid #fff; box-shadow:0 0 0 1px rgba(0,0,0,.15);
-  cursor:pointer;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  border: 2px solid #ddd;
+  cursor: pointer;
+  margin-right: 6px;
 }
-
-/* Example: make buttons follow the theme */
-.use-theme-bg { background: var(--theme-color); border:1px solid var(--theme-color); color:#fff; }
-
 
 /* Example: Unlock / Add / Edit */
-#unlockBtn, #addBtn, #editBtn { 
+#unlockBtn, .reset-btn, #editBtn,  #entrySubmitBtn, #toggleEditModeBtn, #unlockBtn { 
   background: var(--theme-color); 
   border: 1px solid var(--theme-color);
   color:#fff;
 }
+
+
+
+
