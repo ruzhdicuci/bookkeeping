@@ -229,6 +229,11 @@ border: 1px solid #373535;
 
 
 
+.controls-wrapper {
+  background-color: #10a8fa;
+  color: white;
+}
+
 
 
 
@@ -350,7 +355,7 @@ font-weight: bolder;
 
 }
 #themeToggle:hover {
-  background: #63ddf8;
+  background: #10a8fa;
 
 }
 
@@ -478,7 +483,7 @@ color: rgb(213, 79, 79);
   cursor: pointer;
   box-sizing: border-box;
   width: 110px;
-  height:30px;
+  height:35px;
   margin-left: 4px;
 }
 
@@ -792,35 +797,15 @@ color:  #71d0ff !important; /* optional: blue checkmark */
 
 
 
-
-
-
-
-#t1  {
-  color: #343536;
-      text-align: center;
-      font-size: 0.7rem;
-      margin-top: 10px;
-}
-
-
-
-
-#sp1 {
-  color: #00bfff;
-      text-align: right;
-}
-
-
 .reset-btn {
-  background:  #ffffff;
-
+  background: #10a8fa;
+font-size: 0.8rem;
  border:none;
   border-radius: 8px;
-height: 30px;
+height: 35px;
   width: 110px;
   margin-left: 4px;
-
+color: white;
 
   cursor: pointer;
 
@@ -2171,11 +2156,11 @@ body.dark .entry-card .entry-label {
 
 /* Unlock Button */
 #unlockBtn {
-  background-color: #fdf6de;
+  background-color: #10a8fa;
   border: 1px solid transparent;
   border-radius: 10px;
   font-weight: bold;
-  color: rgb(171, 32, 94);
+  color: white;
   font-size: 0.8rem;
   cursor: pointer;
 
@@ -2233,11 +2218,11 @@ margin-top: 20px;
 
 /* Add Card Button */
 #addCardBtn {
-  background-color: #fdf6de;
+  background-color: #00aaff;
   border: 1px solid transparent;
   border-radius: 10px;
   font-weight: bold;
-  color: #2c8249;
+  color: white;
   font-size: 0.8rem;
   cursor: pointer;
  width: 100%;
@@ -2253,11 +2238,11 @@ margin-top: 20px;
 }
 
 #toggleEditModeBtn {
-  background-color: #fdf6de;
+  background-color:#10a8fa;
   border: 1px solid transparent;
   border-radius: 10px;
   font-weight: bold;
-  color: orangered;
+  color: white;
   font-size: 0.8rem;
   cursor: pointer;
   width: 100%;
@@ -2408,7 +2393,7 @@ margin-top: -20px;
 
   color: white;
   background-color: rgb(0, 0, 0);
-  box-shadow: 1px 0 8px #63ddf8;
+  box-shadow: 1px 0 8px #10a8fa;
 
   padding: 16px 20px;
   z-index: 500;
@@ -2442,7 +2427,7 @@ margin-top: -20px;
   margin-left: 10px;
   border: 1px solid white;
  background-color:white;
- color: #63ddf8;
+ color: #10a8fa;
 border-radius: 4px;
 padding: 4px 6px;
 }
@@ -2484,9 +2469,9 @@ padding: 4px 6px;
   right: -12px;
   width: 24px;
   height: 40px;
-  background-color:black;
+  background-color:#10a8fa;
  border: none;
-  color: #63ddf8;
+  color: black;
   font-size: 20px;
   display: flex;
   align-items: center;
@@ -2500,8 +2485,8 @@ padding: 4px 6px;
 }
 
 #sidebarClosePillar:hover {
-  background-color: #63ddf8;
-  color: black;
+  background-color: black;
+  color: #10a8fa;
 }
 
 @media (max-width: 600px) {
@@ -2766,11 +2751,11 @@ body.dark .entry-card.has-note::after {
 
 
 #setbtn{
-  background-color: #fdf6de;
+  background-color: #10a8fa;
   border: none;
   border-radius: 6px;
   width: 60px;
-  color: orangered;
+  color: white;
 height:24px;
 margin-top: -3px;
   font-size: 0.7rem;
@@ -2778,7 +2763,7 @@ margin-top: -3px;
  
 }
 #setbtn:hover {
-  background-color: rgb(44, 205, 249);
+  background-color: #10a8fa;
   color: #fdf6de;
   text-decoration: none;
 }
@@ -2816,7 +2801,7 @@ body.dark #yearlyLimitInput {
 }
 body.dark #yearlyBudgetContainer input {
   background-color: #222222 !important;
-  color: rgb(44, 205, 249);
+  color: #10a8fa;
 }
 
 
@@ -3213,20 +3198,21 @@ body.dark .daily-limit-inline input{
   transform: translateY(-50%);
   z-index: 1000;
 
-  background-color:rgb(54, 50, 50); /* Dark blue-gray */
-  color: white;
+  background-color: black; /* Dark blue-gray */
+  color: #8ce6fa;
   border: none;
-  padding: 44px 6px;
+  padding: 44px 2px;
   font-weight: bold;
   border-radius: 0 6px 6px 0;
   cursor: pointer;
-  font-size: 1.2rem;
+  font-size: 1rem;
+
   transition: background-color 0.3s, transform 0.2s;
 }
 
 #sidebarToggleBtn1:hover {
-  background-color: #1a252f;
-  color: yellow;
+  background-color: #10a8fa;
+  color: black;
 padding: 44px 6px;
 }
 
@@ -3250,7 +3236,7 @@ padding: 44px 6px;
   overflow-y: auto;
   background: white;
   color: black;
-  border: 1px solid #63ddf8;
+  border: 1px solid #10a8fa;
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
   padding: 12px;
   border-radius: 8px;
@@ -3268,7 +3254,7 @@ padding: 44px 6px;
   overflow-y: auto;
   background: white;
   color: black;
-  border: 1px solid #63ddf8;
+  border: 1px solid #10a8fa;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   padding: 12px;
   border-radius: 8px;
@@ -3348,11 +3334,11 @@ color: white;
 }
 
 .btn-save {
-background-color: rgb(44, 205, 249);
+background-color: #10a8fa;
   border: none;
   border-radius: 6px;
 margin-left: -6px;
-  color:  #fdf6de;
+  color:  white;
 height:24px;
 margin-top: -3px;
   font-size: 0.7rem;
@@ -3363,7 +3349,7 @@ margin-top: -3px;
 
 .btn-save:hover {
   background-color:  #fdf6de;
-  color:  rgb(44, 205, 249);
+  color:  #10a8fa;
   text-decoration: none;
 }
 
@@ -3403,13 +3389,13 @@ margin-top: -3px;
 }
 
 .tabs2 .tab-button:hover {
-  color: #00bfff;
+  color: #10a8fa;
 }
 
 .tabs2 .tab-button.active {
-  color: #00bfff;
+  color: #10a8fa;
   
-  border-bottom: 2px solid #00bfff;
+  border-bottom: 2px solid #10a8fa;
 }
 
 /* Dropdown as tab */
@@ -3488,7 +3474,7 @@ margin-top: -3px;
 
 /* ON state */
 .toggle-all-switch input:checked + .slider {
-  background: #00bfff;
+  background: #10a8fa;
 }
 .toggle-all-switch input:checked + .slider::before {
   transform: translateX(20px);
@@ -3543,7 +3529,7 @@ margin-top: -3px;
 
 /* ON state */
 .custom-switch input:checked + .slider {
-  background: #00bfff;
+  background: #10a8fa;
 }
 .custom-switch input:checked + .slider::before {
   transform: translateX(12px); /* knob shift */
@@ -3553,4 +3539,40 @@ margin-top: -3px;
 button, .tab-button {
   -webkit-tap-highlight-color: transparent; /* removes the blue flash */
   touch-action: manipulation;               /* prevents ghost clicks */
+}
+
+
+
+
+
+:root { --theme-color: #10a8fa; }
+
+[hidden] { display: none !important; }
+
+.color-dropdown { position: relative; display: inline-block; }
+.dropdown-toggle {
+  background: var(--theme-color); color:#fff; border:0;
+  padding:6px 12px; border-radius:6px; cursor:pointer;
+}
+.dropdown-menu {
+  position:absolute; top:100%; left:0; margin-top:6px;
+  background:#fff; border:1px solid #ccc; border-radius:8px;
+  padding:8px; display:flex; gap:8px; z-index:1000;
+  box-shadow:0 8px 24px rgba(0,0,0,.12);
+}
+.swatch {
+  width:26px; height:26px; border-radius:50%;
+  border:2px solid #fff; box-shadow:0 0 0 1px rgba(0,0,0,.15);
+  cursor:pointer;
+}
+
+/* Example: make buttons follow the theme */
+.use-theme-bg { background: var(--theme-color); border:1px solid var(--theme-color); color:#fff; }
+
+
+/* Example: Unlock / Add / Edit */
+#unlockBtn, #addBtn, #editBtn { 
+  background: var(--theme-color); 
+  border: 1px solid var(--theme-color);
+  color:#fff;
 }
