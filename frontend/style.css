@@ -2391,9 +2391,9 @@ margin-top: -20px;
   height: calc(100vh - 50px);  /* ← full height minus header */
   width: 200px;
 
-  color: white;
-  background-color: rgb(0, 0, 0);
-  box-shadow: 1px 0 8px #10a8fa;
+  color: rgb(52, 43, 43);
+  background-color: white;
+  box-shadow: 1px 0 8px #d8dcdf;
 
   padding: 16px 20px;
   z-index: 500;
@@ -2413,9 +2413,9 @@ margin-top: -20px;
   font-size: 16px;
   margin-bottom: 12px;
   margin-top: 6px;
-  color: rgb(255, 255, 255);
+  color: rgb(19, 18, 18);
   font-weight: 600;
-     border-bottom: 1px solid #262525;
+     border-bottom: 1px solid #f4eeee;
   padding-bottom: 4px;
 }
 
@@ -2486,7 +2486,7 @@ padding: 4px 6px;
 
 #sidebarClosePillar:hover {
   background-color: black;
-  color: #10a8fa;
+
 }
 
 @media (max-width: 600px) {
@@ -2758,7 +2758,7 @@ body.dark .entry-card.has-note::after {
   color: white;
 height:24px;
 margin-top: -3px;
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   font-weight: bold;
  
 }
@@ -3364,7 +3364,7 @@ margin-top: -3px;
 
 .tabs2 {
   display: flex;
-  gap: 20px;
+  gap: 15px;
   align-items: center;
   
 }
@@ -3394,7 +3394,6 @@ margin-top: -3px;
 
 .tabs2 .tab-button.active {
   color: #10a8fa;
-  
   border-bottom: 2px solid #10a8fa;
 }
 
@@ -3428,11 +3427,11 @@ margin-top: -3px;
 @media (max-width: 600px) {
   .tabs2 .tab-button {
     font-size: 12px;
-    padding: 10px 0;
+    padding: 15px 0;
   }
     #dropbtn {
       font-size: 12px;
-    font-size: 5px 0;
+   
   }
 }
 
@@ -3493,8 +3492,8 @@ margin-top: -3px;
   margin: 8px 0;
   cursor: pointer;
   font-size: 14px;
-  color: #eee;
- border-bottom: 1px solid #262525;
+ color: rgb(52, 43, 43);
+border-bottom: 1px solid #f4eeee;
 }
 
 /* Hide the raw checkbox */
@@ -3581,12 +3580,18 @@ button, .tab-button {
 }
 
 /* Example: Unlock / Add / Edit */
-#unlockBtn, .reset-btn, #editBtn,  #entrySubmitBtn, #toggleEditModeBtn, #unlockBtn { 
+#unlockBtn, .reset-btn, #editBtn, #entrySubmitBtn, #toggleEditModeBtn, #unlockBtn, #addCardBtn, #setbtn, .btn-save, .toggle-all-switch .slider, #sidebarToggleBtn1, #sidebarToggleBtn2, .tab-button, .toggle-all-switch input:checked + .slider, #sidebarClosePillar, .custom-switch input:checked + .slider  { 
   background: var(--theme-color); 
   border: 1px solid var(--theme-color);
+
   color:#fff;
 }
 
+
+.tabs2 .tab-button.active   { 
+  color:var(--theme-color); 
+    border-bottom: 2px solid var(--theme-color);
+}
 
 
 
