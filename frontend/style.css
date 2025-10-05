@@ -396,7 +396,7 @@ border-radius: 10px;
   padding: 10px 4px;
   background-color: inherit;
   font-family: inherit;
-  margin: 0;
+  margin:4px;
     float: left;
   overflow: hidden;
   
@@ -2423,7 +2423,7 @@ margin-top: -20px;
 
 
 #sidebarToggleBtn2 {
-  margin-top: 7px;
+ margin-top: 9px;
   margin-left: 10px;
   border: 1px solid white;
  background-color:white;
