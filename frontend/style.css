@@ -393,13 +393,13 @@ border-radius: 10px;
   border: none;
   outline: none;
   color: rgb(68, 63, 63);
-  padding: 10px 4px;
+  padding-top: 8px;
   background-color: inherit;
   font-family: inherit;
-  margin:4px;
+  margin:4px 4px;
     float: left;
   overflow: hidden;
-  
+  height: 30px;
 }
 
 
@@ -2423,13 +2423,13 @@ margin-top: -20px;
 
 
 #sidebarToggleBtn2 {
- margin-top: 9px;
-  margin-left: 10px;
+  margin-left: 5px;
   border: 1px solid white;
  background-color:white;
  color: #10a8fa;
 border-radius: 4px;
-padding: 4px 6px;
+padding: 3px 6px;
+margin-top: 8px;
 }
 
 #sidebarToggleBtn2:hover {
@@ -3549,9 +3549,10 @@ button, .tab-button {
   background: var(--theme-color);
   color: #fff;
   border: 2px solid white;
-  padding: 0px 8px;
+  padding: 0px 10px;
   border-radius: 4px;
   cursor: pointer;
+  
 
 }
 
@@ -3580,7 +3581,7 @@ button, .tab-button {
 }
 
 /* Example: Unlock / Add / Edit */
-#unlockBtn, .reset-btn, #editBtn, #entrySubmitBtn, #toggleEditModeBtn, #unlockBtn, #addCardBtn, #setbtn, .btn-save, .toggle-all-switch .slider, #sidebarToggleBtn1, #sidebarToggleBtn2, .tab-button, .toggle-all-switch input:checked + .slider, #sidebarClosePillar, .custom-switch input:checked + .slider, .search-input-wrapper input, .load-more-btn { 
+#unlockBtn, .reset-btn, #editBtn, #entrySubmitBtn, #toggleEditModeBtn, #unlockBtn, #addCardBtn, #setbtn, .btn-save, .toggle-all-switch .slider, #sidebarToggleBtn1, #sidebarToggleBtn2, .tab-button, .toggle-all-switch input:checked + .slider, #sidebarClosePillar, .custom-switch input:checked + .slider, .search-input-wrapper input, .load-more-btn, .search-pill { 
   background: var(--theme-color); 
   border: 1px solid var(--theme-color);
 
@@ -3596,14 +3597,15 @@ button, .tab-button {
 
 /* --- Pill button --- */
 .search-pill {
- background-color: white;
+ background: var(--theme-color);
   border: none;
-  border-radius: 20px;
-  padding: 3px 6px;
+  border-radius: 4px;
+  padding: 2px 6px;
  margin-left: 15px;
-
+ height: 20px;
+margin-top: 10px;
   cursor: pointer;
-  color: var(--pill-color, #444);
+  color: white;
   transition: background 0.25s, transform 0.2s, color 0.25s, box-shadow 0.2s;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
