@@ -688,6 +688,20 @@ const fullDifference = fullIncome - fullExpense;
     );
   });
 
+
+  // ✅ Default filter: show only entries from the current month if no timeSort is selected
+if (!document.getElementById('timeSort')?.value) {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth();
+
+  filtered = filtered.filter(e => {
+    const d = new Date(e.date);
+    return d.getFullYear() === currentYear && d.getMonth() === currentMonth;
+  });
+}
+
+
   const selectedTime = document.getElementById('timeSort')?.value;
   if (selectedTime) {
     const now = new Date();
