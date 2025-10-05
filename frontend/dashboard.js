@@ -589,7 +589,7 @@ function populateFilters() {
 
 
 let currentPage = 1;
-const ENTRIES_PER_PAGE = 30;
+const ENTRIES_PER_PAGE = 20;
 
 function getDateLabel(dateStr) {
   const entryDate = new Date(dateStr);
@@ -633,8 +633,9 @@ function getLabelRank(label) {
   return ranks[label] || 9999;
 }
 
-function renderEntries() {
-  const entries = window.entries || [];
+function renderEntries(source) {
+  // ✅ if we pass a list (e.g. from search), use it, otherwise use all entries
+  const entries = Array.isArray(source) ? source : (window.entries || []);
   let fullIncome = 0, fullExpense = 0;
 entries.forEach(e => {
   const amount = parseFloat(e.amount) || 0;
@@ -720,12 +721,19 @@ if (!document.getElementById('timeSort')?.value) {
     });
   }
 
+   // ✅ Pagination setup
+  const totalEntries = filtered.length;
+  const startIndex = 0;
+  const endIndex = currentPage * ENTRIES_PER_PAGE;
+  const paginatedEntries = filtered.slice(startIndex, endIndex);
+
   const container = document.getElementById('entryTableBody');
   if (!container) return;
   container.innerHTML = '';
 
+  // ✅ Group only visible entries
   const groupedEntries = {};
-  filtered.forEach(e => {
+  paginatedEntries.forEach(e => {
     const label = getDateLabel(e.date);
     if (!groupedEntries[label]) groupedEntries[label] = [];
     groupedEntries[label].push(e);
@@ -804,14 +812,17 @@ card.addEventListener('click', (event) => {
     }
   }
 
-  if (filtered.length > currentPage * ENTRIES_PER_PAGE) {
+  // ✅ Show "Load more" only if there are more entries left
+  if (endIndex < totalEntries) {
     const loadMoreBtn = document.createElement('button');
     loadMoreBtn.textContent = 'Load more';
     loadMoreBtn.className = 'load-more-btn';
     loadMoreBtn.onclick = () => {
       currentPage++;
-      renderEntries();
-   
+      renderEntries(source); // re-render with next batch
+      setTimeout(() => {
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+      }, 100);
     };
     container.appendChild(loadMoreBtn);
   }
@@ -3732,4 +3743,105 @@ document.addEventListener("DOMContentLoaded", () => {
       menu.style.display = "none";
     }
   });
+});
+
+
+// search icon etc
+const searchToggle        = document.getElementById("searchToggle");
+const searchBarContainer  = document.getElementById("searchBarContainer");
+const globalSearchInput   = document.getElementById("globalSearchInput");
+const resetSearchBtn      = document.getElementById("resetSearchBtn");
+const toggleAllSwitchEl   = document.getElementById("toggleAllSwitch");       // ⬅️ your slider
+// you already have:
+/// const checkboxes = document.querySelectorAll("#customizeSidebar input[type=checkbox]");
+
+let searchMode = false;
+
+// helper: show ALL sections via your master slider
+function showAllSections() {
+  if (toggleAllSwitchEl) {
+    toggleAllSwitchEl.checked = true;
+    toggleAllSwitchEl.dispatchEvent(new Event("change"));  // fires your logic that checks all + shows all
+  } else {
+    // fallback: check each manually
+    checkboxes.forEach(cb => { cb.checked = true; cb.dispatchEvent(new Event("change")); });
+  }
+}
+
+// helper: hide everything except Totals (uses your checkboxes)
+function hideAllExceptTotals() {
+  checkboxes.forEach(cb => {
+    if (cb.id !== "toggleTotals") {
+      cb.checked = false;
+      cb.dispatchEvent(new Event("change"));
+    }
+  });
+  const totalsCb = document.getElementById("toggleTotals");
+  if (totalsCb) {
+    totalsCb.checked = true;
+    totalsCb.dispatchEvent(new Event("change"));
+  }
+  // belt & suspenders
+  const totalsSection = document.querySelector("#totalsSection, [data-section='totalsSection']");
+  if (totalsSection) { totalsSection.style.display = ""; totalsSection.classList.remove("hidden"); }
+}
+
+// toggle search mode
+searchToggle.addEventListener("click", () => {
+  searchMode = !searchMode;
+  if (searchMode) {
+    hideAllExceptTotals();
+    searchBarContainer.classList.remove("hidden");
+    globalSearchInput.focus();
+  } else {
+    // exit search: restore all sections and full list
+    searchBarContainer.classList.add("hidden");
+    globalSearchInput.value = "";
+    showAllSections();
+    renderEntries(); // default view (your "This Week" default will kick in)
+  }
+});
+
+// live search
+globalSearchInput.addEventListener("input", () => {
+  const q = globalSearchInput.value.trim().toLowerCase();
+  if (!q) { renderEntries(); return; } // empty -> normal view (still in search mode UI)
+  const list = (window.entries || []).filter(en =>
+    (en.description || "").toLowerCase().includes(q) ||
+    (en.amount + "").includes(q) ||
+    (en.person || "").toLowerCase().includes(q) ||
+    (en.bank || "").toLowerCase().includes(q) ||
+    (en.category || "").toLowerCase().includes(q) ||
+    (en.status || "").toLowerCase().includes(q)
+  );
+  renderEntries(list); // ⬅️ works now because renderEntries accepts a list
+});
+
+// Restore pill
+resetSearchBtn.addEventListener("click", () => {
+  globalSearchInput.value = "";
+  searchMode = false;
+  searchBarContainer.classList.add("hidden");
+  showAllSections();        // ⬅️ uses your slider to show everything
+  renderEntries();          // back to normal view
+});
+
+// Esc to restore
+globalSearchInput.addEventListener("keydown", e => {
+  if (e.key === "Escape") resetSearchBtn.click();
+});
+
+
+// 🩵 Clear text only (stay in search mode)
+document.addEventListener("DOMContentLoaded", () => {
+  const clearSearchText = document.getElementById("clearSearchText");
+  const globalSearchInput = document.getElementById("globalSearchInput");
+
+  if (clearSearchText && globalSearchInput) {
+    clearSearchText.addEventListener("click", () => {
+      globalSearchInput.value = "";
+      renderEntries(window.entries); // reset list while staying in search mode
+      globalSearchInput.focus();
+    });
+  }
 });

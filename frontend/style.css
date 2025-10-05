@@ -364,7 +364,7 @@ font-weight: bolder;
   overflow: hidden;
 border-radius: 10px;
    background: #e3e0db;
-   margin-top: 8px;
+  
  
 }
 
@@ -393,7 +393,7 @@ border-radius: 10px;
   border: none;
   outline: none;
   color: rgb(68, 63, 63);
-  padding: 12px 10px;
+  padding: 8px 6px;
   background-color: inherit;
   font-family: inherit;
   margin: 0;
@@ -2119,8 +2119,8 @@ body.dark .entry-card .entry-label {
   padding: 10px 20px;
   font-size: 1rem;
   font-weight: 500;
-  background-color:rgb(255, 255, 255); /* soft green - adjust to your theme */
-  color: blue;
+  background-color:blue; /* soft green - adjust to your theme */
+  color: white;
   border: none;
   border-radius: 12px;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -3580,7 +3580,7 @@ button, .tab-button {
 }
 
 /* Example: Unlock / Add / Edit */
-#unlockBtn, .reset-btn, #editBtn, #entrySubmitBtn, #toggleEditModeBtn, #unlockBtn, #addCardBtn, #setbtn, .btn-save, .toggle-all-switch .slider, #sidebarToggleBtn1, #sidebarToggleBtn2, .tab-button, .toggle-all-switch input:checked + .slider, #sidebarClosePillar, .custom-switch input:checked + .slider  { 
+#unlockBtn, .reset-btn, #editBtn, #entrySubmitBtn, #toggleEditModeBtn, #unlockBtn, #addCardBtn, #setbtn, .btn-save, .toggle-all-switch .slider, #sidebarToggleBtn1, #sidebarToggleBtn2, .tab-button, .toggle-all-switch input:checked + .slider, #sidebarClosePillar, .custom-switch input:checked + .slider, .search-input-wrapper input, .load-more-btn { 
   background: var(--theme-color); 
   border: 1px solid var(--theme-color);
 
@@ -3594,4 +3594,127 @@ button, .tab-button {
 }
 
 
+/* --- Pill button --- */
+.search-pill {
+ background-color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 3px 6px;
+ margin-left: 15px;
 
+  cursor: pointer;
+  color: var(--pill-color, #444);
+  transition: background 0.25s, transform 0.2s, color 0.25s, box-shadow 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+
+/* Hover / Active */
+.search-pill:hover {
+  background: var(--pill-hover, #007bff);
+  color: #fff;
+  transform: scale(1.08);
+  box-shadow: 0 0 8px rgba(0,123,255,0.4);
+}
+
+.search-pill.active {
+ background-color: white;
+  color: #fff;
+  box-shadow: 0 0 8px rgba(0,86,214,0.5);
+}
+
+/* optional: focus style */
+.search-pill:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0,123,255,0.3);
+}
+
+
+.search-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0;
+  background: var(--bg-secondary);
+  padding: 8px 10px;
+  border-radius: 8px;
+}
+.search-input-wrapper {
+  position: relative;
+  width: 80%;
+  display: flex;
+  align-items: center;
+}
+
+.search-input-wrapper input {
+  width: 100%;
+  height: 34px;
+  border-radius: 20px;
+  border: none;
+  font-size: 1rem;
+  padding: 0 34px 0 12px; /* ⬅️ enough space for the "×" inside */
+  outline: none;
+
+}
+
+
+
+/* 💬 White placeholder */
+.search-input-wrapper input::placeholder {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+
+/* ✖ Clear button INSIDE the field */
+.clear-text-btn {
+  position: absolute;
+  right: 10px; /* ⬅️ move it inside */
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ddd;
+  border: none;
+  font-size: 0.8rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background 0.2s, opacity 0.2s;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Only show × when there’s text */
+.search-input-wrapper input:not(:placeholder-shown) + .clear-text-btn {
+  opacity: 1;
+  pointer-events: auto;
+}
+.clear-text-btn:hover {
+  background: white;
+ 
+}
+
+.restore-btn {
+  border: none;
+  border-radius: 20px;
+  padding: 6px 14px;
+  background: #e3e3e3;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.2s;
+  height: 34px;
+}
+
+.restore-btn:hover {
+  background: red;
+}
+
+#searchBarContainer {
+  background-color: none;
+  border: none;
+}

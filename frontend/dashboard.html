@@ -209,6 +209,19 @@
         <button class="swatch" style="background:blue;" data-color="blue"></button>
   </div>
 
+
+  <!-- 🔍 Search toggle button -->
+<!-- 🔍 Modern pill-style search icon button -->
+<button id="searchToggle" class="search-pill" title="Search" style="margin-top:4px;">
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+       fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+       stroke-linejoin="round" class="lucide lucide-search">
+    <circle cx="11" cy="11" r="6"></circle>
+    <line x1="16" y1="16" x2="22" y2="22"></line>
+  </svg>
+</button>
+
+
 </div>  
 
 
@@ -1266,6 +1279,15 @@ function openTab(tabId, btn) {
 
 
 
+
+<!-- 🔍 Search bar -->
+<div id="searchBarContainer" class="hidden search-bar">
+  <div class="search-input-wrapper">
+    <input id="globalSearchInput" type="text" placeholder="Search entries..." />
+    <button id="clearSearchText" class="clear-text-btn" title="Clear">×</button>
+  </div>
+  <button id="resetSearchBtn" class="restore-btn">Restore</button>
+</div>
 
 <div class="filter-grid">
  <!-- Entry table -->
