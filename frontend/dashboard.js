@@ -1,3 +1,5 @@
+let currentPage = 1;
+const ENTRIES_PER_PAGE = 20;
 const DEBUG_MODE = false; // or true for development
 const debug = (...args) => DEBUG_MODE && console.log(...args);
 
@@ -588,8 +590,7 @@ function populateFilters() {
 }
 
 
-let currentPage = 1;
-const ENTRIES_PER_PAGE = 20;
+
 
 function getDateLabel(dateStr) {
   const entryDate = new Date(dateStr);

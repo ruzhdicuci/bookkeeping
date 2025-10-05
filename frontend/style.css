@@ -2129,7 +2129,7 @@ body.dark .entry-card .entry-label {
 }
 
 .load-more-btn:hover {
-  background-color: rgb(25, 25, 138);
+  background-color: black;
   transform: scale(1.02);
 }
 
