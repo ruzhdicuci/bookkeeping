@@ -3840,44 +3840,117 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// 🌐 Language toggle (Swiss flag etc.)
+
+
+
+
+// languages
 document.addEventListener("DOMContentLoaded", async () => {
+  const langToggle = document.getElementById("langToggle");
+  const langMenu = document.getElementById("langMenu");
+  const langSearch = document.getElementById("langSearch");
+  const langList = document.querySelector(".lang-list");
+  const clearLangSearch = document.getElementById("clearLangSearch");
+
+  if (!langToggle || !langMenu) return;
+
+  // 🟢 Load translations
+  let translations = {};
   try {
-    const langToggle = document.getElementById("langToggle");
-    if (!langToggle) return;
+    const res = await fetch("./languages.json");
+    translations = await res.json();
+  } catch (e) {
+    console.warn("⚠️ Could not load languages.json — using fallback only.");
+  }
 
-    // Load translations from JSON
-    const res = await fetch("languages.json");
-    const translations = await res.json();
-
-    let currentLang = localStorage.getItem("lang") || "de";
-    const langs = Object.keys(translations);
-
-    function applyTranslations(lang) {
-      const t = translations[lang];
-      if (!t) return;
-
-      const addBtn = document.querySelector("#addEntryBtn");
-      const totalsLabel = document.querySelector("#totalsLabel");
-      const searchInput = document.querySelector("#globalSearchInput");
-      const resetBtn = document.querySelector("#resetSearchBtn");
-
-      if (addBtn) addBtn.textContent = t.addEntry;
-      if (totalsLabel) totalsLabel.textContent = t.totals;
-      if (searchInput) searchInput.setAttribute("placeholder", t.searchPlaceholder);
-      if (resetBtn) resetBtn.textContent = t.restore;
-      langToggle.textContent = (t.flag ? t.flag + " " : "") + t.label;
+  // ✅ Toggle dropdown visibility
+  langToggle.addEventListener("click", (e) => {
+    e.stopPropagation();
+    langMenu.classList.toggle("open");
+    if (langMenu.classList.contains("open")) {
+      langSearch.focus();
     }
+  });
 
-    langToggle.addEventListener("click", () => {
-      const nextIndex = (langs.indexOf(currentLang) + 1) % langs.length;
-      currentLang = langs[nextIndex];
-      localStorage.setItem("lang", currentLang);
-      applyTranslations(currentLang);
+  // ✅ Close dropdown when clicking outside
+  document.addEventListener("click", (e) => {
+    if (!langMenu.contains(e.target) && !langToggle.contains(e.target)) {
+      langMenu.classList.remove("open");
+    }
+  });
+
+  // ✅ Filter languages by search
+  langSearch.addEventListener("input", () => {
+    const q = langSearch.value.toLowerCase();
+    langList.querySelectorAll("div[data-lang]").forEach((item) => {
+      const match = item.textContent.toLowerCase().includes(q);
+      item.style.display = match ? "block" : "none";
+    });
+  });
+
+  // ✅ Clear search button
+  if (clearLangSearch) {
+    clearLangSearch.addEventListener("click", () => {
+      langSearch.value = "";
+      langSearch.dispatchEvent(new Event("input"));
+      langSearch.focus();
+    });
+  }
+
+  // ✅ Translation function
+  function applyTranslations(lang) {
+    const t = translations[lang];
+    if (!t) return;
+
+    const setText = (selector, text) => {
+      const el = document.querySelector(selector);
+      if (el) el.textContent = text;
+    };
+
+    // Apply to dropdowns
+    setText('.dropdown:nth-of-type(1) .dropbtn', t.settings);
+    setText('.dropdown:nth-of-type(2) .dropbtn', t.table);
+    setText('.dropdown:nth-of-type(3) .dropbtn', t.export);
+
+    setText('#full', t.fullscreen);
+    setText('#close', t.close);
+    setText('[onclick="setFontSize(14)"]', t.smallFont);
+    setText('[onclick="setFontSize(16)"]', t.resetFont);
+    setText('[onclick="setFontSize(18)"]', t.largeFont);
+
+    setText('[onclick="logout()"]', "🔐 " + t.logout);
+    setText('[onclick="showUserManagerModal()"]', "👥 " + t.manageUsers);
+    setText('[onclick="deleteAllEntries()"]', "🧨 " + t.deleteAll);
+    setText('[onclick="backupData()"]', "📦 " + t.backup);
+    setText('[onclick="document.getElementById(\'restoreFile\').click()"]', "♻️ " + t.restore);
+
+    setText('.custom-file-label', "📥 " + t.importCSV);
+    setText('[onclick="exportVisibleCardEntriesAsCSV()"]', "📤 " + t.exportCSV);
+
+    document.querySelectorAll('[onclick="window.print()"]').forEach((el, i) => {
+      el.textContent = i === 0 ? "🖨️ " + t.print : "🧾 " + t.exportPDF;
     });
 
-    applyTranslations(currentLang);
-  } catch (err) {
-    console.error("❌ Language loading failed:", err);
+    // Update button and save state
+    langToggle.textContent = `${lang.toUpperCase()} ▾`;
+    localStorage.setItem("lang", lang);
+  }
+
+  // ✅ Handle language selection
+  langList.addEventListener("click", (e) => {
+    const div = e.target.closest("[data-lang]");
+    if (!div) return;
+    const lang = div.dataset.lang;
+    langMenu.classList.remove("open");
+    langToggle.textContent = `${div.textContent.trim()} ▾`;
+    applyTranslations(lang);
+  });
+
+  // ✅ Restore last language
+  const saved = localStorage.getItem("lang") || "en";
+  const savedDiv = langList.querySelector(`[data-lang="${saved}"]`);
+  if (savedDiv) {
+    langToggle.textContent = `${savedDiv.textContent.trim()} ▾`;
+    applyTranslations(saved);
   }
 });
