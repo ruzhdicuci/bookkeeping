@@ -636,12 +636,13 @@ function getLabelRank(label) {
 }
 
 function renderEntries(source) {
-  // ✅ use last used list if no new source passed
+  // ✅ Remember last used source (for pagination continuity)
   if (!source && lastRenderedSource) source = lastRenderedSource;
   else if (source) lastRenderedSource = source;
 
   const entries = Array.isArray(source) ? source : (window.entries || []);
 
+  // ✅ Compute totals (for later display)
   let fullIncome = 0, fullExpense = 0;
   entries.forEach(e => {
     const amount = parseFloat(e.amount) || 0;
@@ -649,6 +650,8 @@ function renderEntries(source) {
     else fullExpense += amount;
   });
   const fullDifference = fullIncome - fullExpense;
+
+  // ✅ Collect filters
   const dateSearch = document.getElementById('dateSearch')?.value.trim();
   const descSearch = document.getElementById('descSearch')?.value.trim();
   const amountSearch = document.getElementById('amountSearch')?.value.trim();
@@ -667,6 +670,7 @@ function renderEntries(source) {
       .map(s => s.trim().toLowerCase())
       .some(val => (target || '').toLowerCase().includes(val));
 
+  // ✅ Apply filters
   let filtered = entries.filter(e => {
     const entryDay = e.date?.split('-')[2];
     const personMatches =
@@ -690,156 +694,141 @@ function renderEntries(source) {
       (categoryValue === "All" || e.category === categoryValue) &&
       matchesMulti(categorySearch, e.category) &&
       (statusValue === 'All' || e.status === statusValue) &&
-      matchesMulti(amountSearch, e.amount + '')  &&
-      matchesMulti(personSearch, e.person) // 👈 THIS LINE
+      matchesMulti(amountSearch, e.amount + '') &&
+      matchesMulti(personSearch, e.person)
     );
   });
 
+ 
 
-  // ✅ Default filter: show only entries from the current month if no timeSort is selected
-if (!document.getElementById('timeSort')?.value) {
+  // ✅ Time range filtering
+// ✅ Default filter: show ALL entries unless timeSort is selected
+// ✅ Time-based filtering — show all by default, filter only if selected
+const selectedTime = document.getElementById('timeSort')?.value;
+if (selectedTime) {
   const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth();
-
   filtered = filtered.filter(e => {
-    const d = new Date(e.date);
-    return d.getFullYear() === currentYear && d.getMonth() === currentMonth;
+    const entryDate = new Date(e.date);
+    const daysDiff = Math.floor((now - entryDate) / (1000 * 60 * 60 * 24));
+    switch (selectedTime) {
+      case 'Today': return daysDiff === 0;
+      case 'Yesterday': return daysDiff === 1;
+      case 'This Week': return daysDiff <= 6;
+      case 'Last Week': return daysDiff >= 7 && daysDiff <= 13;
+      case '2 Weeks Ago': return daysDiff >= 14 && daysDiff <= 20;
+      case '3 Weeks Ago': return daysDiff >= 21 && daysDiff <= 27;
+      default: return true;
+    }
   });
 }
 
+// ✅ Pagination (cumulative scrolling)
+filtered.sort((a, b) => new Date(b.date) - new Date(a.date)); // newest first
+// ✅ Optional: show only entries up to today (not future)
+const today = new Date();
+filtered = filtered.filter(e => new Date(e.date) <= today);
+const totalEntries = filtered.length;
+const endIndex = currentPage * ENTRIES_PER_PAGE;
+const paginatedEntries = filtered.slice(0, endIndex);
 
-  const selectedTime = document.getElementById('timeSort')?.value;
-  if (selectedTime) {
-    const now = new Date();
-    filtered = filtered.filter(e => {
-      const entryDate = new Date(e.date);
-      const daysDiff = Math.floor((now - entryDate) / (1000 * 60 * 60 * 24));
-      switch (selectedTime) {
-        case 'Today': return daysDiff === 0;
-        case 'Yesterday': return daysDiff === 1;
-        case 'This Week': return daysDiff <= 6;
-        case 'Last Week': return daysDiff >= 7 && daysDiff <= 13;
-        case '2 Weeks Ago': return daysDiff >= 14 && daysDiff <= 20;
-        case '3 Weeks Ago': return daysDiff >= 21 && daysDiff <= 27;
-        default: return true;
-      }
-    });
-  }
+const container = document.getElementById('entryTableBody');
+if (!container) return;
+container.innerHTML = '';
 
-   // ✅ Pagination setup
-  // ✅ Pagination
-  const totalEntries = filtered.length;
-  const startIndex = 0;
-  const endIndex = currentPage * ENTRIES_PER_PAGE;
-
-  // ✅ Limit to visible entries only
-  const paginatedEntries = filtered.slice(startIndex, endIndex);
-
-  const container = document.getElementById('entryTableBody');
-  if (!container) return;
-  container.innerHTML = '';
-
-  // ✅ Group only visible entries
-  const groupedEntries = {};
-  paginatedEntries.forEach(e => {
-    const label = getDateLabel(e.date);
-    if (!groupedEntries[label]) groupedEntries[label] = [];
-    groupedEntries[label].push(e);
-  });
-
-  const sortedLabels = Object.keys(groupedEntries).sort((a, b) => getLabelRank(a) - getLabelRank(b));
-  let entriesRendered = 0;
-
-  for (const label of sortedLabels) {
-    if (entriesRendered >= currentPage * ENTRIES_PER_PAGE) break;
-
-    const labelEl = document.createElement('div');
-    labelEl.className = 'entry-date-label';
-    if (["Today", "Yesterday", "This Week", "Last Week", "This Month"].includes(label)) {
-      labelEl.classList.add('special-label');
-    }
-    labelEl.textContent = label;
-    container.appendChild(labelEl);
-
-    const group = groupedEntries[label].sort((a, b) => new Date(b.date) - new Date(a.date));
-    for (const e of group) {
-      if (entriesRendered >= currentPage * ENTRIES_PER_PAGE) break;
-
-      const card = document.createElement('div');
-    card.className = 'entry-card';
-if (e.note) card.classList.add('has-note');
-      card.dataset.id = e._id;
-
-      const isEditing = document.getElementById('entryForm')?.dataset.editId === e._id;
-      if (isEditing) card.classList.add('editing-row');
-      if (e._id === window.highlightedEntryId) {
-        card.classList.add('highlighted');
-        card.id = 'highlighted-entry';
-      }
-
-      const amountClass = e.type === 'Income' ? 'income' : 'expense';
-
-      card.innerHTML = `
-        <div class="entry-date">
-          <div class="date-block">
-            <div class="day">${new Date(e.date).getDate().toString().padStart(2, '0')}</div>
-            <div class="month-year">
-              ${new Date(e.date).toLocaleString('default', { month: 'short' })}<br>
-              ${new Date(e.date).getFullYear()}
-            </div>
-          </div>
-        </div>
-        <div class="entry-main">
-          <div class="description">${e.description}</div>
-          <div class="meta">${e.category || ''} • ${e.person} • ${e.bank}</div>
-          <div class="status">
-            <span class="status-pill ${e.status === 'Paid' ? 'paid' : 'open'}">${e.status}</span>
-          </div>
-        </div>
-        <div class="entry-amount">
-          <div class="amount-line">
-            <span class="currency small">CHF</span>
-            <span class="amount ${amountClass}">${parseFloat(e.amount).toFixed(2)}</span>
-          </div>
-          <div class="buttons">
-            ${isEditing
-              ? `<button onclick="cancelEdit()" class="action-btn">❌ Cancel</button>`
-              : `<button onclick="editEntry('${e._id}')" class="action-btn">✏️</button>`
-            }
-            <button onclick="duplicateEntry('${e._id}')" class="action-btn">📄</button>
-            <button onclick="showDeleteModal('${e._id}')" class="action-btn">🗑️</button>
-          </div>
-        </div>`;
-
-card.addEventListener('click', (event) => {
-  if (event.target.closest('.action-btn')) return;
-  openEntryNoteModal(e); // ✅ pass the correct entry object
+// ✅ Group visible entries by label (Today, Yesterday, etc.)
+const groupedEntries = {};
+paginatedEntries.forEach(e => {
+  const label = getDateLabel(e.date);
+  if (!groupedEntries[label]) groupedEntries[label] = [];
+  groupedEntries[label].push(e);
 });
-      container.appendChild(card);
-      entriesRendered++;
+
+const sortedLabels = Object.keys(groupedEntries)
+  .sort((a, b) => getLabelRank(a) - getLabelRank(b));
+
+// ✅ Render entries
+for (const label of sortedLabels) {
+  const labelEl = document.createElement('div');
+  labelEl.className = 'entry-date-label';
+  if (["Today", "Yesterday", "This Week", "Last Week", "This Month"].includes(label)) {
+    labelEl.classList.add('special-label');
+  }
+  labelEl.textContent = label;
+  container.appendChild(labelEl);
+
+  const group = groupedEntries[label].sort((a, b) => new Date(b.date) - new Date(a.date));
+  for (const e of group) {
+    const card = document.createElement('div');
+    card.className = 'entry-card';
+    if (e.note) card.classList.add('has-note');
+    card.dataset.id = e._id;
+
+    const isEditing = document.getElementById('entryForm')?.dataset.editId === e._id;
+    if (isEditing) card.classList.add('editing-row');
+    if (e._id === window.highlightedEntryId) {
+      card.classList.add('highlighted');
+      card.id = 'highlighted-entry';
     }
+
+    const amountClass = e.type === 'Income' ? 'income' : 'expense';
+
+    card.innerHTML = `
+      <div class="entry-date">
+        <div class="date-block">
+          <div class="day">${new Date(e.date).getDate().toString().padStart(2, '0')}</div>
+          <div class="month-year">
+            ${new Date(e.date).toLocaleString('default', { month: 'short' })}<br>
+            ${new Date(e.date).getFullYear()}
+          </div>
+        </div>
+      </div>
+      <div class="entry-main">
+        <div class="description">${e.description}</div>
+        <div class="meta">${e.category || ''} • ${e.person} • ${e.bank}</div>
+        <div class="status">
+          <span class="status-pill ${e.status === 'Paid' ? 'paid' : 'open'}">${e.status}</span>
+        </div>
+      </div>
+      <div class="entry-amount">
+        <div class="amount-line">
+          <span class="currency small">CHF</span>
+          <span class="amount ${amountClass}">${parseFloat(e.amount).toFixed(2)}</span>
+        </div>
+        <div class="buttons">
+          ${isEditing
+            ? `<button onclick="cancelEdit()" class="action-btn">❌ Cancel</button>`
+            : `<button onclick="editEntry('${e._id}')" class="action-btn">✏️</button>`
+          }
+          <button onclick="duplicateEntry('${e._id}')" class="action-btn">📄</button>
+          <button onclick="showDeleteModal('${e._id}')" class="action-btn">🗑️</button>
+        </div>
+      </div>`;
+
+    card.addEventListener('click', (event) => {
+      if (event.target.closest('.action-btn')) return;
+      openEntryNoteModal(e);
+    });
+
+    container.appendChild(card);
   }
+}
 
-  // ✅ Show "Load more" only if there are more entries left
-  // ✅ Load more button logic
-  if (endIndex < totalEntries) {
-    const loadMoreBtn = document.createElement('button');
-    loadMoreBtn.textContent = 'Load more';
-    loadMoreBtn.className = 'load-more-btn';
-    loadMoreBtn.onclick = () => {
-      currentPage++;
-      renderEntries(lastRenderedSource); // ✅ use saved list (filtered or all)
-      setTimeout(() => {
-        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-      }, 100);
-    };
-    container.appendChild(loadMoreBtn);
-  }
-  
+// ✅ Load More button — always at bottom
+if (endIndex < totalEntries) {
+  const loadMoreBtn = document.createElement('button');
+  loadMoreBtn.textContent = 'Load more';
+  loadMoreBtn.className = 'load-more-btn';
+  loadMoreBtn.onclick = () => {
+    currentPage++;
+    renderEntries(lastRenderedSource || window.entries);
+    setTimeout(() => {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }, 100);
+  };
+  container.appendChild(loadMoreBtn);
+}
 
-
-  // Highlight scroll
+  // ✅ Highlight scroll animation
   setTimeout(() => {
     const el = document.getElementById('highlighted-entry');
     if (el) {
@@ -852,8 +841,7 @@ card.addEventListener('click', (event) => {
     }
   }, 100);
 
-
-  // ✅ Totals + Averages (moved inside the function)
+  // ✅ Totals & averages
   let incomeTotal = 0, expenseTotal = 0;
   filtered.forEach(e => {
     const amount = parseFloat(e.amount) || 0;
@@ -884,20 +872,16 @@ card.addEventListener('click', (event) => {
   document.getElementById('totalIncome').textContent = incomeTotal.toFixed(2);
   document.getElementById('totalExpense').textContent = expenseTotal.toFixed(2);
   document.getElementById('totalBalance').textContent = (incomeTotal - expenseTotal).toFixed(2);
-  const difference = incomeTotal - expenseTotal;
-// ✅ Now, finally add this:
-  // ✅ Final part — add this at the end of the function
-window.filteredEntries = filtered;
 
-setTimeout(() => {
-  const limit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
-  if (!isNaN(limit)) {
-    updateFullYearBudgetBar(limit, fullDifference);
-   
-  }
-}, 0);
-} // ← ends the function
-
+  // ✅ Update yearly budget bar (async)
+  window.filteredEntries = filtered;
+  setTimeout(() => {
+    const limit = parseFloat(document.getElementById('yearlyLimitInput')?.value);
+    if (!isNaN(limit)) {
+      updateFullYearBudgetBar(limit, fullDifference);
+    }
+  }, 0);
+}
 
 
 async function editEntry(id) {
