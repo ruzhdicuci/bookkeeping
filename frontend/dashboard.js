@@ -3844,7 +3844,7 @@ document.addEventListener("DOMContentLoaded", () => {
 document.addEventListener("DOMContentLoaded", async () => {
   const langToggle = document.getElementById("langToggle");
   if (!langToggle) return;
-
+});
   try {
     // Load translations from JSON (make sure path is correct)
     const res = await fetch("./languages.json");
