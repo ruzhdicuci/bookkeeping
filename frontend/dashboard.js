@@ -3908,9 +3908,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
 
     // Apply to dropdowns
-    setText('.dropdown:nth-of-type(1) .dropbtn', t.settings);
-    setText('.dropdown:nth-of-type(2) .dropbtn', t.table);
-    setText('.dropdown:nth-of-type(3) .dropbtn', t.export);
+ // Apply to dropdowns (using IDs for accuracy)
+setText('#dropdownSettings .dropbtn', t.settings);
+setText('#dropdownTable .dropbtn', t.table);
+setText('#dropdownExport .dropbtn', t.export);
 
     setText('#full', t.fullscreen);
     setText('#close', t.close);
