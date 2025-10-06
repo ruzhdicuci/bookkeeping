@@ -344,14 +344,15 @@ font-weight: bolder;
 
 
 #themeToggle {
-  background: none;
+  background: white;
     cursor: pointer;
    border: none;
- height:40px;
- 
-  width:40px;
+padding: 3px 6px;
+margin-top: 8px;
+ border-radius: 4px;
+
     margin-left: 1px;
-    font-size: 0.7;
+    font-size: 0.5;
 
 }
 #themeToggle:hover {
@@ -3548,8 +3549,9 @@ button, .tab-button {
 #colorToggle {
   background: var(--theme-color);
   color: #fff;
-  border: 2px solid white;
-  padding: 0px 10px;
+  border: 1px solid white;
+ padding: 3px 12px;
+
   border-radius: 4px;
   cursor: pointer;
   
@@ -3581,7 +3583,7 @@ button, .tab-button {
 }
 
 /* Example: Unlock / Add / Edit */
-#unlockBtn, .reset-btn, #editBtn, #entrySubmitBtn, #toggleEditModeBtn, #unlockBtn, #addCardBtn, #setbtn, .btn-save, .toggle-all-switch .slider, #sidebarToggleBtn1, #sidebarToggleBtn2, .tab-button, .toggle-all-switch input:checked + .slider, #sidebarClosePillar, .custom-switch input:checked + .slider, .search-input-wrapper input, .load-more-btn, .search-pill { 
+#unlockBtn, .reset-btn, #editBtn, #entrySubmitBtn, #toggleEditModeBtn, #unlockBtn, #addCardBtn, #setbtn, .btn-save, .toggle-all-switch .slider, #sidebarToggleBtn1, #sidebarToggleBtn2, .tab-button, .toggle-all-switch input:checked + .slider, #sidebarClosePillar, .custom-switch input:checked + .slider, .search-input-wrapper input, .load-more-btn, .search-pill, #themeToggle { 
   background: var(--theme-color); 
   border: 1px solid var(--theme-color);
 
@@ -3600,10 +3602,11 @@ button, .tab-button {
  background: var(--theme-color);
   border: none;
   border-radius: 4px;
-  padding: 2px 6px;
- margin-left: 15px;
- height: 20px;
-margin-top: 10px;
+padding-top: 4px;
+ margin-left: 4px;
+padding-bottom: 3px;
+
+
   cursor: pointer;
   color: white;
   transition: background 0.25s, transform 0.2s, color 0.25s, box-shadow 0.2s;
