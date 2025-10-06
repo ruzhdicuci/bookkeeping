@@ -3841,3 +3841,37 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
+document.addEventListener("DOMContentLoaded", async () => {
+  const langToggle = document.getElementById("langToggle");
+  if (!langToggle) return;
+
+  try {
+    // Load translations from JSON (make sure path is correct)
+    const res = await fetch("./languages.json");
+    const translations = await res.json();
+
+    let currentLang = localStorage.getItem("lang") || "de";
+    const langs = Object.keys(translations);
+
+    function applyTranslations(lang) {
+      const t = translations[lang];
+      if (!t) return;
+      document.querySelector("#addEntryBtn")?.textContent = t.addEntry;
+      document.querySelector("#totalsLabel")?.textContent = t.totals;
+      document.querySelector("#globalSearchInput")?.setAttribute("placeholder", t.searchPlaceholder);
+      document.querySelector("#resetSearchBtn")?.textContent = t.restore;
+      langToggle.textContent = `${t.flag} ${t.label}`;
+    }
+
+    langToggle.addEventListener("click", () => {
+      const nextIndex = (langs.indexOf(currentLang) + 1) % langs.length;
+      currentLang = langs[nextIndex];
+      localStorage.setItem("lang", currentLang);
+      applyTranslations(currentLang);
+    });
+
+    applyTranslations(currentLang);
+  } catch (err) {
+    console.error("❌ Language loading failed:", err);
+  }
+});
