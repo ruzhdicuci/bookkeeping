@@ -3744,7 +3744,7 @@ padding-bottom: 3px;
 
 .lang-btn {
   background: transparent;
-  border: 1px solid #ccc;
+  border: 1px solid var(--theme-color);
   border-radius: 6px;
   padding: 6px 6px;
   font-size: 10px;
