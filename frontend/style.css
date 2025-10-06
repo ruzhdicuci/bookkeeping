@@ -2426,13 +2426,7 @@ margin-top: -20px;
 
 
 
-#sidebarToggleBtn2 {
-  margin-left: 5px;
-margin-top: 3px;
-border-radius: 4px;
-padding: 2.2px 6px;
 
-}
 
 #sidebarToggleBtn2:hover {
   color: white;
@@ -3727,4 +3721,15 @@ padding-bottom: 3px;
 #searchBarContainer {
   background-color: none;
   border: none;
+}
+
+
+.small-hamburger {
+  font-size: 0.92rem;         /* smaller size */
+  line-height: 1;
+ 
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 4.5px 6px;
 }
