@@ -3582,7 +3582,7 @@ button, .tab-button {
 }
 
 /* Example: Unlock / Add / Edit */
-#unlockBtn, .reset-btn, #editBtn, #entrySubmitBtn, #toggleEditModeBtn, #unlockBtn, #addCardBtn, #setbtn, .btn-save, .toggle-all-switch .slider, #sidebarToggleBtn1, #sidebarToggleBtn2, .tab-button, .toggle-all-switch input:checked + .slider, #sidebarClosePillar, .custom-switch input:checked + .slider, .search-input-wrapper input, .load-more-btn, .search-pill, #themeToggle { 
+#unlockBtn, .reset-btn, #editBtn, #entrySubmitBtn, #toggleEditModeBtn, #unlockBtn, #addCardBtn, #setbtn, .btn-save, .toggle-all-switch .slider, #sidebarToggleBtn1, #sidebarToggleBtn2, .tab-button, .toggle-all-switch input:checked + .slider, #sidebarClosePillar, .custom-switch input:checked + .slider, .search-input-wrapper input, .load-more-btn, .search-pill, #themeToggle,.lang-btn  { 
   background: var(--theme-color); 
   border: 1px solid var(--theme-color);
 
@@ -3737,10 +3737,10 @@ padding-bottom: 3px;
 
 .lang-btn {
   background: white;
-  border: none;
+  border: 1px solid var(--theme-color);
   cursor: pointer;
-  font-size: 1.1rem;
-  padding: 1px 4px;
+  font-size: 0.9rem;
+  padding: 2px 4px;
   border-radius: 4px;
   
   align-items: center;

@@ -3844,7 +3844,7 @@ document.addEventListener("DOMContentLoaded", () => {
 document.addEventListener("DOMContentLoaded", async () => {
   const langToggle = document.getElementById("langToggle");
   if (!langToggle) return;
-});
+
   try {
     // Load translations from JSON (make sure path is correct)
     const res = await fetch("./languages.json");
@@ -3860,7 +3860,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       document.querySelector("#totalsLabel")?.textContent = t.totals;
       document.querySelector("#globalSearchInput")?.setAttribute("placeholder", t.searchPlaceholder);
       document.querySelector("#resetSearchBtn")?.textContent = t.restore;
-      langToggle.textContent = `${t.flag} ${t.label}`;
+
+      // ✅ FIXED line — avoid invalid Unicode template literal issue
+      langToggle.textContent = (t.flag ? t.flag + " " : "") + t.label;
     }
 
     langToggle.addEventListener("click", () => {
