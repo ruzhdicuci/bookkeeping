@@ -3838,3 +3838,9 @@ padding-bottom: 3px;
     transform: translateY(0);
   }
 }
+
+
+.dropbtn i {
+  margin-left: 5px;
+  font-size: 10px;
+}

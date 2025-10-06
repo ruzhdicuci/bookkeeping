@@ -3843,101 +3843,95 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-
-// languages
+// 🌍 Languages
 document.addEventListener("DOMContentLoaded", async () => {
-  const langToggle = document.getElementById("langToggle");
-  const langMenu = document.getElementById("langMenu");
-  const langSearch = document.getElementById("langSearch");
-  const langList = document.querySelector(".lang-list");
-  const clearLangSearch = document.getElementById("clearLangSearch");
+  const langToggle       = document.getElementById("langToggle");
+  const langMenu         = document.getElementById("langMenu");
+  const langSearch       = document.getElementById("langSearch");
+  const clearLangSearch  = document.getElementById("clearLangSearch");
+  const langList         = document.querySelector(".lang-list");
 
-  if (!langToggle || !langMenu) return;
+  if (!langToggle || !langMenu || !langList) return;
 
-  // 🟢 Load translations
+  // Load translations JSON
   let translations = {};
   try {
     const res = await fetch("./languages.json");
     translations = await res.json();
   } catch (e) {
-    console.warn("⚠️ Could not load languages.json — using fallback only.");
+    console.warn("⚠️ Could not load languages.json — using fallback only.", e);
   }
 
-  // ✅ Toggle dropdown visibility
+  // Small helper
+  const setText = (selector, text) => {
+    const el = document.querySelector(selector);
+    if (el) el.textContent = text;
+  };
+
+  // ✅ Translate menus (buttons + items)
+  function applyTranslations(lang) {
+    const t = translations[lang];
+    if (!t) return;
+
+    // Main dropdown buttons (use IDs so order never matters)
+    setText("#dropdownSettings .dropbtn", t.settings);
+    setText("#dropdownTable .dropbtn",    t.table);
+    setText("#dropdownExport .dropbtn",   t.export);
+
+    // SETTINGS menu items
+    setText("#full",  t.fullscreen);
+    setText("#close", t.close);
+    setText('[onclick="setFontSize(14)"]', t.smallFont);
+    setText('[onclick="setFontSize(16)"]', t.resetFont);
+    setText('[onclick="setFontSize(18)"]', t.largeFont);
+
+    // TABLE menu items
+    setText('[onclick="logout()"]',                   "🔐 " + t.logout);
+    setText('[onclick="showUserManagerModal()"]',     "👥 " + t.manageUsers);
+    setText('[onclick="deleteAllEntries()"]',         "🧨 " + t.deleteAll);
+    setText('[onclick="backupData()"]',               "📦 " + t.backup);
+    setText('[onclick="document.getElementById(\'restoreFile\').click()"]', "♻️ " + t.restore);
+
+    // EXPORT menu items
+    setText(".custom-file-label",                     "📥 " + t.importCSV);
+    setText('[onclick="exportVisibleCardEntriesAsCSV()"]', "📤 " + t.exportCSV);
+    document.querySelectorAll('[onclick="window.print()"]').forEach((el, i) => {
+      el.textContent = i === 0 ? "🖨️ " + t.print : "🧾 " + t.exportPDF;
+    });
+
+    // Button label + persist
+    langToggle.textContent = `${lang.toUpperCase()} ▾`;
+    localStorage.setItem("lang", lang);
+  }
+
+  // 🔽 Open/close dropdown
   langToggle.addEventListener("click", (e) => {
     e.stopPropagation();
     langMenu.classList.toggle("open");
-    if (langMenu.classList.contains("open")) {
-      langSearch.focus();
-    }
+    if (langMenu.classList.contains("open")) langSearch?.focus();
   });
-
-  // ✅ Close dropdown when clicking outside
   document.addEventListener("click", (e) => {
     if (!langMenu.contains(e.target) && !langToggle.contains(e.target)) {
       langMenu.classList.remove("open");
     }
   });
 
-  // ✅ Filter languages by search
-  langSearch.addEventListener("input", () => {
+  // 🔎 Filter list
+  langSearch?.addEventListener("input", () => {
     const q = langSearch.value.toLowerCase();
     langList.querySelectorAll("div[data-lang]").forEach((item) => {
-      const match = item.textContent.toLowerCase().includes(q);
-      item.style.display = match ? "block" : "none";
+      item.style.display = item.textContent.toLowerCase().includes(q) ? "" : "none";
     });
   });
 
-  // ✅ Clear search button
-  if (clearLangSearch) {
-    clearLangSearch.addEventListener("click", () => {
-      langSearch.value = "";
-      langSearch.dispatchEvent(new Event("input"));
-      langSearch.focus();
-    });
-  }
+  // ⓧ Clear search
+  clearLangSearch?.addEventListener("click", () => {
+    langSearch.value = "";
+    langSearch.dispatchEvent(new Event("input"));
+    langSearch.focus();
+  });
 
-  // ✅ Translation function
-  function applyTranslations(lang) {
-    const t = translations[lang];
-    if (!t) return;
-
-    const setText = (selector, text) => {
-      const el = document.querySelector(selector);
-      if (el) el.textContent = text;
-    };
-
-    // Apply to dropdowns
- // Apply to dropdowns (using IDs for accuracy)
-setText('#dropdownSettings .dropbtn', t.settings);
-setText('#dropdownTable .dropbtn', t.table);
-setText('#dropdownExport .dropbtn', t.export);
-
-    setText('#full', t.fullscreen);
-    setText('#close', t.close);
-    setText('[onclick="setFontSize(14)"]', t.smallFont);
-    setText('[onclick="setFontSize(16)"]', t.resetFont);
-    setText('[onclick="setFontSize(18)"]', t.largeFont);
-
-    setText('[onclick="logout()"]', "🔐 " + t.logout);
-    setText('[onclick="showUserManagerModal()"]', "👥 " + t.manageUsers);
-    setText('[onclick="deleteAllEntries()"]', "🧨 " + t.deleteAll);
-    setText('[onclick="backupData()"]', "📦 " + t.backup);
-    setText('[onclick="document.getElementById(\'restoreFile\').click()"]', "♻️ " + t.restore);
-
-    setText('.custom-file-label', "📥 " + t.importCSV);
-    setText('[onclick="exportVisibleCardEntriesAsCSV()"]', "📤 " + t.exportCSV);
-
-    document.querySelectorAll('[onclick="window.print()"]').forEach((el, i) => {
-      el.textContent = i === 0 ? "🖨️ " + t.print : "🧾 " + t.exportPDF;
-    });
-
-    // Update button and save state
-    langToggle.textContent = `${lang.toUpperCase()} ▾`;
-    localStorage.setItem("lang", lang);
-  }
-
-  // ✅ Handle language selection
+  // ✅ Select language
   langList.addEventListener("click", (e) => {
     const div = e.target.closest("[data-lang]");
     if (!div) return;
@@ -3947,11 +3941,10 @@ setText('#dropdownExport .dropbtn', t.export);
     applyTranslations(lang);
   });
 
-  // ✅ Restore last language
+  // ♻️ Restore last language
   const saved = localStorage.getItem("lang") || "en";
   const savedDiv = langList.querySelector(`[data-lang="${saved}"]`);
-  if (savedDiv) {
-    langToggle.textContent = `${savedDiv.textContent.trim()} ▾`;
-    applyTranslations(saved);
-  }
+  if (savedDiv) langToggle.textContent = `${savedDiv.textContent.trim()} ▾`;
+  else          langToggle.textContent = `${saved.toUpperCase()} ▾`;
+  applyTranslations(saved);
 });
