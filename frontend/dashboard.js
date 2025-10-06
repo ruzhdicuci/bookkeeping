@@ -1,5 +1,6 @@
 let currentPage = 1;
 const ENTRIES_PER_PAGE = 20;
+let lastRenderedSource = null; // ✅ track last used list
 const DEBUG_MODE = false; // or true for development
 const debug = (...args) => DEBUG_MODE && console.log(...args);
 
@@ -635,15 +636,19 @@ function getLabelRank(label) {
 }
 
 function renderEntries(source) {
-  // ✅ if we pass a list (e.g. from search), use it, otherwise use all entries
+  // ✅ use last used list if no new source passed
+  if (!source && lastRenderedSource) source = lastRenderedSource;
+  else if (source) lastRenderedSource = source;
+
   const entries = Array.isArray(source) ? source : (window.entries || []);
+
   let fullIncome = 0, fullExpense = 0;
-entries.forEach(e => {
-  const amount = parseFloat(e.amount) || 0;
-  if ((e.type || '').toLowerCase() === 'income') fullIncome += amount;
-  else fullExpense += amount;
-});
-const fullDifference = fullIncome - fullExpense;
+  entries.forEach(e => {
+    const amount = parseFloat(e.amount) || 0;
+    if ((e.type || '').toLowerCase() === 'income') fullIncome += amount;
+    else fullExpense += amount;
+  });
+  const fullDifference = fullIncome - fullExpense;
   const dateSearch = document.getElementById('dateSearch')?.value.trim();
   const descSearch = document.getElementById('descSearch')?.value.trim();
   const amountSearch = document.getElementById('amountSearch')?.value.trim();
@@ -723,9 +728,12 @@ if (!document.getElementById('timeSort')?.value) {
   }
 
    // ✅ Pagination setup
+  // ✅ Pagination
   const totalEntries = filtered.length;
   const startIndex = 0;
   const endIndex = currentPage * ENTRIES_PER_PAGE;
+
+  // ✅ Limit to visible entries only
   const paginatedEntries = filtered.slice(startIndex, endIndex);
 
   const container = document.getElementById('entryTableBody');
@@ -814,13 +822,14 @@ card.addEventListener('click', (event) => {
   }
 
   // ✅ Show "Load more" only if there are more entries left
+  // ✅ Load more button logic
   if (endIndex < totalEntries) {
     const loadMoreBtn = document.createElement('button');
     loadMoreBtn.textContent = 'Load more';
     loadMoreBtn.className = 'load-more-btn';
     loadMoreBtn.onclick = () => {
       currentPage++;
-      renderEntries(source); // re-render with next batch
+      renderEntries(lastRenderedSource); // ✅ use saved list (filtered or all)
       setTimeout(() => {
         window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
       }, 100);
