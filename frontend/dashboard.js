@@ -3840,14 +3840,14 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-
+// 🌐 Language toggle (Swiss flag etc.)
 document.addEventListener("DOMContentLoaded", async () => {
-  const langToggle = document.getElementById("langToggle");
-  if (!langToggle) return;
-
   try {
-    // Load translations from JSON (make sure path is correct)
-    const res = await fetch("./languages.json");
+    const langToggle = document.getElementById("langToggle");
+    if (!langToggle) return;
+
+    // Load translations from JSON
+    const res = await fetch("languages.json");
     const translations = await res.json();
 
     let currentLang = localStorage.getItem("lang") || "de";
@@ -3856,12 +3856,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     function applyTranslations(lang) {
       const t = translations[lang];
       if (!t) return;
-      document.querySelector("#addEntryBtn")?.textContent = t.addEntry;
-      document.querySelector("#totalsLabel")?.textContent = t.totals;
-      document.querySelector("#globalSearchInput")?.setAttribute("placeholder", t.searchPlaceholder);
-      document.querySelector("#resetSearchBtn")?.textContent = t.restore;
 
-      // ✅ FIXED line — avoid invalid Unicode template literal issue
+      const addBtn = document.querySelector("#addEntryBtn");
+      const totalsLabel = document.querySelector("#totalsLabel");
+      const searchInput = document.querySelector("#globalSearchInput");
+      const resetBtn = document.querySelector("#resetSearchBtn");
+
+      if (addBtn) addBtn.textContent = t.addEntry;
+      if (totalsLabel) totalsLabel.textContent = t.totals;
+      if (searchInput) searchInput.setAttribute("placeholder", t.searchPlaceholder);
+      if (resetBtn) resetBtn.textContent = t.restore;
       langToggle.textContent = (t.flag ? t.flag + " " : "") + t.label;
     }
 
