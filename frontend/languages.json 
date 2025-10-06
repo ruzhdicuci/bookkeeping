@@ -1,0 +1,34 @@
+{
+  "de": {
+    "flag": "🇨🇭",
+    "label": "DE",
+    "addEntry": "Eintrag hinzufügen",
+    "totals": "Gesamt",
+    "searchPlaceholder": "Einträge suchen...",
+    "restore": "Wiederherstellen"
+  },
+  "en": {
+    "flag": "🇬🇧",
+    "label": "EN",
+    "addEntry": "Add Entry",
+    "totals": "Totals",
+    "searchPlaceholder": "Search entries...",
+    "restore": "Restore"
+  },
+  "fr": {
+    "flag": "🇫🇷",
+    "label": "FR",
+    "addEntry": "Ajouter une entrée",
+    "totals": "Totaux",
+    "searchPlaceholder": "Rechercher...",
+    "restore": "Restaurer"
+  },
+  "it": {
+    "flag": "🇮🇹",
+    "label": "IT",
+    "addEntry": "Aggiungi voce",
+    "totals": "Totali",
+    "searchPlaceholder": "Cerca voci...",
+    "restore": "Ripristina"
+  }
+}
