@@ -3863,10 +3863,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   // Small helper
-  const setText = (selector, text) => {
-    const el = document.querySelector(selector);
-    if (el) el.textContent = text;
-  };
+// 🔹 Small helpers
+const setText = (selector, text) => {
+  const el = document.querySelector(selector);
+  if (el) el.textContent = text; // for normal items (no icon)
+};
+
+// 🔹 Special helper for dropdown buttons – keeps caret icon
+const setDropdownText = (selector, text) => {
+  const el = document.querySelector(selector);
+  if (el) el.innerHTML = text + ' <i class="fa fa-caret-down"></i>';
+};
 
   // ✅ Translate menus (buttons + items)
   function applyTranslations(lang) {
@@ -3874,9 +3881,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!t) return;
 
     // Main dropdown buttons (use IDs so order never matters)
-    setText("#dropdownSettings .dropbtn", t.settings);
-    setText("#dropdownTable .dropbtn",    t.table);
-    setText("#dropdownExport .dropbtn",   t.export);
+ setDropdownText('#dropdownSettings .dropbtn', t.settings);
+setDropdownText('#dropdownTable .dropbtn', t.table);
+setDropdownText('#dropdownExport .dropbtn', t.export);
 
     // SETTINGS menu items
     setText("#full",  t.fullscreen);

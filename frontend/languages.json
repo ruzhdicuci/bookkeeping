@@ -171,3 +171,43 @@
     "exportPDF": "导出 PDF"
   }
 }
+
+
+"pt": {
+  "settings": "Configurações",
+  "table": "Tabela",
+  "export": "Exportar",
+  "fullscreen": "Tela cheia",
+  "close": "Fechar tela",
+  "smallFont": "Fonte pequena",
+  "resetFont": "Fonte normal",
+  "largeFont": "Fonte grande",
+  "logout": "Sair",
+  "manageUsers": "Gerenciar usuários",
+  "deleteAll": "Excluir todas as entradas",
+  "backup": "Backup",
+  "restore": "Restaurar",
+  "importCSV": "Importar CSV",
+  "exportCSV": "Exportar CSV",
+  "print": "Imprimir",
+  "exportPDF": "Exportar PDF"
+},
+"ar": {
+  "settings": "الإعدادات",
+  "table": "الجدول",
+  "export": "تصدير",
+  "fullscreen": "ملء الشاشة",
+  "close": "إغلاق الشاشة",
+  "smallFont": "خط صغير",
+  "resetFont": "خط عادي",
+  "largeFont": "خط كبير",
+  "logout": "تسجيل الخروج",
+  "manageUsers": "إدارة المستخدمين",
+  "deleteAll": "حذف جميع الإدخالات",
+  "backup": "نسخ احتياطي",
+  "restore": "استعادة",
+  "importCSV": "استيراد CSV",
+  "exportCSV": "تصدير CSV",
+  "print": "طباعة",
+  "exportPDF": "تصدير PDF"
+}
