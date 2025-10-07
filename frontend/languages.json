@@ -2,186 +2,172 @@
   "en": {
     "settings": "Settings",
     "table": "Table",
-    "export": "Export"
+    "export": "Export",
+    "fullscreen": "Full Screen",
+    "close": "Close Screen",
+    "smallFont": "Small Font",
+    "resetFont": "Reset Font",
+    "largeFont": "Large Font",
+    "logout": "Logout",
+    "manageUsers": "Manage Users",
+    "deleteAll": "Delete All Entries",
+    "backup": "Backup",
+    "restore": "Restore",
+    "importCSV": "Import CSV",
+    "exportCSV": "Export CSV",
+    "print": "Print",
+    "exportPDF": "Export PDF"
   },
   "de": {
     "settings": "Einstellungen",
     "table": "Tabelle",
-    "export": "Exportieren"
+    "export": "Exportieren",
+    "fullscreen": "Vollbild",
+    "close": "Schließen",
+    "smallFont": "Kleine Schrift",
+    "resetFont": "Normale Schrift",
+    "largeFont": "Große Schrift",
+    "logout": "Abmelden",
+    "manageUsers": "Benutzer verwalten",
+    "deleteAll": "Alle Einträge löschen",
+    "backup": "Sicherung",
+    "restore": "Wiederherstellen",
+    "importCSV": "CSV importieren",
+    "exportCSV": "CSV exportieren",
+    "print": "Drucken",
+    "exportPDF": "PDF exportieren"
   },
   "fr": {
     "settings": "Paramètres",
     "table": "Tableau",
-    "export": "Exporter"
+    "export": "Exporter",
+    "fullscreen": "Plein écran",
+    "close": "Fermer l’écran",
+    "smallFont": "Petite police",
+    "resetFont": "Police normale",
+    "largeFont": "Grande police",
+    "logout": "Déconnexion",
+    "manageUsers": "Gérer les utilisateurs",
+    "deleteAll": "Supprimer toutes les entrées",
+    "backup": "Sauvegarde",
+    "restore": "Restaurer",
+    "importCSV": "Importer CSV",
+    "exportCSV": "Exporter CSV",
+    "print": "Imprimer",
+    "exportPDF": "Exporter PDF"
   },
   "it": {
     "settings": "Impostazioni",
     "table": "Tabella",
-    "export": "Esporta"
+    "export": "Esporta",
+    "fullscreen": "Schermo intero",
+    "close": "Chiudi schermo",
+    "smallFont": "Carattere piccolo",
+    "resetFont": "Carattere normale",
+    "largeFont": "Carattere grande",
+    "logout": "Disconnetti",
+    "manageUsers": "Gestisci utenti",
+    "deleteAll": "Elimina tutte le voci",
+    "backup": "Backup",
+    "restore": "Ripristina",
+    "importCSV": "Importa CSV",
+    "exportCSV": "Esporta CSV",
+    "print": "Stampa",
+    "exportPDF": "Esporta PDF"
   },
   "es": {
     "settings": "Configuración",
     "table": "Tabla",
-    "export": "Exportar"
-  },
-  "pt": {
-    "settings": "Configurações",
-    "table": "Tabela",
-    "export": "Exportar"
-  },
-  "nl": {
-    "settings": "Instellingen",
-    "table": "Tabel",
-    "export": "Exporteren"
-  },
-  "pl": {
-    "settings": "Ustawienia",
-    "table": "Tabela",
-    "export": "Eksportuj"
-  },
-  "cs": {
-    "settings": "Nastavení",
-    "table": "Tabulka",
-    "export": "Exportovat"
-  },
-  "sk": {
-    "settings": "Nastavenia",
-    "table": "Tabuľka",
-    "export": "Exportovať"
-  },
-  "sl": {
-    "settings": "Nastavitve",
-    "table": "Tabela",
-    "export": "Izvozi"
-  },
-  "hr": {
-    "settings": "Postavke",
-    "table": "Tablica",
-    "export": "Izvoz"
-  },
-  "sr": {
-    "settings": "Подешавања", 
-    "table": "Табела",
-    "export": "Извоз"
-  },
-  "hu": {
-    "settings": "Beállítások",
-    "table": "Táblázat",
-    "export": "Exportálás"
-  },
-  "ro": {
-    "settings": "Setări",
-    "table": "Tabel",
-    "export": "Export"
-  },
-  "bg": {
-    "settings": "Настройки", 
-    "table": "Таблица",
-    "export": "Експорт"
-  },
-  "el": {
-    "settings": "Ρυθμίσεις", 
-    "table": "Πίνακας",
-    "export": "Εξαγωγή"
-  },
-  "fi": {
-    "settings": "Asetukset",
-    "table": "Taulukko",
-    "export": "Vie"
-  },
-  "sv": {
-    "settings": "Inställningar",
-    "table": "Tabell",
-    "export": "Exportera"
-  },
-  "da": {
-    "settings": "Indstillinger",
-    "table": "Tabel",
-    "export": "Eksporter"
-  },
-  "no": {
-    "settings": "Innstillinger",
-    "table": "Tabell",
-    "export": "Eksporter"
-  },
-  "et": {
-    "settings": "Seaded",
-    "table": "Tabel",
-    "export": "Ekspordi"
-  },
-  "lv": {
-    "settings": "Iestatījumi",
-    "table": "Tabula",
-    "export": "Eksportēt"
-  },
-  "lt": {
-    "settings": "Nustatymai",
-    "table": "Lentelė",
-    "export": "Eksportuoti"
-  },
-  "mt": {
-    "settings": "Settings", 
-    "table": "Tabella",
-    "export": "Esporta"
-  },
-  "sq": {
-    "settings": "Cilësimet",
-    "table": "Tabela",
-    "export": "Eksporto"
-  },
-  "is": {
-    "settings": "Stillingar",
-    "table": "Tafla",
-    "export": "Flytja út"
+    "export": "Exportar",
+    "fullscreen": "Pantalla completa",
+    "close": "Cerrar pantalla",
+    "smallFont": "Letra pequeña",
+    "resetFont": "Letra normal",
+    "largeFont": "Letra grande",
+    "logout": "Cerrar sesión",
+    "manageUsers": "Gestionar usuarios",
+    "deleteAll": "Eliminar todas las entradas",
+    "backup": "Copia de seguridad",
+    "restore": "Restaurar",
+    "importCSV": "Importar CSV",
+    "exportCSV": "Exportar CSV",
+    "print": "Imprimir",
+    "exportPDF": "Exportar PDF"
   },
   "ru": {
-    "settings": "Настройки",  
+    "settings": "Настройки",
     "table": "Таблица",
-    "export": "Экспорт"
-  },
-  "uk": {
-    "settings": "Налаштування", 
-    "table": "Таблиця",
-    "export": "Експорт"
+    "export": "Экспорт",
+    "fullscreen": "Полный экран",
+    "close": "Закрыть экран",
+    "smallFont": "Мелкий шрифт",
+    "resetFont": "Обычный шрифт",
+    "largeFont": "Крупный шрифт",
+    "logout": "Выйти",
+    "manageUsers": "Управление пользователями",
+    "deleteAll": "Удалить все записи",
+    "backup": "Резервное копирование",
+    "restore": "Восстановить",
+    "importCSV": "Импорт CSV",
+    "exportCSV": "Экспорт CSV",
+    "print": "Печать",
+    "exportPDF": "Экспорт PDF"
   },
   "tr": {
     "settings": "Ayarlar",
     "table": "Tablo",
-    "export": "Dışa aktar"
-  },
-  "ar": {
-    "settings": "الإعدادات", 
-    "table": "الجدول",
-    "export": "تصدير"
-  },
-  "he": {
-    "settings": "הגדרות",  
-    "table": "טבלה",
-    "export": "ייצוא"
+    "export": "Dışa aktar",
+    "fullscreen": "Tam ekran",
+    "close": "Ekranı kapat",
+    "smallFont": "Küçük yazı tipi",
+    "resetFont": "Normal yazı tipi",
+    "largeFont": "Büyük yazı tipi",
+    "logout": "Çıkış yap",
+    "manageUsers": "Kullanıcıları yönet",
+    "deleteAll": "Tüm kayıtları sil",
+    "backup": "Yedekle",
+    "restore": "Geri yükle",
+    "importCSV": "CSV içe aktar",
+    "exportCSV": "CSV dışa aktar",
+    "print": "Yazdır",
+    "exportPDF": "PDF olarak dışa aktar"
   },
   "hi": {
-    "settings": "सेटिंग्स",  
+    "settings": "सेटिंग्स",
     "table": "तालिका",
-    "export": "निर्यात"
-  },
-  "bn": {
-    "settings": "সেটিংস",  
-    "table": "টেবিল",
-    "export": "রপ্তানি"
+    "export": "निर्यात",
+    "fullscreen": "पूर्ण स्क्रीन",
+    "close": "स्क्रीन बंद करें",
+    "smallFont": "छोटा फ़ॉन्ट",
+    "resetFont": "सामान्य फ़ॉन्ट",
+    "largeFont": "बड़ा फ़ॉन्ट",
+    "logout": "लॉगआउट",
+    "manageUsers": "उपयोगकर्ताओं का प्रबंधन करें",
+    "deleteAll": "सभी प्रविष्टियाँ हटाएँ",
+    "backup": "बैकअप",
+    "restore": "पुनर्स्थापित करें",
+    "importCSV": "CSV आयात करें",
+    "exportCSV": "CSV निर्यात करें",
+    "print": "प्रिंट करें",
+    "exportPDF": "PDF निर्यात करें"
   },
   "zh": {
-    "settings": "设置", 
+    "settings": "设置",
     "table": "表格",
-    "export": "导出"
-  },
-  "ja": {
-    "settings": "設定",  
-    "table": "テーブル",
-    "export": "エクスポート"
-  },
-  "ko": {
-    "settings": "설정",  
-    "table": "표",
-    "export": "내보내기"
+    "export": "导出",
+    "fullscreen": "全屏",
+    "close": "关闭屏幕",
+    "smallFont": "小号字体",
+    "resetFont": "正常字体",
+    "largeFont": "大号字体",
+    "logout": "登出",
+    "manageUsers": "管理用户",
+    "deleteAll": "删除所有条目",
+    "backup": "备份",
+    "restore": "恢复",
+    "importCSV": "导入 CSV",
+    "exportCSV": "导出 CSV",
+    "print": "打印",
+    "exportPDF": "导出 PDF"
   }
 }
