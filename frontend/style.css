@@ -3716,13 +3716,14 @@ padding-bottom: 3px;
 
 
 .small-hamburger {
-  font-size: 0.92rem;         /* smaller size */
+  font-size: 0.8rem;         /* smaller size */
   line-height: 1;
  
   border: none;
   border-radius: 4px;
   cursor: pointer;
   padding: 4.5px 6px;
+  margin-left: 5px;
 }
 
 
@@ -3842,7 +3843,7 @@ padding-bottom: 3px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;                   /* spacing between text and arrow */
+  padding: 1px;                   /* spacing between text and arrow */
   border: none;
   outline: none;
   background-color: inherit;
@@ -3866,5 +3867,7 @@ padding-bottom: 3px;
   .dropbtn {
     font-size: 12px;
     max-width: 90px;
+   padding:0px;
+
   }
 }
