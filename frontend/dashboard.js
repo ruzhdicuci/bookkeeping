@@ -337,15 +337,17 @@ async function fetchEntries() {
     window.persons = [...new Set(window.entries.map(e => e.person).filter(Boolean))];
     debug("🧑‍🤝‍🧑 Found persons:", window.persons);
 
-    renderEntries();
+    // ✅ Populate filters and dropdowns first
     populateNewEntryDropdowns();
-    populateFilters(); // ✅ must come BEFORE
+    populateFilters();
+
+    // ✅ THEN render everything
+    renderEntries();
     renderBankBalanceForm();
 
+    // ✅ Sync with Dexie
     await db.entries.clear();
     await db.entries.bulkPut(window.entries);
-
-
 
   } catch (err) {
     console.warn('⚠️ fetchEntries failed, loading from Dexie instead:', err);
@@ -357,12 +359,10 @@ async function fetchEntries() {
       debug("📦 Loaded entries from IndexedDB:", window.entries);
       window.persons = [...new Set(window.entries.map(e => e.person).filter(Boolean))];
 
-      renderEntries();
       populateNewEntryDropdowns();
       populateFilters();
+      renderEntries();
       renderBankBalanceForm();
-
-   
 
     } catch (dexieErr) {
       console.error('❌ Dexie fallback also failed:', dexieErr);
@@ -370,7 +370,6 @@ async function fetchEntries() {
     }
   }
 }
-
 
 window.addEventListener('DOMContentLoaded', async () => {
   await fetchEntries(); // ✅ fetch from backend
