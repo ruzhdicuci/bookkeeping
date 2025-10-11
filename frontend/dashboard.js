@@ -1000,8 +1000,10 @@ async function saveEdit(row) {
       const data = await res.json();
       alert(`❌ Failed to save: ${data.message || res.statusText}`);
     } else {
-      fetchEntries();
-    }
+  await fetchEntries();
+  window.entries = [...window.entries]; // 🔄 trigger refresh hash change
+  console.log("✅ Entry updated — refreshing stats & charts...");
+}
   } catch (err) {
     console.error('❌ Save error:', err);
     alert('❌ Could not save changes.');
@@ -1034,11 +1036,12 @@ async function duplicateEntry(id) {
     window.highlightedEntryId = newEntry._id;
     // ✅ Update everything
     await fetchEntries();
+     window.entries = [...window.entries]; // 🔄 trigger auto-refresher
     renderEntries(window.entries);
     renderMonthlyWidgets(window.entries);
     renderBankBalanceForm();
     await renderRealYearlyCards();
-   window.entries = [...window.entries]; // 🔄 trigger auto-refresher
+  
     showToast("✅ Entry duplicated");
   } else {
     alert("❌ Failed to duplicate entry");
@@ -1058,13 +1061,14 @@ async function deleteEntry(id) {
   });
 
   await fetchEntries();             // Reload updated entries
+    window.entries = [...window.entries]; // 🔄 trigger auto-refresher
   renderEntries();                  // Refresh visible table
   populateNewEntryDropdowns();     // Rebuild inputs with updated data
   populateFilters();               // Rebuild filters
   renderBankBalanceForm();         // ✅ Refresh bank balance table
   renderMonthlyWidgets(window.entries); // ✅ Refresh monthly widgets
   await renderRealYearlyCards();
-  window.entries = [...window.entries]; // 🔄 trigger auto-refresher
+
 }
 
 
