@@ -347,7 +347,7 @@ font-weight: bolder;
   background: white;
     cursor: pointer;
    border: none;
-padding: 2.7px 5.7px;
+padding: 2.5px 5.7px;
 margin-top: 10px;
  border-radius: 4px;
 
@@ -3717,13 +3717,14 @@ padding-bottom: 3px;
 
 .small-hamburger {
   font-size: 0.8rem;         /* smaller size */
-  line-height: 1;
+  line-height: 1.1;
  
   border: none;
   border-radius: 4px;
   cursor: pointer;
   padding: 4.5px 6px;
   margin-left: 5px;
+
 }
 
 
@@ -3804,7 +3805,7 @@ padding-bottom: 3px;
 }
 
 .lang-list {
-  max-height: 220px;
+  max-height: auto;
   overflow-y: auto;
 }
 

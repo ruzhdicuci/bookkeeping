@@ -16,7 +16,25 @@
     "importCSV": "Import CSV",
     "exportCSV": "Export CSV",
     "print": "Print",
-    "exportPDF": "Export PDF"
+    "exportPDF": "Export PDF",
+
+        "addEntryTitle": "Add Entry",
+    "selectDate": "Select Date",
+    "description": "Description",
+    "amount": "Amount",
+    "currency": "Currency",
+    "type": "Type",
+    "income": "Income",
+    "expense": "Expense",
+    "transfer": "Transfer",
+    "person": "Person",
+    "bank": "Bank",
+    "category": "Category",
+    "status": "Status",
+    "open": "Open",
+    "paid": "Paid",
+    "addEntry": "Add Entry",
+    "cancel": "Cancel"
   },
   "de": {
     "settings": "Einstellungen",
@@ -35,7 +53,25 @@
     "importCSV": "CSV importieren",
     "exportCSV": "CSV exportieren",
     "print": "Drucken",
-    "exportPDF": "PDF exportieren"
+    "exportPDF": "PDF exportieren",
+
+        "addEntryTitle": "Eintrag hinzufügen",
+    "selectDate": "Datum auswählen",
+    "description": "Beschreibung",
+    "amount": "Betrag",
+    "currency": "Währung",
+    "type": "Typ",
+    "income": "Einnahme",
+    "expense": "Ausgabe",
+    "transfer": "Überweisung",
+    "person": "Person",
+    "bank": "Bank",
+    "category": "Kategorie",
+    "status": "Status",
+    "open": "Offen",
+    "paid": "Bezahlt",
+    "addEntry": "Eintrag hinzufügen",
+    "cancel": "Abbrechen"
   },
   "fr": {
     "settings": "Paramètres",
@@ -54,7 +90,25 @@
     "importCSV": "Importer CSV",
     "exportCSV": "Exporter CSV",
     "print": "Imprimer",
-    "exportPDF": "Exporter PDF"
+    "exportPDF": "Exporter PDF",
+
+        "addEntryTitle": "Ajouter une entrée",
+    "selectDate": "Sélectionner une date",
+    "description": "Description",
+    "amount": "Montant",
+    "currency": "Devise",
+    "type": "Type",
+    "income": "Revenu",
+    "expense": "Dépense",
+    "transfer": "Transfert",
+    "person": "Personne",
+    "bank": "Banque",
+    "category": "Catégorie",
+    "status": "Statut",
+    "open": "Ouvert",
+    "paid": "Payé",
+    "addEntry": "Ajouter une entrée",
+    "cancel": "Annuler"
   },
   "it": {
     "settings": "Impostazioni",
@@ -73,7 +127,25 @@
     "importCSV": "Importa CSV",
     "exportCSV": "Esporta CSV",
     "print": "Stampa",
-    "exportPDF": "Esporta PDF"
+    "exportPDF": "Esporta PDF",
+
+        "addEntryTitle": "Aggiungi voce",
+    "selectDate": "Seleziona data",
+    "description": "Descrizione",
+    "amount": "Importo",
+    "currency": "Valuta",
+    "type": "Tipo",
+    "income": "Entrata",
+    "expense": "Uscita",
+    "transfer": "Trasferimento",
+    "person": "Persona",
+    "bank": "Banca",
+    "category": "Categoria",
+    "status": "Stato",
+    "open": "Aperto",
+    "paid": "Pagato",
+    "addEntry": "Aggiungi voce",
+    "cancel": "Annulla"
   },
   "es": {
     "settings": "Configuración",
@@ -92,7 +164,25 @@
     "importCSV": "Importar CSV",
     "exportCSV": "Exportar CSV",
     "print": "Imprimir",
-    "exportPDF": "Exportar PDF"
+    "exportPDF": "Exportar PDF",
+
+        "addEntryTitle": "Agregar entrada",
+    "selectDate": "Seleccionar fecha",
+    "description": "Descripción",
+    "amount": "Cantidad",
+    "currency": "Moneda",
+    "type": "Tipo",
+    "income": "Ingreso",
+    "expense": "Gasto",
+    "transfer": "Transferencia",
+    "person": "Persona",
+    "bank": "Banco",
+    "category": "Categoría",
+    "status": "Estado",
+    "open": "Abierto",
+    "paid": "Pagado",
+    "addEntry": "Agregar entrada",
+    "cancel": "Cancelar"
   },
   "ru": {
     "settings": "Настройки",
@@ -111,7 +201,25 @@
     "importCSV": "Импорт CSV",
     "exportCSV": "Экспорт CSV",
     "print": "Печать",
-    "exportPDF": "Экспорт PDF"
+    "exportPDF": "Экспорт PDF",
+
+        "addEntryTitle": "Добавить запись",
+    "selectDate": "Выбрать дату",
+    "description": "Описание",
+    "amount": "Сумма",
+    "currency": "Валюта",
+    "type": "Тип",
+    "income": "Доход",
+    "expense": "Расход",
+    "transfer": "Перевод",
+    "person": "Персона",
+    "bank": "Банк",
+    "category": "Категория",
+    "status": "Статус",
+    "open": "Открыто",
+    "paid": "Оплачено",
+    "addEntry": "Добавить запись",
+    "cancel": "Отмена"
   },
   "tr": {
     "settings": "Ayarlar",
@@ -130,7 +238,25 @@
     "importCSV": "CSV içe aktar",
     "exportCSV": "CSV dışa aktar",
     "print": "Yazdır",
-    "exportPDF": "PDF olarak dışa aktar"
+    "exportPDF": "PDF olarak dışa aktar",
+
+        "addEntryTitle": "Kayıt ekle",
+    "selectDate": "Tarih seç",
+    "description": "Açıklama",
+    "amount": "Tutar",
+    "currency": "Para birimi",
+    "type": "Tür",
+    "income": "Gelir",
+    "expense": "Gider",
+    "transfer": "Transfer",
+    "person": "Kişi",
+    "bank": "Banka",
+    "category": "Kategori",
+    "status": "Durum",
+    "open": "Açık",
+    "paid": "Ödendi",
+    "addEntry": "Kayıt ekle",
+    "cancel": "İptal"
   },
   "hi": {
     "settings": "सेटिंग्स",
@@ -149,7 +275,25 @@
     "importCSV": "CSV आयात करें",
     "exportCSV": "CSV निर्यात करें",
     "print": "प्रिंट करें",
-    "exportPDF": "PDF निर्यात करें"
+    "exportPDF": "PDF निर्यात करें",
+
+        "addEntryTitle": "प्रविष्टि जोड़ें",
+    "selectDate": "तारीख चुनें",
+    "description": "विवरण",
+    "amount": "राशि",
+    "currency": "मुद्रा",
+    "type": "प्रकार",
+    "income": "आय",
+    "expense": "व्यय",
+    "transfer": "हस्तांतरण",
+    "person": "व्यक्ति",
+    "bank": "बैंक",
+    "category": "श्रेणी",
+    "status": "स्थिति",
+    "open": "खुला",
+    "paid": "भुगतान किया गया",
+    "addEntry": "प्रविष्टि जोड़ें",
+    "cancel": "रद्द करें"
   },
   "zh": {
     "settings": "设置",
@@ -168,10 +312,26 @@
     "importCSV": "导入 CSV",
     "exportCSV": "导出 CSV",
     "print": "打印",
-    "exportPDF": "导出 PDF"
-  }
-}
+    "exportPDF": "导出 PDF",
 
+        "addEntryTitle": "添加条目",
+    "selectDate": "选择日期",
+    "description": "描述",
+    "amount": "金额",
+    "currency": "货币",
+    "type": "类型",
+    "income": "收入",
+    "expense": "支出",
+    "transfer": "转账",
+    "person": "人员",
+    "bank": "银行",
+    "category": "类别",
+    "status": "状态",
+    "open": "未完成",
+    "paid": "已支付",
+    "addEntry": "添加条目",
+    "cancel": "取消"
+  },
 
 "pt": {
   "settings": "Configurações",
@@ -190,7 +350,25 @@
   "importCSV": "Importar CSV",
   "exportCSV": "Exportar CSV",
   "print": "Imprimir",
-  "exportPDF": "Exportar PDF"
+  "exportPDF": "Exportar PDF",
+
+      "addEntryTitle": "Adicionar registro",
+    "selectDate": "Selecionar data",
+    "description": "Descrição",
+    "amount": "Valor",
+    "currency": "Moeda",
+    "type": "Tipo",
+    "income": "Receita",
+    "expense": "Despesa",
+    "transfer": "Transferência",
+    "person": "Pessoa",
+    "bank": "Banco",
+    "category": "Categoria",
+    "status": "Status",
+    "open": "Aberto",
+    "paid": "Pago",
+    "addEntry": "Adicionar registro",
+    "cancel": "Cancelar"
 },
 "ar": {
   "settings": "الإعدادات",
@@ -209,5 +387,26 @@
   "importCSV": "استيراد CSV",
   "exportCSV": "تصدير CSV",
   "print": "طباعة",
-  "exportPDF": "تصدير PDF"
+  "exportPDF": "تصدير PDF",
+
+      "addEntryTitle": "إضافة إدخال",
+    "selectDate": "اختر التاريخ",
+    "description": "الوصف",
+    "amount": "المبلغ",
+    "currency": "العملة",
+    "type": "النوع",
+    "income": "دخل",
+    "expense": "مصاريف",
+    "transfer": "تحويل",
+    "person": "الشخص",
+    "bank": "البنك",
+    "category": "الفئة",
+    "status": "الحالة",
+    "open": "مفتوح",
+    "paid": "مدفوع",
+    "addEntry": "إضافة إدخال",
+    "cancel": "إلغاء"
 }
+
+}
+

@@ -3295,42 +3295,69 @@ document.querySelectorAll('.section-title').forEach(title => {
 
 
 
-
-// ✅ Wait until all required elements and data are loaded
-function waitAndRenderExpenseStats() {
+// ✅ Smarter wait-and-render logic for expense stats
+function waitAndRenderExpenseStats(force = false) {
+  const maxRetries = 40; // ~12s (40 x 300ms)
   let retryCount = 0;
+  let intervalId;
 
-  const interval = setInterval(() => {
+  const checkReady = () => {
     retryCount++;
 
     const totalEl = document.getElementById('expenseTotal');
     const averageEl = document.getElementById('expenseAverage');
     const inputEl = document.getElementById('dailyLimitInput');
     const fillEl = document.getElementById('spendingProgressFill');
-    const entriesReady = Array.isArray(window.entries) && window.entries.length > 0;
+    const entriesReady = Array.isArray(window.entries); // allow empty array too
 
-    if (totalEl && averageEl && inputEl && fillEl && entriesReady) {
-      clearInterval(interval);
-      console.log("✅ All elements found, rendering...");
+    const allReady = totalEl && averageEl && inputEl && fillEl && entriesReady;
+
+    if (allReady) {
+      clearInterval(intervalId);
+      console.log(`✅ Expense stats ready after ${retryCount} checks`);
       renderExpenseStats();
-    } else {
-      console.warn(`⚠️ Waiting for required DOM elements... Retry: ${retryCount}`, {
-        missing: {
-          expenseTotal: !!totalEl,
-          expenseAverage: !!averageEl,
-          dailyLimitInput: !!inputEl,
-          spendingProgressFill: !!fillEl,
-          entriesReady: entriesReady,
-        },
-      });
+      return true;
     }
 
-    if (retryCount >= 20) {
-      clearInterval(interval);
-      console.warn("⛔ Stopped trying after too many retries.");
+    if (retryCount >= maxRetries) {
+      clearInterval(intervalId);
+      console.warn("⛔ Stopped waiting for DOM/data after timeout", {
+        expenseTotal: !!totalEl,
+        expenseAverage: !!averageEl,
+        dailyLimitInput: !!inputEl,
+        spendingProgressFill: !!fillEl,
+        entriesReady,
+      });
+      return false;
     }
-  }, 300);
+
+    return false;
+  };
+
+  // 🧠 If force mode: run immediate check and short retries
+  if (force) {
+    console.log("🔁 Force recheck of expense stats...");
+    retryCount = 0;
+    intervalId = setInterval(checkReady, 300);
+    return;
+  }
+
+  // 🕒 Wait until DOM loaded
+  if (document.readyState === "complete" || document.readyState === "interactive") {
+    intervalId = setInterval(checkReady, 300);
+  } else {
+    window.addEventListener("DOMContentLoaded", () => {
+      intervalId = setInterval(checkReady, 300);
+    });
+  }
+
+  // 🪄 Listen for entries update event (auto-refresh after add/edit)
+  window.addEventListener("entriesUpdated", () => {
+    console.log("🔄 Detected entries update, re-rendering stats...");
+    renderExpenseStats();
+  });
 }
+
 
 // 📊 Render expense stats and progress bar
 function renderExpenseStats() {
@@ -3906,6 +3933,30 @@ setDropdownText('#dropdownExport .dropbtn', t.export);
       el.textContent = i === 0 ? "🖨️ " + t.print : "🧾 " + t.exportPDF;
     });
 
+    setText('.section-title', t.addEntryTitle);
+document.getElementById('newDate')?.setAttribute('placeholder', t.selectDate);
+document.getElementById('newDescription')?.setAttribute('placeholder', t.description);
+document.getElementById('newAmount')?.setAttribute('placeholder', t.amount);
+document.getElementById('newPerson')?.setAttribute('placeholder', t.person);
+document.getElementById('newBank')?.setAttribute('placeholder', t.bank);
+document.getElementById('newCategory')?.setAttribute('placeholder', t.category);
+
+const newType = document.getElementById('newType');
+if (newType) {
+  newType.options[0].text = t.income;
+  newType.options[1].text = t.expense;
+  newType.options[2].text = t.transfer;
+}
+
+const newStatus = document.getElementById('newStatus');
+if (newStatus) {
+  newStatus.options[0].text = t.open;
+  newStatus.options[1].text = t.paid;
+}
+
+setText('#entrySubmitBtn', t.addEntry);
+setText('#cancelEditBtn', t.cancel);
+
     // Button label + persist
     langToggle.textContent = `${lang.toUpperCase()} ▾`;
     localStorage.setItem("lang", lang);
@@ -3955,3 +4006,90 @@ setDropdownText('#dropdownExport .dropbtn', t.export);
   else          langToggle.textContent = `${saved.toUpperCase()} ▾`;
   applyTranslations(saved);
 });
+
+
+// ✅ Universal Auto-Refresher for Expense Stats
+// ✅ UNIVERSAL AUTO-REFRESHER for Expense Stats, Charts, and Summaries + Toast Notification
+(function setupAutoExpenseStatsAndChartsRefresher() {
+  let lastHash = "";
+
+  // 🧩 Toast setup (creates it once)
+  function showToast(msg = "Updated ✅") {
+    let toast = document.getElementById("autoRefreshToast");
+    if (!toast) {
+      toast = document.createElement("div");
+      toast.id = "autoRefreshToast";
+      Object.assign(toast.style, {
+        position: "fixed",
+        bottom: "25px",
+        right: "25px",
+        background: "rgba(0,0,0,0.75)",
+        color: "#fff",
+        padding: "10px 18px",
+        borderRadius: "12px",
+        fontSize: "14px",
+        zIndex: 9999,
+        opacity: 0,
+        transition: "opacity 0.3s ease",
+      });
+      document.body.appendChild(toast);
+    }
+    toast.textContent = msg;
+    toast.style.opacity = "1";
+    setTimeout(() => (toast.style.opacity = "0"), 1200);
+  }
+
+  function safeRender(fn, name) {
+    try {
+      if (typeof fn === "function") fn();
+      else console.warn(`⚠️ ${name}() not found`);
+    } catch (err) {
+      console.error(`❌ Error in ${name}():`, err);
+    }
+  }
+
+  function tryRenderAll() {
+    const totalEl = document.getElementById("expenseTotal");
+    const averageEl = document.getElementById("expenseAverage");
+    const inputEl = document.getElementById("dailyLimitInput");
+    const fillEl = document.getElementById("spendingProgressFill");
+    const elementsReady = totalEl && averageEl && inputEl && fillEl;
+    const entriesReady = Array.isArray(window.entries);
+
+    if (!elementsReady || !entriesReady) return;
+
+    safeRender(renderExpenseStats, "renderExpenseStats");
+    safeRender(drawCharts, "drawCharts");
+    safeRender(() => renderMonthlySummary(window.entries), "renderMonthlySummary");
+
+    showToast(); // ✅ visual feedback
+  }
+
+  // 🕒 Run once when DOM is ready
+  if (document.readyState === "complete" || document.readyState === "interactive") {
+    tryRenderAll();
+  } else {
+    window.addEventListener("DOMContentLoaded", tryRenderAll);
+  }
+
+  // 🔁 Poll every 1.5s for entry changes
+  setInterval(() => {
+    if (!Array.isArray(window.entries)) return;
+
+    const total = window.entries.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+    const newHash = `${window.entries.length}_${total.toFixed(2)}`;
+
+    if (newHash !== lastHash) {
+      lastHash = newHash;
+      console.log("🆕 Detected entries change — auto-refreshing...");
+      tryRenderAll();
+    }
+  }, 1500);
+
+  // 🪄 Listen for manual triggers too
+  ["entriesUpdated", "entriesLoadedFromCache", "entriesSyncedFromCloud"].forEach(evt =>
+    window.addEventListener(evt, tryRenderAll)
+  );
+
+  console.log("✅ Auto-Refresher initialized (stats, charts, summary + toast)");
+})();
