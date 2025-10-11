@@ -1,3 +1,5 @@
+
+
 let currentPage = 1;
 const ENTRIES_PER_PAGE = 20;
 let lastRenderedSource = null; // ✅ track last used list
@@ -4009,6 +4011,7 @@ setText('#cancelEditBtn', t.cancel);
 
 
 // ✅ AUTO-UPDATER for Expense Stats, Charts & Summaries
+// ✅ AUTO-UPDATER for Expense Stats, Charts & Summaries
 (function setupAutoExpenseStatsAndChartsRefresher() {
   let lastHash = "";
 
@@ -4027,7 +4030,7 @@ setText('#cancelEditBtn', t.cancel);
     console.log("🔄 Auto-refresh: stats + charts + summary");
     safeRender(renderExpenseStats, "renderExpenseStats");
     safeRender(drawCharts, "drawCharts");
-    safeRender(() => renderMonthlySummary(window.entries), "renderMonthlySummary");
+    safeRender(() => renderMonthlyWidgets(window.entries), "renderMonthlyWidgets");
 
     showToast("✅ Updated");
   }
@@ -4070,3 +4073,5 @@ setText('#cancelEditBtn', t.cancel);
 
   console.log("✅ Auto-Refresher initialized (stats, charts, summary + toast)");
 })();
+
+
