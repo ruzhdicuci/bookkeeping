@@ -258,15 +258,17 @@ async function fetchAndCacheEntries() {
     // ✅ Save fresh entries into Dexie
     await db.entries.bulkPut(entries);
 
-    // ✅ Update window.entries
+    // ✅ Update window.entries (make global)
     window.entries = entries;
+
+    // ✅ Notify the Auto-Refresher that new data arrived
+    window.dispatchEvent(new Event("entriesSyncedFromCloud"));
 
     debug("✅ Synced entries from backend to Dexie:", entries.length);
   } catch (err) {
     console.error("❌ fetchAndCacheEntries failed:", err);
   }
 }
-
 
 async function saveYearlyLimitLocally({ userId, year, limit, startFrom  }) {
   if (!userId || !year) {
