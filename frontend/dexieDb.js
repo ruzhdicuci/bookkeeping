@@ -108,12 +108,21 @@ async function getCachedNotes() {
 async function getCachedEntries() {
   try {
     const all = await db.entries.toArray();
-    return all.sort((a, b) => b.date.localeCompare(a.date));
+
+    // ✅ Sort newest first
+    const sorted = all.sort((a, b) => b.date.localeCompare(a.date));
+
+    // ✅ Make globally available + trigger event
+    window.entries = sorted;
+    window.dispatchEvent(new Event("entriesLoadedFromCache"));
+
+    return sorted;
   } catch (err) {
     console.error("❌ Failed to read cached entries:", err);
     return [];
   }
 }
+
 
 async function getCachedBankBalances() {
   try {
@@ -136,6 +145,7 @@ async function saveAllCustomCards(cards) {
     console.error('❌ Failed to save custom cards:', err);
   }
 }
+
 
 async function getCachedCustomCards() {
   try {
