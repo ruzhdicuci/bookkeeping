@@ -1038,10 +1038,11 @@ async function duplicateEntry(id) {
     renderMonthlyWidgets(window.entries);
     renderBankBalanceForm();
     await renderRealYearlyCards();
-   
+   window.entries = [...window.entries]; // 🔄 trigger auto-refresher
     showToast("✅ Entry duplicated");
   } else {
     alert("❌ Failed to duplicate entry");
+    
   }
 }
 
@@ -1063,6 +1064,7 @@ async function deleteEntry(id) {
   renderBankBalanceForm();         // ✅ Refresh bank balance table
   renderMonthlyWidgets(window.entries); // ✅ Refresh monthly widgets
   await renderRealYearlyCards();
+  window.entries = [...window.entries]; // 🔄 trigger auto-refresher
 }
 
 
