@@ -4008,88 +4008,65 @@ setText('#cancelEditBtn', t.cancel);
 });
 
 
-// ✅ Universal Auto-Refresher for Expense Stats
-// ✅ UNIVERSAL AUTO-REFRESHER for Expense Stats, Charts, and Summaries + Toast Notification
+// ✅ AUTO-UPDATER for Expense Stats, Charts & Summaries
 (function setupAutoExpenseStatsAndChartsRefresher() {
   let lastHash = "";
-
-  // 🧩 Toast setup (creates it once)
-  function showToast(msg = "Updated ✅") {
-    let toast = document.getElementById("autoRefreshToast");
-    if (!toast) {
-      toast = document.createElement("div");
-      toast.id = "autoRefreshToast";
-      Object.assign(toast.style, {
-        position: "fixed",
-        bottom: "25px",
-        right: "25px",
-        background: "rgba(0,0,0,0.75)",
-        color: "#fff",
-        padding: "10px 18px",
-        borderRadius: "12px",
-        fontSize: "14px",
-        zIndex: 9999,
-        opacity: 0,
-        transition: "opacity 0.3s ease",
-      });
-      document.body.appendChild(toast);
-    }
-    toast.textContent = msg;
-    toast.style.opacity = "1";
-    setTimeout(() => (toast.style.opacity = "0"), 1200);
-  }
 
   function safeRender(fn, name) {
     try {
       if (typeof fn === "function") fn();
-      else console.warn(`⚠️ ${name}() not found`);
+      else console.warn(`⚠️ ${name}() not found yet`);
     } catch (err) {
       console.error(`❌ Error in ${name}():`, err);
     }
   }
 
   function tryRenderAll() {
-    const totalEl = document.getElementById("expenseTotal");
-    const averageEl = document.getElementById("expenseAverage");
-    const inputEl = document.getElementById("dailyLimitInput");
-    const fillEl = document.getElementById("spendingProgressFill");
-    const elementsReady = totalEl && averageEl && inputEl && fillEl;
-    const entriesReady = Array.isArray(window.entries);
+    if (!window.entries || !Array.isArray(window.entries)) return;
 
-    if (!elementsReady || !entriesReady) return;
-
+    console.log("🔄 Auto-refresh: stats + charts + summary");
     safeRender(renderExpenseStats, "renderExpenseStats");
     safeRender(drawCharts, "drawCharts");
     safeRender(() => renderMonthlySummary(window.entries), "renderMonthlySummary");
 
-    showToast(); // ✅ visual feedback
+    showToast("✅ Updated");
   }
 
-  // 🕒 Run once when DOM is ready
+  function showToast(text) {
+    let el = document.getElementById("autoToast");
+    if (!el) {
+      el = document.createElement("div");
+      el.id = "autoToast";
+      el.style.cssText =
+        "position:fixed;bottom:20px;right:20px;padding:8px 14px;background:#333;color:#fff;border-radius:8px;font-size:14px;z-index:9999;opacity:0;transition:opacity .3s";
+      document.body.appendChild(el);
+    }
+    el.textContent = text;
+    el.style.opacity = "1";
+    setTimeout(() => (el.style.opacity = "0"), 1200);
+  }
+
   if (document.readyState === "complete" || document.readyState === "interactive") {
     tryRenderAll();
   } else {
     window.addEventListener("DOMContentLoaded", tryRenderAll);
   }
 
-  // 🔁 Poll every 1.5s for entry changes
+  window.addEventListener("entriesLoadedFromCache", tryRenderAll);
+  window.addEventListener("entriesSyncedFromCloud", tryRenderAll);
+
   setInterval(() => {
-    if (!Array.isArray(window.entries)) return;
-
-    const total = window.entries.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
-    const newHash = `${window.entries.length}_${total.toFixed(2)}`;
-
-    if (newHash !== lastHash) {
-      lastHash = newHash;
+    if (!window.entries) return;
+    const hash = `${window.entries.length}_${window.entries.reduce(
+      (sum, e) => sum + (parseFloat(e.amount) || 0),
+      0
+    )}`;
+    if (hash !== lastHash) {
+      lastHash = hash;
       console.log("🆕 Detected entries change — auto-refreshing...");
       tryRenderAll();
     }
   }, 1500);
-
-  // 🪄 Listen for manual triggers too
-  ["entriesUpdated", "entriesLoadedFromCache", "entriesSyncedFromCloud"].forEach(evt =>
-    window.addEventListener(evt, tryRenderAll)
-  );
 
   console.log("✅ Auto-Refresher initialized (stats, charts, summary + toast)");
 })();
