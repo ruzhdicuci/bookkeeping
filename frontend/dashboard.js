@@ -67,8 +67,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   await db.entries.clear();              // 🧹 Clear old cache
   await db.entries.bulkPut(window.entries); // 💾 Save fresh ones
 
-  renderEntries(window.entries);         // ✅ Render fresh ones
- renderMonthlyWidgets(window.entries);
+ tryRenderAll();
 renderBankBalanceForm();     
   await loadInitialBankBalances();
 
@@ -1036,8 +1035,7 @@ async function duplicateEntry(id) {
     // ✅ Update everything
     await fetchEntries();
      window.entries = [...window.entries]; // 🔄 trigger auto-refresher
-    renderEntries(window.entries);
-    renderMonthlyWidgets(window.entries);
+tryRenderAll();
     renderBankBalanceForm();
     await renderRealYearlyCards();
   
@@ -3303,68 +3301,40 @@ document.querySelectorAll('.section-title').forEach(title => {
 
 
 // ✅ Smarter wait-and-render logic for expense stats
-function waitAndRenderExpenseStats(force = false) {
-  const maxRetries = 40; // ~12s (40 x 300ms)
-  let retryCount = 0;
-  let intervalId;
 
-  const checkReady = () => {
+// ✅ Smarter single-run expense stats watcher
+function waitAndRenderExpenseStats(force = false) {
+  if (expenseStatsIntervalRunning && !force) {
+    console.log("⏸️ Expense stats watcher already running, skipping duplicate start");
+    return;
+  }
+  expenseStatsIntervalRunning = true;
+
+  const maxRetries = 40; // ~12s
+  let retryCount = 0;
+  const intervalId = setInterval(() => {
     retryCount++;
 
     const totalEl = document.getElementById('expenseTotal');
     const averageEl = document.getElementById('expenseAverage');
     const inputEl = document.getElementById('dailyLimitInput');
     const fillEl = document.getElementById('spendingProgressFill');
-    const entriesReady = Array.isArray(window.entries); // allow empty array too
+    const entriesReady = Array.isArray(window.entries);
 
     const allReady = totalEl && averageEl && inputEl && fillEl && entriesReady;
 
     if (allReady) {
       clearInterval(intervalId);
+      expenseStatsIntervalRunning = false;
       console.log(`✅ Expense stats ready after ${retryCount} checks`);
       renderExpenseStats();
-      return true;
-    }
-
-    if (retryCount >= maxRetries) {
+    } else if (retryCount >= maxRetries) {
       clearInterval(intervalId);
-      console.warn("⛔ Stopped waiting for DOM/data after timeout", {
-        expenseTotal: !!totalEl,
-        expenseAverage: !!averageEl,
-        dailyLimitInput: !!inputEl,
-        spendingProgressFill: !!fillEl,
-        entriesReady,
-      });
-      return false;
+      expenseStatsIntervalRunning = false;
+      console.warn("⛔ Stopped waiting for DOM/data after timeout");
     }
-
-    return false;
-  };
-
-  // 🧠 If force mode: run immediate check and short retries
-  if (force) {
-    console.log("🔁 Force recheck of expense stats...");
-    retryCount = 0;
-    intervalId = setInterval(checkReady, 300);
-    return;
-  }
-
-  // 🕒 Wait until DOM loaded
-  if (document.readyState === "complete" || document.readyState === "interactive") {
-    intervalId = setInterval(checkReady, 300);
-  } else {
-    window.addEventListener("DOMContentLoaded", () => {
-      intervalId = setInterval(checkReady, 300);
-    });
-  }
-
-  // 🪄 Listen for entries update event (auto-refresh after add/edit)
-  window.addEventListener("entriesUpdated", () => {
-    console.log("🔄 Detected entries update, re-rendering stats...");
-    renderExpenseStats();
-  });
+  }, 300);
 }
-
 
 // 📊 Render expense stats and progress bar
 function renderExpenseStats() {
@@ -3868,7 +3838,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (clearSearchText && globalSearchInput) {
     clearSearchText.addEventListener("click", () => {
       globalSearchInput.value = "";
-      renderEntries(window.entries); // reset list while staying in search mode
+      tryRenderAll();
       globalSearchInput.focus();
     });
   }
@@ -4080,3 +4050,66 @@ setText('#cancelEditBtn', t.cancel);
 })();
 
 
+// ✅ Safe re-render after entries change or edit/delete
+// ✅ Safe re-render after entries change or edit/delete
+let lastRenderTime = 0;
+let renderRetryTimer = null;
+
+function tryRenderAll(retries = 0) {
+  // Prevent parallel retries
+  if (renderRetryTimer) {
+    clearTimeout(renderRetryTimer);
+    renderRetryTimer = null;
+  }
+
+  const now = Date.now();
+  if (now - lastRenderTime < 1500 && retries === 0) {
+    console.warn("⏳ Skipping redundant re-render (cooldown active)");
+    return;
+  }
+  lastRenderTime = now;
+
+  // --- Check readiness ---
+  const entriesReady = Array.isArray(window.entries) && window.entries.length > 0;
+  const entriesFnReady = typeof renderEntries === "function";
+  const monthlyFnReady = typeof renderMonthlyWidgets === "function";
+
+  if (!entriesFnReady || !monthlyFnReady || !entriesReady) {
+    console.warn(`⏳ Waiting for readiness (try #${retries})`, {
+      entriesFnReady,
+      monthlyFnReady,
+      entriesReady,
+    });
+
+    if (retries < 10) {
+      renderRetryTimer = setTimeout(() => {
+        renderRetryTimer = null;
+        tryRenderAll(retries + 1);
+      }, 500);
+    } else {
+      console.error("❌ Failed to render after 10 retries — aborting");
+    }
+    return;
+  }
+
+  // --- Perform render safely ---
+  console.log("✅ Safe render triggered with", window.entries.length, "entries");
+
+  try {
+    renderEntries(window.entries);
+  } catch (err) {
+    console.error("❌ renderEntries() failed:", err);
+  }
+
+  try {
+    renderMonthlyWidgets(window.entries);
+  } catch (err) {
+    console.error("❌ renderMonthlyWidgets() failed:", err);
+  }
+
+  try {
+    if (typeof renderExpenseStats === "function") renderExpenseStats();
+  } catch (err) {
+    console.error("❌ renderExpenseStats() failed:", err);
+  }
+}
